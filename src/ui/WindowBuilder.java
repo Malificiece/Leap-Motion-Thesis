@@ -68,7 +68,7 @@ public class WindowBuilder {
         JLabel lastNameLabel = new JLabel("Last Name:     ");
         JLabel ageLabel = new JLabel("Age:                  ");
         JLabel sexLabel = new JLabel("Sex:                 ");
-        JLabel handednessLabel = new JLabel("I DONT UNDERSTAND WHY IT SAYS THIS ISNT CHAGNED: ");
+        JLabel handednessLabel = new JLabel("Handedness: ");
         
         firstNamePanel.add(firstNameLabel);
         lastNamePanel.add(lastNameLabel);
