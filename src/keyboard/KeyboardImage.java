@@ -13,23 +13,29 @@ import javax.media.opengl.glu.GLU;
 import static javax.media.opengl.GL.*;  // GL constants
 import static javax.media.opengl.GL2.*; // GL2 constants
 
-class KeyboardImage {
-    private final String assets = "./assets/leap/";
-    private final String defaultImageFilename = assets+"keyboard_trans.png";
+class KeyboardImage extends KeyboardRenderable {
+    private static final String RENDER_NAME = "Keyboard Image";
+    private final String ASSETS_PATH = "./assets/";
+    private final String DEFAULT_FILE_PATH = "default/";
+    private final String DEFAULT_FILE_NAME = "keyboard.png";
+    private String fullFilename;
     private ByteBuffer image = null;
     private int height;
     private int width;
     
-    public KeyboardImage(String filename) {
-        loadImage(filename);
+    public KeyboardImage(String fileName, String filePath) {
+        super(RENDER_NAME);
+        fullFilename = ASSETS_PATH;
+        fullFilename += fileName == null ? DEFAULT_FILE_PATH : fileName;
+        fullFilename += filePath == null ? DEFAULT_FILE_NAME : filePath;
+        loadImage(fullFilename);
     }
 
     private void loadImage(String filename) {
         // Load image and get height and width for raster.
         if(filename == null) {
-            filename = defaultImageFilename;
+            filename = fullFilename;
         }
-        
         // Media tracker is necessary to access img data
         Image img = Toolkit.getDefaultToolkit().createImage(filename);
         MediaTracker tracker = new MediaTracker(new Canvas());
@@ -65,28 +71,30 @@ class KeyboardImage {
         g.dispose();
     }
 
-    public void render(GL2 gl) {        
-        // Load image, if necessary.
-        if(image == null) {
-            loadImage(defaultImageFilename);
+    public void render(GL2 gl) {    
+        if(isEnabled()) {
+            // Load image, if necessary.
+            if(image == null) {
+                loadImage(fullFilename);
+            }
+    
+            //gl.glPushAttrib( GL.GL_DEPTH_BUFFER_BIT );
+            //gl.glPushAttrib( GL.GL_COLOR_BUFFER_BIT );
+          
+            //gl.glDisable(GL.GL_DEPTH_TEST);
+    	    
+            // enable alpha mask (import from png sets alpha bits)
+            gl.glEnable (GL.GL_BLEND);
+            gl.glBlendFunc (GL.GL_SRC_ALPHA, GL.GL_ONE_MINUS_SRC_ALPHA);
+    
+            // Draw image as bytes.
+            gl.glRasterPos2i(0, 0); // moves in object space
+            //gl.glWindowPos2i(150, 100); // moves in screen space
+            gl.glPixelZoom( 1.0f, 1.0f ); // x-factor, y-factor
+            gl.glDrawPixels(width, height, GL_RGBA, GL_UNSIGNED_BYTE, image);
+    
+            //gl.glPopAttrib(); 
+            //gl.glPopAttrib();
         }
-
-        //gl.glPushAttrib( GL.GL_DEPTH_BUFFER_BIT );
-        //gl.glPushAttrib( GL.GL_COLOR_BUFFER_BIT );
-      
-        //gl.glDisable(GL.GL_DEPTH_TEST);
-	    
-        // enable alpha mask (import from png sets alpha bits)
-        gl.glEnable (GL.GL_BLEND);
-        gl.glBlendFunc (GL.GL_SRC_ALPHA, GL.GL_ONE_MINUS_SRC_ALPHA);
-
-        // Draw image as bytes.
-        gl.glRasterPos2i(0, 0); // moves in object space
-        //gl.glWindowPos2i(150, 100); // moves in screen space
-        gl.glPixelZoom( 1.0f, 1.0f ); // x-factor, y-factor
-        gl.glDrawPixels(width, height, GL_RGBA, GL_UNSIGNED_BYTE, image);
-
-        //gl.glPopAttrib(); 
-        //gl.glPopAttrib(); 
     }
 }

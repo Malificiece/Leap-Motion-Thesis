@@ -31,7 +31,7 @@ public class VirtualKeyboard {
     private static VirtualKey [] keys;
     
     public static void init(GL2 gl) {
-        keyboardImage = new KeyboardImage(null);
+        keyboardImage = new KeyboardImage(null, null);
         keys = new VirtualKey[NUM_KEYS];
         
         int index = 0;
@@ -77,11 +77,12 @@ public class VirtualKeyboard {
         gl = g;
         gl.glPushMatrix();
         gl.glTranslatef(0.0f, 0.0f, -100.0f);
+        // TODO: Figure out what order is best for drawing. Image on top of colors or colors on top of image etc.
         //drawBackground(); // convert to drawing the leap plane in order to determine if leap plane is correct
+        keyboardImage.render(gl);
         for(int keyIndex = 0; keyIndex < keys.length; keyIndex++) {
             keys[keyIndex].render(gl);
         }
-        keyboardImage.render(gl);
         gl.glPopMatrix();
         
         //gl.glTranslatef(-323.5f, -192.5f, -1000.0f); // figure out what to do here in order to do perspective if we use texture

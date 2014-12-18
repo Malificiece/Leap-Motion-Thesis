@@ -84,6 +84,12 @@ public class ExperimentController extends GraphicsController {
         canvas.addGLEventListener(this);
     }
     
+    @Override
+    public void keyboardEventObserved(char key) {
+        // TODO Auto-generated method stub
+        
+    }
+    
     public void disable() {
         frame.setVisible(false);
     }

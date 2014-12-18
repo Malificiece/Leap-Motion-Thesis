@@ -1,10 +1,10 @@
 package enums;
 
 public enum KeyboardType {
-    DEFAULT(0, "Default"),
-    LEAP(1, "Leap"),
-    TABLET(2, "Tablet"),
-    XBOX(3, "X-box");
+    STANDARD(0, "Standard Keyboard"),
+    LEAP(1, "Leap Keyboard"),
+    TABLET(2, "Tablet Keyboard"),
+    XBOX(3, "X-box Keyboard");
 
     private final int keyboardID;
     private final String keyboardName;

@@ -1,4 +1,12 @@
 package ui;
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
@@ -20,7 +28,9 @@ import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.Timer;
 
+import utilities.MyUtilities;
 import keyboard.VirtualKeyboard;
 
 import com.jogamp.opengl.util.FPSAnimator;
@@ -30,26 +40,94 @@ import com.leapmotion.leap.Vector;
 public class CalibrationController extends GraphicsController {
     private JFrame frame;
     private JLabel typed;
+    private JPanel typedPanel;
     private JComboBox<String> keyboardType;
     private JButton calibrate;
     private JPanel settings;
     private JPanel renderOptions;
+    private Timer clearTextTimer;
+    private Timer typedFocusTimer;
     
     public CalibrationController() {
         canvas = new GLCanvas(capabilities);
         frame = new JFrame("Calibration");
         typed = new JLabel();
+        typedPanel = new JPanel();
         keyboardType = new JComboBox<String>();
         calibrate = new JButton("Calibrate");
         settings = new JPanel();
         renderOptions = new JPanel();
         
-        JPanel panels[] = {settings, renderOptions};
+        JPanel panels[] = {settings, renderOptions, typedPanel};
         
         // Window builder builds window using important fields here. It adds unimportant fields that we won't use for aesthetics only.
         WindowBuilder.buildCalibrationWindow(frame, canvas, typed, keyboardType, calibrate, panels);
-        
+        canvas.setFocusable(false);
+        typedPanel.setFocusable(true);
+        typedPanel.requestFocusInWindow();
         //frame.setVisible(true);
+        
+        clearTextTimer = new Timer(1000, new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent arg0) {
+                typed.setText("");
+            }
+        });
+        clearTextTimer.start();
+        
+        typedFocusTimer = new Timer(3000, new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent arg0) {
+                typedPanel.requestFocusInWindow();
+            }
+        });
+        
+        typedPanel.addFocusListener(new FocusListener() {
+
+            @Override
+            public void focusGained(FocusEvent arg0) {
+                typedFocusTimer.stop();
+                clearTextTimer.start();
+                typed.setText(typed.getText().replaceFirst("FOCUS LOST", ""));
+                typed.setForeground(Color.DARK_GRAY);
+            }
+
+            @Override
+            public void focusLost(FocusEvent arg0) {
+                typedFocusTimer.start();
+                clearTextTimer.stop();
+                typed.setText("FOCUS LOST");
+                typed.setForeground(Color.RED);
+                MyUtilities.calculateFontSize(typed.getText(), typed, typedPanel);
+            }
+            
+        });
+        
+        /*
+        typedPanel.addKeyListener(new KeyListener() {
+
+            @Override
+            public void keyPressed(KeyEvent e) {
+                // TODO Auto-generated method stub
+            }
+
+            @Override
+            public void keyReleased(KeyEvent e) {
+                // TODO Auto-generated method stub 
+            }
+
+            @Override
+            public void keyTyped(KeyEvent e) {
+                clearTextTimer.restart();
+                typed.setText(typed.getText()+Character.toString(e.getKeyChar()));
+                MyUtilities.calculateFontSize(typed.getText(), typed, typedPanel);
+            }
+            
+        });*/
+        
+        
+        
+        // TODO: Change to size of currently selected keyboard.
         
         // by default, an AWT Frame doesn't do anything when you click
         // the close button; this bit of code will terminate the program when
@@ -68,9 +146,12 @@ public class CalibrationController extends GraphicsController {
         dir = new Vector();
     }
     
-    public void update(Vector position, Vector direction) {
-       pos = position;
-       dir = direction;
+    @Override
+    public void keyboardEventObserved(char key) {
+        // TODO: Add full implementation required for detailed analysis of key presses
+        clearTextTimer.restart();
+        typed.setText(typed.getText()+Character.toString(key));
+        MyUtilities.calculateFontSize(typed.getText(), typed, typedPanel);
     }
     
     public void disable() {
@@ -79,6 +160,12 @@ public class CalibrationController extends GraphicsController {
     
     public void enable() {
         frame.setVisible(true);
+        typedPanel.requestFocusInWindow();
+    }
+    
+    public void update(Vector position, Vector direction) {
+        pos = position;
+        dir = direction;
     }
     
     public void render(GLAutoDrawable drawable) {

@@ -9,6 +9,7 @@ import javax.media.opengl.awt.GLCanvas;
 import javax.media.opengl.awt.GLJPanel;
 import javax.media.opengl.glu.GLU;
 
+import keyboard.KeyboardObserver;
 import keyboard.VirtualKeyboard;
 import static javax.media.opengl.GL.*;  // GL constants
 import static javax.media.opengl.GL2.*; // GL2 constants
@@ -16,7 +17,7 @@ import static javax.media.opengl.GL2.*; // GL2 constants
 import com.leapmotion.leap.Vector;
 
 
-public abstract class GraphicsController implements GLEventListener {
+public abstract class GraphicsController implements GLEventListener, KeyboardObserver {
 	private static GLProfile profile;
 	protected static GLCapabilities capabilities;
 	protected GLCanvas canvas;

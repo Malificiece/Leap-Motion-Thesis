@@ -15,6 +15,7 @@ import javax.media.opengl.awt.GLCanvas;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
+import javax.swing.GroupLayout.Alignment;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
@@ -169,7 +170,7 @@ public class WindowBuilder {
             JLabel typedLabel,
             JComboBox<String> keyboardTypeComboBox,
             JButton calibrateButton,
-            JPanel[] panels) { // settings, render options
+            JPanel[] panels) { // settings, render options, typedPanel
         
         JPanel background = new JPanel();
         background.setLayout(new BoxLayout(background, BoxLayout.X_AXIS));
@@ -187,15 +188,14 @@ public class WindowBuilder {
         leftPanelSetBackground.add(previewBackground);
         
         // Build typing preview.
-        JPanel typedPanel = new JPanel();
-        typedPanel.setBackground(Color.WHITE);
-        typedPanel.setLayout(new GridBagLayout());
-        typedPanel.setBorder(BorderFactory.createEtchedBorder());
-        typedPanel.setPreferredSize(new Dimension(VirtualKeyboard.WIDTH, 100));
-        previewBackground.add(typedPanel);
+        panels[2].setBackground(Color.WHITE);
+        panels[2].setLayout(new GridBagLayout());
+        panels[2].setBorder(BorderFactory.createEtchedBorder());
+        panels[2].setPreferredSize(new Dimension(VirtualKeyboard.WIDTH, 100));
+        previewBackground.add(panels[2]);
         
         // Add our modded label.
-        typedPanel.add(typedLabel);
+        panels[2].add(typedLabel);
         
         // Build canvas preview.
         canvas.setPreferredSize(new Dimension(VirtualKeyboard.WIDTH + 20, VirtualKeyboard.HEIGHT + 20));
@@ -205,6 +205,7 @@ public class WindowBuilder {
         JPanel rightPanelSet = new JPanel();
         rightPanelSet.setLayout(new BoxLayout(rightPanelSet, BoxLayout.Y_AXIS));
         rightPanelSet.setBorder(BorderFactory.createEmptyBorder(10, 0, 10, 10));
+        rightPanelSet.setPreferredSize(new Dimension(350, previewBackground.getHeight()));
         background.add(rightPanelSet);
         
         // Add our three info panels (keyboard select, settings, render options) to the right side.
@@ -212,7 +213,6 @@ public class WindowBuilder {
         JPanel keyboardTypePanel = new JPanel();
         keyboardTypePanel.setLayout(new BoxLayout(keyboardTypePanel, BoxLayout.Y_AXIS));
         keyboardTypePanel.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createTitledBorder("Keyboard Type"), BorderFactory.createEmptyBorder(5, 10, 10, 10)));
-        //keyboardTypePanel.setPreferredSize(new Dimension(250, 0));
         rightPanelSet.add(keyboardTypePanel);
         
         // keyboard combo box
@@ -223,13 +223,24 @@ public class WindowBuilder {
         keyboardTypeComboBox.setMaximumSize(new Dimension(keyboardTypeComboBox.getMaximumSize().width, keyboardTypeComboBox.getMinimumSize().height));
         keyboardTypePanel.add(keyboardTypeComboBox);
         
+        JPanel padding0 = new JPanel();
+        keyboardTypePanel.add(padding0);
+        
         // calibration button (grey out for all but leap) -- calibrates the leap plane
         keyboardTypePanel.add(calibrateButton);
+        calibrateButton.setVerticalAlignment(0);
         
         // 2 - Render Options
         JPanel renderOptionsPanel = new JPanel();
         renderOptionsPanel.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createTitledBorder("Render Options"), BorderFactory.createEmptyBorder(5, 10, 10, 10)));
         rightPanelSet.add(renderOptionsPanel);
+        
+        renderOptionsPanel.add(panels[1]);
+        panels[1].setLayout(new BoxLayout(panels[1], BoxLayout.Y_AXIS));
+        
+        JScrollPane renderScrollBar = new JScrollPane(panels[1], JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        renderScrollBar.setPreferredSize(new Dimension(rightPanelSet.getPreferredSize().width-50, previewBackground.getPreferredSize().height/3));
+        renderOptionsPanel.add(renderScrollBar);
         
         // 3 - Settings
         JPanel settingsPanelMain = new JPanel();
@@ -239,96 +250,13 @@ public class WindowBuilder {
         settingsPanelMain.add(panels[0]);
         panels[0].setLayout(new BoxLayout(panels[0], BoxLayout.Y_AXIS));
         
-        JPanel testPan = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        testPan.add(new JLabel("Test: "));
-        testPan.add(new JTextField());
-        
-        panels[0].add(testPan);
-        panels[0].add(new JLabel("TEST"));
-        panels[0].add(new JLabel("TEST"));
-        panels[0].add(new JLabel("TEST"));       
-        panels[0].add(new JLabel("TEST lots of words to see what happens we need it to pack really"));
-        panels[0].add(new JLabel("TEST"));
-        panels[0].add(new JLabel("TEST"));
-        panels[0].add(new JLabel("TEST"));
-        panels[0].add(new JLabel("TEST"));
-        panels[0].add(new JLabel("TEST"));
-        panels[0].add(new JLabel("TEST"));
-        panels[0].add(new JLabel("TEST"));
-        panels[0].add(new JLabel("TEST"));
-        panels[0].add(new JLabel("TEST"));
-        panels[0].add(new JLabel("TEST"));
-        panels[0].add(new JLabel("TEST"));
-        panels[0].add(new JLabel("TEST"));
-        panels[0].add(new JLabel("TEST"));
-        panels[0].add(new JLabel("TEST"));
-        panels[0].add(new JLabel("TEST"));
-        panels[0].add(new JLabel("TEST"));
-        panels[0].add(new JLabel("TEST"));
-        panels[0].add(new JLabel("TEST"));
-        panels[0].add(new JLabel("TEST"));
-        panels[0].add(new JLabel("TEST"));
-        panels[0].add(new JLabel("TEST"));
-        panels[0].add(new JLabel("TEST"));
-        panels[0].add(new JLabel("TEST"));
-        panels[0].add(new JLabel("TEST"));
-        panels[0].add(new JLabel("TEST"));
-        panels[0].add(new JLabel("TEST"));
-        panels[0].add(new JLabel("TEST"));
-        panels[0].add(new JLabel("TEST"));
-        panels[0].add(new JLabel("TEST"));
-        panels[0].add(new JLabel("TEST"));
-        panels[0].add(new JLabel("TEST"));
-        panels[0].add(new JLabel("TEST"));
-        panels[0].add(new JLabel("TEST"));
-        panels[0].add(new JLabel("TEST"));
-        panels[0].add(new JLabel("TEST"));
-        panels[0].add(new JLabel("TEST"));
-        panels[0].add(new JLabel("TEST"));
-        panels[0].add(new JLabel("TEST"));
-        panels[0].add(new JLabel("TEST"));
-        panels[0].add(new JLabel("TEST"));
-        panels[0].add(new JLabel("TEST"));
-        panels[0].add(new JLabel("TEST"));
-        panels[0].add(new JLabel("TEST"));
-        panels[0].add(new JLabel("TEST"));
-        panels[0].add(new JLabel("TEST"));
-        panels[0].add(new JLabel("TEST"));
-        panels[0].add(new JLabel("TEST"));
-        panels[0].add(new JLabel("TEST"));
-        panels[0].add(new JLabel("TEST"));
-        
-        
-        JScrollPane scrollBar = new JScrollPane(panels[0], JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-        scrollBar.setPreferredSize(new Dimension(settingsPanelMain.getPreferredSize().width, 200));
-        settingsPanelMain.add(scrollBar);
-        
-        // TODO: Change to size of currently selected keyboard.
-
-        // This is just the code to change font size. Can put this in a location to set dynamically (need to worry about 'typed' parent panel to determine size).
-        /*
-        Font labelFont = typed.getFont();
-        String labelText = typed.getText();
-
-        int stringWidth = typed.getFontMetrics(labelFont).stringWidth(labelText);
-        int componentWidth = frame.getWidth();
-
-        // Find out how much the font can grow in width.
-        double widthRatio = (double)componentWidth / (double)stringWidth;
-
-        int newFontSize = (int)(labelFont.getSize() * widthRatio);
-        int componentHeight = frame.getHeight();
-
-        // Pick a new font size so it will not be larger than the height of label.
-        int fontSizeToUse = Math.min(newFontSize, componentHeight);
-
-        // Set the label's font size to the newly determined size.
-        typed.setFont(new Font(labelFont.getName(), Font.PLAIN, fontSizeToUse));
-        */
+        JScrollPane settingsScrollBar = new JScrollPane(panels[0], JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        settingsScrollBar.setPreferredSize(new Dimension(rightPanelSet.getPreferredSize().width-50, previewBackground.getPreferredSize().height/3));
+        settingsPanelMain.add(settingsScrollBar);
         
         // Arrange the components inside the window
         frame.pack();
-        //frame.setResizable(false);
+        frame.setResizable(false);
         
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
         Dimension windowSize = frame.getSize();
