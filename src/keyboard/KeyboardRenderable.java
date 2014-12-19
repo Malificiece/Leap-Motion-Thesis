@@ -22,5 +22,9 @@ public abstract class KeyboardRenderable {
         return enabled;
     }
     
+    public String getName() {
+        return name;
+    }
+    
     public abstract void render(GL2 gl);
 }

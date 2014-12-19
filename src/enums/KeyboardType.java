@@ -35,4 +35,11 @@ public enum KeyboardType {
         }
         return null;
     }
+    
+    public static KeyboardType getByName(String keyboardName) {
+        for(int i = 0; i < SIZE; i++) {
+            if(VALUES[i].getKeyboardName().equalsIgnoreCase(keyboardName)) return VALUES[i];
+        }
+        return null;
+    }
 }

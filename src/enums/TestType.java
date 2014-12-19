@@ -6,11 +6,11 @@ public enum TestType {
     LEAP_S_L(3, "Small leap keyboard - left-handed", 'l'),
     LEAP_L_R(4, "Large leap keyboard - right-handed", 'r'),
     LEAP_L_L(5, "Large leap keyboard - left-handed", 'l'),
-    TABLET_R(5, "Tablet keyboard - right-handed", 'r'),
-    TABLET_L(5, "Tablet keyboard - left-handed", 'l'),
-    XBOX_R(5, "X-box keyboard - right-handed", 'r'),
-    XBOX_L(5, "X-box keyboard - left-handed", 'l'),
-    VOICE(5, "Voice input", 'n');
+    TABLET_R(6, "Tablet keyboard - right-handed", 'r'),
+    TABLET_L(7, "Tablet keyboard - left-handed", 'l'),
+    XBOX_R(8, "X-box keyboard - right-handed", 'r'),
+    XBOX_L(9, "X-box keyboard - left-handed", 'l'),
+    VOICE(10, "Voice input", 'n');
 
     private final int testID;
     private final String testName;
@@ -44,6 +44,13 @@ public enum TestType {
     public static TestType getByID(int testID) {
         if(testID >= 0 && testID < SIZE) {
             return VALUES[testID];
+        }
+        return null;
+    }
+    
+    public static TestType getByName(String testName) {
+        for(int i = 0; i < SIZE; i++) {
+            if(VALUES[i].getTestName().equalsIgnoreCase(testName)) return VALUES[i];
         }
         return null;
     }

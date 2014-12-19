@@ -191,14 +191,14 @@ public class WindowBuilder {
         panels[2].setBackground(Color.WHITE);
         panels[2].setLayout(new GridBagLayout());
         panels[2].setBorder(BorderFactory.createEtchedBorder());
-        panels[2].setPreferredSize(new Dimension(VirtualKeyboard.WIDTH, 100));
+        panels[2].setPreferredSize(new Dimension(752, 100));
         previewBackground.add(panels[2]);
         
         // Add our modded label.
         panels[2].add(typedLabel);
         
         // Build canvas preview.
-        canvas.setPreferredSize(new Dimension(VirtualKeyboard.WIDTH + 20, VirtualKeyboard.HEIGHT + 20));
+        canvas.setPreferredSize(new Dimension(752 + 20, 298 + 20));
         previewBackground.add(canvas);
         
         // Right panel (type selection, settings, and render options).

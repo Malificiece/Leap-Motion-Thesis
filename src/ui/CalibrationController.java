@@ -36,6 +36,8 @@ import keyboard.VirtualKeyboard;
 import com.jogamp.opengl.util.FPSAnimator;
 import com.leapmotion.leap.Vector;
 
+import enums.TestType;
+
 
 public class CalibrationController extends GraphicsController {
     private JFrame frame;
@@ -69,7 +71,7 @@ public class CalibrationController extends GraphicsController {
         
         clearTextTimer = new Timer(1000, new ActionListener() {
             @Override
-            public void actionPerformed(ActionEvent arg0) {
+            public void actionPerformed(ActionEvent e) {
                 typed.setText("");
             }
         });
@@ -77,7 +79,7 @@ public class CalibrationController extends GraphicsController {
         
         typedFocusTimer = new Timer(3000, new ActionListener() {
             @Override
-            public void actionPerformed(ActionEvent arg0) {
+            public void actionPerformed(ActionEvent e) {
                 typedPanel.requestFocusInWindow();
             }
         });
@@ -85,7 +87,7 @@ public class CalibrationController extends GraphicsController {
         typedPanel.addFocusListener(new FocusListener() {
 
             @Override
-            public void focusGained(FocusEvent arg0) {
+            public void focusGained(FocusEvent e) {
                 typedFocusTimer.stop();
                 clearTextTimer.start();
                 typed.setText(typed.getText().replaceFirst("FOCUS LOST", ""));
@@ -93,7 +95,7 @@ public class CalibrationController extends GraphicsController {
             }
 
             @Override
-            public void focusLost(FocusEvent arg0) {
+            public void focusLost(FocusEvent e) {
                 typedFocusTimer.start();
                 clearTextTimer.stop();
                 typed.setText("FOCUS LOST");
@@ -179,7 +181,7 @@ public class CalibrationController extends GraphicsController {
        // Setup ortho projection, with aspect ratio matches viewport
        gl.glMatrixMode(GL_PROJECTION);
        gl.glLoadIdentity();
-       gl.glOrtho(0, 647, 0, 385, 0.1, 1000);
+       gl.glOrtho(0, keyboard.getWidth(), 0, keyboard.getHeight(), 0.1, 1000);
   
        // Enable the model-view transform
        gl.glMatrixMode(GL_MODELVIEW);
@@ -189,7 +191,7 @@ public class CalibrationController extends GraphicsController {
        // this consists of drawing a box for the whole keyboard to calibrated scale
        // cover this box in the texture
        // draw boxes over all keys to the calibrated scale to detect 3D key presses by leap pos
-       VirtualKeyboard.render(gl, pos);
+       keyboard.render();
        
        // Setup ortho projection, with aspect ratio matches viewport
        gl.glMatrixMode(GL_PROJECTION);

@@ -9,8 +9,10 @@ import javax.media.opengl.awt.GLCanvas;
 import javax.media.opengl.awt.GLJPanel;
 import javax.media.opengl.glu.GLU;
 
+import keyboard.IKeyboard;
 import keyboard.KeyboardObserver;
 import keyboard.VirtualKeyboard;
+import keyboard.standard.StandardKeyboard;
 import static javax.media.opengl.GL.*;  // GL constants
 import static javax.media.opengl.GL2.*; // GL2 constants
 
@@ -24,6 +26,7 @@ public abstract class GraphicsController implements GLEventListener, KeyboardObs
 	protected GLU glu;  // for the GL Utility
 	protected Vector pos;
 	protected Vector dir;
+	protected IKeyboard keyboard;
 	
 	public static void init() {
 	    GLProfile.initSingleton();
@@ -55,7 +58,8 @@ public abstract class GraphicsController implements GLEventListener, KeyboardObs
         GL2 gl = drawable.getGL().getGL2();      // get the OpenGL graphics context
         glu = new GLU();                         // get GL Utilities
         // TODO: Remove this initialization. Change keyboards from singleton to instance. Move keyboard creation to somewhere that makes sense (keyboard selection in calib/run buttons).
-        VirtualKeyboard.init(gl);
+        keyboard = new StandardKeyboard(gl, pos);
+        keyboard.registerObserver(this);
         gl.glClearColor(0.2f, 0.2f, 0.2f, 0.0f); // set background (clear) color
         gl.glClearDepth(1.0f);      // set clear depth value to farthest
         gl.glEnable(GL_DEPTH_TEST); // enables depth testing
@@ -74,12 +78,12 @@ public abstract class GraphicsController implements GLEventListener, KeyboardObs
         if (height == 0) height = 1;   // prevent divide by zero
    
         // Set the view port (display area) to cover the entire window
-        gl.glViewport((width/2 - 647/2), (height/2 - 385/2), 647, 385);
+        gl.glViewport((width/2 - keyboard.getWidth()/2), (height/2 - keyboard.getHeight()/2), keyboard.getWidth(), keyboard.getHeight());
    
         // Setup ortho projection, with aspect ratio matches viewport
         gl.glMatrixMode(GL_PROJECTION);
         gl.glLoadIdentity();
-        gl.glOrtho(0, 647, 0, 385, 0.1, 1000);
+        gl.glOrtho(0, keyboard.getWidth(), 0, keyboard.getHeight(), 0.1, 1000);
    
         // Enable the model-view transform
         gl.glMatrixMode(GL_MODELVIEW);

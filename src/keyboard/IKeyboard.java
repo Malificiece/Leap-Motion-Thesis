@@ -11,14 +11,22 @@ public abstract class IKeyboard {
     // 4 - get/set the renderables of the keyboard (image, key colors, leap plane etc)
     // 5 - give it key pressed events (to render them properly) --- and record specialized data for the specific type of keyboard
     // 6 - must be capable of creating it's own keyboard events using the robot if not the default (This will require a self sustaining update function possibly)
-    // 7 - 
     private ArrayList<KeyboardObserver> observers = new ArrayList<KeyboardObserver>();
-    private ArrayList<KeyboardSetting> keyboardSettings = new ArrayList<KeyboardSetting>();
-    private ArrayList<KeyboardAttribute> keyboardAttributes = new ArrayList<KeyboardAttribute>();
-    private ArrayList<KeyboardRenderable> keyboardRenderables = new ArrayList<KeyboardRenderable>();
+    protected ArrayList<KeyboardSetting> keyboardSettings = new ArrayList<KeyboardSetting>();
+    protected ArrayList<KeyboardAttribute> keyboardAttributes = new ArrayList<KeyboardAttribute>();
+    protected ArrayList<KeyboardRenderable> keyboardRenderables = new ArrayList<KeyboardRenderable>();
+    protected int width;
+    protected int height;
     
     public abstract void render();
     public abstract void update();
+    
+    public int getHeight() {
+        return height;
+    }
+    public int getWidth() {
+        return width;
+    }
     
     public ArrayList<KeyboardSetting> getAllSettings() {
         return keyboardSettings;
@@ -26,12 +34,19 @@ public abstract class IKeyboard {
     public ArrayList<KeyboardAttribute> getAllAttributes() {
         return keyboardAttributes;
     }
-    public  ArrayList<KeyboardRenderable> getAllRenderables() {
+    public ArrayList<KeyboardRenderable> getAllRenderables() {
         return keyboardRenderables;
     }
     
     public void registerObserver(KeyboardObserver observer) {
+        if(observers.contains(observer)) {
+            return;
+        }
         observers.add(observer);
+    }
+    
+    public void removeObserver(KeyboardObserver observer) {
+        observers.remove(observer);
     }
 
     protected void notifyListeners() {

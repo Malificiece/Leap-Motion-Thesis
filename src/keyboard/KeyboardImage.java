@@ -13,10 +13,10 @@ import javax.media.opengl.glu.GLU;
 import static javax.media.opengl.GL.*;  // GL constants
 import static javax.media.opengl.GL2.*; // GL2 constants
 
-class KeyboardImage extends KeyboardRenderable {
+public class KeyboardImage extends KeyboardRenderable {
     private static final String RENDER_NAME = "Keyboard Image";
     private final String ASSETS_PATH = "./assets/";
-    private final String DEFAULT_FILE_PATH = "default/";
+    private final String DEFAULT_FILE_PATH = "standard/";
     private final String DEFAULT_FILE_NAME = "keyboard.png";
     private String fullFilename;
     private ByteBuffer image = null;
@@ -26,8 +26,8 @@ class KeyboardImage extends KeyboardRenderable {
     public KeyboardImage(String fileName, String filePath) {
         super(RENDER_NAME);
         fullFilename = ASSETS_PATH;
-        fullFilename += fileName == null ? DEFAULT_FILE_PATH : fileName;
-        fullFilename += filePath == null ? DEFAULT_FILE_NAME : filePath;
+        fullFilename += filePath == null ? DEFAULT_FILE_PATH : filePath;
+        fullFilename += fileName == null ? DEFAULT_FILE_NAME : fileName;
         loadImage(fullFilename);
     }
 
