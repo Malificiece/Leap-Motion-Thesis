@@ -26,8 +26,7 @@ public class LeapKeyboard extends VirtualKeyboard {
     private static KeyboardImage  keyboardImage;
     private static VirtualKey [] keys;
     
-    public LeapKeyboard(GL2 gl, Vector leapPos) { // TODO: Why is leapPos here (was originally in render)..not used yet
-        this.gl = gl;
+    public LeapKeyboard() { // TODO: Why is leapPos here (was originally in render)..not used yet
         keyboardImage = new KeyboardImage("keyboard.png", "leap/");
         width = WIDTH;
         height = HEIGHT;
@@ -42,7 +41,7 @@ public class LeapKeyboard extends VirtualKeyboard {
     }
     
     @Override
-    public void render() {
+    public void render(GL2 gl) {
         gl.glPushMatrix();
         gl.glTranslatef(0.0f, 0.0f, -100.0f);
         // TODO: Figure out what order is best for drawing. Image on top of colors or colors on top of image etc.
@@ -55,11 +54,13 @@ public class LeapKeyboard extends VirtualKeyboard {
         
         //gl.glTranslatef(-323.5f, -192.5f, -1000.0f); // figure out what to do here in order to do perspective if we use texture
         //gl.GL_TEXTURE_RECTANGLE_ARB --- use this for exact texturing if imaging attempt fails.
+        key = 'l';
+        notifyListeners();
     }
     
     private void drawBackground() {
-        gl.glColor4f(0.5f, 0.5f, 0.5f, 0.5f);
-        gl.glRecti(0, 0, WIDTH, HEIGHT);
+        //gl.glColor4f(0.5f, 0.5f, 0.5f, 0.5f);
+        //gl.glRecti(0, 0, WIDTH, HEIGHT);
         
         
         /*// Use this for leap plane

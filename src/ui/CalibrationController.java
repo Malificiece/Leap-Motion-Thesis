@@ -1,5 +1,6 @@
 package ui;
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -23,56 +24,97 @@ import static javax.media.opengl.GL2.*; // GL2 constants
 import static javax.media.opengl.fixedfunc.GLMatrixFunc.GL_MODELVIEW;
 import static javax.media.opengl.fixedfunc.GLMatrixFunc.GL_PROJECTION;
 
+import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.Timer;
 
 import utilities.MyUtilities;
 import keyboard.VirtualKeyboard;
+import keyboard.standard.StandardKeyboard;
 
 import com.jogamp.opengl.util.FPSAnimator;
 import com.leapmotion.leap.Vector;
 
+import enums.KeyboardType;
 import enums.TestType;
 
 
 public class CalibrationController extends GraphicsController {
     private JFrame frame;
-    private JLabel typed;
+    private JLabel typedLabel;
     private JPanel typedPanel;
-    private JComboBox<String> keyboardType;
-    private JButton calibrate;
-    private JPanel settings;
-    private JPanel renderOptions;
+    private JComboBox<String> keyboardTypeComboBox;
+    private JButton calibrateButton;
+    private JPanel settingsPanel;
+    private JPanel renderOptionsPanel;
     private Timer clearTextTimer;
     private Timer typedFocusTimer;
     
     public CalibrationController() {
+        keyboard = KeyboardType.STANDARD.getKeyboard();
         canvas = new GLCanvas(capabilities);
+        canvas.setPreferredSize(new Dimension(keyboard.getWidth(), keyboard.getHeight()));
+        canvas.setSize(keyboard.getWidth(), keyboard.getHeight());
         frame = new JFrame("Calibration");
-        typed = new JLabel();
+        typedLabel = new JLabel();
         typedPanel = new JPanel();
-        keyboardType = new JComboBox<String>();
-        calibrate = new JButton("Calibrate");
-        settings = new JPanel();
-        renderOptions = new JPanel();
+        keyboardTypeComboBox = new JComboBox<String>();
+        calibrateButton = new JButton("Calibrate");
+        settingsPanel = new JPanel();
+        renderOptionsPanel = new JPanel();
         
-        JPanel panels[] = {settings, renderOptions, typedPanel};
-        
+        JPanel panels[] = {typedPanel, settingsPanel, renderOptionsPanel};
+
         // Window builder builds window using important fields here. It adds unimportant fields that we won't use for aesthetics only.
-        WindowBuilder.buildCalibrationWindow(frame, canvas, typed, keyboardType, calibrate, panels);
+        WindowBuilder.buildCalibrationWindow(frame, canvas, typedLabel, keyboardTypeComboBox, calibrateButton, panels);
         canvas.setFocusable(false);
         typedPanel.setFocusable(true);
         typedPanel.requestFocusInWindow();
         //frame.setVisible(true);
         
+        calibrateButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if(keyboard == KeyboardType.LEAP.getKeyboard()) {
+                    // START CALIBRATION EVENT
+                    // PUT TEXT WHERE LABEL IS
+                }
+                typedPanel.requestFocusInWindow();
+            }
+        });
+        
+        keyboardTypeComboBox.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                JComboBox comboBox = (JComboBox)e.getSource();
+                int selectedIndex = comboBox.getSelectedIndex();
+                if(keyboard != KeyboardType.getByID(selectedIndex).getKeyboard()) {
+                    if(KeyboardType.LEAP == KeyboardType.getByID(selectedIndex)) {
+                        calibrateButton.setEnabled(true);
+                    } else {
+                        calibrateButton.setEnabled(false);
+                    }
+                    // REMOVE EVERYTHING FROM PEVIOUS KEYBOARD
+                    
+                    // ADD EVERYTHING FROM NEW KEYBOARD
+                    keyboard = KeyboardType.getByID(selectedIndex).getKeyboard();
+                    canvas.setPreferredSize(new Dimension(keyboard.getWidth(), keyboard.getHeight()));
+                    canvas.setSize(keyboard.getWidth(), keyboard.getHeight());
+                    frame.pack();
+                }
+                typedPanel.requestFocusInWindow();
+            }
+        });
+        
         clearTextTimer = new Timer(1000, new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                typed.setText("");
+                typedLabel.setText("");
             }
         });
         clearTextTimer.start();
@@ -90,17 +132,17 @@ public class CalibrationController extends GraphicsController {
             public void focusGained(FocusEvent e) {
                 typedFocusTimer.stop();
                 clearTextTimer.start();
-                typed.setText(typed.getText().replaceFirst("FOCUS LOST", ""));
-                typed.setForeground(Color.DARK_GRAY);
+                typedLabel.setText(typedLabel.getText().replaceFirst("FOCUS LOST", ""));
+                typedLabel.setForeground(Color.DARK_GRAY);
             }
 
             @Override
             public void focusLost(FocusEvent e) {
                 typedFocusTimer.start();
                 clearTextTimer.stop();
-                typed.setText("FOCUS LOST");
-                typed.setForeground(Color.RED);
-                MyUtilities.calculateFontSize(typed.getText(), typed, typedPanel);
+                typedLabel.setText("FOCUS LOST");
+                typedLabel.setForeground(Color.RED);
+                MyUtilities.calculateFontSize(typedLabel.getText(), typedLabel, typedPanel);
             }
             
         });
@@ -121,8 +163,8 @@ public class CalibrationController extends GraphicsController {
             @Override
             public void keyTyped(KeyEvent e) {
                 clearTextTimer.restart();
-                typed.setText(typed.getText()+Character.toString(e.getKeyChar()));
-                MyUtilities.calculateFontSize(typed.getText(), typed, typedPanel);
+                typedLabel.setText(typedLabel.getText()+Character.toString(e.getKeyChar()));
+                MyUtilities.calculateFontSize(typedLabel.getText(), typedLabel, typedPanel);
             }
             
         });*/
@@ -151,9 +193,9 @@ public class CalibrationController extends GraphicsController {
     @Override
     public void keyboardEventObserved(char key) {
         // TODO: Add full implementation required for detailed analysis of key presses
-        clearTextTimer.restart();
-        typed.setText(typed.getText()+Character.toString(key));
-        MyUtilities.calculateFontSize(typed.getText(), typed, typedPanel);
+        //clearTextTimer.restart();
+        //typed.setText(typed.getText()+Character.toString(key));
+        //MyUtilities.calculateFontSize(typed.getText(), typed, typedPanel);
     }
     
     public void disable() {
@@ -175,7 +217,7 @@ public class CalibrationController extends GraphicsController {
         // Only thing that might be appropriate to do here is set the perspectives
         // but even these can be pushed further down into the keyboard.
         
-       GL2 gl = drawable.getGL().getGL2();
+       //GL2 gl = drawable.getGL().getGL2();
        gl.glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
        
        // Setup ortho projection, with aspect ratio matches viewport
@@ -191,7 +233,7 @@ public class CalibrationController extends GraphicsController {
        // this consists of drawing a box for the whole keyboard to calibrated scale
        // cover this box in the texture
        // draw boxes over all keys to the calibrated scale to detect 3D key presses by leap pos
-       keyboard.render();
+       keyboard.render(gl);
        
        // Setup ortho projection, with aspect ratio matches viewport
        gl.glMatrixMode(GL_PROJECTION);

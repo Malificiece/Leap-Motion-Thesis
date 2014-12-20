@@ -2,11 +2,13 @@
 package ui;
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.GridBagLayout;
+import java.awt.GridLayout;
 import java.awt.Toolkit;
 import java.awt.event.AdjustmentEvent;
 import java.awt.event.AdjustmentListener;
@@ -30,6 +32,7 @@ import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 
 import keyboard.VirtualKeyboard;
+import keyboard.standard.StandardKeyboard;
 import enums.*;
 
 public class WindowBuilder {
@@ -170,7 +173,7 @@ public class WindowBuilder {
             JLabel typedLabel,
             JComboBox<String> keyboardTypeComboBox,
             JButton calibrateButton,
-            JPanel[] panels) { // settings, render options, typedPanel
+            JPanel[] panels) { // typed, settings, render options
         
         JPanel background = new JPanel();
         background.setLayout(new BoxLayout(background, BoxLayout.X_AXIS));
@@ -188,24 +191,26 @@ public class WindowBuilder {
         leftPanelSetBackground.add(previewBackground);
         
         // Build typing preview.
-        panels[2].setBackground(Color.WHITE);
-        panels[2].setLayout(new GridBagLayout());
-        panels[2].setBorder(BorderFactory.createEtchedBorder());
-        panels[2].setPreferredSize(new Dimension(752, 100));
-        previewBackground.add(panels[2]);
+        panels[0].setBackground(Color.WHITE);
+        panels[0].setLayout(new GridBagLayout());
+        panels[0].setBorder(BorderFactory.createEtchedBorder());
+        panels[0].setPreferredSize(new Dimension(0, 100));
+        panels[0].setMinimumSize(panels[0].getPreferredSize());
+        panels[0].setMaximumSize(new Dimension(1000, 100));
+        previewBackground.add(panels[0]);
         
         // Add our modded label.
-        panels[2].add(typedLabel);
+        panels[0].add(typedLabel);
         
         // Build canvas preview.
-        canvas.setPreferredSize(new Dimension(752 + 20, 298 + 20));
         previewBackground.add(canvas);
         
         // Right panel (type selection, settings, and render options).
         JPanel rightPanelSet = new JPanel();
         rightPanelSet.setLayout(new BoxLayout(rightPanelSet, BoxLayout.Y_AXIS));
         rightPanelSet.setBorder(BorderFactory.createEmptyBorder(10, 0, 10, 10));
-        rightPanelSet.setPreferredSize(new Dimension(350, previewBackground.getHeight()));
+        rightPanelSet.setPreferredSize(new Dimension(350, 0));
+        rightPanelSet.setMinimumSize(rightPanelSet.getPreferredSize());
         background.add(rightPanelSet);
         
         // Add our three info panels (keyboard select, settings, render options) to the right side.
@@ -213,6 +218,7 @@ public class WindowBuilder {
         JPanel keyboardTypePanel = new JPanel();
         keyboardTypePanel.setLayout(new BoxLayout(keyboardTypePanel, BoxLayout.Y_AXIS));
         keyboardTypePanel.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createTitledBorder("Keyboard Type"), BorderFactory.createEmptyBorder(5, 10, 10, 10)));
+        keyboardTypePanel.setMaximumSize(new Dimension(rightPanelSet.getPreferredSize().width, 100));
         rightPanelSet.add(keyboardTypePanel);
         
         // keyboard combo box
@@ -228,35 +234,37 @@ public class WindowBuilder {
         
         // calibration button (grey out for all but leap) -- calibrates the leap plane
         keyboardTypePanel.add(calibrateButton);
-        calibrateButton.setVerticalAlignment(0);
+        calibrateButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+        calibrateButton.setEnabled(false);
         
-        // 2 - Render Options
-        JPanel renderOptionsPanel = new JPanel();
-        renderOptionsPanel.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createTitledBorder("Render Options"), BorderFactory.createEmptyBorder(5, 10, 10, 10)));
-        rightPanelSet.add(renderOptionsPanel);
+        // 1.5 - Need a special panel to allow the scrollpanes to be the same size.
+        JPanel settingsAndRenderPanel = new JPanel(new GridLayout(2,1));
+        rightPanelSet.add(settingsAndRenderPanel);
         
-        renderOptionsPanel.add(panels[1]);
-        panels[1].setLayout(new BoxLayout(panels[1], BoxLayout.Y_AXIS));
-        
-        JScrollPane renderScrollBar = new JScrollPane(panels[1], JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-        renderScrollBar.setPreferredSize(new Dimension(rightPanelSet.getPreferredSize().width-50, previewBackground.getPreferredSize().height/3));
-        renderOptionsPanel.add(renderScrollBar);
-        
-        // 3 - Settings
-        JPanel settingsPanelMain = new JPanel();
+        // 2 - Settings
+        JPanel settingsPanelMain = new JPanel(new GridLayout(0,1));
+        settingsPanelMain.setPreferredSize(new Dimension(350, 200));
         settingsPanelMain.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createTitledBorder("Settings"), BorderFactory.createEmptyBorder(5, 10, 10, 10)));
-        rightPanelSet.add(settingsPanelMain);
+        settingsAndRenderPanel.add(settingsPanelMain);
         
-        settingsPanelMain.add(panels[0]);
-        panels[0].setLayout(new BoxLayout(panels[0], BoxLayout.Y_AXIS));
-        
-        JScrollPane settingsScrollBar = new JScrollPane(panels[0], JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-        settingsScrollBar.setPreferredSize(new Dimension(rightPanelSet.getPreferredSize().width-50, previewBackground.getPreferredSize().height/3));
+        panels[1].setLayout(new BoxLayout(panels[1], BoxLayout.Y_AXIS));
+
+        JScrollPane settingsScrollBar = new JScrollPane(panels[1], JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         settingsPanelMain.add(settingsScrollBar);
+        
+        // 3 - Render Options
+        JPanel renderOptionsPanelMain = new JPanel(new GridLayout(0,1));
+        renderOptionsPanelMain.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createTitledBorder("Render Options"), BorderFactory.createEmptyBorder(5, 10, 10, 10)));
+        settingsAndRenderPanel.add(renderOptionsPanelMain);
+        
+        panels[2].setLayout(new BoxLayout(panels[2], BoxLayout.Y_AXIS));
+
+        JScrollPane renderOptionsScrollBar = new JScrollPane(panels[2], JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        renderOptionsPanelMain.add(renderOptionsScrollBar);
         
         // Arrange the components inside the window
         frame.pack();
-        frame.setResizable(false);
+        frame.setResizable(false); 
         
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
         Dimension windowSize = frame.getSize();

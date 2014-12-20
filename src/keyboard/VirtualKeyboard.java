@@ -16,10 +16,9 @@ public abstract class VirtualKeyboard extends IKeyboard {
     protected int keyWidth;
     protected int keyHeight;
     protected int spaceKeyWidth;
-    protected int numKeys; // ignoring dark buttons for now
+    protected int numKeys;
     protected int [] rowOffsets;
     protected String [][] keyRows;
-    protected GL2 gl;
     protected KeyboardImage  keyboardImage;
     protected VirtualKey [] keys;
     

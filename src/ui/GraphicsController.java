@@ -18,12 +18,15 @@ import static javax.media.opengl.GL2.*; // GL2 constants
 
 import com.leapmotion.leap.Vector;
 
+import enums.KeyboardType;
+
 
 public abstract class GraphicsController implements GLEventListener, KeyboardObserver {
 	private static GLProfile profile;
 	protected static GLCapabilities capabilities;
 	protected GLCanvas canvas;
 	protected GLU glu;  // for the GL Utility
+	public static GL2 gl;
 	protected Vector pos;
 	protected Vector dir;
 	protected IKeyboard keyboard;
@@ -55,12 +58,14 @@ public abstract class GraphicsController implements GLEventListener, KeyboardObs
 
     @Override
     public void init(GLAutoDrawable drawable) {
-        GL2 gl = drawable.getGL().getGL2();      // get the OpenGL graphics context
+        GraphicsController.gl = drawable.getGL().getGL2();      // get the OpenGL graphics context
         glu = new GLU();                         // get GL Utilities
         // TODO: Remove this initialization. Change keyboards from singleton to instance. Move keyboard creation to somewhere that makes sense (keyboard selection in calib/run buttons).
-        keyboard = new StandardKeyboard(gl, pos);
-        keyboard.registerObserver(this);
-        gl.glClearColor(0.2f, 0.2f, 0.2f, 0.0f); // set background (clear) color
+        //keyboard = new StandardKeyboard(gl, pos);
+        KeyboardType.STANDARD.getKeyboard().registerObserver(this);
+        KeyboardType.LEAP.getKeyboard().registerObserver(this);
+        //keyboard = KeyboardType.STANDARD.getKeyboard();
+        gl.glClearColor(1f, 1f, 1f, 0.0f); // set background (clear) color
         gl.glClearDepth(1.0f);      // set clear depth value to farthest
         gl.glEnable(GL_DEPTH_TEST); // enables depth testing
         gl.glDepthFunc(GL_LEQUAL);  // the type of depth test to do
@@ -74,7 +79,7 @@ public abstract class GraphicsController implements GLEventListener, KeyboardObs
 
     @Override
     public void reshape(GLAutoDrawable drawable, int x, int y, int width, int height) {
-        GL2 gl = drawable.getGL().getGL2();
+        //GL2 gl = drawable.getGL().getGL2();
         if (height == 0) height = 1;   // prevent divide by zero
    
         // Set the view port (display area) to cover the entire window

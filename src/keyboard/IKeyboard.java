@@ -3,6 +3,8 @@ package keyboard;
 import java.util.ArrayList;
 import java.util.Map;
 
+import javax.media.opengl.GL2;
+
 public abstract class IKeyboard {
     // TODO: list of things we need from the keyboard as an outside party
     // 1 - render the keyboard
@@ -17,8 +19,9 @@ public abstract class IKeyboard {
     protected ArrayList<KeyboardRenderable> keyboardRenderables = new ArrayList<KeyboardRenderable>();
     protected int width;
     protected int height;
+    protected char key;
     
-    public abstract void render();
+    public abstract void render(GL2 gl);
     public abstract void update();
     
     public int getHeight() {
@@ -51,7 +54,7 @@ public abstract class IKeyboard {
 
     protected void notifyListeners() {
         for(KeyboardObserver observer : observers) {
-            observer.keyboardEventObserved('a');
+            observer.keyboardEventObserved(key);
         }
     }
 }
