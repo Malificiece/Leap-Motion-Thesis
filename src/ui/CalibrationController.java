@@ -1,47 +1,33 @@
 package ui;
 import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
-import javax.media.opengl.GL;
-import javax.media.opengl.GL2;
 import javax.media.opengl.GLAutoDrawable;
 import javax.media.opengl.awt.GLCanvas;
-import javax.media.opengl.awt.GLJPanel;
-import javax.media.opengl.glu.GLU;
-import javax.media.opengl.glu.GLUquadric;
 
 import static javax.media.opengl.GL.*;  // GL constants
 import static javax.media.opengl.GL2.*; // GL2 constants
 import static javax.media.opengl.fixedfunc.GLMatrixFunc.GL_MODELVIEW;
 import static javax.media.opengl.fixedfunc.GLMatrixFunc.GL_PROJECTION;
 
-import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
 import javax.swing.Timer;
 
 import utilities.MyUtilities;
-import keyboard.VirtualKeyboard;
-import keyboard.standard.StandardKeyboard;
 
-import com.jogamp.opengl.util.FPSAnimator;
 import com.leapmotion.leap.Vector;
 
 import enums.KeyboardType;
-import enums.TestType;
 
 
 public class CalibrationController extends GraphicsController {
@@ -91,7 +77,8 @@ public class CalibrationController extends GraphicsController {
         keyboardTypeComboBox.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                JComboBox comboBox = (JComboBox)e.getSource();
+                @SuppressWarnings("unchecked")
+                JComboBox<String> comboBox = (JComboBox<String>)e.getSource();
                 int selectedIndex = comboBox.getSelectedIndex();
                 if(keyboard != KeyboardType.getByID(selectedIndex).getKeyboard()) {
                     if(KeyboardType.LEAP == KeyboardType.getByID(selectedIndex)) {
@@ -180,7 +167,7 @@ public class CalibrationController extends GraphicsController {
             public void windowClosing(WindowEvent e) {
                 // Change to close experiment window.
                 //System.exit(0);
-                
+                frame.dispose();
             }
         });
         
@@ -193,9 +180,9 @@ public class CalibrationController extends GraphicsController {
     @Override
     public void keyboardEventObserved(char key) {
         // TODO: Add full implementation required for detailed analysis of key presses
-        //clearTextTimer.restart();
-        //typed.setText(typed.getText()+Character.toString(key));
-        //MyUtilities.calculateFontSize(typed.getText(), typed, typedPanel);
+        clearTextTimer.restart();
+        typedLabel.setText(typedLabel.getText()+Character.toString(key));
+        MyUtilities.calculateFontSize(typedLabel.getText(),typedLabel, typedPanel);
     }
     
     public void disable() {

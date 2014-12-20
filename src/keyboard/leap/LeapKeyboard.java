@@ -2,11 +2,9 @@ package keyboard.leap;
 
 import javax.media.opengl.GL2;
 
-import keyboard.KeyboardImage;
-import keyboard.VirtualKey;
 import keyboard.VirtualKeyboard;
-
-import com.leapmotion.leap.Vector;
+import keyboard.renderables.KeyboardImage;
+import keyboard.renderables.VirtualKey;
 
 public class LeapKeyboard extends VirtualKeyboard {
     public static final int HEIGHT = 385;
@@ -58,20 +56,20 @@ public class LeapKeyboard extends VirtualKeyboard {
         notifyListeners();
     }
     
-    private void drawBackground() {
+    /*private void drawBackground() {
         //gl.glColor4f(0.5f, 0.5f, 0.5f, 0.5f);
         //gl.glRecti(0, 0, WIDTH, HEIGHT);
         
         
-        /*// Use this for leap plane
+        /* Use this for leap plane
         gl.glBegin(GL_QUADS);
         gl.glColor3f(1.0f, 0.0f, 0.0f); // red
         gl.glVertex3f(300, 300, 0);
         gl.glVertex3f(0, 300, -100);
         gl.glVertex3f(0, 0, -100);
         gl.glVertex3f(300, 0, 0);
-        gl.glEnd();*/
-    }
+        gl.glEnd();
+    }*/
     
     @Override
     public void update() {

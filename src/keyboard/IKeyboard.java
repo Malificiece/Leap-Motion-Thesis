@@ -1,7 +1,6 @@
 package keyboard;
 
 import java.util.ArrayList;
-import java.util.Map;
 
 import javax.media.opengl.GL2;
 

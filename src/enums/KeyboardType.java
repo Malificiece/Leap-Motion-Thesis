@@ -1,8 +1,5 @@
 package enums;
 
-import com.leapmotion.leap.Vector;
-
-import ui.GraphicsController;
 import keyboard.IKeyboard;
 import keyboard.leap.LeapKeyboard;
 import keyboard.standard.StandardKeyboard;

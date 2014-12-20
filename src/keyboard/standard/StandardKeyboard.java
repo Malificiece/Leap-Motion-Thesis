@@ -2,11 +2,8 @@ package keyboard.standard;
 
 import javax.media.opengl.GL2;
 
-import keyboard.KeyboardImage;
-import keyboard.VirtualKey;
 import keyboard.VirtualKeyboard;
-
-import com.leapmotion.leap.Vector;
+import keyboard.renderables.KeyboardImage;
 
 public class StandardKeyboard extends VirtualKeyboard {
     protected static final int HEIGHT = 298;
@@ -58,21 +55,6 @@ public class StandardKeyboard extends VirtualKeyboard {
         //gl.GL_TEXTURE_RECTANGLE_ARB --- use this for exact texturing if imaging attempt fails.
         key = 's';
         notifyListeners();
-    }
-    
-    private void drawBackground() {
-        //gl.glColor4f(0.5f, 0.5f, 0.5f, 0.5f);
-        //gl.glRecti(0, 0, WIDTH, HEIGHT);
-        
-        
-        /*// Use this for leap plane
-        gl.glBegin(GL_QUADS);
-        gl.glColor3f(1.0f, 0.0f, 0.0f); // red
-        gl.glVertex3f(300, 300, 0);
-        gl.glVertex3f(0, 300, -100);
-        gl.glVertex3f(0, 0, -100);
-        gl.glVertex3f(300, 0, 0);
-        gl.glEnd();*/
     }
     
     @Override

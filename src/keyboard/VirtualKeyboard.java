@@ -1,15 +1,10 @@
 package keyboard;
-import java.nio.ByteBuffer;
-import java.nio.IntBuffer;
 
-import javax.media.opengl.GL;
-import javax.media.opengl.GL2;
-import javax.media.opengl.glu.GLU;
+import keyboard.renderables.KeyboardImage;
+import keyboard.renderables.VirtualKey;
 
-import com.leapmotion.leap.Vector;
-
-import static javax.media.opengl.GL.*;  // GL constants
-import static javax.media.opengl.GL2.*; // GL2 constants
+//import static javax.media.opengl.GL.*;  // GL constants
+//import static javax.media.opengl.GL2.*; // GL2 constants
 
 public abstract class VirtualKeyboard extends IKeyboard {
     protected int gapSize;

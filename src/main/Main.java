@@ -1,8 +1,4 @@
 package main;
-import java.awt.Frame;
-import java.io.IOException;
-
-import javax.media.opengl.GLProfile;
 
 import ui.ControlCenter;
 import ui.GraphicsController;

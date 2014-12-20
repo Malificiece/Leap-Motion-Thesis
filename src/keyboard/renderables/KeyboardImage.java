@@ -1,5 +1,4 @@
-package keyboard;
-import java.io.*;
+package keyboard.renderables;
 import java.nio.*;
 import java.awt.*;
 import java.awt.image.*;
@@ -8,10 +7,10 @@ import java.awt.geom.AffineTransform;
 
 import javax.media.opengl.GL;
 import javax.media.opengl.GL2;
-import javax.media.opengl.glu.GLU;
 
+import keyboard.KeyboardRenderable;
 import static javax.media.opengl.GL.*;  // GL constants
-import static javax.media.opengl.GL2.*; // GL2 constants
+//import static javax.media.opengl.GL2.*; // GL2 constants
 
 public class KeyboardImage extends KeyboardRenderable {
     private static final String RENDER_NAME = "Keyboard Image";

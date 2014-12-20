@@ -7,11 +7,10 @@ package leap;
 * between Leap Motion and you, your company or other organization.             *
 \******************************************************************************/
 
-import java.lang.Math;
 import java.util.concurrent.locks.ReentrantLock;
 
 import com.leapmotion.leap.*;
-import com.leapmotion.leap.Gesture.State;
+//import com.leapmotion.leap.Gesture.State;
 
 public class LeapListener extends Listener {
     public Vector trackedPosition = new Vector();

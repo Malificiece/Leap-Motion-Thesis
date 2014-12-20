@@ -1,16 +1,14 @@
-package keyboard;
+package keyboard.renderables;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
 
 import com.leapmotion.leap.Vector;
 
-import javax.media.opengl.GL;
 import javax.media.opengl.GL2;
-import javax.media.opengl.glu.GLU;
 
-import static javax.media.opengl.GL.*;  // GL constants
-import static javax.media.opengl.GL2.*; // GL2 constants
+//import static javax.media.opengl.GL.*;  // GL constants
+//import static javax.media.opengl.GL2.*; // GL2 constants
 
 public class VirtualKey {
     private final static int THICKNESS = 5;
@@ -35,6 +33,8 @@ public class VirtualKey {
         color = vbb.asFloatBuffer();  // create a floating point buffer from the ByteBuffer
         color.put(ACTIVE);
         color.position(0);
+        color.put(HOVER);
+        color.position(0);
         color.put(NONE);
         color.position(0);
     }
@@ -48,12 +48,16 @@ public class VirtualKey {
         gl.glPopMatrix();
     }
     
-    private boolean containsPoint(Vector point) {
+    public boolean containsPoint(Vector point) {
         if(max.getX() < point.getX() || max.getY() < point.getY() || max.getZ() < point.getZ())
             return false;
         if(min.getX() > point.getX() || min.getY() > point.getY() || min.getZ() > point.getZ())
             return false;
         //color = ACTIVE;
         return true;
+    }
+    
+    public String getKeyValue() {
+        return value;
     }
 }

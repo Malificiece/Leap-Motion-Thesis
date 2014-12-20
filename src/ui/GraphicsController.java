@@ -1,18 +1,14 @@
 package ui;
-import javax.media.opengl.GL;
 import javax.media.opengl.GL2;
 import javax.media.opengl.GLAutoDrawable;
 import javax.media.opengl.GLCapabilities;
 import javax.media.opengl.GLEventListener;
 import javax.media.opengl.GLProfile;
 import javax.media.opengl.awt.GLCanvas;
-import javax.media.opengl.awt.GLJPanel;
 import javax.media.opengl.glu.GLU;
 
 import keyboard.IKeyboard;
 import keyboard.KeyboardObserver;
-import keyboard.VirtualKeyboard;
-import keyboard.standard.StandardKeyboard;
 import static javax.media.opengl.GL.*;  // GL constants
 import static javax.media.opengl.GL2.*; // GL2 constants
 
