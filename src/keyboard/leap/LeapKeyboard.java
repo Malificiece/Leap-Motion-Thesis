@@ -36,6 +36,8 @@ public class LeapKeyboard extends VirtualKeyboard {
         rowOffsets = new int[] {FIRST_ROW_OFFSET,SECOND_ROW_OFFSET,THIRD_ROW_OFFSET,FOURTH_ROW_OFFSET};
         keyRows = new String[][] {FIRST_ROW, SECOND_ROW, THIRD_ROW, FOURTH_ROW};
         keys = createKeys();
+        
+        keyboardRenderables.add(keyboardImage);
     }
     
     @Override

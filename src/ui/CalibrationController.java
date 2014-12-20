@@ -23,6 +23,8 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.Timer;
 
+import keyboard.KeyboardRenderable;
+import keyboard.KeyboardSetting;
 import utilities.MyUtilities;
 
 import com.leapmotion.leap.Vector;
@@ -87,9 +89,20 @@ public class CalibrationController extends GraphicsController {
                         calibrateButton.setEnabled(false);
                     }
                     // REMOVE EVERYTHING FROM PEVIOUS KEYBOARD
+                    settingsPanel.removeAll();
+                    renderOptionsPanel.removeAll();
                     
                     // ADD EVERYTHING FROM NEW KEYBOARD
                     keyboard = KeyboardType.getByID(selectedIndex).getKeyboard();
+                    
+                    for(KeyboardSetting ks: keyboard.getAllSettings()) {
+                        settingsPanel.add(ks.getSettingsPanel());
+                    }
+                    
+                    for(KeyboardRenderable kr: keyboard.getAllRenderables()) {
+                        renderOptionsPanel.add(kr.getRenderablePanel());
+                    }
+                    
                     canvas.setPreferredSize(new Dimension(keyboard.getWidth(), keyboard.getHeight()));
                     canvas.setSize(keyboard.getWidth(), keyboard.getHeight());
                     frame.pack();
@@ -134,30 +147,6 @@ public class CalibrationController extends GraphicsController {
             
         });
         
-        /*
-        typedPanel.addKeyListener(new KeyListener() {
-
-            @Override
-            public void keyPressed(KeyEvent e) {
-                // TODO Auto-generated method stub
-            }
-
-            @Override
-            public void keyReleased(KeyEvent e) {
-                // TODO Auto-generated method stub 
-            }
-
-            @Override
-            public void keyTyped(KeyEvent e) {
-                clearTextTimer.restart();
-                typedLabel.setText(typedLabel.getText()+Character.toString(e.getKeyChar()));
-                MyUtilities.calculateFontSize(typedLabel.getText(), typedLabel, typedPanel);
-            }
-            
-        });*/
-        
-        
-        
         // TODO: Change to size of currently selected keyboard.
         
         // by default, an AWT Frame doesn't do anything when you click
@@ -180,9 +169,9 @@ public class CalibrationController extends GraphicsController {
     @Override
     public void keyboardEventObserved(char key) {
         // TODO: Add full implementation required for detailed analysis of key presses
-        clearTextTimer.restart();
+        /*clearTextTimer.restart();
         typedLabel.setText(typedLabel.getText()+Character.toString(key));
-        MyUtilities.calculateFontSize(typedLabel.getText(),typedLabel, typedPanel);
+        MyUtilities.calculateFontSize(typedLabel.getText(),typedLabel, typedPanel);*/
     }
     
     public void disable() {
