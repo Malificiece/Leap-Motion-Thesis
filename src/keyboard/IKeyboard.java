@@ -13,30 +13,30 @@ public abstract class IKeyboard {
     // 5 - give it key pressed events (to render them properly) --- and record specialized data for the specific type of keyboard
     // 6 - must be capable of creating it's own keyboard events using the robot if not the default (This will require a self sustaining update function possibly)
     private ArrayList<KeyboardObserver> observers = new ArrayList<KeyboardObserver>();
-    protected ArrayList<KeyboardSetting> keyboardSettings = new ArrayList<KeyboardSetting>();
-    protected ArrayList<KeyboardAttribute> keyboardAttributes = new ArrayList<KeyboardAttribute>();
-    protected ArrayList<KeyboardRenderable> keyboardRenderables = new ArrayList<KeyboardRenderable>();
-    protected int width;
-    protected int height;
+    protected KeyboardSettings keyboardSettings;
+    protected KeyboardAttributes keyboardAttributes;
+    protected KeyboardRenderables keyboardRenderables;
+    protected KeyboardAttribute width;
+    protected KeyboardAttribute height;
     protected char key;
     
     public abstract void render(GL2 gl);
     public abstract void update();
     
     public int getHeight() {
-        return height;
+        return height.getValueAsInteger();
     }
     public int getWidth() {
-        return width;
+        return width.getValueAsInteger();
     }
     
-    public ArrayList<KeyboardSetting> getAllSettings() {
+    public KeyboardSettings getSettings() {
         return keyboardSettings;
     }
-    public ArrayList<KeyboardAttribute> getAllAttributes() {
+    public KeyboardAttributes getAttributes() {
         return keyboardAttributes;
     }
-    public ArrayList<KeyboardRenderable> getAllRenderables() {
+    public KeyboardRenderables getRenderables() {
         return keyboardRenderables;
     }
     

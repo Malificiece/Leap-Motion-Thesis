@@ -1,4 +1,4 @@
-package keyboard.standard;
+package keyboard.leap;
 
 import javax.media.opengl.GL2;
 
@@ -7,13 +7,16 @@ import keyboard.KeyboardRenderables;
 import keyboard.renderables.KeyboardImage;
 import keyboard.renderables.VirtualKeyboard;
 
-public class StandardRenderables extends KeyboardRenderables {
+public class LeapRenderables extends KeyboardRenderables {
     //private KeyboardImage keyboardImage;
     //private VirtualKeyboard virtualKeyboard;
+    //private LeapPlane leapPlane;
+    //private LeapObject leapObject;
+    //private LeapTool leapTool;
 
-    StandardRenderables(StandardKeyboard keyboard) {
+    LeapRenderables(LeapKeyboard keyboard) {
         // order here determines render order
-        this.addRenderable(new KeyboardImage("keyboard.png", "standard/"));
+        this.addRenderable(new KeyboardImage("keyboard.png", "leap/"));
         this.addRenderable(new VirtualKeyboard(keyboard.getAttributes()));
     }
 

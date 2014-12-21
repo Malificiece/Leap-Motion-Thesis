@@ -23,12 +23,14 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.Timer;
 
+import keyboard.KeyboardAttributes;
 import keyboard.KeyboardRenderable;
 import keyboard.KeyboardSetting;
 import utilities.MyUtilities;
 
 import com.leapmotion.leap.Vector;
 
+import enums.AttributeName;
 import enums.KeyboardType;
 
 
@@ -95,11 +97,15 @@ public class CalibrationController extends GraphicsController {
                     // ADD EVERYTHING FROM NEW KEYBOARD
                     keyboard = KeyboardType.getByID(selectedIndex).getKeyboard();
                     
-                    for(KeyboardSetting ks: keyboard.getAllSettings()) {
+                    KeyboardAttributes ka = keyboard.getAttributes();
+                    settingsPanel.add(ka.getAttributeByName(AttributeName.KEYBOARD_WIDTH.toString()).getAttributePanel());
+                    settingsPanel.add(ka.getAttributeByName(AttributeName.KEYBOARD_HEIGHT.toString()).getAttributePanel());
+                    
+                    for(KeyboardSetting ks: keyboard.getSettings().getAllSettings()) {
                         settingsPanel.add(ks.getSettingsPanel());
                     }
                     
-                    for(KeyboardRenderable kr: keyboard.getAllRenderables()) {
+                    for(KeyboardRenderable kr: keyboard.getRenderables().getAllRenderables()) {
                         renderOptionsPanel.add(kr.getRenderablePanel());
                     }
                     
@@ -130,7 +136,7 @@ public class CalibrationController extends GraphicsController {
 
             @Override
             public void focusGained(FocusEvent e) {
-                typedFocusTimer.stop();
+                //typedFocusTimer.stop();
                 clearTextTimer.start();
                 typedLabel.setText(typedLabel.getText().replaceFirst("FOCUS LOST", ""));
                 typedLabel.setForeground(Color.DARK_GRAY);
@@ -138,7 +144,7 @@ public class CalibrationController extends GraphicsController {
 
             @Override
             public void focusLost(FocusEvent e) {
-                typedFocusTimer.start();
+                //typedFocusTimer.start();
                 clearTextTimer.stop();
                 typedLabel.setText("FOCUS LOST");
                 typedLabel.setForeground(Color.RED);
@@ -164,6 +170,9 @@ public class CalibrationController extends GraphicsController {
         
         pos = new Vector();
         dir = new Vector();
+        
+        // Something causes the canvas to resize depending on # of lines of code when initializing.
+        frame.pack();
     }
     
     @Override

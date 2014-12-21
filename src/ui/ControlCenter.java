@@ -22,11 +22,11 @@ import com.leapmotion.leap.Vector;
 
 public class ControlCenter {
     // Constants
-    static final int HOURS_MIN = 0;
-    static final int HOURS_MAX = 24;
-    static final int HOURS_INIT = 12;
-    static final CalibrationController CALIBRATION_CONTROLLER = new CalibrationController();
-    static final ExperimentController EXPERIMENT_CONTROLLER = new ExperimentController();
+    private static final int HOURS_MIN = 0;
+    private static final int HOURS_MAX = 24;
+    private static final int HOURS_INIT = 12;
+    private static final CalibrationController CALIBRATION_CONTROLLER = new CalibrationController();
+    private static final ExperimentController EXPERIMENT_CONTROLLER = new ExperimentController();
     
     // Not Constants
     private JFrame frame;

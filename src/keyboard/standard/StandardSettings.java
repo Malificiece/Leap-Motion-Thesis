@@ -1,7 +1,10 @@
 package keyboard.standard;
 
-public class StandardSettings {
-    public void init() {
+import keyboard.KeyboardSettings;
+
+public class StandardSettings extends KeyboardSettings {
+
+    StandardSettings(StandardKeyboard keyboard) {
         
     }
 }

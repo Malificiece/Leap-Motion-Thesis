@@ -181,9 +181,11 @@ public class WindowBuilder {
         panels[0].setBackground(Color.WHITE);
         panels[0].setLayout(new GridBagLayout());
         panels[0].setBorder(BorderFactory.createEtchedBorder());
-        panels[0].setPreferredSize(new Dimension(0, 100));
-        panels[0].setMinimumSize(panels[0].getPreferredSize());
-        panels[0].setMaximumSize(new Dimension(1000, 100));
+        Dimension d0 = panels[0].getPreferredSize();
+        d0.height = 100;
+        panels[0].setPreferredSize(d0);
+        panels[0].setMinimumSize(d0);
+        panels[0].setMaximumSize(new Dimension(1000, d0.height));
         previewBackground.add(panels[0]);
         
         // Add our modded label.
@@ -196,7 +198,9 @@ public class WindowBuilder {
         JPanel rightPanelSet = new JPanel();
         rightPanelSet.setLayout(new BoxLayout(rightPanelSet, BoxLayout.Y_AXIS));
         rightPanelSet.setBorder(BorderFactory.createEmptyBorder(10, 0, 10, 10));
-        rightPanelSet.setPreferredSize(new Dimension(350, 0));
+        Dimension d1 = rightPanelSet.getPreferredSize();
+        d1.width = 375;
+        rightPanelSet.setPreferredSize(d1);
         rightPanelSet.setMinimumSize(rightPanelSet.getPreferredSize());
         background.add(rightPanelSet);
         
@@ -230,7 +234,7 @@ public class WindowBuilder {
         
         // 2 - Settings
         JPanel settingsPanelMain = new JPanel(new GridLayout(0,1));
-        settingsPanelMain.setPreferredSize(new Dimension(350, 200));
+        settingsPanelMain.setPreferredSize(new Dimension(d1.width, 200));
         settingsPanelMain.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createTitledBorder("Settings"), BorderFactory.createEmptyBorder(5, 10, 10, 10)));
         settingsAndRenderPanel.add(settingsPanelMain);
         

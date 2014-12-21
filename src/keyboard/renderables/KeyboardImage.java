@@ -8,12 +8,12 @@ import java.awt.geom.AffineTransform;
 import javax.media.opengl.GL;
 import javax.media.opengl.GL2;
 
+import enums.RenderableName;
 import keyboard.KeyboardRenderable;
 import static javax.media.opengl.GL.*;  // GL constants
 //import static javax.media.opengl.GL2.*; // GL2 constants
 
 public class KeyboardImage extends KeyboardRenderable {
-    private static final String RENDER_NAME = "Keyboard Image";
     private final String ASSETS_PATH = "./assets/";
     private final String DEFAULT_FILE_PATH = "standard/";
     private final String DEFAULT_FILE_NAME = "keyboard.png";
@@ -23,7 +23,7 @@ public class KeyboardImage extends KeyboardRenderable {
     private int width;
     
     public KeyboardImage(String fileName, String filePath) {
-        super(RENDER_NAME);
+        super(RenderableName.KEYBOARD_IMAGE.toString());
         fullFilename = ASSETS_PATH;
         fullFilename += filePath == null ? DEFAULT_FILE_PATH : filePath;
         fullFilename += fileName == null ? DEFAULT_FILE_NAME : fileName;
@@ -48,7 +48,7 @@ public class KeyboardImage extends KeyboardRenderable {
 
         height = img.getHeight(null);
         width = img.getWidth(null);
-        System.out.println( "Image, w = " + width + ", h = " + height );
+        //System.out.println( "Image, w = " + width + ", h = " + height );
 
         // Create a raster with correct size and a colorModel and finally a bufImg.
         WritableRaster raster = Raster.createInterleavedRaster(DataBuffer.TYPE_BYTE, width, height, 4, null); 
