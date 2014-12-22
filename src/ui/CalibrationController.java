@@ -1,5 +1,6 @@
 package ui;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -26,12 +27,15 @@ import javax.swing.Timer;
 import keyboard.KeyboardAttributes;
 import keyboard.KeyboardRenderable;
 import keyboard.KeyboardSetting;
+import keyboard.renderables.LeapPlane;
+import keyboard.standard.StandardKeyboard;
 import utilities.MyUtilities;
 
 import com.leapmotion.leap.Vector;
 
 import enums.AttributeName;
 import enums.KeyboardType;
+import enums.RenderableName;
 
 
 public class CalibrationController extends GraphicsController {
@@ -43,7 +47,7 @@ public class CalibrationController extends GraphicsController {
     private JPanel settingsPanel;
     private JPanel renderOptionsPanel;
     private Timer clearTextTimer;
-    private Timer typedFocusTimer;
+    //private Timer typedFocusTimer;
     
     public CalibrationController() {
         keyboard = KeyboardType.STANDARD.getKeyboard();
@@ -62,19 +66,36 @@ public class CalibrationController extends GraphicsController {
 
         // Window builder builds window using important fields here. It adds unimportant fields that we won't use for aesthetics only.
         WindowBuilder.buildCalibrationWindow(frame, canvas, typedLabel, keyboardTypeComboBox, calibrateButton, panels);
-        canvas.setFocusable(false);
-        typedPanel.setFocusable(true);
-        typedPanel.requestFocusInWindow();
+        canvas.setFocusable(true);
+        addKeyboardToUI();
+        //typedPanel.setFocusable(true);
+        //typedPanel.requestFocusInWindow();
         //frame.setVisible(true);
+        
+        clearTextTimer = new Timer(1000, new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                typedLabel.setText("");
+            }
+        });
+        clearTextTimer.start();
         
         calibrateButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 if(keyboard == KeyboardType.LEAP.getKeyboard()) {
                     // START CALIBRATION EVENT
-                    // PUT TEXT WHERE LABEL IS
+                    // PUT TEXT WHERE LABEL IS? I suppose.
+                    typedPanel.removeAll();
+                    clearTextTimer.stop();
+                    LeapPlane leapPlane = (LeapPlane) keyboard.getRenderables().getRenderableByName(RenderableName.LEAP_PLANE.toString());
+                    if(leapPlane != null) {
+                        // leapPlane.calibrate(frame);
+                    }
+                    typedPanel.add(typedLabel);
+                    clearTextTimer.start();
                 }
-                typedPanel.requestFocusInWindow();
+                //typedPanel.requestFocusInWindow();
             }
         });
         
@@ -96,36 +117,14 @@ public class CalibrationController extends GraphicsController {
                     
                     // ADD EVERYTHING FROM NEW KEYBOARD
                     keyboard = KeyboardType.getByID(selectedIndex).getKeyboard();
-                    
-                    KeyboardAttributes ka = keyboard.getAttributes();
-                    settingsPanel.add(ka.getAttributeByName(AttributeName.KEYBOARD_WIDTH.toString()).getAttributePanel());
-                    settingsPanel.add(ka.getAttributeByName(AttributeName.KEYBOARD_HEIGHT.toString()).getAttributePanel());
-                    
-                    for(KeyboardSetting ks: keyboard.getSettings().getAllSettings()) {
-                        settingsPanel.add(ks.getSettingsPanel());
-                    }
-                    
-                    for(KeyboardRenderable kr: keyboard.getRenderables().getAllRenderables()) {
-                        renderOptionsPanel.add(kr.getRenderablePanel());
-                    }
-                    
-                    canvas.setPreferredSize(new Dimension(keyboard.getWidth(), keyboard.getHeight()));
-                    canvas.setSize(keyboard.getWidth(), keyboard.getHeight());
-                    frame.pack();
+                    addKeyboardToUI();
                 }
-                typedPanel.requestFocusInWindow();
+                frame.requestFocusInWindow();
+                //typedPanel.requestFocusInWindow();
             }
         });
         
-        clearTextTimer = new Timer(1000, new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                typedLabel.setText("");
-            }
-        });
-        clearTextTimer.start();
-        
-        typedFocusTimer = new Timer(3000, new ActionListener() {
+        /*typedFocusTimer = new Timer(3000, new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 typedPanel.requestFocusInWindow();
@@ -151,7 +150,7 @@ public class CalibrationController extends GraphicsController {
                 MyUtilities.calculateFontSize(typedLabel.getText(), typedLabel, typedPanel);
             }
             
-        });
+        });*/
         
         // TODO: Change to size of currently selected keyboard.
         
@@ -171,16 +170,16 @@ public class CalibrationController extends GraphicsController {
         pos = new Vector();
         dir = new Vector();
         
-        // Something causes the canvas to resize depending on # of lines of code when initializing.
+        // Something causes the canvas to resize between the original frame.pack() and this one so we just pack again, no harm done.
         frame.pack();
     }
     
     @Override
     public void keyboardEventObserved(char key) {
         // TODO: Add full implementation required for detailed analysis of key presses
-        /*clearTextTimer.restart();
+        clearTextTimer.restart();
         typedLabel.setText(typedLabel.getText()+Character.toString(key));
-        MyUtilities.calculateFontSize(typedLabel.getText(),typedLabel, typedPanel);*/
+        MyUtilities.calculateFontSize(typedLabel.getText(),typedLabel, typedPanel);
     }
     
     public void disable() {
@@ -189,12 +188,13 @@ public class CalibrationController extends GraphicsController {
     
     public void enable() {
         frame.setVisible(true);
-        typedPanel.requestFocusInWindow();
+        //typedPanel.requestFocusInWindow();
     }
     
     public void update(Vector position, Vector direction) {
         pos = position;
         dir = direction;
+        keyboard.update();
     }
     
     public void render(GLAutoDrawable drawable) {
@@ -282,5 +282,26 @@ public class CalibrationController extends GraphicsController {
   
        gl.glEnd(); // of the color cube*/
        gl.glPopMatrix();
+    }
+    
+    private void addKeyboardToUI() {
+        KeyboardAttributes ka = keyboard.getAttributes();
+        settingsPanel.add(ka.getAttributeByName(AttributeName.KEYBOARD_WIDTH.toString()).getAttributePanel());
+        settingsPanel.add(ka.getAttributeByName(AttributeName.KEYBOARD_HEIGHT.toString()).getAttributePanel());
+        if(keyboard == KeyboardType.STANDARD.getKeyboard()) {
+            settingsPanel.add((JPanel) ka.getAttributeByName(AttributeName.KEY_BINDINGS.toString()).getValue());
+        }
+        
+        for(KeyboardSetting ks: keyboard.getSettings().getAllSettings()) {
+            settingsPanel.add(ks.getSettingsPanel());
+        }
+        
+        for(KeyboardRenderable kr: keyboard.getRenderables().getAllRenderables()) {
+            renderOptionsPanel.add(kr.getRenderablePanel());
+        }
+        
+        canvas.setPreferredSize(new Dimension(keyboard.getWidth(), keyboard.getHeight()));
+        canvas.setSize(keyboard.getWidth(), keyboard.getHeight());
+        frame.pack();
     }
 }

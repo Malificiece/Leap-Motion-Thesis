@@ -1,4 +1,6 @@
 package keyboard.renderables;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
@@ -6,6 +8,7 @@ import java.nio.FloatBuffer;
 import com.leapmotion.leap.Vector;
 
 import javax.media.opengl.GL2;
+import javax.swing.Timer;
 
 //import static javax.media.opengl.GL.*;  // GL constants
 //import static javax.media.opengl.GL2.*; // GL2 constants
@@ -19,10 +22,11 @@ public class VirtualKey {
     private Vector min; // also equivalent to location (not center)
     private int width;
     private int height;
-    private String value;
+    private char value;
     private FloatBuffer color;
+    private Timer lightUpKeyTimer;
     
-    public VirtualKey(float x, float y, float width, float height, String value) {
+    public VirtualKey(float x, float y, float width, float height, char value) {
         min = new Vector(x, y, 0);
         max = new Vector(x+width, y+height, THICKNESS);
         this.width = (int)width;
@@ -31,12 +35,23 @@ public class VirtualKey {
         ByteBuffer vbb = ByteBuffer.allocateDirect(16); 
         vbb.order(ByteOrder.nativeOrder());    // use the device hardware's native byte order
         color = vbb.asFloatBuffer();  // create a floating point buffer from the ByteBuffer
-        color.put(ACTIVE);
-        color.position(0);
-        color.put(HOVER);
-        color.position(0);
         color.put(NONE);
         color.position(0);
+        
+        lightUpKeyTimer = new Timer(100, new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                lightUpKeyTimer.stop();
+                color.put(NONE);
+                color.position(0);
+            }
+        });
+    }
+    
+    public void pressed() {
+        color.put(ACTIVE);
+        color.position(0);
+        lightUpKeyTimer.restart();
     }
     
     public void render(GL2 gl) {
@@ -48,16 +63,32 @@ public class VirtualKey {
         gl.glPopMatrix();
     }
     
+    public boolean isHovering(Vector point) {
+        if(max.getX() < point.getX() || max.getY() < point.getY()) {
+            color.put(NONE);
+            color.position(0);
+            return false;
+        }
+        if(min.getX() > point.getX() || min.getY() > point.getY()) {
+            color.put(NONE);
+            color.position(0);
+            return false;
+        }
+        color.put(HOVER);
+        color.position(0);
+        return true;
+    }
+    
     public boolean containsPoint(Vector point) {
         if(max.getX() < point.getX() || max.getY() < point.getY() || max.getZ() < point.getZ())
             return false;
         if(min.getX() > point.getX() || min.getY() > point.getY() || min.getZ() > point.getZ())
             return false;
-        //color = ACTIVE;
+        pressed();
         return true;
     }
     
-    public String getKeyValue() {
+    public char getKeyValue() {
         return value;
     }
 }

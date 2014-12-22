@@ -190,6 +190,8 @@ public class WindowBuilder {
         
         // Add our modded label.
         panels[0].add(typedLabel);
+        typedLabel.setVerticalAlignment(JLabel.BOTTOM); // not sure why but this moves it up a bit
+        //typedLabel.setAlignmentY(Component.CENTER_ALIGNMENT);
         
         // Build canvas preview.
         previewBackground.add(canvas);
@@ -206,11 +208,11 @@ public class WindowBuilder {
         
         // Add our three info panels (keyboard select, settings, render options) to the right side.
         // 1 - Keyboard Type
-        JPanel keyboardTypePanel = new JPanel();
-        keyboardTypePanel.setLayout(new BoxLayout(keyboardTypePanel, BoxLayout.Y_AXIS));
-        keyboardTypePanel.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createTitledBorder("Keyboard Type"), BorderFactory.createEmptyBorder(5, 10, 10, 10)));
-        keyboardTypePanel.setMaximumSize(new Dimension(rightPanelSet.getPreferredSize().width, 100));
-        rightPanelSet.add(keyboardTypePanel);
+        JPanel keyboardTypeSelectionPanel = new JPanel();
+        keyboardTypeSelectionPanel.setLayout(new BoxLayout(keyboardTypeSelectionPanel, BoxLayout.Y_AXIS));
+        keyboardTypeSelectionPanel.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createTitledBorder("Keyboard Type"), BorderFactory.createEmptyBorder(5, 10, 10, 10)));
+        keyboardTypeSelectionPanel.setMaximumSize(new Dimension(rightPanelSet.getPreferredSize().width, 100));
+        rightPanelSet.add(keyboardTypeSelectionPanel);
         
         // keyboard combo box
         for(int i = 0; i < KeyboardType.getSize(); i++) {
@@ -218,13 +220,13 @@ public class WindowBuilder {
         }
         keyboardTypeComboBox.setBackground(Color.WHITE);
         keyboardTypeComboBox.setMaximumSize(new Dimension(keyboardTypeComboBox.getMaximumSize().width, keyboardTypeComboBox.getMinimumSize().height));
-        keyboardTypePanel.add(keyboardTypeComboBox);
+        keyboardTypeSelectionPanel.add(keyboardTypeComboBox);
         
         JPanel padding0 = new JPanel();
-        keyboardTypePanel.add(padding0);
+        keyboardTypeSelectionPanel.add(padding0);
         
         // calibration button (grey out for all but leap) -- calibrates the leap plane
-        keyboardTypePanel.add(calibrateButton);
+        keyboardTypeSelectionPanel.add(calibrateButton);
         calibrateButton.setAlignmentX(Component.CENTER_ALIGNMENT);
         calibrateButton.setEnabled(false);
         
@@ -241,6 +243,7 @@ public class WindowBuilder {
         panels[1].setLayout(new BoxLayout(panels[1], BoxLayout.Y_AXIS));
 
         JScrollPane settingsScrollBar = new JScrollPane(panels[1], JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        settingsScrollBar.getVerticalScrollBar().setUnitIncrement(16);
         settingsPanelMain.add(settingsScrollBar);
         
         // 3 - Render Options
@@ -251,6 +254,7 @@ public class WindowBuilder {
         panels[2].setLayout(new BoxLayout(panels[2], BoxLayout.Y_AXIS));
 
         JScrollPane renderOptionsScrollBar = new JScrollPane(panels[2], JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        renderOptionsScrollBar.getVerticalScrollBar().setUnitIncrement(16);
         renderOptionsPanelMain.add(renderOptionsScrollBar);
         
         // Arrange the components inside the window

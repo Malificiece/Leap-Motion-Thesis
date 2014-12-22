@@ -15,10 +15,10 @@ public class LeapAttributes extends KeyboardAttributes {
     private static final int SECOND_ROW_OFFSET = 33;
     private static final int THIRD_ROW_OFFSET = 85;
     private static final int FOURTH_ROW_OFFSET = 150;
-    private static final String [] FIRST_ROW = {"q", "w", "e", "r", "t", "y", "u", "i", "o", "p"};
-    private static final String [] SECOND_ROW = {"a", "s", "d", "f", "g", "h", "j", "k", "l"};
-    private static final String [] THIRD_ROW = {"z", "x", "c", "v", "b", "n", "m"};
-    private static final String [] FOURTH_ROW = {",", " ", "."};
+    private static final char [] FIRST_ROW = {'q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p'};
+    private static final char [] SECOND_ROW = {'a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l'};
+    private static final char [] THIRD_ROW = {'z', 'x', 'c', 'v', 'b', 'n', 'm'};
+    private static final char [] FOURTH_ROW = {',', ' ', '.'};
     
     LeapAttributes(LeapKeyboard keyboard) {
         this.addAttribute(new KeyboardAttribute(AttributeName.KEYBOARD_HEIGHT.toString(), HEIGHT));
@@ -29,6 +29,6 @@ public class LeapAttributes extends KeyboardAttributes {
         this.addAttribute(new KeyboardAttribute(AttributeName.SPACE_KEY_WIDTH.toString(), SPACE_KEY_WIDTH));
         this.addAttribute(new KeyboardAttribute(AttributeName.NUMBER_OF_KEYS.toString(), FIRST_ROW.length + SECOND_ROW.length + THIRD_ROW.length + FOURTH_ROW.length));
         this.addAttribute(new KeyboardAttribute(AttributeName.ROW_OFFSETS.toString(), (new int[] {FIRST_ROW_OFFSET,SECOND_ROW_OFFSET,THIRD_ROW_OFFSET,FOURTH_ROW_OFFSET})));
-        this.addAttribute(new KeyboardAttribute(AttributeName.KEY_ROWS.toString(), new String[][] {FIRST_ROW, SECOND_ROW, THIRD_ROW, FOURTH_ROW}));
+        this.addAttribute(new KeyboardAttribute(AttributeName.KEY_ROWS.toString(), new char[][] {FIRST_ROW, SECOND_ROW, THIRD_ROW, FOURTH_ROW}));
     }
 }

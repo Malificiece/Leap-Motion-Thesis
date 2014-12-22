@@ -9,7 +9,8 @@ public enum AttributeName {
     SPACE_KEY_WIDTH("Space Key Width"),
     ROW_OFFSETS("Row Offsets"),
     KEY_ROWS("Key Rows"),
-    NUMBER_OF_KEYS("Number of Keys");
+    NUMBER_OF_KEYS("Number of Keys"),
+    KEY_BINDINGS("Key Bindings");
 
     private final String name;
     
