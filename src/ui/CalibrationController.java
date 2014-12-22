@@ -1,13 +1,10 @@
 package ui;
-import java.awt.Color;
-import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.FocusEvent;
-import java.awt.event.FocusListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.util.ArrayList;
 
 import javax.media.opengl.GLAutoDrawable;
 import javax.media.opengl.awt.GLCanvas;
@@ -28,7 +25,7 @@ import keyboard.KeyboardAttributes;
 import keyboard.KeyboardRenderable;
 import keyboard.KeyboardSetting;
 import keyboard.renderables.LeapPlane;
-import keyboard.standard.StandardKeyboard;
+import leap.LeapObserver;
 import utilities.MyUtilities;
 
 import com.leapmotion.leap.Vector;
@@ -39,11 +36,13 @@ import enums.RenderableName;
 
 
 public class CalibrationController extends GraphicsController {
+    private ArrayList<SaveSettingsObserver> observers = new ArrayList<SaveSettingsObserver>();
     private JFrame frame;
     private JLabel typedLabel;
     private JPanel typedPanel;
     private JComboBox<String> keyboardTypeComboBox;
     private JButton calibrateButton;
+    private JButton saveSettingsButton;
     private JPanel settingsPanel;
     private JPanel renderOptionsPanel;
     private Timer clearTextTimer;
@@ -51,6 +50,10 @@ public class CalibrationController extends GraphicsController {
     
     public CalibrationController() {
         keyboard = KeyboardType.STANDARD.getKeyboard();
+        registerObserver(KeyboardType.STANDARD.getKeyboard());
+        registerObserver(KeyboardType.LEAP.getKeyboard());
+        registerObserver(KeyboardType.TABLET.getKeyboard());
+        registerObserver(KeyboardType.XBOX.getKeyboard());
         canvas = new GLCanvas(capabilities);
         canvas.setPreferredSize(new Dimension(keyboard.getWidth(), keyboard.getHeight()));
         canvas.setSize(keyboard.getWidth(), keyboard.getHeight());
@@ -59,13 +62,15 @@ public class CalibrationController extends GraphicsController {
         typedPanel = new JPanel();
         keyboardTypeComboBox = new JComboBox<String>();
         calibrateButton = new JButton("Calibrate");
+        saveSettingsButton = new JButton("Save Settings");
         settingsPanel = new JPanel();
         renderOptionsPanel = new JPanel();
         
         JPanel panels[] = {typedPanel, settingsPanel, renderOptionsPanel};
+        JButton buttons[] = {calibrateButton, saveSettingsButton};      
 
         // Window builder builds window using important fields here. It adds unimportant fields that we won't use for aesthetics only.
-        WindowBuilder.buildCalibrationWindow(frame, canvas, typedLabel, keyboardTypeComboBox, calibrateButton, panels);
+        WindowBuilder.buildCalibrationWindow(frame, canvas, typedLabel, keyboardTypeComboBox, buttons, panels);
         canvas.setFocusable(true);
         addKeyboardToUI();
         //typedPanel.setFocusable(true);
@@ -79,6 +84,27 @@ public class CalibrationController extends GraphicsController {
             }
         });
         clearTextTimer.start();
+        
+        saveSettingsButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent arg0) {
+                if(keyboard == KeyboardType.LEAP.getKeyboard()) {
+                    // SAVE SETTINGS TO LEAP VIA CONFIGURATION UTIL
+                    // TODO: SAVE SETTINGS TO FILE FOR USE NEXT TIME AND LOAD THEM FROM FILE
+                    //LeapObject leapObject = (LeapObject) keyboard.getAttributes().getAttributeByName(AttributeName.KEY_BINDINGS.toString()).getValue();
+                    // leapObject.saveSettings()
+                    
+                    // Probably better to do keyboard.saveSettings() if we add the ability to change things on the other keyboards.
+                    // Otherwise I probably would be better off just casting to LeapKeyboard.saveSettings()
+                    // This way the keyboard can save it's already fully internalized settings.
+                    
+                    // We can also just grab the settings from the keyboard.getSettings() function. We probably just can make this an observer object
+                    // and notify the leap when we hit save, sending it the keyboards current settings.
+                    notifyListeners();
+                }
+                frame.requestFocusInWindow();
+            }
+        });
         
         calibrateButton.addActionListener(new ActionListener() {
             @Override
@@ -95,7 +121,7 @@ public class CalibrationController extends GraphicsController {
                     typedPanel.add(typedLabel);
                     clearTextTimer.start();
                 }
-                //typedPanel.requestFocusInWindow();
+                frame.requestFocusInWindow();
             }
         });
         
@@ -107,11 +133,16 @@ public class CalibrationController extends GraphicsController {
                 int selectedIndex = comboBox.getSelectedIndex();
                 if(keyboard != KeyboardType.getByID(selectedIndex).getKeyboard()) {
                     if(KeyboardType.LEAP == KeyboardType.getByID(selectedIndex)) {
+                        calibrateButton.setVisible(true);
                         calibrateButton.setEnabled(true);
+                        saveSettingsButton.setEnabled(true);
                     } else {
+                        calibrateButton.setVisible(false);
                         calibrateButton.setEnabled(false);
+                        saveSettingsButton.setEnabled(false);
                     }
                     // REMOVE EVERYTHING FROM PEVIOUS KEYBOARD
+                    typedLabel.setText("");
                     settingsPanel.removeAll();
                     renderOptionsPanel.removeAll();
                     
@@ -120,7 +151,6 @@ public class CalibrationController extends GraphicsController {
                     addKeyboardToUI();
                 }
                 frame.requestFocusInWindow();
-                //typedPanel.requestFocusInWindow();
             }
         });
         
@@ -235,7 +265,7 @@ public class CalibrationController extends GraphicsController {
        gl.glPushMatrix();
        //gl.glTranslatef(pos.getX(), pos.getY(), pos.getZ());
        gl.glTranslatef(pos.getX()+50, pos.getY()-120.0f, pos.getZ());
-       /// TEMP LEAP OFFSET STUFF: System.out.println("leapPos: " + pos + "\t\t glPos: " + "(" + (pos.getX()+50) + ", " + (pos.getY()-120) + ", " + pos.getZ() + ")");
+       //System.out.println("leapPos: " + pos + "\t\t glPos: " + "(" + (pos.getX()+50) + ", " + (pos.getY()-120) + ", " + pos.getZ() + ")");
        gl.glBegin(GL_QUADS); // of the color cube
        
        // Top-face
@@ -303,5 +333,22 @@ public class CalibrationController extends GraphicsController {
         canvas.setPreferredSize(new Dimension(keyboard.getWidth(), keyboard.getHeight()));
         canvas.setSize(keyboard.getWidth(), keyboard.getHeight());
         frame.pack();
+    }
+    
+    public void registerObserver(SaveSettingsObserver observer) {
+        if(observers.contains(observer)) {
+            return;
+        }
+        observers.add(observer);
+    }
+    
+    public void removeObserver(SaveSettingsObserver observer) {
+        observers.remove(observer);
+    }
+
+    protected void notifyListeners() {
+        for(SaveSettingsObserver observer : observers) {
+            observer.saveSettingsEventObserved(keyboard.getSettings());
+        }
     }
 }

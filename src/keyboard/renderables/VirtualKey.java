@@ -14,7 +14,7 @@ import javax.swing.Timer;
 //import static javax.media.opengl.GL2.*; // GL2 constants
 
 public class VirtualKey {
-    private final static int THICKNESS = 5;
+    private final static int THICKNESS = 10;
     private final static float[] ACTIVE = {0f, 1f, 0f, 0.5f};
     private final static float[] HOVER = {1f, 1f, 0f, 0.5f};
     private final static float[] NONE = {1f, 0f, 0f, 0.5f};
@@ -79,7 +79,7 @@ public class VirtualKey {
         return true;
     }
     
-    public boolean containsPoint(Vector point) {
+    public boolean isTouching(Vector point) {
         if(max.getX() < point.getX() || max.getY() < point.getY() || max.getZ() < point.getZ())
             return false;
         if(min.getX() > point.getX() || min.getY() > point.getY() || min.getZ() > point.getZ())

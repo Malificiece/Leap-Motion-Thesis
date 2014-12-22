@@ -21,11 +21,12 @@ public class Main {
          */
         
         GraphicsController.init();
-        controlCenter = new ControlCenter();
         
         // Create a sample listener and controller
         LeapListener listener = new LeapListener();
         Controller controller = new Controller();
+        
+        controlCenter = new ControlCenter(listener);
 
         // Have the sample listener receive events from the controller
         controller.addListener(listener);
@@ -36,7 +37,7 @@ public class Main {
              *      Rearrange data
              *      Perform computations
              */
-            controlCenter.update(listener.getTrackedPosition(), listener.getTrackedDirection());
+            controlCenter.update();
             
             /* Render
              *      Draw scene geometry from a particular view

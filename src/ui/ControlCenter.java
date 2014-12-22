@@ -17,7 +17,7 @@ import javax.swing.JRadioButton;
 import javax.swing.JSlider;
 import javax.swing.JTextField;
 
-import com.leapmotion.leap.Vector;
+import leap.LeapListener;
 
 
 public class ControlCenter {
@@ -29,6 +29,7 @@ public class ControlCenter {
     private static final ExperimentController EXPERIMENT_CONTROLLER = new ExperimentController();
     
     // Not Constants
+    LeapListener leapListener;
     private JFrame frame;
     private JTextField firstName;
     private JTextField lastName;
@@ -49,7 +50,9 @@ public class ControlCenter {
     private final ReentrantLock calibLock = new ReentrantLock();
     
     
-    public ControlCenter() {
+    public ControlCenter(LeapListener leapListener) {
+        this.leapListener = leapListener;
+        CALIBRATION_CONTROLLER.registerObserver(leapListener);
         // Java Swing/AWT important fields and selections
         frame = new JFrame("Experiment Control Center v0.1");
         firstName = new JTextField(10);
@@ -130,13 +133,13 @@ public class ControlCenter {
         });
     }
     
-    public void update(Vector position, Vector direction) {
+    public void update() {
         if(expInProgress()) {
-            EXPERIMENT_CONTROLLER.update(position, direction);
+            //EXPERIMENT_CONTROLLER.update(position, direction);
         }
         
         if(calibInProgress()) {
-            CALIBRATION_CONTROLLER.update(position, direction);
+            //CALIBRATION_CONTROLLER.update(position, direction);
         }
     }
     

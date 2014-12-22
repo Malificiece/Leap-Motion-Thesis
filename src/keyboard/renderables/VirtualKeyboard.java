@@ -4,6 +4,8 @@ import java.util.TreeMap;
 
 import javax.media.opengl.GL2;
 
+import com.leapmotion.leap.Vector;
+
 import enums.AttributeName;
 import enums.RenderableName;
 import keyboard.KeyboardAttributes;
@@ -13,11 +15,12 @@ import keyboard.KeyboardRenderable;
 //import static javax.media.opengl.GL2.*; // GL2 constants
 
 public class VirtualKeyboard extends KeyboardRenderable {
+    private static final String RENDER_NAME = RenderableName.VIRTUAL_KEYS.toString();
     private TreeMap<Character, VirtualKey> keys = new TreeMap<Character, VirtualKey>();
     //private VirtualKey [] keys;
     
     public VirtualKeyboard(KeyboardAttributes keyboardAttributes) {
-        super(RenderableName.VIRTUAL_KEYS.toString());
+        super(RENDER_NAME);
         createKeys(keyboardAttributes);
     }
     
@@ -50,6 +53,16 @@ public class VirtualKeyboard extends KeyboardRenderable {
     public void pressed(char key) { // possibly generate key pressed event here with time/key/etc saved. Return the key pressed object.
         VirtualKey vk = keys.get(key);
         vk.pressed();
+    }
+    
+    public boolean isHovering(char key, Vector point) {
+        VirtualKey vk = keys.get(key);
+        return vk.isHovering(point);
+    }
+    
+    public boolean isTouching(char key, Vector point) {
+        VirtualKey vk = keys.get(key);
+        return vk.isTouching(point);
     }
 
     @Override

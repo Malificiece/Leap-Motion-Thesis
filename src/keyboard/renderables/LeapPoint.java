@@ -4,13 +4,13 @@ import javax.media.opengl.GL2;
 
 import enums.RenderableName;
 import keyboard.KeyboardRenderable;
-import leap.LeapPlaneData;
+import leap.LeapPointData;
 
-public class LeapPlane extends KeyboardRenderable {
-    private static final String RENDER_NAME = RenderableName.LEAP_PLANE.toString();
-    private LeapPlaneData leapPlaneData;
+public class LeapPoint extends KeyboardRenderable {
+    private static final String RENDER_NAME = RenderableName.LEAP_POINT.toString();
+    private LeapPointData leapPointData;
     
-    public LeapPlane() {
+    public LeapPoint() {
         super(RENDER_NAME);
         // TODO Auto-generated constructor stub
     }

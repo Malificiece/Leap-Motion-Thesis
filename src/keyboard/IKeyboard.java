@@ -4,7 +4,9 @@ import java.util.ArrayList;
 
 import javax.media.opengl.GL2;
 
-public abstract class IKeyboard {
+import ui.SaveSettingsObserver;
+
+public abstract class IKeyboard implements SaveSettingsObserver {
     // TODO: list of things we need from the keyboard as an outside party
     // 1 - render the keyboard
     // 2 - get the attributes of the keyboard (size, etc)
@@ -55,5 +57,10 @@ public abstract class IKeyboard {
         for(KeyboardObserver observer : observers) {
             observer.keyboardEventObserved(key);
         }
+    }
+    
+    public void saveSettingsEventObserved(KeyboardSettings settings) {
+        // Save all settings and attributes to file (stored for next time program launched)
+        System.out.println("Saving Settings and Attributes to file");
     }
 }

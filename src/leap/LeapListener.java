@@ -7,18 +7,28 @@ package leap;
 * between Leap Motion and you, your company or other organization.             *
 \******************************************************************************/
 
-import java.util.concurrent.locks.ReentrantLock;
+import java.util.ArrayList;
+
+import keyboard.KeyboardSetting;
+import keyboard.KeyboardSettings;
+import ui.SaveSettingsObserver;
 
 import com.leapmotion.leap.*;
 //import com.leapmotion.leap.Gesture.State;
 
-public class LeapListener extends Listener {
-    public Vector trackedPosition = new Vector();
-    public Vector trackedDirection = new Vector();
-    public ReentrantLock leapLock = new ReentrantLock();
+public class LeapListener extends Listener implements SaveSettingsObserver {
+    private ArrayList<LeapObserver> observers = new ArrayList<LeapObserver>();
+    Controller controller;
+    LeapPointData leapPointData = new LeapPointData();
+    LeapPlaneData leapPlaneData = new LeapPlaneData();
+    LeapToolData leapToolData = new LeapToolData();
+    LeapGestureData leapGestureData = new LeapGestureData();
+    LeapObject leapObject = new LeapObject(leapPointData, leapPlaneData, leapToolData, leapGestureData);
+    //public ReentrantLock leapLock = new ReentrantLock();
     
     public void onInit(Controller controller) {
-        System.out.println("Initialized");
+        System.out.println("Initialized ");
+        this.controller = controller;
     }
 
     public void onConnect(Controller controller) {
@@ -38,7 +48,7 @@ public class LeapListener extends Listener {
         System.out.println("Exited");
     }
     
-    public Vector getTrackedPosition() {
+    /*public Vector getTrackedPosition() {
         leapLock.lock();
         try {
             return trackedPosition;
@@ -54,7 +64,7 @@ public class LeapListener extends Listener {
         } finally {
             leapLock.unlock();
         }
-    }
+    }*/
 
     public void onFrame(Controller controller) {
         // Get the most recent frame and report some basic information
@@ -109,13 +119,13 @@ public class LeapListener extends Listener {
             /*System.out.println("  Tool id: " + tool.id()
                              + ", position: " + tool.tipPosition()
                              + ", direction: " + tool.direction());*/
-            leapLock.lock();
+            /*leapLock.lock();
             try {
                 trackedPosition = tool.tipPosition();
                 trackedDirection = tool.direction();
             } finally {
                 leapLock.unlock();
-            }
+            }*/
         }
 
        /* GestureList gestures = frame.gestures();
@@ -180,5 +190,33 @@ public class LeapListener extends Listener {
         if (!frame.hands().isEmpty() || !gestures.isEmpty()) {
             System.out.println();
         }*/
+        notifyListeners();
+    }
+    
+    public void registerObserver(LeapObserver observer) {
+        if(observers.contains(observer)) {
+            return;
+        }
+        observers.add(observer);
+    }
+    
+    public void removeObserver(LeapObserver observer) {
+        observers.remove(observer);
+    }
+
+    protected void notifyListeners() {
+        for(LeapObserver observer : observers) {
+            observer.leapEventObserved(leapObject);
+        }
+    }
+
+    @Override
+    public void saveSettingsEventObserved(KeyboardSettings settings) {
+        Config config = controller.config();
+        System.out.println("Saving Settings to Leap Config");
+        int index = 0;
+        for(KeyboardSetting ks: settings.getAllSettings()) {
+            System.out.println("setting(" + index++ + "): " + ks);
+        }
     }
 }

@@ -15,11 +15,12 @@ import enums.AttributeName;
 import enums.RenderableName;
 import keyboard.IKeyboard;
 import keyboard.KeyboardAttribute;
+import keyboard.KeyboardSettings;
 import keyboard.renderables.VirtualKeyboard;
 
 public class StandardKeyboard extends IKeyboard {
-    VirtualKeyboard virtualKeyboard;
-    KeyBindings keyBindings;
+    private VirtualKeyboard virtualKeyboard;
+    private KeyBindings keyBindings;
     
     public StandardKeyboard() {
         keyboardAttributes = new StandardAttributes(this);

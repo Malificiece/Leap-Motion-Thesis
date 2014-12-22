@@ -1,7 +1,6 @@
 // THIS IS A TEST TO SEE IF EGIT WORKS
 package ui;
 import java.awt.Color;
-import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridBagLayout;
@@ -159,7 +158,7 @@ public class WindowBuilder {
             GLCanvas canvas,
             JLabel typedLabel,
             JComboBox<String> keyboardTypeComboBox,
-            JButton calibrateButton,
+            JButton[] buttons,
             JPanel[] panels) { // typed, settings, render options
         
         JPanel background = new JPanel();
@@ -225,10 +224,15 @@ public class WindowBuilder {
         JPanel padding0 = new JPanel();
         keyboardTypeSelectionPanel.add(padding0);
         
+        JPanel keyboardButtonsPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        keyboardTypeSelectionPanel.add(keyboardButtonsPanel);
+        
         // calibration button (grey out for all but leap) -- calibrates the leap plane
-        keyboardTypeSelectionPanel.add(calibrateButton);
-        calibrateButton.setAlignmentX(Component.CENTER_ALIGNMENT);
-        calibrateButton.setEnabled(false);
+        //calibrateButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+        keyboardButtonsPanel.add(buttons[0]);
+        keyboardButtonsPanel.add(buttons[1]);
+        buttons[0].setEnabled(false);
+        buttons[1].setEnabled(false);
         
         // 1.5 - Need a special panel to allow the scrollpanes to be the same size.
         JPanel settingsAndRenderPanel = new JPanel(new GridLayout(2,1));

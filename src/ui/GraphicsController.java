@@ -56,11 +56,13 @@ public abstract class GraphicsController implements GLEventListener, KeyboardObs
     public void init(GLAutoDrawable drawable) {
         GraphicsController.gl = drawable.getGL().getGL2();      // get the OpenGL graphics context
         glu = new GLU();                         // get GL Utilities
-        // TODO: Remove this initialization. Change keyboards from singleton to instance. Move keyboard creation to somewhere that makes sense (keyboard selection in calib/run buttons).
-        //keyboard = new StandardKeyboard(gl, pos);
+        
+        // TODO: Make sure this is where I want to register observers.
         KeyboardType.STANDARD.getKeyboard().registerObserver(this);
         KeyboardType.LEAP.getKeyboard().registerObserver(this);
-        //keyboard = KeyboardType.STANDARD.getKeyboard();
+        KeyboardType.TABLET.getKeyboard().registerObserver(this);
+        KeyboardType.XBOX.getKeyboard().registerObserver(this);
+
         gl.glClearColor(1f, 1f, 1f, 0.0f); // set background (clear) color
         gl.glClearDepth(1.0f);      // set clear depth value to farthest
         gl.glEnable(GL_DEPTH_TEST); // enables depth testing

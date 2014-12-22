@@ -7,7 +7,7 @@ import keyboard.IKeyboard;
 
 public class LeapKeyboard extends IKeyboard {
     
-    public LeapKeyboard() { // TODO: Why is leapPos here (was originally in render)..not used yet
+    public LeapKeyboard() {
         keyboardAttributes = new LeapAttributes(this);
         keyboardSettings = new LeapSettings(this);
         keyboardRenderables = new LeapRenderables(this);
@@ -49,6 +49,4 @@ public class LeapKeyboard extends IKeyboard {
     public void update() {
         // TODO Auto-generated method stub
     }
-    
-
 }
