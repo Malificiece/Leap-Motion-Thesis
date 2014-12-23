@@ -4,7 +4,9 @@ import java.util.ArrayList;
 
 import javax.media.opengl.GL2;
 
+import enums.FilePath;
 import ui.SaveSettingsObserver;
+import utilities.MyUtilities;
 
 public abstract class IKeyboard implements SaveSettingsObserver {
     // TODO: list of things we need from the keyboard as an outside party
@@ -14,16 +16,31 @@ public abstract class IKeyboard implements SaveSettingsObserver {
     // 4 - get/set the renderables of the keyboard (image, key colors, leap plane etc)
     // 5 - give it key pressed events (to render them properly) --- and record specialized data for the specific type of keyboard
     // 6 - must be capable of creating it's own keyboard events using the robot if not the default (This will require a self sustaining update function possibly)
+    private int keyboardID;
+    private String filePath;
     private ArrayList<KeyboardObserver> observers = new ArrayList<KeyboardObserver>();
     protected KeyboardSettings keyboardSettings;
     protected KeyboardAttributes keyboardAttributes;
     protected KeyboardRenderables keyboardRenderables;
     protected KeyboardAttribute width;
     protected KeyboardAttribute height;
-    protected char key;
+    protected char keyPressed;
+    
+    public IKeyboard(int keyboardID, String filePath) {
+        this.keyboardID = keyboardID;
+        this.filePath = filePath;
+    }
     
     public abstract void render(GL2 gl);
     public abstract void update();
+    
+    public int getKeyboardID() {
+        return keyboardID;
+    }
+    
+    public String getKeyboardFilePath() {
+        return filePath;
+    }
     
     public int getHeight() {
         return height.getValueAsInteger();
@@ -55,12 +72,16 @@ public abstract class IKeyboard implements SaveSettingsObserver {
 
     protected void notifyListeners() {
         for(KeyboardObserver observer : observers) {
-            observer.keyboardEventObserved(key);
+            observer.keyboardEventObserved(keyPressed);
         }
     }
     
-    public void saveSettingsEventObserved(KeyboardSettings settings) {
+    public void saveSettingsEventObserved(IKeyboard keyboard) {
         // Save all settings and attributes to file (stored for next time program launched)
-        System.out.println("Saving Settings and Attributes to file");
+        if(keyboardID == keyboard.getKeyboardID()) {
+            System.out.println(keyboard + ": Saving Settings and Attributes to file");
+            MyUtilities.writeAttributeListToFile(FilePath.CONFIG_PATH.getPath() + (filePath.subSequence(0, filePath.length()-1)) + ".ini", keyboardAttributes.getAllAttributes());
+            MyUtilities.writeSettingListToFile(FilePath.CONFIG_PATH.getPath() + (filePath.subSequence(0, filePath.length()-1)) + ".ini", keyboardSettings.getAllSettings());
+        }
     }
 }

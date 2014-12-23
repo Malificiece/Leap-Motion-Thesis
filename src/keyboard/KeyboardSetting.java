@@ -29,9 +29,9 @@ public class KeyboardSetting {
     
     public KeyboardSetting(String name, Number value, Number min, Number max, DecimalPrecision decimalPrecision) {
         this.name = name;
-        this.value = value.floatValue();
-        this.min = min.floatValue();
-        this.max = max.floatValue();
+        this.value = value.doubleValue();
+        this.min = min.doubleValue();
+        this.max = max.doubleValue();
         this.decimalPrecision = decimalPrecision;
         createSettingsPanel();
     }

@@ -8,6 +8,7 @@ import java.awt.geom.AffineTransform;
 import javax.media.opengl.GL;
 import javax.media.opengl.GL2;
 
+import enums.FilePath;
 import enums.RenderableName;
 import keyboard.KeyboardRenderable;
 import static javax.media.opengl.GL.*;  // GL constants
@@ -15,9 +16,9 @@ import static javax.media.opengl.GL.*;  // GL constants
 
 public class KeyboardImage extends KeyboardRenderable {
     private static final String RENDER_NAME = RenderableName.KEYBOARD_IMAGE.toString();
-    private final String ASSETS_PATH = "./assets/";
-    private final String DEFAULT_FILE_PATH = "standard/";
-    private final String DEFAULT_FILE_NAME = "keyboard.png";
+    private static final String ASSETS_PATH = FilePath.ASSETS_PATH.getPath();
+    private static final String DEFAULT_FILE_PATH = FilePath.STANDARD_PATH.getPath();
+    private static final String DEFAULT_FILE_NAME = "keyboard.png";
     private String fullFilename;
     private ByteBuffer image = null;
     private int height;

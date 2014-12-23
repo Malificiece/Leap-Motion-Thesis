@@ -33,7 +33,7 @@ public abstract class GraphicsController implements GLEventListener, KeyboardObs
 		capabilities = new GLCapabilities(profile);
 	}
 	
-	public abstract void update(Vector position, Vector direction);
+	public abstract void update();
 	public abstract void render(GLAutoDrawable drawable);
 	
 	public void display() {
@@ -61,7 +61,7 @@ public abstract class GraphicsController implements GLEventListener, KeyboardObs
         KeyboardType.STANDARD.getKeyboard().registerObserver(this);
         KeyboardType.LEAP.getKeyboard().registerObserver(this);
         KeyboardType.TABLET.getKeyboard().registerObserver(this);
-        KeyboardType.XBOX.getKeyboard().registerObserver(this);
+        KeyboardType.CONTROLLER.getKeyboard().registerObserver(this);
 
         gl.glClearColor(1f, 1f, 1f, 0.0f); // set background (clear) color
         gl.glClearDepth(1.0f);      // set clear depth value to farthest

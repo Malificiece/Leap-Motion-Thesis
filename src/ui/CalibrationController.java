@@ -25,7 +25,7 @@ import keyboard.KeyboardAttributes;
 import keyboard.KeyboardRenderable;
 import keyboard.KeyboardSetting;
 import keyboard.renderables.LeapPlane;
-import leap.LeapObserver;
+import leap.LeapListener;
 import utilities.MyUtilities;
 
 import com.leapmotion.leap.Vector;
@@ -53,7 +53,7 @@ public class CalibrationController extends GraphicsController {
         registerObserver(KeyboardType.STANDARD.getKeyboard());
         registerObserver(KeyboardType.LEAP.getKeyboard());
         registerObserver(KeyboardType.TABLET.getKeyboard());
-        registerObserver(KeyboardType.XBOX.getKeyboard());
+        registerObserver(KeyboardType.CONTROLLER.getKeyboard());
         canvas = new GLCanvas(capabilities);
         canvas.setPreferredSize(new Dimension(keyboard.getWidth(), keyboard.getHeight()));
         canvas.setSize(keyboard.getWidth(), keyboard.getHeight());
@@ -88,20 +88,7 @@ public class CalibrationController extends GraphicsController {
         saveSettingsButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent arg0) {
-                if(keyboard == KeyboardType.LEAP.getKeyboard()) {
-                    // SAVE SETTINGS TO LEAP VIA CONFIGURATION UTIL
-                    // TODO: SAVE SETTINGS TO FILE FOR USE NEXT TIME AND LOAD THEM FROM FILE
-                    //LeapObject leapObject = (LeapObject) keyboard.getAttributes().getAttributeByName(AttributeName.KEY_BINDINGS.toString()).getValue();
-                    // leapObject.saveSettings()
-                    
-                    // Probably better to do keyboard.saveSettings() if we add the ability to change things on the other keyboards.
-                    // Otherwise I probably would be better off just casting to LeapKeyboard.saveSettings()
-                    // This way the keyboard can save it's already fully internalized settings.
-                    
-                    // We can also just grab the settings from the keyboard.getSettings() function. We probably just can make this an observer object
-                    // and notify the leap when we hit save, sending it the keyboards current settings.
-                    notifyListeners();
-                }
+                notifyListeners();
                 frame.requestFocusInWindow();
             }
         });
@@ -133,10 +120,12 @@ public class CalibrationController extends GraphicsController {
                 int selectedIndex = comboBox.getSelectedIndex();
                 if(keyboard != KeyboardType.getByID(selectedIndex).getKeyboard()) {
                     if(KeyboardType.LEAP == KeyboardType.getByID(selectedIndex)) {
+                        LeapListener.startListening();
                         calibrateButton.setVisible(true);
                         calibrateButton.setEnabled(true);
                         saveSettingsButton.setEnabled(true);
                     } else {
+                        LeapListener.stopListening();
                         calibrateButton.setVisible(false);
                         calibrateButton.setEnabled(false);
                         saveSettingsButton.setEnabled(false);
@@ -208,7 +197,13 @@ public class CalibrationController extends GraphicsController {
     public void keyboardEventObserved(char key) {
         // TODO: Add full implementation required for detailed analysis of key presses
         clearTextTimer.restart();
-        typedLabel.setText(typedLabel.getText()+Character.toString(key));
+        if(key == '\b' && 0 < typedLabel.getText().length()) {
+            typedLabel.setText(typedLabel.getText().substring(0, typedLabel.getText().length()-1));
+        } else if(key == '\n') {
+            typedLabel.setText("");
+        } else {
+            typedLabel.setText(typedLabel.getText()+Character.toString(key));
+        }
         MyUtilities.calculateFontSize(typedLabel.getText(),typedLabel, typedPanel);
     }
     
@@ -221,9 +216,9 @@ public class CalibrationController extends GraphicsController {
         //typedPanel.requestFocusInWindow();
     }
     
-    public void update(Vector position, Vector direction) {
-        pos = position;
-        dir = direction;
+    public void update(/*Vector position, Vector direction*/) {
+        //pos = position;
+        //dir = direction;
         keyboard.update();
     }
     
@@ -348,7 +343,7 @@ public class CalibrationController extends GraphicsController {
 
     protected void notifyListeners() {
         for(SaveSettingsObserver observer : observers) {
-            observer.saveSettingsEventObserved(keyboard.getSettings());
+            observer.saveSettingsEventObserved(keyboard);
         }
     }
 }

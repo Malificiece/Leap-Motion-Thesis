@@ -8,8 +8,7 @@ public enum TestType {
     LEAP_L_L(5, "Large leap keyboard - left-handed", 'l'),
     TABLET_R(6, "Tablet keyboard - right-handed", 'r'),
     TABLET_L(7, "Tablet keyboard - left-handed", 'l'),
-    XBOX_R(8, "X-box keyboard - right-handed", 'r'),
-    XBOX_L(9, "X-box keyboard - left-handed", 'l'),
+    CONTROLLER(8, "Controller keyboard", 'n'),
     VOICE(10, "Voice input", 'n');
 
     private final int testID;

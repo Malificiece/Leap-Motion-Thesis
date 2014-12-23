@@ -7,6 +7,7 @@ import javax.media.opengl.GL2;
 import com.leapmotion.leap.Vector;
 
 import enums.AttributeName;
+import enums.Key;
 import enums.RenderableName;
 import keyboard.KeyboardAttributes;
 import keyboard.KeyboardRenderable;
@@ -16,7 +17,7 @@ import keyboard.KeyboardRenderable;
 
 public class VirtualKeyboard extends KeyboardRenderable {
     private static final String RENDER_NAME = RenderableName.VIRTUAL_KEYS.toString();
-    private TreeMap<Character, VirtualKey> keys = new TreeMap<Character, VirtualKey>();
+    private TreeMap<Key, VirtualKey> keys = new TreeMap<Key, VirtualKey>();
     //private VirtualKey [] keys;
     
     public VirtualKeyboard(KeyboardAttributes keyboardAttributes) {
@@ -30,39 +31,62 @@ public class VirtualKeyboard extends KeyboardRenderable {
         int keyWidth = (int) keyboardAttributes.getValueByName(AttributeName.KEY_WIDTH.toString());
         int keyHeight = (int) keyboardAttributes.getValueByName(AttributeName.KEY_HEIGHT.toString());
         int spaceKeyWidth = (int) keyboardAttributes.getValueByName(AttributeName.SPACE_KEY_WIDTH.toString());
+        int backSpaceKeyWidth = (int) keyboardAttributes.getValueByName(AttributeName.BACK_SPACE_KEY_WIDTH.toString());
+        int shiftKeyWidth = (int) keyboardAttributes.getValueByName(AttributeName.SHIFT_KEY_WIDTH.toString());
+        int enterWidth = (int) keyboardAttributes.getValueByName(AttributeName.ENTER_KEY_WIDTH.toString());
         //int numKeys = (int) keyboardAttributes.getValueByName(AttributeName.NUMBER_OF_KEYS.toString());
         int[] rowOffsets = (int[]) keyboardAttributes.getValueByName(AttributeName.ROW_OFFSETS.toString());
-        char[][] keyRows = (char[][]) keyboardAttributes.getValueByName(AttributeName.KEY_ROWS.toString());
+        Key[][] keyRows = (Key[][]) keyboardAttributes.getValueByName(AttributeName.KEY_ROWS.toString());
         
         for(int rowIndex = 0, x = 0, y = keyboardHeight + gapSize; rowIndex < keyRows.length; rowIndex++) {
             x = rowOffsets[rowIndex];
             y -= (keyHeight + gapSize);
             for(int colIndex = 0; colIndex < keyRows[rowIndex].length; colIndex++) {
-                char key = keyRows[rowIndex][colIndex];
-                if(key == ' ') {
+                Key key = keyRows[rowIndex][colIndex];
+                if(key == Key.VK_SPACE) {
                     keys.put(key, new VirtualKey(x, y, spaceKeyWidth, keyHeight, key));
                     x += spaceKeyWidth + gapSize;
+                } else if (key == Key.VK_BACK_SPACE) {
+                    keys.put(key, new VirtualKey(x, y, backSpaceKeyWidth, keyHeight, key));
+                    x += backSpaceKeyWidth + gapSize;
+                } else if (key == Key.VK_SHIFT) {
+                    keys.put(key, new VirtualKey(x, y, shiftKeyWidth, keyHeight, key));
+                    x += shiftKeyWidth + gapSize;
+                } else if (key == Key.VK_ENTER) {
+                    keys.put(key, new VirtualKey(x, y, enterWidth, keyHeight, key));
+                    x += enterWidth + gapSize;
+                } else if (key == Key.VK_NULL) {
+                    x += keyWidth + gapSize;
                 } else {
                     keys.put(key, new VirtualKey(x, y, keyWidth, keyHeight, key));
                     x += keyWidth + gapSize;
                 }
             }
         }
+        
     }
     
-    public void pressed(char key) { // possibly generate key pressed event here with time/key/etc saved. Return the key pressed object.
+    public void pressed(Key key) { // possibly generate key pressed event here with time/key/etc saved. Return the key pressed object.
         VirtualKey vk = keys.get(key);
-        vk.pressed();
+        if(vk != null) {
+            vk.pressed();
+        }
     }
     
-    public boolean isHovering(char key, Vector point) {
+    public boolean isHovering(Key key, Vector point) {
         VirtualKey vk = keys.get(key);
-        return vk.isHovering(point);
+        if(vk != null) {
+            return vk.isHovering(point);
+        }
+        return false;
     }
     
-    public boolean isTouching(char key, Vector point) {
+    public boolean isTouching(Key key, Vector point) {
         VirtualKey vk = keys.get(key);
-        return vk.isTouching(point);
+        if(vk != null) {
+            return vk.isTouching(point);
+        }
+        return false;
     }
 
     @Override

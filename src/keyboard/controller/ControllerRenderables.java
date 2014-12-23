@@ -1,4 +1,4 @@
-package keyboard.standard;
+package keyboard.controller;
 
 import javax.media.opengl.GL2;
 
@@ -7,11 +7,11 @@ import keyboard.KeyboardRenderables;
 import keyboard.renderables.KeyboardImage;
 import keyboard.renderables.VirtualKeyboard;
 
-public class StandardRenderables extends KeyboardRenderables {
+public class ControllerRenderables extends KeyboardRenderables {
     //private KeyboardImage keyboardImage;
     //private VirtualKeyboard virtualKeyboard;
 
-    StandardRenderables(StandardKeyboard keyboard) {
+    ControllerRenderables(ControllerKeyboard keyboard) {
         // order here determines render order
         this.addRenderable(new KeyboardImage("keyboard.png", keyboard.getKeyboardFilePath()));
         this.addRenderable(new VirtualKeyboard(keyboard.getAttributes()));

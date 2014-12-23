@@ -1,11 +1,11 @@
-package keyboard.standard;
+package keyboard.controller;
 
-import enums.AttributeName;
-import enums.Key;
 import keyboard.KeyboardAttribute;
 import keyboard.KeyboardAttributes;
+import enums.AttributeName;
+import enums.Key;
 
-public class StandardAttributes extends KeyboardAttributes {
+public class ControllerAttributes extends KeyboardAttributes {
     private static final int HEIGHT = 298;
     private static final int WIDTH = 752;
     private static final int GAP_SIZE = 2;
@@ -26,7 +26,7 @@ public class StandardAttributes extends KeyboardAttributes {
     private static final Key [] FOURTH_ROW = {Key.VK_SHIFT, Key.VK_Z, Key.VK_X, Key.VK_C, Key.VK_V, Key.VK_B, Key.VK_N, Key.VK_M, Key.VK_COMMA, Key.VK_PERIOD};
     private static final Key [] FIFTH_ROW = {Key.VK_SPACE};
     
-    StandardAttributes(StandardKeyboard keyboard) {
+    ControllerAttributes(ControllerKeyboard keyboard) {
         this.addAttribute(new KeyboardAttribute(AttributeName.KEYBOARD_HEIGHT.toString(), HEIGHT));
         this.addAttribute(new KeyboardAttribute(AttributeName.KEYBOARD_WIDTH.toString(), WIDTH));
         this.addAttribute(new KeyboardAttribute(AttributeName.GAP_SIZE.toString(), GAP_SIZE));

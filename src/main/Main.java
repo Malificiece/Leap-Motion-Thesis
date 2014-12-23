@@ -23,14 +23,13 @@ public class Main {
         GraphicsController.init();
         
         // Create a sample listener and controller
-        LeapListener listener = new LeapListener();
         Controller controller = new Controller();
+        LeapListener listener = new LeapListener(controller);
         
         controlCenter = new ControlCenter(listener);
 
         // Have the sample listener receive events from the controller
-        controller.addListener(listener);
-        
+        //controller.addListener(listener);
         while(!exit) {
             /* Update (Simulate Leap)
              *      Calculate geometry

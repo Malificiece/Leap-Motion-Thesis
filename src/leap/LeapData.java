@@ -1,14 +1,14 @@
 package leap;
 
-public class LeapObject {
+public class LeapData {
     private LeapPointData leapPointData;
-    private LeapPlaneData leapPlaneData;
+    //private LeapPlaneData leapPlaneData;
     private LeapToolData leapToolData;
     private LeapGestureData leapGestureData;
     
-    public LeapObject(LeapPointData leapPointData, LeapPlaneData leapPlaneData, LeapToolData leapToolData, LeapGestureData leapGestureData) {
+    public LeapData(LeapPointData leapPointData,/* LeapPlaneData leapPlaneData,*/ LeapToolData leapToolData, LeapGestureData leapGestureData) {
         this.leapPointData = leapPointData;
-        this.leapPlaneData = leapPlaneData;
+        //this.leapPlaneData = leapPlaneData;
         this.leapToolData = leapToolData;
         this.leapGestureData = leapGestureData;
     }
@@ -17,9 +17,9 @@ public class LeapObject {
         this.leapPointData = leapPointData;
     }
     
-    public void setLeapPlaneData(LeapPlaneData leapPlaneData) {
+    /*public void setLeapPlaneData(LeapPlaneData leapPlaneData) {
         this.leapPlaneData = leapPlaneData;
-    }
+    }*/
     
     public void setLeapToolData(LeapToolData leapToolData) {
         this.leapToolData = leapToolData;
@@ -33,9 +33,9 @@ public class LeapObject {
         return leapPointData;
     }
     
-    public LeapPlaneData getLeapPlaneData() {
+    /*public LeapPlaneData getLeapPlaneData() {
         return leapPlaneData;
-    }
+    }*/
     
     public LeapToolData getLeapToolData() {
         return leapToolData;

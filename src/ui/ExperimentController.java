@@ -93,7 +93,7 @@ public class ExperimentController extends GraphicsController {
         frame.setVisible(true);
     }
     
-    public void update(Vector position, Vector direction) {
+    public void update(/*Vector position, Vector direction*/) {
         theta += 0.01;
         s = Math.sin(theta);
         c = Math.cos(theta);

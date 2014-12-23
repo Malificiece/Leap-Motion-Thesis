@@ -1,14 +1,16 @@
 package enums;
 
 import keyboard.IKeyboard;
+import keyboard.controller.ControllerKeyboard;
 import keyboard.leap.LeapKeyboard;
 import keyboard.standard.StandardKeyboard;
+import keyboard.tablet.TabletKeyboard;
 
 public enum KeyboardType {
-    STANDARD(0, "Standard Keyboard", new StandardKeyboard()),
-    LEAP(1, "Leap Keyboard", new LeapKeyboard()),
-    TABLET(2, "Tablet Keyboard", new StandardKeyboard()),
-    XBOX(3, "X-box Keyboard", new StandardKeyboard());
+    STANDARD(StandardKeyboard.KEYBOARD_ID, "Standard Keyboard", new StandardKeyboard()),
+    LEAP(LeapKeyboard.KEYBOARD_ID, "Leap Keyboard", new LeapKeyboard()),
+    TABLET(TabletKeyboard.KEYBOARD_ID, "Tablet Keyboard", new TabletKeyboard()),
+    CONTROLLER(ControllerKeyboard.KEYBOARD_ID, "Controller Keyboard", new ControllerKeyboard());
 
     private final int keyboardID;
     private final String keyboardName;

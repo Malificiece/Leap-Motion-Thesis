@@ -7,6 +7,8 @@ import java.nio.FloatBuffer;
 
 import com.leapmotion.leap.Vector;
 
+import enums.Key;
+
 import javax.media.opengl.GL2;
 import javax.swing.Timer;
 
@@ -22,16 +24,16 @@ public class VirtualKey {
     private Vector min; // also equivalent to location (not center)
     private int width;
     private int height;
-    private char value;
+    private Key key;
     private FloatBuffer color;
     private Timer lightUpKeyTimer;
     
-    public VirtualKey(float x, float y, float width, float height, char value) {
+    public VirtualKey(float x, float y, float width, float height, Key key) {
         min = new Vector(x, y, 0);
         max = new Vector(x+width, y+height, THICKNESS);
         this.width = (int)width;
         this.height = (int)height;
-        this.value = value;
+        this.key = key;
         ByteBuffer vbb = ByteBuffer.allocateDirect(16); 
         vbb.order(ByteOrder.nativeOrder());    // use the device hardware's native byte order
         color = vbb.asFloatBuffer();  // create a floating point buffer from the ByteBuffer
@@ -88,7 +90,7 @@ public class VirtualKey {
         return true;
     }
     
-    public char getKeyValue() {
-        return value;
+    public Key getKey() {
+        return key;
     }
 }

@@ -1,7 +1,7 @@
 package ui;
 
-import keyboard.KeyboardSettings;
+import keyboard.IKeyboard;
 
 public interface SaveSettingsObserver {
-    public void saveSettingsEventObserved(KeyboardSettings settings);
+    public void saveSettingsEventObserved(IKeyboard keyboard);
 }

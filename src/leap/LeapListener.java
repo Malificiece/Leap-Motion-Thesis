@@ -9,26 +9,34 @@ package leap;
 
 import java.util.ArrayList;
 
+import keyboard.IKeyboard;
 import keyboard.KeyboardSetting;
-import keyboard.KeyboardSettings;
 import ui.SaveSettingsObserver;
 
 import com.leapmotion.leap.*;
-//import com.leapmotion.leap.Gesture.State;
+
+import enums.KeyboardType;
 
 public class LeapListener extends Listener implements SaveSettingsObserver {
+    private static Controller controller;
+    private static LeapListener listener;
     private ArrayList<LeapObserver> observers = new ArrayList<LeapObserver>();
-    Controller controller;
-    LeapPointData leapPointData = new LeapPointData();
-    LeapPlaneData leapPlaneData = new LeapPlaneData();
-    LeapToolData leapToolData = new LeapToolData();
-    LeapGestureData leapGestureData = new LeapGestureData();
-    LeapObject leapObject = new LeapObject(leapPointData, leapPlaneData, leapToolData, leapGestureData);
-    //public ReentrantLock leapLock = new ReentrantLock();
+    private LeapPointData leapPointData = new LeapPointData();
+    //private LeapPlaneData leapPlaneData = new LeapPlaneData();
+    private LeapToolData leapToolData = new LeapToolData();
+    private LeapGestureData leapGestureData = new LeapGestureData();
+    private LeapData leapData = new LeapData(leapPointData,/* leapPlaneData,*/ leapToolData, leapGestureData);
+    //private ReentrantLock leapLock = new ReentrantLock();
+    private Tool testTool = new Tool();
+    
+    public LeapListener(Controller controller) {
+        super();
+        LeapListener.listener = this;
+        LeapListener.controller = controller;
+    }
     
     public void onInit(Controller controller) {
-        System.out.println("Initialized ");
-        this.controller = controller;
+        System.out.println("Initialized");
     }
 
     public void onConnect(Controller controller) {
@@ -69,6 +77,8 @@ public class LeapListener extends Listener implements SaveSettingsObserver {
     public void onFrame(Controller controller) {
         // Get the most recent frame and report some basic information
         Frame frame = controller.frame();
+        System.out.println("Frame id: " + frame.id());
+        
         /*System.out.println("Frame id: " + frame.id()
                          + ", timestamp: " + frame.timestamp()
                          + ", hands: " + frame.hands().count()
@@ -126,6 +136,8 @@ public class LeapListener extends Listener implements SaveSettingsObserver {
             } finally {
                 leapLock.unlock();
             }*/
+            System.out.println("leap: " + "Tip Position: " + tool.tipPosition() + " Stabilized Tip Position: " + tool.stabilizedTipPosition());
+            testTool = tool;
         }
 
        /* GestureList gestures = frame.gestures();
@@ -190,7 +202,17 @@ public class LeapListener extends Listener implements SaveSettingsObserver {
         if (!frame.hands().isEmpty() || !gestures.isEmpty()) {
             System.out.println();
         }*/
-        notifyListeners();
+        if(testTool.isValid()) {
+            notifyListeners();
+        }
+    }
+    
+    public static void stopListening() {
+        controller.removeListener(listener);
+    }
+    
+    public static void startListening() {
+        controller.addListener(listener);
     }
     
     public void registerObserver(LeapObserver observer) {
@@ -206,17 +228,18 @@ public class LeapListener extends Listener implements SaveSettingsObserver {
 
     protected void notifyListeners() {
         for(LeapObserver observer : observers) {
-            observer.leapEventObserved(leapObject);
+            observer.leapEventObserved(testTool);
         }
     }
 
     @Override
-    public void saveSettingsEventObserved(KeyboardSettings settings) {
-        Config config = controller.config();
-        System.out.println("Saving Settings to Leap Config");
-        int index = 0;
-        for(KeyboardSetting ks: settings.getAllSettings()) {
-            System.out.println("setting(" + index++ + "): " + ks);
+    public void saveSettingsEventObserved(IKeyboard keyboard) {
+        if(keyboard == KeyboardType.LEAP.getKeyboard()) {
+            Config config = controller.config();
+            for(KeyboardSetting ks: keyboard.getSettings().getAllSettings()) {
+                config.setFloat(ks.getName(), (float) ks.getValue());
+            }
+            System.out.println("Saving Settings to Leap Config: " + (config.save() ? "success" : "failed"));
         }
     }
 }

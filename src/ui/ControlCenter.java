@@ -17,6 +17,8 @@ import javax.swing.JRadioButton;
 import javax.swing.JSlider;
 import javax.swing.JTextField;
 
+import keyboard.leap.LeapKeyboard;
+import enums.KeyboardType;
 import leap.LeapListener;
 
 
@@ -29,7 +31,7 @@ public class ControlCenter {
     private static final ExperimentController EXPERIMENT_CONTROLLER = new ExperimentController();
     
     // Not Constants
-    LeapListener leapListener;
+    //LeapListener leapListener;
     private JFrame frame;
     private JTextField firstName;
     private JTextField lastName;
@@ -51,7 +53,7 @@ public class ControlCenter {
     
     
     public ControlCenter(LeapListener leapListener) {
-        this.leapListener = leapListener;
+        leapListener.registerObserver((LeapKeyboard) KeyboardType.LEAP.getKeyboard());
         CALIBRATION_CONTROLLER.registerObserver(leapListener);
         // Java Swing/AWT important fields and selections
         frame = new JFrame("Experiment Control Center v0.1");
@@ -135,11 +137,11 @@ public class ControlCenter {
     
     public void update() {
         if(expInProgress()) {
-            //EXPERIMENT_CONTROLLER.update(position, direction);
+            EXPERIMENT_CONTROLLER.update();
         }
         
         if(calibInProgress()) {
-            //CALIBRATION_CONTROLLER.update(position, direction);
+            CALIBRATION_CONTROLLER.update();
         }
     }
     
