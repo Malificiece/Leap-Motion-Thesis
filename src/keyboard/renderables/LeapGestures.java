@@ -2,45 +2,41 @@ package keyboard.renderables;
 
 import javax.media.opengl.GL2;
 
+import com.leapmotion.leap.GestureList;
 import com.leapmotion.leap.InteractionBox;
-import com.leapmotion.leap.Tool;
 
 import enums.AttributeName;
 import enums.RenderableName;
 import keyboard.KeyboardAttributes;
 import keyboard.KeyboardRenderable;
 
-public class LeapTool extends KeyboardRenderable {
-    private static final String RENDER_NAME = RenderableName.LEAP_TOOL.toString();
+public class LeapGestures extends KeyboardRenderable {
+    private static final String RENDER_NAME = RenderableName.LEAP_GESTURES.toString();
     private final int KEYBOARD_WIDTH;
     private final int KEYBOARD_HEIGHT;
-    private Tool tool = new Tool();
+    private GestureList gestures = new GestureList();
     private InteractionBox iBox;
-    
-    public LeapTool(KeyboardAttributes keyboardAttributes) {
+
+    public LeapGestures(KeyboardAttributes keyboardAttributes) {
         super(RENDER_NAME);
         KEYBOARD_WIDTH = keyboardAttributes.getAttributeByName(AttributeName.KEYBOARD_WIDTH.toString()).getValueAsInteger();
         KEYBOARD_HEIGHT = keyboardAttributes.getAttributeByName(AttributeName.KEYBOARD_HEIGHT.toString()).getValueAsInteger();
     }
     
-    public void setTool(Tool tool) {
-        this.tool = tool;
+    public void setGestures(GestureList gestures) {
+        this.gestures = gestures;
     }
     
-    public Tool getTool() {
-        return tool;
+    public GestureList getGestures() {
+        return gestures;
     }
     
     public void setInteractionBox(InteractionBox iBox) {
         this.iBox = iBox;
     }
     
-    public boolean isValid() {
-        return tool.isValid();
-    }
-    
-    public void normalize() {
-        
+    public boolean isEmpty() {
+        return gestures.isEmpty();
     }
 
     @Override

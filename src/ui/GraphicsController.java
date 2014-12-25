@@ -1,4 +1,8 @@
 package ui;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+import java.nio.FloatBuffer;
+
 import javax.media.opengl.GL2;
 import javax.media.opengl.GLAutoDrawable;
 import javax.media.opengl.GLCapabilities;
@@ -11,6 +15,8 @@ import keyboard.IKeyboard;
 import keyboard.KeyboardObserver;
 import static javax.media.opengl.GL.*;  // GL constants
 import static javax.media.opengl.GL2.*; // GL2 constants
+import static javax.media.opengl.fixedfunc.GLLightingFunc.GL_LIGHT0;
+import static javax.media.opengl.fixedfunc.GLLightingFunc.GL_LIGHTING;
 
 import com.leapmotion.leap.Vector;
 
@@ -68,10 +74,18 @@ public abstract class GraphicsController implements GLEventListener, KeyboardObs
         gl.glEnable(GL_DEPTH_TEST); // enables depth testing
         gl.glDepthFunc(GL_LEQUAL);  // the type of depth test to do
         gl.glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST); // best perspective correction
-        //gl.glShadeModel(GL_SMOOTH); // blends colors nicely, and smoothes out lighting
-        //gl.glEnable(GL_LIGHTING);
+        gl.glShadeModel(GL_SMOOTH); // blends colors nicely, and smoothes out lighting
+        gl.glEnable(GL_LIGHTING);
    
         // ----- Your OpenGL initialization code here -----
+        float lightpos[] = {0f, 10f,0f, 1f};
+        ByteBuffer vbb = ByteBuffer.allocateDirect(16); 
+        vbb.order(ByteOrder.nativeOrder());    // use the device hardware's native byte order
+        FloatBuffer light = vbb.asFloatBuffer();  // create a floating point buffer from the ByteBuffer
+        light.put(lightpos);
+        light.position(0);
+        gl.glLightfv(GL_LIGHT0, GL_POSITION, light);
+        gl.glEnable(GL_LIGHT0);
         
     }
 

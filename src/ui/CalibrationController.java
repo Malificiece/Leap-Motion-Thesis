@@ -204,7 +204,7 @@ public class CalibrationController extends GraphicsController {
         } else {
             typedLabel.setText(typedLabel.getText()+Character.toString(key));
         }
-        MyUtilities.calculateFontSize(typedLabel.getText(),typedLabel, typedPanel);
+        MyUtilities.JAVA_SWING_UTILITIES.calculateFontSize(typedLabel.getText(),typedLabel, typedPanel);
     }
     
     public void disable() {
@@ -213,12 +213,10 @@ public class CalibrationController extends GraphicsController {
     
     public void enable() {
         frame.setVisible(true);
-        //typedPanel.requestFocusInWindow();
+        frame.requestFocusInWindow();
     }
     
-    public void update(/*Vector position, Vector direction*/) {
-        //pos = position;
-        //dir = direction;
+    public void update() {
         keyboard.update();
     }
     
@@ -243,70 +241,20 @@ public class CalibrationController extends GraphicsController {
        // this consists of drawing a box for the whole keyboard to calibrated scale
        // cover this box in the texture
        // draw boxes over all keys to the calibrated scale to detect 3D key presses by leap pos
-       keyboard.render(gl);
        
-       // Setup ortho projection, with aspect ratio matches viewport
+       // Setup perspective projection, with aspect ratio matches viewport
        gl.glMatrixMode(GL_PROJECTION);
        gl.glLoadIdentity();
-       float aspect = (float) 800/800; // float aspect = (float) 647f/385f;
-       //gl.glViewport((800/2 - 647/2), (800/2 - 385/2), 647, 385);
+       //float aspect = (float) 800/800; //
+       float aspect = (float) 647f/385f;
+       gl.glViewport((647/2 - 647/2), (385/2 - 385/2), 647, 385);
        glu.gluPerspective(45.0, aspect, 0.1, 1000.0);
   
        // Enable the model-view transform
        gl.glMatrixMode(GL_MODELVIEW);
        gl.glLoadIdentity();
        
-       //gl.glLoadIdentity();
-       gl.glPushMatrix();
-       //gl.glTranslatef(pos.getX(), pos.getY(), pos.getZ());
-       gl.glTranslatef(pos.getX()+50, pos.getY()-120.0f, pos.getZ());
-       //System.out.println("leapPos: " + pos + "\t\t glPos: " + "(" + (pos.getX()+50) + ", " + (pos.getY()-120) + ", " + pos.getZ() + ")");
-       gl.glBegin(GL_QUADS); // of the color cube
-       
-       // Top-face
-       gl.glColor3f(0.0f, 1.0f, 0.0f); // green
-       gl.glVertex3f(3f, 3f, -3f);
-       gl.glVertex3f(-3f, 3f, -3f);
-       gl.glVertex3f(-3f, 3f, 3f);
-       gl.glVertex3f(3f, 3f, 3f);
-  
-       // Bottom-face
-       gl.glColor3f(1.0f, 0.5f, 0.0f); // orange
-       gl.glVertex3f(3f, -3f, 3f);
-       gl.glVertex3f(-3f, -3f, 3f);
-       gl.glVertex3f(-3f, -3f, -3f);
-       gl.glVertex3f(3f, -3f, -3f);
-  
-       // Front-face
-       gl.glColor3f(1.0f, 0.0f, 0.0f); // red
-       gl.glVertex3f(3f, 3f, 3f);
-       gl.glVertex3f(-3f, 3f, 3f);
-       gl.glVertex3f(-3f, -3f, 3f);
-       gl.glVertex3f(3f, -3f, 3f);
-  
-       // Back-face
-       gl.glColor3f(1.0f, 1.0f, 0.0f); // yellow
-       gl.glVertex3f(3f, -3f, -3f);
-       gl.glVertex3f(-3f, -3f, -3f);
-       gl.glVertex3f(-3f, 3f, -3f);
-       gl.glVertex3f(3f, 3f, -3f);
-  
-       // Left-face
-       gl.glColor3f(0.0f, 0.0f, 1.0f); // blue
-       gl.glVertex3f(-3f, 3f, 3f);
-       gl.glVertex3f(-3f, 3f, -3f);
-       gl.glVertex3f(-3f, -3f, -3f);
-       gl.glVertex3f(-3f, -3f, 3f);
-  
-       // Right-face
-       gl.glColor3f(1.0f, 0.0f, 1.0f); // magenta
-       gl.glVertex3f(3f, 3f, -3f);
-       gl.glVertex3f(3f, 3f, 3f);
-       gl.glVertex3f(3f, -3f, 3f);
-       gl.glVertex3f(3f, -3f, -3f);
-  
-       gl.glEnd(); // of the color cube*/
-       gl.glPopMatrix();
+       keyboard.render(gl);
     }
     
     private void addKeyboardToUI() {

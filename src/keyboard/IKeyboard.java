@@ -22,8 +22,8 @@ public abstract class IKeyboard implements SaveSettingsObserver {
     protected KeyboardSettings keyboardSettings;
     protected KeyboardAttributes keyboardAttributes;
     protected KeyboardRenderables keyboardRenderables;
-    protected KeyboardAttribute width;
-    protected KeyboardAttribute height;
+    protected KeyboardAttribute keyboardWidth;
+    protected KeyboardAttribute keyboardHeight;
     protected char keyPressed;
     
     public IKeyboard(int keyboardID, String filePath) {
@@ -43,10 +43,10 @@ public abstract class IKeyboard implements SaveSettingsObserver {
     }
     
     public int getHeight() {
-        return height.getValueAsInteger();
+        return keyboardHeight.getValueAsInteger();
     }
     public int getWidth() {
-        return width.getValueAsInteger();
+        return keyboardWidth.getValueAsInteger();
     }
     
     public KeyboardSettings getSettings() {
@@ -80,8 +80,10 @@ public abstract class IKeyboard implements SaveSettingsObserver {
         // Save all settings and attributes to file (stored for next time program launched)
         if(keyboardID == keyboard.getKeyboardID()) {
             System.out.println(keyboard + ": Saving Settings and Attributes to file");
-            MyUtilities.writeAttributeListToFile(FilePath.CONFIG_PATH.getPath() + (filePath.subSequence(0, filePath.length()-1)) + ".ini", keyboardAttributes.getAllAttributes());
-            MyUtilities.writeSettingListToFile(FilePath.CONFIG_PATH.getPath() + (filePath.subSequence(0, filePath.length()-1)) + ".ini", keyboardSettings.getAllSettings());
+            MyUtilities.FILE_IO_UTILITIES.writeAttributeListToFile(FilePath.CONFIG_PATH.getPath() 
+                    + (filePath.subSequence(0, filePath.length()-1)) + ".ini", keyboardAttributes.getAllAttributes());
+            MyUtilities.FILE_IO_UTILITIES.writeSettingListToFile(FilePath.CONFIG_PATH.getPath() 
+                    + (filePath.subSequence(0, filePath.length()-1)) + ".ini", keyboardSettings.getAllSettings());
         }
     }
 }

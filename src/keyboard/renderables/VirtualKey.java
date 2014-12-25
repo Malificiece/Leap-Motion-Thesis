@@ -12,11 +12,10 @@ import enums.Key;
 import javax.media.opengl.GL2;
 import javax.swing.Timer;
 
-//import static javax.media.opengl.GL.*;  // GL constants
-//import static javax.media.opengl.GL2.*; // GL2 constants
+import static javax.media.opengl.GL.*;  // GL constants
+import static javax.media.opengl.GL2.*; // GL2 constants
 
 public class VirtualKey {
-    private final static int THICKNESS = 10;
     private final static float[] ACTIVE = {0f, 1f, 0f, 0.5f};
     private final static float[] HOVER = {1f, 1f, 0f, 0.5f};
     private final static float[] NONE = {1f, 0f, 0f, 0.5f};
@@ -30,7 +29,7 @@ public class VirtualKey {
     
     public VirtualKey(float x, float y, float width, float height, Key key) {
         min = new Vector(x, y, 0);
-        max = new Vector(x+width, y+height, THICKNESS);
+        max = new Vector(x+width, y+height, 0);
         this.width = (int)width;
         this.height = (int)height;
         this.key = key;
@@ -60,7 +59,8 @@ public class VirtualKey {
         gl.glPushMatrix();
         gl.glTranslatef(min.getX(), min.getY(), min.getZ());
         // figure out how to make color change based off distance to key
-        gl.glColor4fv(color);
+        //gl.glColor4fv(color);
+        gl.glMaterialfv(GL_FRONT, GL_DIFFUSE, color);
         gl.glRecti(0, 0, width, height);
         gl.glPopMatrix();
     }
@@ -78,15 +78,6 @@ public class VirtualKey {
         }
         color.put(HOVER);
         color.position(0);
-        return true;
-    }
-    
-    public boolean isTouching(Vector point) {
-        if(max.getX() < point.getX() || max.getY() < point.getY() || max.getZ() < point.getZ())
-            return false;
-        if(min.getX() > point.getX() || min.getY() > point.getY() || min.getZ() > point.getZ())
-            return false;
-        pressed();
         return true;
     }
     

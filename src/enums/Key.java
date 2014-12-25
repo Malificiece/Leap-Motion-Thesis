@@ -33,7 +33,8 @@ public enum Key {
     VK_SPACE(' ', "VK_SPACE", KeyEvent.VK_SPACE),
     VK_COMMA(',', "VK_COMMA", KeyEvent.VK_COMMA),
     VK_PERIOD('.', "VK_PERIOD", KeyEvent.VK_PERIOD),
-    VK_SHIFT((char)KeyEvent.VK_SHIFT, "VK_SHIFT", KeyEvent.VK_SHIFT),
+    VK_SHIFT((char) KeyEvent.VK_SHIFT, "VK_SHIFT", KeyEvent.VK_SHIFT),
+    VK_SHIFT_RELEASED((char) (KeyEvent.VK_SHIFT-1), "VK_SHIFT_RELEASED", KeyEvent.VK_SHIFT-1),
     VK_BACK_SPACE('\b', "VK_BACK_SPACE", KeyEvent.VK_BACK_SPACE),
     VK_ENTER('\n', "VK_ENTER", KeyEvent.VK_ENTER);
 

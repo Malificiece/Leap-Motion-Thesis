@@ -1,47 +1,74 @@
 package leap;
 
+import keyboard.renderables.LeapGestures;
+import keyboard.renderables.LeapPoint;
+import keyboard.renderables.LeapTool;
+
+import com.leapmotion.leap.GestureList;
+import com.leapmotion.leap.Tool;
+import com.leapmotion.leap.Vector;
+
 public class LeapData {
-    private LeapPointData leapPointData;
-    //private LeapPlaneData leapPlaneData;
-    private LeapToolData leapToolData;
-    private LeapGestureData leapGestureData;
+    private Long timeStamp;
+    private Vector pointData;
+    private Tool toolData;
+    private GestureList gesturesData;
     
-    public LeapData(LeapPointData leapPointData,/* LeapPlaneData leapPlaneData,*/ LeapToolData leapToolData, LeapGestureData leapGestureData) {
-        this.leapPointData = leapPointData;
-        //this.leapPlaneData = leapPlaneData;
-        this.leapToolData = leapToolData;
-        this.leapGestureData = leapGestureData;
+    public LeapData() {
+        // On creation, be safe and create non-null invalid data
+        timeStamp = -1l;
+        pointData = new Vector();
+        toolData = new Tool();
+        gesturesData = new GestureList();
     }
     
-    public void setLeapPointData(LeapPointData leapPointData) {
-        this.leapPointData = leapPointData;
+    public void setTimeStamp(long timeStamp) {
+        this.timeStamp = timeStamp;
     }
     
-    /*public void setLeapPlaneData(LeapPlaneData leapPlaneData) {
-        this.leapPlaneData = leapPlaneData;
-    }*/
-    
-    public void setLeapToolData(LeapToolData leapToolData) {
-        this.leapToolData = leapToolData;
+    public void setPointData(Vector pointData) {
+        this.pointData = pointData;
+    }
+
+    public void setToolData(Tool toolData) {
+        this.toolData = toolData;
     }
     
-    public void setLeapGestureData(LeapGestureData leapGestureData) {
-        this.leapGestureData = leapGestureData;
+    public void setGestureData(GestureList gesturesData) {
+        this.gesturesData = gesturesData;
     }
     
-    public LeapPointData getLeapPointData() {
-        return leapPointData;
+    public long getTimeStamp() {
+        return timeStamp;
     }
     
-    /*public LeapPlaneData getLeapPlaneData() {
-        return leapPlaneData;
-    }*/
-    
-    public LeapToolData getLeapToolData() {
-        return leapToolData;
+    public Vector getPointData() {
+        return pointData;
     }
     
-    public LeapGestureData getLeapGestureData() {
-        return leapGestureData;
+    public Tool getToolData() {
+        return toolData;
+    }
+    
+    public GestureList getGestureData() {
+        return gesturesData;
+    }
+    
+    public void populateData(LeapPoint leapPoint, LeapTool leapTool, LeapGestures leapGestures) {
+        populateData(leapPoint);
+        populateData(leapTool);
+        populateData(leapGestures);
+    }
+    
+    public void populateData(LeapTool leapTool) {
+        leapTool.setTool(toolData);
+    }
+    
+    public void populateData(LeapGestures leapGestures) {
+        leapGestures.setGestures(gesturesData);
+    }
+    
+    public void populateData(LeapPoint leapPoint) {
+        leapPoint.setPoint(pointData);
     }
 }

@@ -21,13 +21,11 @@ public class LeapListener extends Listener implements SaveSettingsObserver {
     private static Controller controller;
     private static LeapListener listener;
     private ArrayList<LeapObserver> observers = new ArrayList<LeapObserver>();
-    private LeapPointData leapPointData = new LeapPointData();
-    //private LeapPlaneData leapPlaneData = new LeapPlaneData();
-    private LeapToolData leapToolData = new LeapToolData();
-    private LeapGestureData leapGestureData = new LeapGestureData();
-    private LeapData leapData = new LeapData(leapPointData,/* leapPlaneData,*/ leapToolData, leapGestureData);
-    //private ReentrantLock leapLock = new ReentrantLock();
-    private Tool testTool = new Tool();
+    private Vector point;
+    private Tool tool;
+    private GestureList gestures;
+    private long timeStamp;
+    private LeapData leapData = new LeapData();
     
     public LeapListener(Controller controller) {
         super();
@@ -37,6 +35,7 @@ public class LeapListener extends Listener implements SaveSettingsObserver {
     
     public void onInit(Controller controller) {
         System.out.println("Initialized");
+        notifyListenersInteractionBoxUpdate(controller.frame().interactionBox());
     }
 
     public void onConnect(Controller controller) {
@@ -55,29 +54,31 @@ public class LeapListener extends Listener implements SaveSettingsObserver {
     public void onExit(Controller controller) {
         System.out.println("Exited");
     }
-    
-    /*public Vector getTrackedPosition() {
-        leapLock.lock();
-        try {
-            return trackedPosition;
-        } finally {
-            leapLock.unlock();
-        }
-    }
-    
-    public Vector getTrackedDirection() {
-        leapLock.lock();
-        try {
-            return trackedDirection;
-        } finally {
-            leapLock.unlock();
-        }
-    }*/
 
     public void onFrame(Controller controller) {
         // Get the most recent frame and report some basic information
         Frame frame = controller.frame();
-        System.out.println("Frame id: " + frame.id());
+        
+        // Hold the data just in case we need it, probably can get rid of these later and just set the leapData directly
+        tool = frame.tools().frontmost();
+        point = tool.stabilizedTipPosition();
+        gestures = frame.gestures();
+        
+        
+        // only notify our class if the tool is valid. I suppose if the tool isn't valid we might be able
+        // to still send it to the class, and the class, can just stop rendering once an invalid tool is
+        // received. Otherwise we might record bad data once a tool isn't in view
+        // there are probably other ways to determine when to record/update/render leap-based data
+        //if(tool.isValid()) {
+            // Populate leapData with relevant tool data and gestures.
+            leapData.setToolData(tool);
+            leapData.setPointData(point);
+            leapData.setGestureData(gestures);
+            leapData.setTimeStamp(timeStamp);
+        
+            notifyListenersDataUpdate();
+        //}
+        
         
         /*System.out.println("Frame id: " + frame.id()
                          + ", timestamp: " + frame.timestamp()
@@ -122,25 +123,17 @@ public class LeapListener extends Listener implements SaveSettingsObserver {
                                      + ", direction: " + bone.direction());
                 }
             }
-        }*/
+        }
 
         // Get tools
         for(Tool tool : frame.tools()) {
-            /*System.out.println("  Tool id: " + tool.id()
+            System.out.println("  Tool id: " + tool.id()
                              + ", position: " + tool.tipPosition()
-                             + ", direction: " + tool.direction());*/
-            /*leapLock.lock();
-            try {
-                trackedPosition = tool.tipPosition();
-                trackedDirection = tool.direction();
-            } finally {
-                leapLock.unlock();
-            }*/
-            System.out.println("leap: " + "Tip Position: " + tool.tipPosition() + " Stabilized Tip Position: " + tool.stabilizedTipPosition());
-            testTool = tool;
+                             + ", direction: " + tool.direction());
+
         }
 
-       /* GestureList gestures = frame.gestures();
+        GestureList gestures = frame.gestures();
         for (int i = 0; i < gestures.count(); i++) {
             Gesture gesture = gestures.get(i);
 
@@ -202,9 +195,6 @@ public class LeapListener extends Listener implements SaveSettingsObserver {
         if (!frame.hands().isEmpty() || !gestures.isEmpty()) {
             System.out.println();
         }*/
-        if(testTool.isValid()) {
-            notifyListeners();
-        }
     }
     
     public static void stopListening() {
@@ -226,9 +216,15 @@ public class LeapListener extends Listener implements SaveSettingsObserver {
         observers.remove(observer);
     }
 
-    protected void notifyListeners() {
+    protected void notifyListenersInteractionBoxUpdate(InteractionBox iBox) {
         for(LeapObserver observer : observers) {
-            observer.leapEventObserved(testTool);
+            observer.leapInteractionBoxSet(iBox);
+        }
+    }
+    
+    protected void notifyListenersDataUpdate() {
+        for(LeapObserver observer : observers) {
+            observer.leapEventObserved(leapData);
         }
     }
 

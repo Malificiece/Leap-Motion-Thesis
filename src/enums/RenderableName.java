@@ -6,7 +6,7 @@ public enum RenderableName {
     LEAP_PLANE("LeapMotion Interaction Plane"),
     LEAP_TOOL("LeapMotion Tool"),
     LEAP_POINT("LeapMotion Point"),
-    LEAP_GESTURE("LeapMotion Gesture");
+    LEAP_GESTURES("LeapMotion Gestures");
 
     private final String name;
     

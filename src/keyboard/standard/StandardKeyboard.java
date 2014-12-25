@@ -24,14 +24,15 @@ public class StandardKeyboard extends IKeyboard {
     private static final String KEYBOARD_FILE_PATH = FilePath.STANDARD_PATH.getPath();
     private VirtualKeyboard virtualKeyboard;
     private KeyBindings keyBindings;
+    private boolean shiftDown = false;
     
     public StandardKeyboard() {
         super(KEYBOARD_ID, KEYBOARD_FILE_PATH);
         keyboardAttributes = new StandardAttributes(this);
         keyboardSettings = new StandardSettings(this);
         keyboardRenderables = new StandardRenderables(this);
-        width = keyboardAttributes.getAttributeByName(AttributeName.KEYBOARD_WIDTH.toString());
-        height = keyboardAttributes.getAttributeByName(AttributeName.KEYBOARD_HEIGHT.toString());
+        keyboardWidth = keyboardAttributes.getAttributeByName(AttributeName.KEYBOARD_WIDTH.toString());
+        keyboardHeight = keyboardAttributes.getAttributeByName(AttributeName.KEYBOARD_HEIGHT.toString());
         virtualKeyboard = (VirtualKeyboard) keyboardRenderables.getRenderableByName(RenderableName.VIRTUAL_KEYS.toString());
         keyBindings = new KeyBindings();
         keyboardAttributes.addAttribute(new KeyboardAttribute(AttributeName.KEY_BINDINGS.toString(), keyBindings));
@@ -40,7 +41,7 @@ public class StandardKeyboard extends IKeyboard {
     @Override
     public void render(GL2 gl) {
         gl.glPushMatrix();
-        gl.glTranslatef(0.0f, 0.0f, -100.0f);
+        gl.glTranslatef(0.0f, 0.0f, -0.1f);
         // TODO: Figure out what order is best for drawing. Image on top of colors or colors on top of image etc.
         //drawBackground(); // convert to drawing the leap plane in order to determine if leap plane is correct
         keyboardRenderables.render(gl);
@@ -53,6 +54,9 @@ public class StandardKeyboard extends IKeyboard {
     @Override
     public void update() {
         // do nothing for standard keyboard (possibly add settings later such as enabling the shift/enter/backspace keys)
+        if(shiftDown) {
+            virtualKeyboard.pressed(Key.VK_SHIFT);
+        }
     }
     
     @SuppressWarnings("serial")
@@ -69,7 +73,7 @@ public class StandardKeyboard extends IKeyboard {
             
             for(int i = 0; i < Key.getSize(); i++) {
                 Key k = Key.getByIndex(i);
-                if(k != Key.VK_NULL) {
+                if(k != Key.VK_NULL || k != Key.VK_SHIFT_RELEASED) {
                     // Add normal keys to input map
                     if(k != Key.VK_SHIFT) {
                         inputMap.put(KeyStroke.getKeyStroke(k.getKeyCode(), 0), k.getKeyName());
@@ -77,8 +81,7 @@ public class StandardKeyboard extends IKeyboard {
                     
                     // Add shifted keys to input map
                     //Shift might act funny --- test this... remove it if need be
-                    //inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_SHIFT, InputEvent.SHIFT_DOWN_MASK), shift);
-                    inputMap.put(KeyStroke.getKeyStroke(k.getKeyCode(), KeyEvent.SHIFT_DOWN_MASK), k.getKeyName() + Key.VK_SHIFT.getKeyName());
+                    inputMap.put(KeyStroke.getKeyStroke(k.getKeyCode(), KeyEvent.SHIFT_DOWN_MASK, false), k.getKeyName() + Key.VK_SHIFT.getKeyName());
                     
                     // Add normal keys to action map
                     if(k != Key.VK_SHIFT) {
@@ -93,6 +96,8 @@ public class StandardKeyboard extends IKeyboard {
                     }
                 }
             }
+            inputMap.put(KeyStroke.getKeyStroke(Key.VK_SHIFT.getKeyCode(), 0, true), Key.VK_SHIFT_RELEASED.getKeyName());
+            actionMap.put(Key.VK_SHIFT_RELEASED.getKeyName(), new KeyAction(Key.VK_SHIFT_RELEASED.getKeyValue()));
         }
         
         private class KeyAction extends AbstractAction {
@@ -104,14 +109,17 @@ public class StandardKeyboard extends IKeyboard {
             public void actionPerformed(ActionEvent e) {
                 keyPressed = e.getActionCommand().charAt(0);
                 Key key = Key.getByCode(keyPressed) == null ? Key.getByValue(keyPressed) : Key.getByCode(keyPressed);
-                if((e.getModifiers() & KeyEvent.SHIFT_MASK) != 0) {
-                    virtualKeyboard.pressed(Key.VK_SHIFT);
+                if((e.getModifiers() & KeyEvent.SHIFT_MASK) != 0 || shiftDown) {
+                    shiftDown = true;
                     virtualKeyboard.pressed(key);
                 } else {
                     virtualKeyboard.pressed(key);
                 }
-                if(key != Key.VK_SHIFT) {
+                if(key != Key.VK_SHIFT && key != Key.VK_SHIFT_RELEASED) {
                     notifyListeners();
+                }
+                if(key == Key.VK_SHIFT_RELEASED) {
+                    shiftDown = false;
                 }
             }
        }

@@ -54,6 +54,7 @@ public abstract class KeyboardRenderable {
                 } else {
                     disable();
                 }
+                renderablePanel.getRootPane().requestFocusInWindow();
             }
         });
         

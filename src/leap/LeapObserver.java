@@ -1,7 +1,8 @@
 package leap;
 
-import com.leapmotion.leap.Tool;
+import com.leapmotion.leap.InteractionBox;
 
 public interface LeapObserver {
-    public void leapEventObserved(Tool testTool);
+    public void leapEventObserved(LeapData leapData);
+    public void leapInteractionBoxSet(InteractionBox iBox);
 }

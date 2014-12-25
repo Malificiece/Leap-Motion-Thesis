@@ -67,24 +67,25 @@ public class VirtualKeyboard extends KeyboardRenderable {
     }
     
     public void pressed(Key key) { // possibly generate key pressed event here with time/key/etc saved. Return the key pressed object.
-        VirtualKey vk = keys.get(key);
-        if(vk != null) {
-            vk.pressed();
+        VirtualKey virtualKey = keys.get(key);
+        if(virtualKey != null) {
+            virtualKey.pressed();
         }
+    }
+    
+    public VirtualKey isHoveringAny(Vector point) {
+        for(VirtualKey virtualKey: keys.values()) {
+            if(virtualKey.isHovering(point)) {
+                return virtualKey;
+            }
+        }
+        return null;
     }
     
     public boolean isHovering(Key key, Vector point) {
-        VirtualKey vk = keys.get(key);
-        if(vk != null) {
-            return vk.isHovering(point);
-        }
-        return false;
-    }
-    
-    public boolean isTouching(Key key, Vector point) {
-        VirtualKey vk = keys.get(key);
-        if(vk != null) {
-            return vk.isTouching(point);
+        VirtualKey virtualKey = keys.get(key);
+        if(virtualKey != null) {
+            return virtualKey.isHovering(point);
         }
         return false;
     }
@@ -92,8 +93,8 @@ public class VirtualKeyboard extends KeyboardRenderable {
     @Override
     public void render(GL2 gl) {
         if(isEnabled()) {
-            for(VirtualKey vk: keys.values()) {
-                vk.render(gl);
+            for(VirtualKey virtualKey: keys.values()) {
+                virtualKey.render(gl);
             }
         }
     }

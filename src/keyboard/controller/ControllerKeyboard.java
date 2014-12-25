@@ -16,8 +16,8 @@ public class ControllerKeyboard extends IKeyboard {
         keyboardAttributes = new ControllerAttributes(this);
         keyboardSettings = new ControllerSettings(this);
         keyboardRenderables = new ControllerRenderables(this);
-        width = keyboardAttributes.getAttributeByName(AttributeName.KEYBOARD_WIDTH.toString());
-        height = keyboardAttributes.getAttributeByName(AttributeName.KEYBOARD_HEIGHT.toString());
+        keyboardWidth = keyboardAttributes.getAttributeByName(AttributeName.KEYBOARD_WIDTH.toString());
+        keyboardHeight = keyboardAttributes.getAttributeByName(AttributeName.KEYBOARD_HEIGHT.toString());
         //virtualKeyboard = (VirtualKeyboard) keyboardRenderables.getRenderableByName(RenderableName.VIRTUAL_KEYS.toString());
     }
     
