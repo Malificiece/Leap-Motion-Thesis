@@ -10,9 +10,9 @@ import javax.media.opengl.GLAutoDrawable;
 import javax.media.opengl.awt.GLCanvas;
 
 import static javax.media.opengl.GL.*;  // GL constants
-import static javax.media.opengl.GL2.*; // GL2 constants
-import static javax.media.opengl.fixedfunc.GLMatrixFunc.GL_MODELVIEW;
-import static javax.media.opengl.fixedfunc.GLMatrixFunc.GL_PROJECTION;
+//import static javax.media.opengl.GL2.*; // GL2 constants
+//import static javax.media.opengl.fixedfunc.GLMatrixFunc.GL_MODELVIEW;
+//import static javax.media.opengl.fixedfunc.GLMatrixFunc.GL_PROJECTION;
 
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -227,32 +227,6 @@ public class CalibrationController extends GraphicsController {
         
        //GL2 gl = drawable.getGL().getGL2();
        gl.glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-       
-       // Setup ortho projection, with aspect ratio matches viewport
-       gl.glMatrixMode(GL_PROJECTION);
-       gl.glLoadIdentity();
-       gl.glOrtho(0, keyboard.getWidth(), 0, keyboard.getHeight(), 0.1, 1000);
-  
-       // Enable the model-view transform
-       gl.glMatrixMode(GL_MODELVIEW);
-       gl.glLoadIdentity();
-       
-       // keyboard.draw() // all data saved in Virtual Keyboard (have listeners there as well)
-       // this consists of drawing a box for the whole keyboard to calibrated scale
-       // cover this box in the texture
-       // draw boxes over all keys to the calibrated scale to detect 3D key presses by leap pos
-       
-       // Setup perspective projection, with aspect ratio matches viewport
-       gl.glMatrixMode(GL_PROJECTION);
-       gl.glLoadIdentity();
-       //float aspect = (float) 800/800; //
-       float aspect = (float) 647f/385f;
-       gl.glViewport((647/2 - 647/2), (385/2 - 385/2), 647, 385);
-       glu.gluPerspective(45.0, aspect, 0.1, 1000.0);
-  
-       // Enable the model-view transform
-       gl.glMatrixMode(GL_MODELVIEW);
-       gl.glLoadIdentity();
        
        keyboard.render(gl);
     }

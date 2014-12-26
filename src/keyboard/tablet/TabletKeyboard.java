@@ -1,5 +1,8 @@
 package keyboard.tablet;
 
+import static javax.media.opengl.fixedfunc.GLMatrixFunc.GL_MODELVIEW;
+import static javax.media.opengl.fixedfunc.GLMatrixFunc.GL_PROJECTION;
+
 import javax.media.opengl.GL2;
 
 import keyboard.IKeyboard;
@@ -23,6 +26,18 @@ public class TabletKeyboard extends IKeyboard {
     
     @Override
     public void render(GL2 gl) {
+        // Setup ortho projection, with aspect ratio matches viewport
+        gl.glMatrixMode(GL_PROJECTION);
+        gl.glLoadIdentity();
+        gl.glOrtho(0, keyboardWidth.getValueAsInteger(), 0, keyboardHeight.getValueAsInteger(), 0.1, 1000);
+   
+        // Enable the model-view transform
+        gl.glMatrixMode(GL_MODELVIEW);
+        gl.glLoadIdentity();
+        
+        gl.glPushMatrix();
+        gl.glTranslatef(0.0f, 0.0f, -0.1f);
+        
         gl.glPushMatrix();
         gl.glTranslatef(0.0f, 0.0f, -100.0f);
         // TODO: Figure out what order is best for drawing. Image on top of colors or colors on top of image etc.

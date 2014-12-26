@@ -59,8 +59,8 @@ public class VirtualKey {
         gl.glPushMatrix();
         gl.glTranslatef(min.getX(), min.getY(), min.getZ());
         // figure out how to make color change based off distance to key
-        //gl.glColor4fv(color);
-        gl.glMaterialfv(GL_FRONT, GL_DIFFUSE, color);
+        gl.glColor4fv(color);
+        //gl.glMaterialfv(GL_FRONT, GL_DIFFUSE, color);
         gl.glRecti(0, 0, width, height);
         gl.glPopMatrix();
     }

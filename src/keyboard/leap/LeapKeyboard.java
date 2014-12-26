@@ -1,6 +1,11 @@
 package keyboard.leap;
 
+import static javax.media.opengl.GL2.*; // GL2 constants
+import static javax.media.opengl.fixedfunc.GLMatrixFunc.GL_MODELVIEW;
+import static javax.media.opengl.fixedfunc.GLMatrixFunc.GL_PROJECTION;
+
 import javax.media.opengl.GL2;
+import javax.media.opengl.glu.GLU;
 
 import com.leapmotion.leap.InteractionBox;
 
@@ -16,6 +21,7 @@ import keyboard.renderables.VirtualKeyboard;
 import leap.LeapData;
 import leap.LeapObserver;
 
+
 public class LeapKeyboard extends IKeyboard implements LeapObserver {
     public static final int KEYBOARD_ID = 1;
     private static final String KEYBOARD_FILE_PATH = FilePath.LEAP_PATH.getPath();
@@ -25,6 +31,7 @@ public class LeapKeyboard extends IKeyboard implements LeapObserver {
     private LeapGestures leapGestures;
     private LeapPlane leapPlane;
     private VirtualKeyboard virtualKeyboard;
+    protected GLU glu  = new GLU();
     
     public LeapKeyboard() {
         super(KEYBOARD_ID, KEYBOARD_FILE_PATH);
@@ -42,6 +49,18 @@ public class LeapKeyboard extends IKeyboard implements LeapObserver {
     
     @Override
     public void render(GL2 gl) {
+        // Setup perspective projection, with aspect ratio matches viewport
+        gl.glMatrixMode(GL_PROJECTION);
+        gl.glLoadIdentity();
+        //float aspect = (float) 800/800; //
+        float aspect = (float) 647f/385f;
+        gl.glViewport((647/2 - 647/2), (385/2 - 385/2), 647, 385);
+        glu.gluPerspective(45.0, aspect, 0.1, 1000.0);
+   
+        // Enable the model-view transform
+        gl.glMatrixMode(GL_MODELVIEW);
+        gl.glLoadIdentity();
+        
         gl.glPushMatrix();
         gl.glTranslatef(-keyboardWidth.getValueAsInteger()/2.0f, -keyboardHeight.getValueAsInteger()/2.0f, -500.0f);// Might need to add stuff like this to individual render functions
         // TODO: Figure out what order is best for drawing. Image on top of colors or colors on top of image etc.
