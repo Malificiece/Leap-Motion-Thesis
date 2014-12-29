@@ -74,12 +74,13 @@ public class VirtualKeyboard extends KeyboardRenderable {
     }
     
     public VirtualKey isHoveringAny(Vector point) {
+        VirtualKey vKey = null;
         for(VirtualKey virtualKey: keys.values()) {
             if(virtualKey.isHovering(point)) {
-                return virtualKey;
+                vKey = virtualKey;
             }
         }
-        return null;
+        return vKey;
     }
     
     public boolean isHovering(Key key, Vector point) {
@@ -96,6 +97,12 @@ public class VirtualKeyboard extends KeyboardRenderable {
             for(VirtualKey virtualKey: keys.values()) {
                 virtualKey.render(gl);
             }
+        }
+    }
+
+    public void clearAll() {
+        for(VirtualKey virtualKey: keys.values()) {
+            virtualKey.clear();
         }
     }
 }

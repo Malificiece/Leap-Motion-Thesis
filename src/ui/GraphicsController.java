@@ -1,7 +1,4 @@
 package ui;
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
-import java.nio.FloatBuffer;
 
 import javax.media.opengl.GL2;
 import javax.media.opengl.GLAutoDrawable;
@@ -11,12 +8,11 @@ import javax.media.opengl.GLProfile;
 import javax.media.opengl.awt.GLCanvas;
 import javax.media.opengl.glu.GLU;
 
+import utilities.MyUtilities;
 import keyboard.IKeyboard;
 import keyboard.KeyboardObserver;
 import static javax.media.opengl.GL.*;  // GL constants
 import static javax.media.opengl.GL2.*; // GL2 constants
-import static javax.media.opengl.fixedfunc.GLLightingFunc.GL_LIGHT0;
-import static javax.media.opengl.fixedfunc.GLLightingFunc.GL_LIGHTING;
 
 import com.leapmotion.leap.Vector;
 
@@ -90,21 +86,24 @@ public abstract class GraphicsController implements GLEventListener, KeyboardObs
     }
 
     @Override
-    public void reshape(GLAutoDrawable drawable, int x, int y, int width, int height) {
-        //GL2 gl = drawable.getGL().getGL2();
-        if (height == 0) height = 1;   // prevent divide by zero
+    public void reshape(GLAutoDrawable drawable, int x, int y, int width, int height) { 
+        MyUtilities.OPEN_GL_UTILITIES.reshape(gl, glu, keyboard);
+        
+        // CHECK THIS OUT IF WE NEED IT --- OLD VIEWPORT CODE
+        
+        //if (height == 0) height = 1;   // prevent divide by zero
    
         // Set the view port (display area) to cover the entire window
-        gl.glViewport((width/2 - keyboard.getWidth()/2), (height/2 - keyboard.getHeight()/2), keyboard.getWidth(), keyboard.getHeight());
+        //gl.glViewport((width/2 - keyboard.getWidth()/2), (height/2 - keyboard.getHeight()/2), keyboard.getWidth(), keyboard.getHeight());
    
         // Setup ortho projection, with aspect ratio matches viewport
-        gl.glMatrixMode(GL_PROJECTION);
+        /*gl.glMatrixMode(GL_PROJECTION);
         gl.glLoadIdentity();
         gl.glOrtho(0, keyboard.getWidth(), 0, keyboard.getHeight(), 0.1, 1000);
    
         // Enable the model-view transform
         gl.glMatrixMode(GL_MODELVIEW);
-        gl.glLoadIdentity();
+        gl.glLoadIdentity();*/
         
         // If we replace the raster img with a 3D texture
         //float aspect = (float) width/height; // float aspect = (float) 647f/385f;

@@ -1,8 +1,5 @@
 package keyboard.standard;
 
-import static javax.media.opengl.fixedfunc.GLMatrixFunc.GL_MODELVIEW;
-import static javax.media.opengl.fixedfunc.GLMatrixFunc.GL_PROJECTION;
-
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 
@@ -14,6 +11,7 @@ import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.KeyStroke;
 
+import utilities.MyUtilities;
 import enums.AttributeName;
 import enums.FilePath;
 import enums.RenderableName;
@@ -43,29 +41,15 @@ public class StandardKeyboard extends IKeyboard {
     
     @Override
     public void render(GL2 gl) {
-        // Setup ortho projection, with aspect ratio matches viewport
-        gl.glMatrixMode(GL_PROJECTION);
-        gl.glLoadIdentity();
-        gl.glOrtho(0, keyboardWidth.getValueAsInteger(), 0, keyboardHeight.getValueAsInteger(), 0.1, 1000);
-   
-        // Enable the model-view transform
-        gl.glMatrixMode(GL_MODELVIEW);
-        gl.glLoadIdentity();
-        
+        MyUtilities.OPEN_GL_UTILITIES.switchToOrthogonal(gl, this);
         gl.glPushMatrix();
         gl.glTranslatef(0.0f, 0.0f, -0.1f);
-        // TODO: Figure out what order is best for drawing. Image on top of colors or colors on top of image etc.
-        //drawBackground(); // convert to drawing the leap plane in order to determine if leap plane is correct
         keyboardRenderables.render(gl);
         gl.glPopMatrix();
-        
-        //gl.glTranslatef(-323.5f, -192.5f, -1000.0f); // figure out what to do here in order to do perspective if we use texture
-        //gl.GL_TEXTURE_RECTANGLE_ARB --- use this for exact texturing if imaging attempt fails.
     }
     
     @Override
     public void update() {
-        // do nothing for standard keyboard (possibly add settings later such as enabling the shift/enter/backspace keys)
         if(shiftDown) {
             virtualKeyboard.pressed(Key.VK_SHIFT);
         }
@@ -92,7 +76,6 @@ public class StandardKeyboard extends IKeyboard {
                     }
                     
                     // Add shifted keys to input map
-                    //Shift might act funny --- test this... remove it if need be
                     inputMap.put(KeyStroke.getKeyStroke(k.getKeyCode(), KeyEvent.SHIFT_DOWN_MASK, false), k.getKeyName() + Key.VK_SHIFT.getKeyName());
                     
                     // Add normal keys to action map

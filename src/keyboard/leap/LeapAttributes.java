@@ -8,6 +8,7 @@ import enums.Key;
 public class LeapAttributes extends KeyboardAttributes {
     public static final int HEIGHT = 385;
     public static final int WIDTH = 647;
+    private static final int DIST_TO_CAMERA = 465;
     private static final int GAP_SIZE = 3;
     private static final int KEY_WIDTH = 62;
     private static final int KEY_HEIGHT = 94;
@@ -27,6 +28,7 @@ public class LeapAttributes extends KeyboardAttributes {
     LeapAttributes(LeapKeyboard keyboard) {
         this.addAttribute(new KeyboardAttribute(AttributeName.KEYBOARD_HEIGHT.toString(), HEIGHT));
         this.addAttribute(new KeyboardAttribute(AttributeName.KEYBOARD_WIDTH.toString(), WIDTH));
+        this.addAttribute(new KeyboardAttribute(AttributeName.DIST_TO_CAMERA.toString(), DIST_TO_CAMERA));
         this.addAttribute(new KeyboardAttribute(AttributeName.GAP_SIZE.toString(), GAP_SIZE));
         this.addAttribute(new KeyboardAttribute(AttributeName.KEY_WIDTH.toString(), KEY_WIDTH));
         this.addAttribute(new KeyboardAttribute(AttributeName.KEY_HEIGHT.toString(), KEY_HEIGHT));

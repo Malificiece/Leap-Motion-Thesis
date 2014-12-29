@@ -98,12 +98,22 @@ public class CalibrationController extends GraphicsController {
             public void actionPerformed(ActionEvent e) {
                 if(keyboard == KeyboardType.LEAP.getKeyboard()) {
                     // START CALIBRATION EVENT
-                    // PUT TEXT WHERE LABEL IS? I suppose.
+                    // Two choices:
+                    // 1) Replace typedLabel with a text area describing what to do for calibration as it goes on
+                    // 2) Open a new calibration window that is stand alone and takes care of everything itself
                     typedPanel.removeAll();
                     clearTextTimer.stop();
                     LeapPlane leapPlane = (LeapPlane) keyboard.getRenderables().getRenderableByName(RenderableName.LEAP_PLANE.toString());
                     if(leapPlane != null) {
-                        // leapPlane.calibrate(frame);
+                        if(leapPlane.isCalibrated()) {
+                            // ask if we should proceed with calibration, it will overwrite current plane
+                            // if yes
+                                // calibrate
+                            // if no
+                                // do nothing
+                        } else {
+                            leapPlane.calibrate();
+                        }
                     }
                     typedPanel.add(typedLabel);
                     clearTextTimer.start();
@@ -130,12 +140,12 @@ public class CalibrationController extends GraphicsController {
                         calibrateButton.setEnabled(false);
                         saveSettingsButton.setEnabled(false);
                     }
-                    // REMOVE EVERYTHING FROM PEVIOUS KEYBOARD
+                    // Remove all settings, attributes, and renderables from the previous keyboard.
                     typedLabel.setText("");
                     settingsPanel.removeAll();
                     renderOptionsPanel.removeAll();
                     
-                    // ADD EVERYTHING FROM NEW KEYBOARD
+                    // Add all settings, attributes, and renderables from the new keyboard.
                     keyboard = KeyboardType.getByID(selectedIndex).getKeyboard();
                     addKeyboardToUI();
                 }

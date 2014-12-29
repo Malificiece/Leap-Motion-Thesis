@@ -12,9 +12,6 @@ import enums.Key;
 import javax.media.opengl.GL2;
 import javax.swing.Timer;
 
-import static javax.media.opengl.GL.*;  // GL constants
-import static javax.media.opengl.GL2.*; // GL2 constants
-
 public class VirtualKey {
     private final static float[] ACTIVE = {0f, 1f, 0f, 0.5f};
     private final static float[] HOVER = {1f, 1f, 0f, 0.5f};
@@ -36,22 +33,19 @@ public class VirtualKey {
         ByteBuffer vbb = ByteBuffer.allocateDirect(16); 
         vbb.order(ByteOrder.nativeOrder());    // use the device hardware's native byte order
         color = vbb.asFloatBuffer();  // create a floating point buffer from the ByteBuffer
-        color.put(NONE);
-        color.position(0);
+        setColor(NONE);
         
         lightUpKeyTimer = new Timer(100, new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 lightUpKeyTimer.stop();
-                color.put(NONE);
-                color.position(0);
+                setColor(NONE);
             }
         });
     }
     
     public void pressed() {
-        color.put(ACTIVE);
-        color.position(0);
+        setColor(ACTIVE);
         lightUpKeyTimer.restart();
     }
     
@@ -67,21 +61,28 @@ public class VirtualKey {
     
     public boolean isHovering(Vector point) {
         if(max.getX() < point.getX() || max.getY() < point.getY()) {
-            color.put(NONE);
-            color.position(0);
+            setColor(NONE);
             return false;
         }
         if(min.getX() > point.getX() || min.getY() > point.getY()) {
-            color.put(NONE);
-            color.position(0);
+            setColor(NONE);
             return false;
         }
-        color.put(HOVER);
-        color.position(0);
+        setColor(HOVER);
         return true;
     }
     
     public Key getKey() {
         return key;
+    }
+    
+    public void clear() {
+        setColor(NONE);
+    }
+    
+    private void setColor(float [] color) {
+        this.color.clear();
+        this.color.put(color);
+        this.color.flip();
     }
 }

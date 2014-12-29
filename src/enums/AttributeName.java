@@ -13,7 +13,8 @@ public enum AttributeName {
     ROW_OFFSETS("Row Offsets"),
     KEY_ROWS("Key Rows"),
     NUMBER_OF_KEYS("Number of Keys"),
-    KEY_BINDINGS("Key Bindings");
+    KEY_BINDINGS("Key Bindings"),
+    DIST_TO_CAMERA("Distance to Camera");
 
     private final String name;
     

@@ -4,6 +4,8 @@ import static javax.media.opengl.GL2GL3.GL_TRIANGLE_FAN;
 
 import javax.media.opengl.GL2;
 
+import utilities.MyUtilities;
+
 import com.leapmotion.leap.InteractionBox;
 import com.leapmotion.leap.Vector;
 
@@ -20,13 +22,16 @@ public class LeapPoint extends KeyboardRenderable {
     private Vector A = new Vector(-57.324f, 138.28f, -32.742f);
     private final int KEYBOARD_WIDTH;
     private final int KEYBOARD_HEIGHT;
+    private final int DIST_TO_CAMERA;
     private Vector point = new Vector();
+    private Vector normalizedPoint = point;
     private InteractionBox iBox;
     
     public LeapPoint(KeyboardAttributes keyboardAttributes) {
         super(RENDER_NAME);
         KEYBOARD_WIDTH = keyboardAttributes.getAttributeByName(AttributeName.KEYBOARD_WIDTH.toString()).getValueAsInteger();
         KEYBOARD_HEIGHT = keyboardAttributes.getAttributeByName(AttributeName.KEYBOARD_HEIGHT.toString()).getValueAsInteger();
+        DIST_TO_CAMERA = keyboardAttributes.getAttributeByName(AttributeName.DIST_TO_CAMERA.toString()).getValueAsInteger();
     }
     
     public void setPoint(Vector point) {
@@ -37,38 +42,41 @@ public class LeapPoint extends KeyboardRenderable {
         return point;
     }
     
+    public Vector getNormalizedPoint() {
+        return normalizedPoint;
+    }
+    
     public void setInteractionBox(InteractionBox iBox) {
         this.iBox = iBox;
     }
     
-    public Vector normalize() {
-        return iBox.normalizePoint(point);
+    private void normalizePoint() {
+        normalizedPoint = iBox.normalizePoint(normalizedPoint);
+    }
+    
+    public void applyPlaneRotationAndNormalizePoint(Vector axis, float angle) {
+        normalizedPoint = MyUtilities.MATH_UTILITILES.rotateVector(point, axis, angle);
+        normalizePoint();
+    }
+    
+    public void applyPlaneNormalization() {
+        normalizedPoint.setX(normalizedPoint.getX() * KEYBOARD_WIDTH);
+        normalizedPoint.setY(normalizedPoint.getY() * KEYBOARD_HEIGHT);
+        normalizedPoint.setZ(normalizedPoint.getZ() * DIST_TO_CAMERA);
     }
 
     @Override
     public void render(GL2 gl) {
         if(isEnabled()) {
-            //gl.glLoadIdentity();
             gl.glPushMatrix();
-
-            Vector norm = normalize();
-            float x = norm.getX() * KEYBOARD_WIDTH;
-            float y = KEYBOARD_HEIGHT - norm.getY() * KEYBOARD_HEIGHT;
-             y = KEYBOARD_HEIGHT - y;
-            //gl.glTranslatef(x, y, norm.getZ());
-            Vector tmpP = point.minus(A);
-            gl.glTranslatef(tmpP.getX(), tmpP.getY(), tmpP.getZ());
-
-            //System.out.println("Leap Point: " + point  + "   Normalized: " + norm);
-            
+            gl.glTranslatef(normalizedPoint.getX(), normalizedPoint.getY(), normalizedPoint.getZ());
             drawPoint(gl);
-            
             gl.glPopMatrix();
         }
     }
     
     private void drawPoint(GL2 gl) {
-        gl.glColor3f(0f, 0f, 0f);
+        gl.glColor4f(0f, 0f, 1f, (DIST_TO_CAMERA-normalizedPoint.getZ())/DIST_TO_CAMERA);
         gl.glBegin(GL_TRIANGLE_FAN);
 
         //draw the vertex at the center of the circle      
