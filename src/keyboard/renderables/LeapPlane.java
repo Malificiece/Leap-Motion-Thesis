@@ -2,8 +2,6 @@ package keyboard.renderables;
 
 import javax.media.opengl.GL2;
 import static javax.media.opengl.GL2GL3.GL_QUADS;
-import static javax.media.opengl.GL2GL3.GL_LINES;
-
 import utilities.MyUtilities;
 
 import com.leapmotion.leap.InteractionBox;
@@ -16,8 +14,7 @@ import keyboard.KeyboardRenderable;
 
 public class LeapPlane extends KeyboardRenderable {
     private static final String RENDER_NAME = RenderableName.LEAP_PLANE.toString();
-    private static final float EPSILON = 0.01f;
-    private static final float TOUCH_THRESHOLD =  -5.0f;
+    private static final float TOUCH_THRESHOLD = -0.10f;//-10.0f;
     private final int KEYBOARD_WIDTH;
     private final int KEYBOARD_HEIGHT;
     private final int DIST_TO_CAMERA;
@@ -32,13 +29,20 @@ public class LeapPlane extends KeyboardRenderable {
     private Vector pointD; // calculated
     private Vector planeNormal;
     private Vector planeCenter;
+    private float distanceToCameraPlane;
     private float planeD;
     private float angleToCamera;
     private Vector axisToCamera;
     private boolean calibrated = false;
     private float distanceToPlane;
+    private float normalizedPlaneWidth;
+    private float normalizedPlaneHeight;
     private float planeWidth;
     private float planeHeight;
+    private Vector BA;
+    private Vector DA;
+    private Vector intersectionPoint = new Vector();
+    private float x, y, z = -1;
     
     public LeapPlane(KeyboardAttributes keyboardAttributes) {
         super(RENDER_NAME);
@@ -79,11 +83,18 @@ public class LeapPlane extends KeyboardRenderable {
         return distanceToPlane;
     }
     
-    public boolean isTouching(Vector point) {
+    public boolean isTouching() {
         if(distanceToPlane > TOUCH_THRESHOLD) {
             return true;
         }
         return false;
+    }
+    
+    public boolean isValid() {
+        if(x == -1 || y == -1) {
+            return false;
+        }
+        return true;
     }
     
     private void calculatePlaneData() {
@@ -103,28 +114,14 @@ public class LeapPlane extends KeyboardRenderable {
         // Compute the 4th point of the plane for drawing.
         pointD = pointA.minus(pointB).plus(pointC);
         
-        // Calculate the width and height of the plane we created.
-        planeWidth = MyUtilities.MATH_UTILITILES.findDistanceToPoint(pointB, pointC);
-        planeHeight = MyUtilities.MATH_UTILITILES.findDistanceToPoint(pointB, pointA);
-        
-        // TEMP: force right angle
-        
-        /*pointA.setX(pointB.getX());
-        pointA.setY(pointB.getY() - planeHeight);
-        
-        pointD.setX(pointC.getX());
-        pointD.setY(pointC.getY() - planeHeight);
-        System.out.println("A: " + pointA);
-        System.out.println("B: " + pointB);
-        System.out.println("C: " + pointC);
-        System.out.println("D: " + pointD);*/
-        
         // Calculate the axis and angle to the camera.
         Vector n = new Vector(0,0,-1);
         angleToCamera = planeNormal.angleTo(n);
         axisToCamera = planeNormal.cross(n).divide(planeNormal.cross(n).magnitude());
         
-        System.out.println("perpendicular test: " + (EPSILON > planeNormal.dot(pointC.minus(pointA))));
+        // Calculate the width and height of the plane in real world space.
+        planeWidth = MyUtilities.MATH_UTILITILES.findDistanceToPoint(pointB, pointC);
+        planeHeight = MyUtilities.MATH_UTILITILES.findDistanceToPoint(pointB, pointA);
         
         // Rotate all points to face the camera.
         pointA = MyUtilities.MATH_UTILITILES.rotateVector(pointA, axisToCamera, angleToCamera);
@@ -134,67 +131,111 @@ public class LeapPlane extends KeyboardRenderable {
         planeCenter = MyUtilities.MATH_UTILITILES.rotateVector(planeCenter, axisToCamera, angleToCamera);
         
         // Normalize points in the leap box.
-        //pointA = iBox.normalizePoint(pointA);
-        //pointB = iBox.normalizePoint(pointB);
-        //pointC = iBox.normalizePoint(pointC);
-        //pointD = iBox.normalizePoint(pointD);
+        pointA = iBox.normalizePoint(pointA);
+        pointB = iBox.normalizePoint(pointB);
+        pointC = iBox.normalizePoint(pointC);
+        pointD = iBox.normalizePoint(pointD);
+        planeCenter = iBox.normalizePoint(planeCenter);
         
+        // Recalculate normalized plane
+        // Determine the vectors
+        AB = pointB.minus(pointA);
+        AC = pointC.minus(pointA);
         
-        // for our point, find a parallel vector to top or bot that runs through this point
-        // the parallel vector of AB is just AB using whatever point we have, we'll find the intersection of the other vector BC etc
-        System.out.println("A: " + pointA);
-        System.out.println("B: " + pointB);
-        System.out.println("Center: " + planeCenter);
-        Vector BtoA = pointB.minus(pointA);
-        System.out.println("BtoA: " + BtoA);
-        Vector BtoC = pointB.minus(pointC);
-        System.out.println(BtoA.angleTo(BtoC));
+        // Determine the normal of the plane by finding the cross product
+        planeNormal = AB.cross(AC);
         
-        //find distance to right side and divide by planeWidth for %
+        // Find D, a simple variable that holds our normal time's a point on the plane
+        planeD = MyUtilities.MATH_UTILITILES.calcPlaneD(planeNormal, planeCenter);
         
+        // Precalculate side vectors needed for finding keyboard position.
+        BA = pointA.minus(pointB);
+        DA = pointA.minus(pointD);
+        
+        // Calculate the width and height of the normalized plane we created.
+        normalizedPlaneWidth = MyUtilities.MATH_UTILITILES.findDistanceToPoint(pointB, pointC);
+        normalizedPlaneHeight = MyUtilities.MATH_UTILITILES.findDistanceToPoint(pointB, pointA);
+        //distanceToCameraPlane = Math.abs((iBox.normalizePoint(iBox.center()).getZ() - 0.5f) - planeCenter.getZ());
+        distanceToCameraPlane = 1 - planeCenter.getZ();
     }
     
     private void calcDistToPlane(Vector point) {
         distanceToPlane = MyUtilities.MATH_UTILITILES.findDistanceToPlane(point, planeNormal, planeD);
-        System.out.println(distanceToPlane);
     }
     
     private void applyPlaneNormalization(Vector point) {
-        //normalizedPointA
+        // Since all of the Z's should be equal for the plane (this is post rotation). We can throw them out and
+        // solve for LeMothe's 2D intersecting line equations instead. Makes things much easier.
+        
+        // Find horizontal position.
+        // r1(t) = (point) + t(DA)
+        // r2(s) = (B) + s(BA)
+        // Find distance to intersection point and divide by planeWidth for %.
+        if(MyUtilities.MATH_UTILITILES.findLineIntersection(intersectionPoint, point, DA, pointB, BA)) {
+            x = MyUtilities.MATH_UTILITILES.findDistanceToPoint(point, intersectionPoint)/normalizedPlaneWidth;
+            if(x > 1) {x = 1;} else if(x < 0) {x = 0;}
+        } else {
+            x = -1;
+        }
+        
+        // Find vertical position.
+        // r1(t) = (point) + t(BA)
+        // r2(s) = (D) + s(DA)
+        // Find distance to intersection point and divide by planeHeight for %.
+        if(MyUtilities.MATH_UTILITILES.findLineIntersection(intersectionPoint, point, BA, pointD, DA)) {
+            y = MyUtilities.MATH_UTILITILES.findDistanceToPoint(point, intersectionPoint)/normalizedPlaneHeight;
+            if(y > 1) {y = 1;} else if(y < 0) {y = 0;}
+        } else {
+            y = -1;
+        }
+        
+        // Use planeCenter and point's Z's to determine %.
+        z = (point.getZ() - planeCenter.getZ()) / distanceToCameraPlane;
+        if(z > 1) {z = 1;} else if(z < 0) {z = 0;}
+        
+        // Apply X, Y, and Z to point.
+        point.setX(x);
+        point.setY(y);
+        point.setZ(z);
     }
     
-    public void update(LeapPoint leapPoint) {
-        calcDistToPlane(leapPoint.getPoint());
+    public void update(LeapPoint leapPoint, LeapTool leapTool) {
+        // Find point distance, normalize it, and position it.
         leapPoint.applyPlaneRotationAndNormalizePoint(axisToCamera, angleToCamera);
+        calcDistToPlane(leapPoint.getNormalizedPoint());
         applyPlaneNormalization(leapPoint.getNormalizedPoint());
-        leapPoint.applyPlaneNormalization();
-        // rotate tool here
-        // rotate gestures here
-        //normalizedPoint.setX(normalizedPoint.getX() * KEYBOARD_WIDTH);
-        //normalizedPoint.setY(normalizedPoint.getY() * KEYBOARD_HEIGHT);
-        //normalizedPoint.setZ(normalizedPoint.getZ() * DIST_TO_CAMERA);
+        leapPoint.scaleTo3DSpace();
+        
+        // Set tool point, scale it, rotate and position it.
+        leapTool.setPoint(leapPoint.getNormalizedPoint());
+        leapTool.calculateOrientation();
+        leapTool.scaleTo3DSpace(planeWidth, planeHeight);
+        
+        // Set gesture location and scale it.
     }
 
     @Override
     public void render(GL2 gl) {
         if(isEnabled()) {
             gl.glPushMatrix();
-            //gl.glRotatef(angle, x, y, z);
             gl.glColor3f(0.5f, 0.5f, 0.5f);
-            gl.glTranslatef(KEYBOARD_WIDTH/2f-planeWidth/2f, KEYBOARD_HEIGHT/2f-planeHeight/2f, 0f);
-            
-            // Move points to origin.
-            Vector tmpA = pointA.minus(pointA);
-            Vector tmpB = pointB.minus(pointA);
-            Vector tmpC = pointC.minus(pointA);
-            Vector tmpD = pointD.minus(pointA);
-            gl.glBegin(GL_QUADS);
-            gl.glVertex3f(pointA.getX(), pointA.getY(), pointA.getZ());
-            gl.glVertex3f(pointB.getX(), pointB.getY(), pointB.getZ());
-            gl.glVertex3f(pointC.getX(), pointC.getY(), pointC.getZ());
-            gl.glVertex3f(pointD.getX(), pointD.getY(), pointD.getZ());
-            gl.glEnd();
+            gl.glTranslatef(KEYBOARD_WIDTH/2f-normalizedPlaneWidth/2f, KEYBOARD_HEIGHT/2f-normalizedPlaneHeight/2f, DIST_TO_CAMERA-1f);
+            drawRectangle(gl);
             gl.glPopMatrix();
         }
+    }
+    
+    private void drawRectangle(GL2 gl) {
+        // Move points to origin.
+        Vector tmpA = pointA.minus(pointA);
+        Vector tmpB = pointB.minus(pointA);
+        Vector tmpC = pointC.minus(pointA);
+        Vector tmpD = pointD.minus(pointA);
+        gl.glBegin(GL_QUADS);
+        gl.glVertex3f(tmpA.getX(), tmpA.getY(), tmpA.getZ());
+        gl.glVertex3f(tmpB.getX(), tmpB.getY(), tmpB.getZ());
+        gl.glVertex3f(tmpC.getX(), tmpC.getY(), tmpC.getZ());
+        gl.glVertex3f(tmpD.getX(), tmpD.getY(), tmpD.getZ());
+        gl.glEnd();
     }
 }

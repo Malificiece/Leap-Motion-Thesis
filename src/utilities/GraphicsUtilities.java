@@ -6,6 +6,7 @@ import static javax.media.opengl.fixedfunc.GLMatrixFunc.GL_PROJECTION;
 import javax.media.opengl.GL2;
 import javax.media.opengl.glu.GLU;
 
+import ui.GraphicsController;
 import keyboard.IKeyboard;
 
 public class GraphicsUtilities {
@@ -13,9 +14,9 @@ public class GraphicsUtilities {
     
     // Need to add in all the open GL stuff here to switch perspectives easily from 2D to 3D etc
     // Anything else we might need with open GL as well
-    public void switchToPerspective(GL2 gl, GLU glu, IKeyboard keyboard) {
+    public void switchToPerspective(GL2 gl, IKeyboard keyboard) {
         if(isOrtho) {
-            perspective(gl, glu, keyboard);
+            perspective(gl, keyboard);
             isOrtho = false;
         } else {
             gl.glLoadIdentity();
@@ -31,7 +32,7 @@ public class GraphicsUtilities {
         }
     }
     
-    public void reshape(GL2 gl, GLU glu, IKeyboard keyboard) {
+    public void reshape(GL2 gl, IKeyboard keyboard) {
         // Set viewport
         gl.glViewport(0, 0, keyboard.getWidth(), keyboard.getHeight());
         
@@ -39,16 +40,16 @@ public class GraphicsUtilities {
         if(isOrtho) {
             orthogonal(gl, keyboard);
         } else {
-            perspective(gl, glu, keyboard);
+            perspective(gl, keyboard);
         }
     }
     
-    private void perspective(GL2 gl, GLU glu, IKeyboard keyboard) {
+    private void perspective(GL2 gl, IKeyboard keyboard) {
         // Setup perspective projection, with aspect ratio matches viewport
         gl.glMatrixMode(GL_PROJECTION);
         gl.glLoadIdentity();
         float aspect = keyboard.getWidth()/ (float) keyboard.getHeight();
-        glu.gluPerspective(45.0, aspect, 0.1, 1000.0);
+        GraphicsController.glu.gluPerspective(45.0, aspect, 0.1, 1000.0);
    
         // Enable the model-view transform
         gl.glMatrixMode(GL_MODELVIEW);

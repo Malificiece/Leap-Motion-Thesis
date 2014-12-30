@@ -42,7 +42,7 @@ public class LeapGestures extends KeyboardRenderable {
     @Override
     public void render(GL2 gl) {
         if(isEnabled()) {
-            // TODO Auto-generated method stub
+            
         }
     }
 }

@@ -3,7 +3,6 @@ package keyboard.leap;
 import java.util.concurrent.locks.ReentrantLock;
 
 import javax.media.opengl.GL2;
-import javax.media.opengl.glu.GLU;
 
 import utilities.MyUtilities;
 
@@ -34,7 +33,6 @@ public class LeapKeyboard extends IKeyboard implements LeapObserver {
     private LeapGestures leapGestures;
     private LeapPlane leapPlane;
     private VirtualKeyboard virtualKeyboard;
-    protected GLU glu  = new GLU();
     
     public LeapKeyboard() {
         super(KEYBOARD_ID, KEYBOARD_FILE_PATH);
@@ -53,32 +51,24 @@ public class LeapKeyboard extends IKeyboard implements LeapObserver {
     
     @Override
     public void render(GL2 gl) {
-        MyUtilities.OPEN_GL_UTILITIES.switchToPerspective(gl, glu, this);
+        MyUtilities.OPEN_GL_UTILITIES.switchToPerspective(gl, this);
         gl.glPushMatrix();
-        // TODO: Might need to add translates to individual render functions depending on the ortho vs perspective thing
-        gl.glTranslatef(-keyboardWidth.getValueAsInteger()/2.0f, -keyboardHeight.getValueAsInteger()/2.0f, -DIST_TO_CAMERA); // 465 is the magic number that somehow centers the 2D with the 3D
+        gl.glTranslatef(-keyboardWidth.getValueAsInteger()/2f, -keyboardHeight.getValueAsInteger()/2f, -DIST_TO_CAMERA); // 465 is the magic number that somehow centers the 2D with the 3D
         keyboardRenderables.render(gl);
         gl.glPopMatrix();
     }
     
     @Override
     public void update() {
-        // do calculations/normalization etc here?
-        // render functions will only render the object/shape I want based off of what I set them to here
-        // can also make it so that the render function takes care of their explicit 3D/2D, depth, light preferences
-        // also make to switch from ortho to perspective here
-        
-        // Last but not least once we calibrate the leap plane (however/wherever we do that) we'll need to call
-        // virtualKeyboard.rebuildKeys(leapPlane);
         LEAP_LOCK.lock();
         try {
             if(leapTool.isValid()) {
                 //keyPressed = 'l';
                 //notifyListeners();
-                //System.out.println("point: " + leapPoint.getPoint() + "  distance: " + leapPlane.distToPlane(leapPoint.getPoint()));
-                leapPlane.update(leapPoint);
+                // Allow leap plane to take over the updates of specific objects that require the plane
+                leapPlane.update(leapPoint, leapTool);
                 VirtualKey vKey;
-                if((vKey = virtualKeyboard.isHoveringAny(leapPoint.getNormalizedPoint())) != null && leapPlane.isTouching(leapPoint.getPoint())) {
+                if((vKey = virtualKeyboard.isHoveringAny(leapPoint.getNormalizedPoint())) != null && leapPlane.isTouching()) {
                     vKey.pressed();
                 }
             } else {
@@ -107,7 +97,10 @@ public class LeapKeyboard extends IKeyboard implements LeapObserver {
         leapGestures.setInteractionBox(iBox);
         leapTool.setInteractionBox(iBox);
 
-        // temporary - call this after we get points from leapPlane.calibrate()
+        // Add this also to calibration I suppose
+        leapTool.createCylinder();
+        
+        // temporary - move this to section that fires when calibration button is pushed
         leapPlane.calibrate();
     }
 }

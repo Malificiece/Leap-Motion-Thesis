@@ -1,5 +1,8 @@
 package keyboard.renderables;
 
+import static javax.media.opengl.GL.GL_LINES;
+import static javax.media.opengl.GL2.GL_ENABLE_BIT;
+import static javax.media.opengl.GL2.GL_LINE_STIPPLE;
 import static javax.media.opengl.GL2GL3.GL_TRIANGLE_FAN;
 
 import javax.media.opengl.GL2;
@@ -16,10 +19,9 @@ import keyboard.KeyboardRenderable;
 
 public class LeapPoint extends KeyboardRenderable {
     private static final String RENDER_NAME = RenderableName.LEAP_POINT.toString();
-    private static final int NUM_VERTICIES = 32;
+    private static final int NUM_VERTICIES = 16;
     private static final float DELTA_ANGLE = (float) (2.0f * Math.PI / NUM_VERTICIES);
     private static final float RADIUS = 10f;
-    private Vector A = new Vector(-57.324f, 138.28f, -32.742f);
     private final int KEYBOARD_WIDTH;
     private final int KEYBOARD_HEIGHT;
     private final int DIST_TO_CAMERA;
@@ -59,7 +61,7 @@ public class LeapPoint extends KeyboardRenderable {
         normalizePoint();
     }
     
-    public void applyPlaneNormalization() {
+    public void scaleTo3DSpace() {
         normalizedPoint.setX(normalizedPoint.getX() * KEYBOARD_WIDTH);
         normalizedPoint.setY(normalizedPoint.getY() * KEYBOARD_HEIGHT);
         normalizedPoint.setZ(normalizedPoint.getZ() * DIST_TO_CAMERA);
@@ -69,26 +71,37 @@ public class LeapPoint extends KeyboardRenderable {
     public void render(GL2 gl) {
         if(isEnabled()) {
             gl.glPushMatrix();
+            drawDottedLine(gl);
             gl.glTranslatef(normalizedPoint.getX(), normalizedPoint.getY(), normalizedPoint.getZ());
             drawPoint(gl);
             gl.glPopMatrix();
         }
     }
     
+    private void drawDottedLine(GL2 gl) {
+        gl.glColor4f(0f, 0f, 1f, 1f);
+        gl.glPushAttrib(GL_ENABLE_BIT);
+        gl.glLineWidth(2);
+        gl.glLineStipple(1, (short) 0xAAAA);
+        gl.glEnable(GL_LINE_STIPPLE);
+        gl.glBegin(GL_LINES);
+        gl.glVertex3f(normalizedPoint.getX(), normalizedPoint.getY(), normalizedPoint.getZ());
+        gl.glVertex3f(normalizedPoint.getX(), normalizedPoint.getY(), 0);
+        gl.glEnd();
+        gl.glDisable(GL_LINE_STIPPLE);
+        gl.glPopAttrib();
+    }
+    
     private void drawPoint(GL2 gl) {
         gl.glColor4f(0f, 0f, 1f, (DIST_TO_CAMERA-normalizedPoint.getZ())/DIST_TO_CAMERA);
         gl.glBegin(GL_TRIANGLE_FAN);
-
-        //draw the vertex at the center of the circle      
+        // Draw the vertex at the center of the circle
         gl.glVertex3f(0f, 0f, 0f);
-       
-        for(int i = 0; i < NUM_VERTICIES ; i++)
+        for(int i = 0; i < NUM_VERTICIES; i++)
         {
           gl.glVertex3d(Math.cos(DELTA_ANGLE * i) * RADIUS, Math.sin(DELTA_ANGLE * i) * RADIUS, 0.0);
         }
-
         gl.glVertex3f(1f * RADIUS, 0f, 0f);
-        
         gl.glEnd();
     }
 }

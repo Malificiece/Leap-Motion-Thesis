@@ -1,5 +1,9 @@
 package ui;
 
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+import java.nio.FloatBuffer;
+
 import javax.media.opengl.GL2;
 import javax.media.opengl.GLAutoDrawable;
 import javax.media.opengl.GLCapabilities;
@@ -23,11 +27,11 @@ public abstract class GraphicsController implements GLEventListener, KeyboardObs
 	private static GLProfile profile;
 	protected static GLCapabilities capabilities;
 	protected GLCanvas canvas;
-	protected GLU glu;  // for the GL Utility
 	public static GL2 gl;
 	protected Vector pos;
 	protected Vector dir;
 	protected IKeyboard keyboard;
+	public static GLU glu;
 	
 	public static void init() {
 	    GLProfile.initSingleton();
@@ -56,8 +60,9 @@ public abstract class GraphicsController implements GLEventListener, KeyboardObs
 
     @Override
     public void init(GLAutoDrawable drawable) {
-        GraphicsController.gl = drawable.getGL().getGL2();      // get the OpenGL graphics context
-        glu = new GLU();                         // get GL Utilities
+        GraphicsController.gl = drawable.getGL().getGL2();  // get the OpenGL graphics context
+        glu = new GLU();  // get GL Utilities
+        gl.setSwapInterval(1);
         
         // TODO: Make sure this is where I want to register observers.
         KeyboardType.STANDARD.getKeyboard().registerObserver(this);
@@ -70,24 +75,30 @@ public abstract class GraphicsController implements GLEventListener, KeyboardObs
         gl.glEnable(GL_DEPTH_TEST); // enables depth testing
         gl.glDepthFunc(GL_LEQUAL);  // the type of depth test to do
         gl.glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST); // best perspective correction
-        //gl.glShadeModel(GL_SMOOTH); // blends colors nicely, and smoothes out lighting
-        //gl.glEnable(GL_LIGHTING);
+        gl.glShadeModel(GL_SMOOTH); // blends colors nicely, and smoothes out lighting
+        gl.glEnable(GL_LIGHTING);
+        gl.glPolygonMode(GL_FRONT_AND_BACK, GL_SMOOTH);
    
         // ----- Your OpenGL initialization code here -----
-        /*float lightpos[] = {0f, 10f,0f, 1f};
+        float lightpos[] = {0f, 0f, 1f, 0f};
+        //float light_Ka2[] = { 0.0, 0.0, 0.0, 1.0 }; // default ambient light
+        //float light_Kd2[] = { 1.0, 1.0, 1.0, 1.0 }; // default diffuse light
+        //float light_Ks2[] = { 1.0, 1.0, 1.0, 1.0 }; // default specular light
         ByteBuffer vbb = ByteBuffer.allocateDirect(16); 
         vbb.order(ByteOrder.nativeOrder());    // use the device hardware's native byte order
         FloatBuffer light = vbb.asFloatBuffer();  // create a floating point buffer from the ByteBuffer
+        light.clear();
         light.put(lightpos);
-        light.position(0);
+        light.flip();
         gl.glLightfv(GL_LIGHT0, GL_POSITION, light);
-        gl.glEnable(GL_LIGHT0);*/
+        gl.glEnable(GL_LIGHT0);
+        gl.glDisable(GL_LIGHTING);
         
     }
 
     @Override
     public void reshape(GLAutoDrawable drawable, int x, int y, int width, int height) { 
-        MyUtilities.OPEN_GL_UTILITIES.reshape(gl, glu, keyboard);
+        MyUtilities.OPEN_GL_UTILITIES.reshape(gl, keyboard);
         
         // CHECK THIS OUT IF WE NEED IT --- OLD VIEWPORT CODE
         
