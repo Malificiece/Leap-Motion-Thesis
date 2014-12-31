@@ -11,9 +11,9 @@ public class KeyboardAttribute {
     private Object value;
     private JPanel attributesPanel;
     
-    public KeyboardAttribute(String name, Object value) {
-        this.name = name;
-        this.value = value;
+    public KeyboardAttribute(String attributeName, Object defaultValue) {
+        this.name = attributeName;
+        this.value = defaultValue;
         createAttributePanel();
     }
 

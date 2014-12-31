@@ -1,9 +1,5 @@
 package ui;
 
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
-import java.nio.FloatBuffer;
-
 import javax.media.opengl.GL2;
 import javax.media.opengl.GLAutoDrawable;
 import javax.media.opengl.GLCapabilities;
@@ -80,17 +76,19 @@ public abstract class GraphicsController implements GLEventListener, KeyboardObs
         gl.glPolygonMode(GL_FRONT_AND_BACK, GL_SMOOTH);
    
         // ----- Your OpenGL initialization code here -----
-        float lightpos[] = {0f, 0f, 1f, 0f};
-        //float light_Ka2[] = { 0.0, 0.0, 0.0, 1.0 }; // default ambient light
-        //float light_Kd2[] = { 1.0, 1.0, 1.0, 1.0 }; // default diffuse light
-        //float light_Ks2[] = { 1.0, 1.0, 1.0, 1.0 }; // default specular light
-        ByteBuffer vbb = ByteBuffer.allocateDirect(16); 
-        vbb.order(ByteOrder.nativeOrder());    // use the device hardware's native byte order
-        FloatBuffer light = vbb.asFloatBuffer();  // create a floating point buffer from the ByteBuffer
-        light.clear();
-        light.put(lightpos);
-        light.flip();
-        gl.glLightfv(GL_LIGHT0, GL_POSITION, light);
+        float lightPos[] = {0f, 0f, 1f, 0f};
+        float lightAmbient[] = {0f, 0f, 0f, 1f}; // default ambient light
+        float lightDiffuse[] = {1f, 1f, 1f, 1f}; // default diffuse light
+        float lightSpecular[] = {1f, 1f, 1f, 1f}; // default specular light
+        float materialSpecular[] = { 0f, 0f, 0f, 1f}; // default specular material property
+        float materialShininess[] = {5f}; // default shininess material property\
+        
+        gl.glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, materialSpecular, 0);
+        gl.glMaterialfv(GL_FRONT_AND_BACK, GL_SHININESS, materialShininess, 0);
+        gl.glLightfv(GL_LIGHT0, GL_AMBIENT, lightAmbient, 0);
+        gl.glLightfv(GL_LIGHT0, GL_DIFFUSE, lightDiffuse, 0);
+        gl.glLightfv(GL_LIGHT0, GL_SPECULAR, lightSpecular, 0);
+        gl.glLightfv(GL_LIGHT0, GL_POSITION, lightPos, 0);
         gl.glEnable(GL_LIGHT0);
         gl.glDisable(GL_LIGHTING);
         
@@ -99,26 +97,5 @@ public abstract class GraphicsController implements GLEventListener, KeyboardObs
     @Override
     public void reshape(GLAutoDrawable drawable, int x, int y, int width, int height) { 
         MyUtilities.OPEN_GL_UTILITIES.reshape(gl, keyboard);
-        
-        // CHECK THIS OUT IF WE NEED IT --- OLD VIEWPORT CODE
-        
-        //if (height == 0) height = 1;   // prevent divide by zero
-   
-        // Set the view port (display area) to cover the entire window
-        //gl.glViewport((width/2 - keyboard.getWidth()/2), (height/2 - keyboard.getHeight()/2), keyboard.getWidth(), keyboard.getHeight());
-   
-        // Setup ortho projection, with aspect ratio matches viewport
-        /*gl.glMatrixMode(GL_PROJECTION);
-        gl.glLoadIdentity();
-        gl.glOrtho(0, keyboard.getWidth(), 0, keyboard.getHeight(), 0.1, 1000);
-   
-        // Enable the model-view transform
-        gl.glMatrixMode(GL_MODELVIEW);
-        gl.glLoadIdentity();*/
-        
-        // If we replace the raster img with a 3D texture
-        //float aspect = (float) width/height; // float aspect = (float) 647f/385f;
-        //gl.glViewport(0, 0, width, height);
-        //glu.gluPerspective(45.0, aspect, 0.1, 1000.0);
     }
 }

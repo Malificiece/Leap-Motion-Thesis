@@ -1,33 +1,29 @@
 package keyboard.renderables;
 
+import static javax.media.opengl.GL.GL_FRONT;
 import static javax.media.opengl.GL2.*; // GL2 constants
 
 import javax.media.opengl.GL2;
 import javax.media.opengl.glu.GLUquadric;
 
 import ui.GraphicsController;
-import utilities.MyUtilities;
 
-import com.leapmotion.leap.InteractionBox;
 import com.leapmotion.leap.Tool;
 import com.leapmotion.leap.Vector;
 
-import enums.RenderableName;
+import enums.Attribute;
+import enums.Renderable;
 import keyboard.KeyboardAttributes;
 import keyboard.KeyboardRenderable;
 
 public class LeapTool extends KeyboardRenderable {
-    private static final String RENDER_NAME = RenderableName.LEAP_TOOL.toString();
-    private static final int NUM_VERTICIES = 16;
-    private static final int NUM_STACKS = 4;
+    private static final String RENDER_NAME = Renderable.LEAP_TOOL.toString();
+    private static final int NUM_VERTICIES = 32;
+    private static final int NUM_STACKS = 32;
     private static final float DELTA_ANGLE = (float) (2.0f * Math.PI / NUM_VERTICIES);
     private static final float RADS_TO_DEGREES = (float) (180 / Math.PI);
-    private static final float[] color = {0.8f, 0.67f, 0.49f, 1f};
-    //private static final float mat_Ka2[] = { 0.2, 0.2, 0.2, 1f}; // default ambient material property
-    //private static final float mat_Kd2[] = { 0.8, 0.8, 0.8, 1f}; // default diffuse material property
-    //private static final float mat_Ks2[] = { 0.0, 0.0, 0.0, 1f}; // default specular material property
-    //private static final float mat_Ksh2[] = {0f}; // default shinniness material property
-    private InteractionBox iBox;
+    private static final float[] COLOR = {0.85f, 0.7f, 0.41f, 1f};
+    private final int DIST_TO_CAMERA;
     private float length;
     private float radius;
     private float scaledLength;
@@ -42,6 +38,7 @@ public class LeapTool extends KeyboardRenderable {
     
     public LeapTool(KeyboardAttributes keyboardAttributes) {
         super(RENDER_NAME);
+        DIST_TO_CAMERA = keyboardAttributes.getAttributeByName(Attribute.DIST_TO_CAMERA.toString()).getValueAsInteger();
     }
     
     public void createCylinder() {
@@ -50,8 +47,6 @@ public class LeapTool extends KeyboardRenderable {
             GraphicsController.glu.gluDeleteQuadric(cylinder);
         }
         cylinder = GraphicsController.glu.gluNewQuadric();
-        //GraphicsController.glu.gluQuadricOrientation(cylinder, GLU.GLU_OUTSIDE);
-        //GraphicsController.glu.gluQuadricDrawStyle(cylinder, GLU.GLU_FILL);
         GraphicsController.glu.gluQuadricNormals(cylinder, GL_TRUE);
     }
     
@@ -68,16 +63,8 @@ public class LeapTool extends KeyboardRenderable {
         tipPoint = point;
     }
     
-    public void setInteractionBox(InteractionBox iBox) {
-        this.iBox = iBox;
-    }
-    
     public boolean isValid() {
         return isValid;
-    }
-    
-    private void normalizePoint() {
-        tipPoint = iBox.normalizePoint(tipPoint);
     }
     
     public void scaleLengthAndWidth(float length, float radius) {
@@ -91,11 +78,6 @@ public class LeapTool extends KeyboardRenderable {
         axisToDirection = axisToDirection.divide(axisToDirection.magnitude());
     }
     
-    public void applyPlaneRotationAndNormalizePoint(Vector axis, float angle) {
-        tipPoint = MyUtilities.MATH_UTILITILES.rotateVector(tipPoint, axis, angle);
-        normalizePoint();
-    }
-    
     public void scaleTo3DSpace(float planeWidth, float planeHeight) {
         //scaledLength = (length / iBox.height()) * planeHeight;
         //scaledRadius = (radius / iBox.width()) * planeWidth;
@@ -107,21 +89,22 @@ public class LeapTool extends KeyboardRenderable {
     public void render(GL2 gl) {
         if(isEnabled()) {
             gl.glPushMatrix();
-            gl.glEnable(GL_LIGHTING);
             gl.glEnable(GL_CULL_FACE);
-            gl.glMaterialfv(GL_FRONT, GL_DIFFUSE, color, 0);
+            gl.glEnable(GL_LIGHTING);
+            COLOR[3] = (DIST_TO_CAMERA-tipPoint.getZ())/DIST_TO_CAMERA;
+            gl.glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, COLOR, 0);
             gl.glTranslatef(tipPoint.getX(), tipPoint.getY(), tipPoint.getZ());
             gl.glRotatef(angleToDirection, axisToDirection.getX(), axisToDirection.getY(), axisToDirection.getZ());
             gl.glTranslatef(0, 0, -scaledLength);
             drawTool(gl);
-            gl.glDisable(GL_CULL_FACE);
             gl.glDisable(GL_LIGHTING);
+            gl.glDisable(GL_CULL_FACE);
             gl.glPopMatrix();
         }
     }
     
     private void drawTool(GL2 gl) {
-
+        
         gl.glCullFace(GL_FRONT);
         drawCircle(gl);
         gl.glCullFace(GL_BACK);

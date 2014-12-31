@@ -8,11 +8,13 @@ import java.awt.event.ItemListener;
 import javax.media.opengl.GL2;
 import javax.swing.JCheckBox;
 import javax.swing.JPanel;
+import javax.swing.JRootPane;
 
 public abstract class KeyboardRenderable {
     private String name;
     private Boolean enabled = true;
     private JPanel renderablePanel;
+    private JCheckBox renderableCheckBox;
     
     public KeyboardRenderable(String name) {
         this.name = name;
@@ -25,6 +27,17 @@ public abstract class KeyboardRenderable {
     
     public void disable() {
         enabled = false;
+    }
+    
+    public void blockAccess(boolean disable) {
+        System.out.println("turned off");
+        if(disable) renderableCheckBox.setSelected(false);
+        renderableCheckBox.setEnabled(false);
+    }
+    
+    public void grantAccess(boolean enable) {
+        renderableCheckBox.setEnabled(true);
+        if(enable) renderableCheckBox.setSelected(true);
     }
     
     public Boolean isEnabled() {
@@ -43,9 +56,9 @@ public abstract class KeyboardRenderable {
     
     private void createCheckboxPanel() {
         renderablePanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        JCheckBox renderableCheckBox = new JCheckBox(name);
+        renderableCheckBox = new JCheckBox(name);
         renderableCheckBox.setSelected(true);
-        
+        System.out.println("created");
         renderableCheckBox.addItemListener(new ItemListener() {
             @Override
             public void itemStateChanged(ItemEvent e) {
@@ -54,7 +67,10 @@ public abstract class KeyboardRenderable {
                 } else {
                     disable();
                 }
-                renderablePanel.getRootPane().requestFocusInWindow();
+                JRootPane rootPane = renderablePanel.getRootPane();
+                if(rootPane != null) {
+                    rootPane.requestFocusInWindow();
+                }
             }
         });
         

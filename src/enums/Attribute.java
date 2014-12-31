@@ -1,6 +1,6 @@
 package enums;
 
-public enum AttributeName {
+public enum Attribute {
     KEYBOARD_WIDTH("Keyboard Width"),
     KEYBOARD_HEIGHT("Keyboard Height"),
     GAP_SIZE("Gap Size"),
@@ -18,11 +18,11 @@ public enum AttributeName {
 
     private final String name;
     
-    private AttributeName(String name) {
+    private Attribute(String name) {
         this.name = name;
     }
     
-    public String toString() {
+    public String getName() {
         return name;
     }
 }

@@ -6,9 +6,9 @@ import javax.media.opengl.GL2;
 
 import com.leapmotion.leap.Vector;
 
-import enums.AttributeName;
+import enums.Attribute;
 import enums.Key;
-import enums.RenderableName;
+import enums.Renderable;
 import keyboard.KeyboardAttributes;
 import keyboard.KeyboardRenderable;
 
@@ -16,7 +16,7 @@ import keyboard.KeyboardRenderable;
 //import static javax.media.opengl.GL2.*; // GL2 constants
 
 public class VirtualKeyboard extends KeyboardRenderable {
-    private static final String RENDER_NAME = RenderableName.VIRTUAL_KEYS.toString();
+    private static final String RENDER_NAME = Renderable.VIRTUAL_KEYS.toString();
     private TreeMap<Key, VirtualKey> keys = new TreeMap<Key, VirtualKey>();
     //private VirtualKey [] keys;
     
@@ -26,17 +26,17 @@ public class VirtualKeyboard extends KeyboardRenderable {
     }
     
     private void createKeys(KeyboardAttributes keyboardAttributes) {
-        int keyboardHeight = (int) keyboardAttributes.getValueByName(AttributeName.KEYBOARD_HEIGHT.toString());
-        int gapSize = (int) keyboardAttributes.getValueByName(AttributeName.GAP_SIZE.toString());
-        int keyWidth = (int) keyboardAttributes.getValueByName(AttributeName.KEY_WIDTH.toString());
-        int keyHeight = (int) keyboardAttributes.getValueByName(AttributeName.KEY_HEIGHT.toString());
-        int spaceKeyWidth = (int) keyboardAttributes.getValueByName(AttributeName.SPACE_KEY_WIDTH.toString());
-        int backSpaceKeyWidth = (int) keyboardAttributes.getValueByName(AttributeName.BACK_SPACE_KEY_WIDTH.toString());
-        int shiftKeyWidth = (int) keyboardAttributes.getValueByName(AttributeName.SHIFT_KEY_WIDTH.toString());
-        int enterWidth = (int) keyboardAttributes.getValueByName(AttributeName.ENTER_KEY_WIDTH.toString());
+        int keyboardHeight = (int) keyboardAttributes.getValueByName(Attribute.KEYBOARD_HEIGHT.toString());
+        int gapSize = (int) keyboardAttributes.getValueByName(Attribute.GAP_SIZE.toString());
+        int keyWidth = (int) keyboardAttributes.getValueByName(Attribute.KEY_WIDTH.toString());
+        int keyHeight = (int) keyboardAttributes.getValueByName(Attribute.KEY_HEIGHT.toString());
+        int spaceKeyWidth = (int) keyboardAttributes.getValueByName(Attribute.SPACE_KEY_WIDTH.toString());
+        int backSpaceKeyWidth = (int) keyboardAttributes.getValueByName(Attribute.BACK_SPACE_KEY_WIDTH.toString());
+        int shiftKeyWidth = (int) keyboardAttributes.getValueByName(Attribute.SHIFT_KEY_WIDTH.toString());
+        int enterWidth = (int) keyboardAttributes.getValueByName(Attribute.ENTER_KEY_WIDTH.toString());
         //int numKeys = (int) keyboardAttributes.getValueByName(AttributeName.NUMBER_OF_KEYS.toString());
-        int[] rowOffsets = (int[]) keyboardAttributes.getValueByName(AttributeName.ROW_OFFSETS.toString());
-        Key[][] keyRows = (Key[][]) keyboardAttributes.getValueByName(AttributeName.KEY_ROWS.toString());
+        int[] rowOffsets = (int[]) keyboardAttributes.getValueByName(Attribute.ROW_OFFSETS.toString());
+        Key[][] keyRows = (Key[][]) keyboardAttributes.getValueByName(Attribute.KEY_ROWS.toString());
         
         for(int rowIndex = 0, x = 0, y = keyboardHeight + gapSize; rowIndex < keyRows.length; rowIndex++) {
             x = rowOffsets[rowIndex];

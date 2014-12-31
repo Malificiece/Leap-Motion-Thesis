@@ -1,6 +1,6 @@
 package enums;
 
-public enum RenderableName {
+public enum Renderable {
     KEYBOARD_IMAGE("Keyboard Image"),
     VIRTUAL_KEYS("Virtual Keys"),
     LEAP_PLANE("LeapMotion Interaction Plane"),
@@ -10,11 +10,11 @@ public enum RenderableName {
 
     private final String name;
     
-    private RenderableName(String name) {
+    private Renderable(String name) {
         this.name = name;
     }
     
-    public String toString() {
+    public String getName() {
         return name;
     }
 }

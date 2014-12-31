@@ -3,6 +3,7 @@ package keyboard;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.io.IOException;
 import java.text.DecimalFormat;
 
 import javax.swing.BoxLayout;
@@ -15,7 +16,10 @@ import javax.swing.SwingConstants;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
+import utilities.MyUtilities;
 import enums.DecimalPrecision;
+import enums.FileExtension;
+import enums.FilePath;
 
 public class KeyboardSetting {
     private String name;
@@ -27,11 +31,17 @@ public class KeyboardSetting {
     private boolean spinnerEvent = false; // Not a good programming practice. For some reason the lock I added didn't solve the problem
     private boolean sliderEvent = false;  // but this pair of booleans did. Removing the redundant event would require additional classes.
     
-    public KeyboardSetting(String name, Number value, Number min, Number max, DecimalPrecision decimalPrecision) {
-        this.name = name;
-        this.value = value.doubleValue();
-        this.min = min.doubleValue();
-        this.max = max.doubleValue();
+    public KeyboardSetting(IKeyboard keyboard, String settingName, double minimumValue, double defaultValue, double maximumValue, DecimalPrecision decimalPrecision) {
+        this.name = settingName;
+        try {
+            this.value = MyUtilities.FILE_IO_UTILITIES.readAttributeOrSettingFromFile(FilePath.CONFIG_PATH.getPath(),
+                    keyboard.getKeyboardFileName() + FileExtension.INI.getExtension(), settingName, defaultValue).doubleValue();
+        } catch(IOException e) {
+            System.err.println("Error occured while trying to read "  + settingName + " from file. Using default value.");
+            this.value = defaultValue;
+        }
+        this.min = minimumValue;
+        this.max = maximumValue;
         this.decimalPrecision = decimalPrecision;
         createSettingsPanel();
     }

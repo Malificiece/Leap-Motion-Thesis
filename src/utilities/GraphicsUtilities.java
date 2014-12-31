@@ -1,10 +1,8 @@
 package utilities;
 
-import static javax.media.opengl.fixedfunc.GLMatrixFunc.GL_MODELVIEW;
-import static javax.media.opengl.fixedfunc.GLMatrixFunc.GL_PROJECTION;
+import static javax.media.opengl.GL2.*;
 
 import javax.media.opengl.GL2;
-import javax.media.opengl.glu.GLU;
 
 import ui.GraphicsController;
 import keyboard.IKeyboard;

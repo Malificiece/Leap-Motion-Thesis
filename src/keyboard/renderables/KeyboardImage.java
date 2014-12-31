@@ -9,13 +9,13 @@ import javax.media.opengl.GL;
 import javax.media.opengl.GL2;
 
 import enums.FilePath;
-import enums.RenderableName;
+import enums.Renderable;
 import keyboard.KeyboardRenderable;
 import static javax.media.opengl.GL.*;  // GL constants
 //import static javax.media.opengl.GL2.*; // GL2 constants
 
 public class KeyboardImage extends KeyboardRenderable {
-    private static final String RENDER_NAME = RenderableName.KEYBOARD_IMAGE.toString();
+    private static final String RENDER_NAME = Renderable.KEYBOARD_IMAGE.toString();
     private static final String ASSETS_PATH = FilePath.ASSETS_PATH.getPath();
     private static final String DEFAULT_FILE_PATH = FilePath.STANDARD_PATH.getPath();
     private static final String DEFAULT_FILE_NAME = "keyboard.png";

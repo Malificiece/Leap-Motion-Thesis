@@ -21,6 +21,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.Timer;
 
+import keyboard.leap.LeapKeyboard;
 import keyboard.KeyboardAttributes;
 import keyboard.KeyboardRenderable;
 import keyboard.KeyboardSetting;
@@ -30,9 +31,9 @@ import utilities.MyUtilities;
 
 import com.leapmotion.leap.Vector;
 
-import enums.AttributeName;
+import enums.Attribute;
 import enums.KeyboardType;
-import enums.RenderableName;
+import enums.Renderable;
 
 
 public class CalibrationController extends GraphicsController {
@@ -46,7 +47,6 @@ public class CalibrationController extends GraphicsController {
     private JPanel settingsPanel;
     private JPanel renderOptionsPanel;
     private Timer clearTextTimer;
-    //private Timer typedFocusTimer;
     
     public CalibrationController() {
         keyboard = KeyboardType.STANDARD.getKeyboard();
@@ -73,9 +73,6 @@ public class CalibrationController extends GraphicsController {
         WindowBuilder.buildCalibrationWindow(frame, canvas, typedLabel, keyboardTypeComboBox, buttons, panels);
         canvas.setFocusable(true);
         addKeyboardToUI();
-        //typedPanel.setFocusable(true);
-        //typedPanel.requestFocusInWindow();
-        //frame.setVisible(true);
         
         clearTextTimer = new Timer(1000, new ActionListener() {
             @Override
@@ -97,26 +94,9 @@ public class CalibrationController extends GraphicsController {
             @Override
             public void actionPerformed(ActionEvent e) {
                 if(keyboard == KeyboardType.LEAP.getKeyboard()) {
-                    // START CALIBRATION EVENT
-                    // Two choices:
-                    // 1) Replace typedLabel with a text area describing what to do for calibration as it goes on
-                    // 2) Open a new calibration window that is stand alone and takes care of everything itself
-                    typedPanel.removeAll();
-                    clearTextTimer.stop();
-                    LeapPlane leapPlane = (LeapPlane) keyboard.getRenderables().getRenderableByName(RenderableName.LEAP_PLANE.toString());
-                    if(leapPlane != null) {
-                        if(leapPlane.isCalibrated()) {
-                            // ask if we should proceed with calibration, it will overwrite current plane
-                            // if yes
-                                // calibrate
-                            // if no
-                                // do nothing
-                        } else {
-                            leapPlane.calibrate();
-                        }
-                    }
-                    typedPanel.add(typedLabel);
-                    clearTextTimer.start();
+                    calibrationStarted();
+                    ((LeapKeyboard) keyboard).calibrateLeapPlane();
+                    calibrationFinished();
                 }
                 frame.requestFocusInWindow();
             }
@@ -153,36 +133,6 @@ public class CalibrationController extends GraphicsController {
             }
         });
         
-        /*typedFocusTimer = new Timer(3000, new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                typedPanel.requestFocusInWindow();
-            }
-        });
-        
-        typedPanel.addFocusListener(new FocusListener() {
-
-            @Override
-            public void focusGained(FocusEvent e) {
-                //typedFocusTimer.stop();
-                clearTextTimer.start();
-                typedLabel.setText(typedLabel.getText().replaceFirst("FOCUS LOST", ""));
-                typedLabel.setForeground(Color.DARK_GRAY);
-            }
-
-            @Override
-            public void focusLost(FocusEvent e) {
-                //typedFocusTimer.start();
-                clearTextTimer.stop();
-                typedLabel.setText("FOCUS LOST");
-                typedLabel.setForeground(Color.RED);
-                MyUtilities.calculateFontSize(typedLabel.getText(), typedLabel, typedPanel);
-            }
-            
-        });*/
-        
-        // TODO: Change to size of currently selected keyboard.
-        
         // by default, an AWT Frame doesn't do anything when you click
         // the close button; this bit of code will terminate the program when
         // the window is asked to close
@@ -205,7 +155,6 @@ public class CalibrationController extends GraphicsController {
     
     @Override
     public void keyboardEventObserved(char key) {
-        // TODO: Add full implementation required for detailed analysis of key presses
         clearTextTimer.restart();
         if(key == '\b' && 0 < typedLabel.getText().length()) {
             typedLabel.setText(typedLabel.getText().substring(0, typedLabel.getText().length()-1));
@@ -215,6 +164,22 @@ public class CalibrationController extends GraphicsController {
             typedLabel.setText(typedLabel.getText()+Character.toString(key));
         }
         MyUtilities.JAVA_SWING_UTILITIES.calculateFontSize(typedLabel.getText(),typedLabel, typedPanel);
+    }
+    
+    private void calibrationStarted() {
+        typedPanel.removeAll();
+        calibrateButton.setEnabled(false);
+        saveSettingsButton.setEnabled(false);
+        keyboardTypeComboBox.setEnabled(false);
+        clearTextTimer.stop();
+    }
+    
+    private void calibrationFinished() {
+        typedPanel.add(typedLabel);
+        calibrateButton.setEnabled(true);
+        saveSettingsButton.setEnabled(true);
+        keyboardTypeComboBox.setEnabled(true);
+        clearTextTimer.start();
     }
     
     public void disable() {
@@ -231,22 +196,16 @@ public class CalibrationController extends GraphicsController {
     }
     
     public void render(GLAutoDrawable drawable) {
-        // TODO: Need to encapsulate all rendering within current selected keyboard. 
-        // Only thing that might be appropriate to do here is set the perspectives
-        // but even these can be pushed further down into the keyboard.
-        
-       //GL2 gl = drawable.getGL().getGL2();
        gl.glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-       
        keyboard.render(gl);
     }
     
     private void addKeyboardToUI() {
         KeyboardAttributes ka = keyboard.getAttributes();
-        settingsPanel.add(ka.getAttributeByName(AttributeName.KEYBOARD_WIDTH.toString()).getAttributePanel());
-        settingsPanel.add(ka.getAttributeByName(AttributeName.KEYBOARD_HEIGHT.toString()).getAttributePanel());
+        settingsPanel.add(ka.getAttributeByName(Attribute.KEYBOARD_WIDTH.toString()).getAttributePanel());
+        settingsPanel.add(ka.getAttributeByName(Attribute.KEYBOARD_HEIGHT.toString()).getAttributePanel());
         if(keyboard == KeyboardType.STANDARD.getKeyboard()) {
-            settingsPanel.add((JPanel) ka.getAttributeByName(AttributeName.KEY_BINDINGS.toString()).getValue());
+            settingsPanel.add((JPanel) ka.getAttributeByName(Attribute.KEY_BINDINGS.toString()).getValue());
         }
         
         for(KeyboardSetting ks: keyboard.getSettings().getAllSettings()) {
@@ -273,7 +232,7 @@ public class CalibrationController extends GraphicsController {
         observers.remove(observer);
     }
 
-    protected void notifyListeners() {
+    private void notifyListeners() {
         for(SaveSettingsObserver observer : observers) {
             observer.saveSettingsEventObserved(keyboard);
         }

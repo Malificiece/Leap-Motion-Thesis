@@ -1,9 +1,7 @@
 package keyboard.renderables;
+
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
-import java.nio.FloatBuffer;
 
 import com.leapmotion.leap.Vector;
 
@@ -13,15 +11,15 @@ import javax.media.opengl.GL2;
 import javax.swing.Timer;
 
 public class VirtualKey {
-    private final static float[] ACTIVE = {0f, 1f, 0f, 0.5f};
-    private final static float[] HOVER = {1f, 1f, 0f, 0.5f};
-    private final static float[] NONE = {1f, 0f, 0f, 0.5f};
+    private final static float[] ACTIVE_COLOR = {0f, 1f, 0f, 0.5f};
+    private final static float[] HOVER_COLOR = {1f, 1f, 0f, 0.5f};
+    private final static float[] NONE_COLOR = {1f, 0f, 0f, 0.5f};
     private Vector max;
     private Vector min; // also equivalent to location (not center)
     private int width;
     private int height;
     private Key key;
-    private FloatBuffer color;
+    private float[] color;
     private Timer lightUpKeyTimer;
     
     public VirtualKey(float x, float y, float width, float height, Key key) {
@@ -30,45 +28,40 @@ public class VirtualKey {
         this.width = (int)width;
         this.height = (int)height;
         this.key = key;
-        ByteBuffer vbb = ByteBuffer.allocateDirect(16); 
-        vbb.order(ByteOrder.nativeOrder());    // use the device hardware's native byte order
-        color = vbb.asFloatBuffer();  // create a floating point buffer from the ByteBuffer
-        setColor(NONE);
+        color = NONE_COLOR;
         
         lightUpKeyTimer = new Timer(100, new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 lightUpKeyTimer.stop();
-                setColor(NONE);
+                color = NONE_COLOR;
             }
         });
     }
     
     public void pressed() {
-        setColor(ACTIVE);
+        color = ACTIVE_COLOR;
         lightUpKeyTimer.restart();
     }
     
     public void render(GL2 gl) {
         gl.glPushMatrix();
+        gl.glColor4fv(color, 0);
         gl.glTranslatef(min.getX(), min.getY(), min.getZ());
-        // figure out how to make color change based off distance to key
-        gl.glColor4fv(color);
-        //gl.glMaterialfv(GL_FRONT, GL_DIFFUSE, color);
         gl.glRecti(0, 0, width, height);
         gl.glPopMatrix();
     }
     
     public boolean isHovering(Vector point) {
         if(max.getX() < point.getX() || max.getY() < point.getY()) {
-            setColor(NONE);
+            color = NONE_COLOR;
             return false;
         }
         if(min.getX() > point.getX() || min.getY() > point.getY()) {
-            setColor(NONE);
+            color = NONE_COLOR;
             return false;
         }
-        setColor(HOVER);
+        color = HOVER_COLOR;
         return true;
     }
     
@@ -77,12 +70,6 @@ public class VirtualKey {
     }
     
     public void clear() {
-        setColor(NONE);
-    }
-    
-    private void setColor(float [] color) {
-        this.color.clear();
-        this.color.put(color);
-        this.color.flip();
+        color = NONE_COLOR;
     }
 }

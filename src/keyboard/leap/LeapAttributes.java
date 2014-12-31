@@ -2,12 +2,12 @@ package keyboard.leap;
 
 import keyboard.KeyboardAttribute;
 import keyboard.KeyboardAttributes;
-import enums.AttributeName;
+import enums.Attribute;
 import enums.Key;
 
 public class LeapAttributes extends KeyboardAttributes {
-    public static final int HEIGHT = 385;
-    public static final int WIDTH = 647;
+    public static final int KEYBOARD_HEIGHT = 385;
+    public static final int KEYBOARD_WIDTH = 647;
     private static final int DIST_TO_CAMERA = 465;
     private static final int GAP_SIZE = 3;
     private static final int KEY_WIDTH = 62;
@@ -26,18 +26,18 @@ public class LeapAttributes extends KeyboardAttributes {
     private static final Key [] FOURTH_ROW = {Key.VK_COMMA, Key.VK_SPACE, Key.VK_PERIOD, Key.VK_ENTER};
     
     LeapAttributes(LeapKeyboard keyboard) {
-        this.addAttribute(new KeyboardAttribute(AttributeName.KEYBOARD_HEIGHT.toString(), HEIGHT));
-        this.addAttribute(new KeyboardAttribute(AttributeName.KEYBOARD_WIDTH.toString(), WIDTH));
-        this.addAttribute(new KeyboardAttribute(AttributeName.DIST_TO_CAMERA.toString(), DIST_TO_CAMERA));
-        this.addAttribute(new KeyboardAttribute(AttributeName.GAP_SIZE.toString(), GAP_SIZE));
-        this.addAttribute(new KeyboardAttribute(AttributeName.KEY_WIDTH.toString(), KEY_WIDTH));
-        this.addAttribute(new KeyboardAttribute(AttributeName.KEY_HEIGHT.toString(), KEY_HEIGHT));
-        this.addAttribute(new KeyboardAttribute(AttributeName.SPACE_KEY_WIDTH.toString(), SPACE_KEY_WIDTH));
-        this.addAttribute(new KeyboardAttribute(AttributeName.BACK_SPACE_KEY_WIDTH.toString(), BACK_SPACE_KEY_WIDTH));
-        this.addAttribute(new KeyboardAttribute(AttributeName.ENTER_KEY_WIDTH.toString(), ENTER_KEY_WIDTH));
-        this.addAttribute(new KeyboardAttribute(AttributeName.SHIFT_KEY_WIDTH.toString(), SHIFT_KEY_WIDTH));
-        this.addAttribute(new KeyboardAttribute(AttributeName.NUMBER_OF_KEYS.toString(), FIRST_ROW.length + SECOND_ROW.length + THIRD_ROW.length + FOURTH_ROW.length));
-        this.addAttribute(new KeyboardAttribute(AttributeName.ROW_OFFSETS.toString(), (new int[] {FIRST_ROW_OFFSET,SECOND_ROW_OFFSET,THIRD_ROW_OFFSET,FOURTH_ROW_OFFSET})));
-        this.addAttribute(new KeyboardAttribute(AttributeName.KEY_ROWS.toString(), new Key[][] {FIRST_ROW, SECOND_ROW, THIRD_ROW, FOURTH_ROW}));
+        this.addAttribute(new KeyboardAttribute(Attribute.KEYBOARD_HEIGHT.toString(), KEYBOARD_HEIGHT));
+        this.addAttribute(new KeyboardAttribute(Attribute.KEYBOARD_WIDTH.toString(), KEYBOARD_WIDTH));
+        this.addAttribute(new KeyboardAttribute(Attribute.DIST_TO_CAMERA.toString(), DIST_TO_CAMERA));
+        this.addAttribute(new KeyboardAttribute(Attribute.GAP_SIZE.toString(), GAP_SIZE));
+        this.addAttribute(new KeyboardAttribute(Attribute.KEY_WIDTH.toString(), KEY_WIDTH));
+        this.addAttribute(new KeyboardAttribute(Attribute.KEY_HEIGHT.toString(), KEY_HEIGHT));
+        this.addAttribute(new KeyboardAttribute(Attribute.SPACE_KEY_WIDTH.toString(), SPACE_KEY_WIDTH));
+        this.addAttribute(new KeyboardAttribute(Attribute.BACK_SPACE_KEY_WIDTH.toString(), BACK_SPACE_KEY_WIDTH));
+        this.addAttribute(new KeyboardAttribute(Attribute.ENTER_KEY_WIDTH.toString(), ENTER_KEY_WIDTH));
+        this.addAttribute(new KeyboardAttribute(Attribute.SHIFT_KEY_WIDTH.toString(), SHIFT_KEY_WIDTH));
+        this.addAttribute(new KeyboardAttribute(Attribute.NUMBER_OF_KEYS.toString(), FIRST_ROW.length + SECOND_ROW.length + THIRD_ROW.length + FOURTH_ROW.length));
+        this.addAttribute(new KeyboardAttribute(Attribute.ROW_OFFSETS.toString(), (new int[] {FIRST_ROW_OFFSET,SECOND_ROW_OFFSET,THIRD_ROW_OFFSET,FOURTH_ROW_OFFSET})));
+        this.addAttribute(new KeyboardAttribute(Attribute.KEY_ROWS.toString(), new Key[][] {FIRST_ROW, SECOND_ROW, THIRD_ROW, FOURTH_ROW}));
     }
 }

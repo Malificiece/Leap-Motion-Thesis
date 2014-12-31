@@ -1,48 +1,171 @@
 package utilities;
 
-import java.util.ArrayList;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.nio.file.FileSystems;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.TreeMap;
 
-import keyboard.KeyboardAttribute;
+import enums.FileExtension;
+import enums.FileName;
+import enums.FilePath;
 import keyboard.KeyboardSetting;
+import keyboard.KeyboardSettings;
 
 public class FileUtilities {
-    // ALL OF THE BELOW must check to see if variable exists in file yet
-    // if not, insert the variable in alphabetical order into the file and put the new value
-    // if the variable already exists then we just update the value there
-    public KeyboardAttribute readAttributeFromFile(String path, String name) {
-        return null;
-    }
     
-    public void writeAttributeToFile(String path, KeyboardAttribute attribute) {
+    public FileUtilities() {
+        File file;
+        Path path;
+        //Create data folder if it doesn't already exist.
+        path = FileSystems.getDefault().getPath(FilePath.DATA_PATH.getPath());
+        if(!Files.exists(path)) {
+            file = path.toFile();
+            file.mkdirs();
+        }
         
+        // Create config/settings path/files if they don't exist.
+        // Create config folder.
+        path = FileSystems.getDefault().getPath(FilePath.CONFIG_PATH.getPath());
+        if(!Files.exists(path)) {
+            file = path.toFile();
+            file.mkdirs();
+        }
+        // Create standard.ini
+        path = FileSystems.getDefault().getPath(FilePath.CONFIG_PATH.getPath(), FileName.STANDARD_NAME.getName() + FileExtension.INI.getExtension());
+        if(!Files.exists(path)) {
+            file = path.toFile();
+            try {
+                file.createNewFile();
+            } catch (IOException e) {e.printStackTrace();}
+        }
+        // Create leap.ini
+        path = FileSystems.getDefault().getPath(FilePath.CONFIG_PATH.getPath(), FileName.LEAP_NAME.getName() + FileExtension.INI.getExtension());
+        if(!Files.exists(path)) {
+            file = path.toFile();
+            try {
+                file.createNewFile();
+            } catch (IOException e) {e.printStackTrace();}
+        }
+        // Create controller.ini
+        path = FileSystems.getDefault().getPath(FilePath.CONFIG_PATH.getPath(), FileName.CONTROLLER_NAME.getName() + FileExtension.INI.getExtension());
+        if(!Files.exists(path)) {
+            file = path.toFile();
+            try {
+                file.createNewFile();
+            } catch (IOException e) {e.printStackTrace();}
+        }
+        // Create tablet.ini
+        path = FileSystems.getDefault().getPath(FilePath.CONFIG_PATH.getPath(), FileName.TABLET_NAME.getName() + FileExtension.INI.getExtension());
+        if(!Files.exists(path)) {
+            file = path.toFile();
+            try {
+                file.createNewFile();
+            } catch (IOException e) {e.printStackTrace();}
+        }
     }
     
-    public void writeAttributeListToFile(String path, ArrayList<KeyboardAttribute> attributes) {
-        openDirectory();
-        openFile();
-    }
-    
-    public KeyboardSetting readSettingFromFile(String path, String name) {
-        return null;
-    }
-    
-    public void writeSettingToFile(String path, KeyboardSetting setting) {
+    public Number readAttributeOrSettingFromFile(String filePath, String fileName, String attributeOrSettingName, double defaultValue) throws IOException {
+        // Store default value just in cause we find no other value.
+        double value = defaultValue;
         
-    }
-    
-    public void writeSettingListToFile(String path, ArrayList<KeyboardSetting> settings) {
+        // Attempt to open file, create it if it doesn't exist.
+        File file = new File(filePath, fileName);
+        if (!file.isFile() && !file.createNewFile())
+        {
+            throw new IOException("Error creating new file: " + file.getAbsolutePath());
+        }
         
-    }
-    
-    // open's directory specified by path or creates the folder if it doesn't exist yet
-    private void openDirectory() {
+        // Find and read the setting from file if it exists.
+        BufferedReader bufferedReader = new BufferedReader(new FileReader(file));
+        String line = null;
+        while((line = bufferedReader.readLine()) != null) {
+            String[] words = line.split(" ");
+            if(words.length == 2) {
+                if(attributeOrSettingName.equals(words[0].substring(0, words[0].length()-1))) {
+                    value = Double.parseDouble(words[1]);
+                    break;
+                }
+            }
+        }
         
+        // Close our reader and return the value.
+        bufferedReader.close();
+        return value;
     }
     
-    // open's file specified by path or creates a new file if it doesn't exist yet
-    private void openFile() {
+    public void writeSettingToFile(String filePath, String fileName, KeyboardSetting keyboardSetting) throws IOException {
+        // Attempt to open file, create it if it doesn't exist.
+        File file = new File(filePath, fileName);
+        if (!file.isFile() && !file.createNewFile())
+        {
+            throw new IOException("Error creating new file: " + file.getAbsolutePath());
+        }
         
+        // Read in all stored settings from file into an alphabetically sorted Map.
+        BufferedReader bufferedReader = new BufferedReader(new FileReader(file));
+        TreeMap<String, Double> savedSettings = new TreeMap<String, Double>();
+        String line = null;
+        while((line = bufferedReader.readLine()) != null) {
+            String[] words = line.split(" ");
+            if(words.length == 2) {
+                savedSettings.put(words[0].substring(0, words[0].length()-1), Double.parseDouble(words[1]));
+            }
+        }
+        bufferedReader.close();
+        
+        // Change the setting specified.
+        savedSettings.put(keyboardSetting.getName(), keyboardSetting.getValue());
+        
+        // Rewrite settings to file.
+        FileWriter fileWriter = new FileWriter(filePath+fileName);
+        PrintWriter out = new PrintWriter(fileWriter);
+        for(String settingName: savedSettings.keySet()) {
+            out.println(settingName + ": " + savedSettings.get(settingName));
+        }
+        out.flush();
+        out.close();
+        fileWriter.close();
     }
     
-    // Add data recording function or make a separate DataRecorder class to take care of it.
+    public void writeSettingsToFile(String filePath, String fileName, KeyboardSettings keyboardSettings) throws IOException {
+        // Attempt to open file, create it if it doesn't exist.
+        File file = new File(filePath, fileName);
+        if (!file.isFile() && !file.createNewFile())
+        {
+            throw new IOException("Error creating new file: " + file.getAbsolutePath());
+        }
+        
+        // Read in all stored settings from file into an alphabetically sorted Map.
+        BufferedReader bufferedReader = new BufferedReader(new FileReader(file));
+        TreeMap<String, Double> savedSettings = new TreeMap<String, Double>();
+        String line = null;
+        while((line = bufferedReader.readLine()) != null) {
+            String[] words = line.split(" ");
+            if(words.length == 2) {
+                savedSettings.put(words[0].substring(0, words[0].length()-1), Double.parseDouble(words[1]));
+            }
+        }
+        bufferedReader.close();
+        
+        // Change all of the setting's values.
+        for(KeyboardSetting keyboardSetting: keyboardSettings.getAllSettings()) {
+            savedSettings.put(keyboardSetting.getName(), keyboardSetting.getValue());
+        }
+        
+        // Rewrite settings to file.
+        FileWriter fileWriter = new FileWriter(filePath+fileName);
+        PrintWriter out = new PrintWriter(fileWriter);
+        for(String settingName: savedSettings.keySet()) {
+            out.println(settingName + ": " + savedSettings.get(settingName));
+        }
+        out.flush();
+        out.close();
+        fileWriter.close();
+    }
 }

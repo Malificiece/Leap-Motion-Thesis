@@ -12,14 +12,15 @@ import utilities.MyUtilities;
 import com.leapmotion.leap.InteractionBox;
 import com.leapmotion.leap.Vector;
 
-import enums.AttributeName;
-import enums.RenderableName;
+import enums.Attribute;
+import enums.Renderable;
 import keyboard.KeyboardAttributes;
 import keyboard.KeyboardRenderable;
 
 public class LeapPoint extends KeyboardRenderable {
-    private static final String RENDER_NAME = RenderableName.LEAP_POINT.toString();
-    private static final int NUM_VERTICIES = 16;
+    private static final String RENDER_NAME = Renderable.LEAP_POINT.toString();
+    private static final float[] COLOR = {0f, 0f, 1f, 1f};
+    private static final int NUM_VERTICIES = 32;
     private static final float DELTA_ANGLE = (float) (2.0f * Math.PI / NUM_VERTICIES);
     private static final float RADIUS = 10f;
     private final int KEYBOARD_WIDTH;
@@ -31,9 +32,9 @@ public class LeapPoint extends KeyboardRenderable {
     
     public LeapPoint(KeyboardAttributes keyboardAttributes) {
         super(RENDER_NAME);
-        KEYBOARD_WIDTH = keyboardAttributes.getAttributeByName(AttributeName.KEYBOARD_WIDTH.toString()).getValueAsInteger();
-        KEYBOARD_HEIGHT = keyboardAttributes.getAttributeByName(AttributeName.KEYBOARD_HEIGHT.toString()).getValueAsInteger();
-        DIST_TO_CAMERA = keyboardAttributes.getAttributeByName(AttributeName.DIST_TO_CAMERA.toString()).getValueAsInteger();
+        KEYBOARD_WIDTH = keyboardAttributes.getAttributeByName(Attribute.KEYBOARD_WIDTH.toString()).getValueAsInteger();
+        KEYBOARD_HEIGHT = keyboardAttributes.getAttributeByName(Attribute.KEYBOARD_HEIGHT.toString()).getValueAsInteger();
+        DIST_TO_CAMERA = keyboardAttributes.getAttributeByName(Attribute.DIST_TO_CAMERA.toString()).getValueAsInteger();
     }
     
     public void setPoint(Vector point) {
@@ -79,7 +80,8 @@ public class LeapPoint extends KeyboardRenderable {
     }
     
     private void drawDottedLine(GL2 gl) {
-        gl.glColor4f(0f, 0f, 1f, 1f);
+        COLOR[3] = 1f;
+        gl.glColor4fv(COLOR, 0);
         gl.glPushAttrib(GL_ENABLE_BIT);
         gl.glLineWidth(2);
         gl.glLineStipple(1, (short) 0xAAAA);
@@ -93,7 +95,8 @@ public class LeapPoint extends KeyboardRenderable {
     }
     
     private void drawPoint(GL2 gl) {
-        gl.glColor4f(0f, 0f, 1f, (DIST_TO_CAMERA-normalizedPoint.getZ())/DIST_TO_CAMERA);
+        COLOR[3] = (DIST_TO_CAMERA-normalizedPoint.getZ())/DIST_TO_CAMERA;
+        gl.glColor4fv(COLOR, 0);
         gl.glBegin(GL_TRIANGLE_FAN);
         // Draw the vertex at the center of the circle
         gl.glVertex3f(0f, 0f, 0f);

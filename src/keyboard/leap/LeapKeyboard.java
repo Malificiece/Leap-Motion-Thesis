@@ -8,9 +8,9 @@ import utilities.MyUtilities;
 
 import com.leapmotion.leap.InteractionBox;
 
-import enums.AttributeName;
-import enums.FilePath;
-import enums.RenderableName;
+import enums.Attribute;
+import enums.FileName;
+import enums.Renderable;
 import keyboard.IKeyboard;
 import keyboard.renderables.LeapGestures;
 import keyboard.renderables.LeapPlane;
@@ -24,7 +24,7 @@ import leap.LeapObserver;
 
 public class LeapKeyboard extends IKeyboard implements LeapObserver {
     public static final int KEYBOARD_ID = 1;
-    private static final String KEYBOARD_FILE_PATH = FilePath.LEAP_PATH.getPath();
+    private static final String KEYBOARD_FILE_NAME = FileName.LEAP_NAME.getName();
     private static final ReentrantLock LEAP_LOCK = new ReentrantLock();
     private final int DIST_TO_CAMERA;
     private LeapData leapData;
@@ -35,18 +35,30 @@ public class LeapKeyboard extends IKeyboard implements LeapObserver {
     private VirtualKeyboard virtualKeyboard;
     
     public LeapKeyboard() {
-        super(KEYBOARD_ID, KEYBOARD_FILE_PATH);
+        super(KEYBOARD_ID, KEYBOARD_FILE_NAME);
         keyboardAttributes = new LeapAttributes(this);
         keyboardSettings = new LeapSettings(this);
         keyboardRenderables = new LeapRenderables(this);
-        keyboardWidth = keyboardAttributes.getAttributeByName(AttributeName.KEYBOARD_WIDTH.toString());
-        keyboardHeight = keyboardAttributes.getAttributeByName(AttributeName.KEYBOARD_HEIGHT.toString());
-        DIST_TO_CAMERA = keyboardAttributes.getAttributeByName(AttributeName.DIST_TO_CAMERA.toString()).getValueAsInteger();
-        virtualKeyboard = (VirtualKeyboard) keyboardRenderables.getRenderableByName(RenderableName.VIRTUAL_KEYS.toString());
-        leapPoint = (LeapPoint) keyboardRenderables.getRenderableByName(RenderableName.LEAP_POINT.toString());
-        leapTool = (LeapTool) keyboardRenderables.getRenderableByName(RenderableName.LEAP_TOOL.toString());
-        leapGestures = (LeapGestures) keyboardRenderables.getRenderableByName(RenderableName.LEAP_GESTURES.toString());
-        leapPlane = (LeapPlane) keyboardRenderables.getRenderableByName(RenderableName.LEAP_PLANE.toString());
+        keyboardWidth = keyboardAttributes.getAttributeByName(Attribute.KEYBOARD_WIDTH.toString());
+        keyboardHeight = keyboardAttributes.getAttributeByName(Attribute.KEYBOARD_HEIGHT.toString());
+        DIST_TO_CAMERA = keyboardAttributes.getAttributeByName(Attribute.DIST_TO_CAMERA.toString()).getValueAsInteger();
+        virtualKeyboard = (VirtualKeyboard) keyboardRenderables.getRenderableByName(Renderable.VIRTUAL_KEYS.toString());
+        leapPoint = (LeapPoint) keyboardRenderables.getRenderableByName(Renderable.LEAP_POINT.toString());
+        leapTool = (LeapTool) keyboardRenderables.getRenderableByName(Renderable.LEAP_TOOL.toString());
+        leapGestures = (LeapGestures) keyboardRenderables.getRenderableByName(Renderable.LEAP_GESTURES.toString());
+        leapPlane = (LeapPlane) keyboardRenderables.getRenderableByName(Renderable.LEAP_PLANE.toString());
+        if(!leapPlane.isCalibrated()) {
+            leapPoint.blockAccess(true);
+            leapTool.blockAccess(true);
+            leapGestures.blockAccess(true);
+        }
+    }
+    
+    public void calibrateLeapPlane() {
+        leapPlane.calibrate();
+        leapPoint.grantAccess(true);
+        leapTool.grantAccess(true);
+        leapGestures.grantAccess(true);
     }
     
     @Override
@@ -84,7 +96,7 @@ public class LeapKeyboard extends IKeyboard implements LeapObserver {
         LEAP_LOCK.lock();
         try {
             this.leapData = leapData;
-            this.leapData.populateData(leapPoint, leapTool, leapGestures);
+            this.leapData.populateData(leapPoint, leapTool);
         } finally {
             LEAP_LOCK.unlock();
         }
@@ -95,12 +107,6 @@ public class LeapKeyboard extends IKeyboard implements LeapObserver {
         leapPoint.setInteractionBox(iBox);
         leapPlane.setInteractionBox(iBox);
         leapGestures.setInteractionBox(iBox);
-        leapTool.setInteractionBox(iBox);
-
-        // Add this also to calibration I suppose
         leapTool.createCylinder();
-        
-        // temporary - move this to section that fires when calibration button is pushed
-        leapPlane.calibrate();
     }
 }

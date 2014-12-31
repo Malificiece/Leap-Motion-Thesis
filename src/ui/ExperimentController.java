@@ -12,8 +12,6 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
-import com.leapmotion.leap.Vector;
-
 
 public class ExperimentController extends GraphicsController {
     private JFrame frame;

@@ -54,7 +54,7 @@ public class ControlCenter {
     
     public ControlCenter(LeapListener leapListener) {
         leapListener.registerObserver((LeapKeyboard) KeyboardType.LEAP.getKeyboard());
-        CALIBRATION_CONTROLLER.registerObserver(leapListener);
+       // CALIBRATION_CONTROLLER.registerObserver(leapListener); -- Leap can't see tool gestures.
         // Java Swing/AWT important fields and selections
         frame = new JFrame("Experiment Control Center v0.1");
         firstName = new JTextField(10);

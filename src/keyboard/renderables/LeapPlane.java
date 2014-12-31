@@ -1,20 +1,24 @@
 package keyboard.renderables;
 
 import javax.media.opengl.GL2;
+
 import static javax.media.opengl.GL2GL3.GL_QUADS;
 import utilities.MyUtilities;
 
 import com.leapmotion.leap.InteractionBox;
 import com.leapmotion.leap.Vector;
 
-import enums.AttributeName;
-import enums.RenderableName;
-import keyboard.KeyboardAttributes;
+import enums.Attribute;
+import enums.Renderable;
+import enums.Setting;
+import keyboard.IKeyboard;
 import keyboard.KeyboardRenderable;
+import keyboard.KeyboardSetting;
 
 public class LeapPlane extends KeyboardRenderable {
-    private static final String RENDER_NAME = RenderableName.LEAP_PLANE.toString();
-    private static final float TOUCH_THRESHOLD = -0.10f;//-10.0f;
+    private static final String RENDER_NAME = Renderable.LEAP_PLANE.toString();
+    private static final float[] COLOR = {0.4f, 0.7f, 1f, 0.5f};
+    private final KeyboardSetting TOUCH_THRESHOLD; // -0.10f; normalized // -10.0f; not normalized
     private final int KEYBOARD_WIDTH;
     private final int KEYBOARD_HEIGHT;
     private final int DIST_TO_CAMERA;
@@ -23,17 +27,17 @@ public class LeapPlane extends KeyboardRenderable {
     // other Leap Point: (-60.117, 196.815, -28.5863)   Normalized: (0.244452, 0.48646, 0.306524)
     // min Leap Point: (-57.324, 138.28, -32.742)   Normalized: (0.256324, 0.237636, 0.278398)
     // max Leap Point: (37.5257, 196.318, -26.0687)   Normalized: (0.659516, 0.48435, 0.323563)
-    private Vector pointA; // min
-    private Vector pointB; // other
-    private Vector pointC; // max
-    private Vector pointD; // calculated
+    private Vector pointA = new Vector(); // min
+    private Vector pointB = pointA; // other
+    private Vector pointC = pointA; // max
+    private Vector pointD = pointA; // calculated
     private Vector planeNormal;
     private Vector planeCenter;
     private float distanceToCameraPlane;
     private float planeD;
     private float angleToCamera;
     private Vector axisToCamera;
-    private boolean calibrated = false;
+    private boolean isCalibrated = false;
     private float distanceToPlane;
     private float normalizedPlaneWidth;
     private float normalizedPlaneHeight;
@@ -44,16 +48,20 @@ public class LeapPlane extends KeyboardRenderable {
     private Vector intersectionPoint = new Vector();
     private float x, y, z = -1;
     
-    public LeapPlane(KeyboardAttributes keyboardAttributes) {
+    public LeapPlane(IKeyboard keyboard) {
         super(RENDER_NAME);
-        KEYBOARD_WIDTH = keyboardAttributes.getAttributeByName(AttributeName.KEYBOARD_WIDTH.toString()).getValueAsInteger();
-        KEYBOARD_HEIGHT = keyboardAttributes.getAttributeByName(AttributeName.KEYBOARD_HEIGHT.toString()).getValueAsInteger();
-        DIST_TO_CAMERA = keyboardAttributes.getAttributeByName(AttributeName.DIST_TO_CAMERA.toString()).getValueAsInteger();
-        // read points from file
+        KEYBOARD_WIDTH = keyboard.getAttributes().getAttributeByName(Attribute.KEYBOARD_WIDTH.toString()).getValueAsInteger();
+        KEYBOARD_HEIGHT = keyboard.getAttributes().getAttributeByName(Attribute.KEYBOARD_HEIGHT.toString()).getValueAsInteger();
+        DIST_TO_CAMERA = keyboard.getAttributes().getAttributeByName(Attribute.DIST_TO_CAMERA.toString()).getValueAsInteger();
+        TOUCH_THRESHOLD = keyboard.getSettings().getSettingByName(Setting.TOUCH_THRESHOLD.toString());
+        // if read A _ B _ C from file
+        // calibrated = true
+        calculatePlaneData();
     }
     
     public void setInteractionBox(InteractionBox iBox) {
         this.iBox = iBox;
+        calculatePlaneData();
     }
     
     public void calibrate() {
@@ -72,11 +80,11 @@ public class LeapPlane extends KeyboardRenderable {
         pointB =  new Vector(-60.117f, 196.815f, -28.5863f); // third
         pointC = new Vector(37.5257f, 196.318f, -26.0687f); // max
         calculatePlaneData();
-        calibrated = true;
+        isCalibrated = true;
     }
     
     public boolean isCalibrated() {
-        return calibrated;
+        return isCalibrated;
     }
     
     public float getDistance() {
@@ -84,14 +92,14 @@ public class LeapPlane extends KeyboardRenderable {
     }
     
     public boolean isTouching() {
-        if(distanceToPlane > TOUCH_THRESHOLD) {
+        if(distanceToPlane > TOUCH_THRESHOLD.getValue()) {
             return true;
         }
         return false;
     }
     
     public boolean isValid() {
-        if(x == -1 || y == -1) {
+        if(x == -1 || y == -1 || !isCalibrated) {
             return false;
         }
         return true;
@@ -131,11 +139,13 @@ public class LeapPlane extends KeyboardRenderable {
         planeCenter = MyUtilities.MATH_UTILITILES.rotateVector(planeCenter, axisToCamera, angleToCamera);
         
         // Normalize points in the leap box.
-        pointA = iBox.normalizePoint(pointA);
-        pointB = iBox.normalizePoint(pointB);
-        pointC = iBox.normalizePoint(pointC);
-        pointD = iBox.normalizePoint(pointD);
-        planeCenter = iBox.normalizePoint(planeCenter);
+        if(iBox != null) {
+            pointA = iBox.normalizePoint(pointA);
+            pointB = iBox.normalizePoint(pointB);
+            pointC = iBox.normalizePoint(pointC);
+            pointD = iBox.normalizePoint(pointD);
+            planeCenter = iBox.normalizePoint(planeCenter);
+        }
         
         // Recalculate normalized plane
         // Determine the vectors
@@ -218,7 +228,7 @@ public class LeapPlane extends KeyboardRenderable {
     public void render(GL2 gl) {
         if(isEnabled()) {
             gl.glPushMatrix();
-            gl.glColor3f(0.5f, 0.5f, 0.5f);
+            gl.glColor4fv(COLOR, 0);
             gl.glTranslatef(KEYBOARD_WIDTH/2f-normalizedPlaneWidth/2f, KEYBOARD_HEIGHT/2f-normalizedPlaneHeight/2f, DIST_TO_CAMERA-1f);
             drawRectangle(gl);
             gl.glPopMatrix();

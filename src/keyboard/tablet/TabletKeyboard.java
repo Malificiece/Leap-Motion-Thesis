@@ -6,21 +6,21 @@ import static javax.media.opengl.fixedfunc.GLMatrixFunc.GL_PROJECTION;
 import javax.media.opengl.GL2;
 
 import keyboard.IKeyboard;
-import enums.AttributeName;
-import enums.FilePath;
+import enums.Attribute;
+import enums.FileName;
 
 public class TabletKeyboard extends IKeyboard {
     public static final int KEYBOARD_ID = 2;
-    private static final String KEYBOARD_FILE_PATH = FilePath.TABLET_PATH.getPath();
+    private static final String KEYBOARD_FILE_NAME = FileName.TABLET_NAME.getName();
     //private VirtualKeyboard virtualKeyboard;
     
     public TabletKeyboard() {
-        super(KEYBOARD_ID, KEYBOARD_FILE_PATH);
+        super(KEYBOARD_ID, KEYBOARD_FILE_NAME);
         keyboardAttributes = new TabletAttributes(this);
         keyboardSettings = new TabletSettings(this);
         keyboardRenderables = new TabletRenderables(this);
-        keyboardWidth = keyboardAttributes.getAttributeByName(AttributeName.KEYBOARD_WIDTH.toString());
-        keyboardHeight = keyboardAttributes.getAttributeByName(AttributeName.KEYBOARD_HEIGHT.toString());
+        keyboardWidth = keyboardAttributes.getAttributeByName(Attribute.KEYBOARD_WIDTH.toString());
+        keyboardHeight = keyboardAttributes.getAttributeByName(Attribute.KEYBOARD_HEIGHT.toString());
         //virtualKeyboard = (VirtualKeyboard) keyboardRenderables.getRenderableByName(RenderableName.VIRTUAL_KEYS.toString());
     }
     

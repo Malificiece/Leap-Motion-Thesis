@@ -12,9 +12,9 @@ import javax.swing.JPanel;
 import javax.swing.KeyStroke;
 
 import utilities.MyUtilities;
-import enums.AttributeName;
-import enums.FilePath;
-import enums.RenderableName;
+import enums.Attribute;
+import enums.FileName;
+import enums.Renderable;
 import enums.Key;
 import keyboard.IKeyboard;
 import keyboard.KeyboardAttribute;
@@ -22,21 +22,21 @@ import keyboard.renderables.VirtualKeyboard;
 
 public class StandardKeyboard extends IKeyboard {
     public static final int KEYBOARD_ID = 0;
-    private static final String KEYBOARD_FILE_PATH = FilePath.STANDARD_PATH.getPath();
+    private static final String KEYBOARD_FILE_NAME = FileName.STANDARD_NAME.getName();
     private VirtualKeyboard virtualKeyboard;
     private KeyBindings keyBindings;
     private boolean shiftDown = false;
     
     public StandardKeyboard() {
-        super(KEYBOARD_ID, KEYBOARD_FILE_PATH);
+        super(KEYBOARD_ID, KEYBOARD_FILE_NAME);
         keyboardAttributes = new StandardAttributes(this);
         keyboardSettings = new StandardSettings(this);
         keyboardRenderables = new StandardRenderables(this);
-        keyboardWidth = keyboardAttributes.getAttributeByName(AttributeName.KEYBOARD_WIDTH.toString());
-        keyboardHeight = keyboardAttributes.getAttributeByName(AttributeName.KEYBOARD_HEIGHT.toString());
-        virtualKeyboard = (VirtualKeyboard) keyboardRenderables.getRenderableByName(RenderableName.VIRTUAL_KEYS.toString());
+        keyboardWidth = keyboardAttributes.getAttributeByName(Attribute.KEYBOARD_WIDTH.toString());
+        keyboardHeight = keyboardAttributes.getAttributeByName(Attribute.KEYBOARD_HEIGHT.toString());
+        virtualKeyboard = (VirtualKeyboard) keyboardRenderables.getRenderableByName(Renderable.VIRTUAL_KEYS.toString());
         keyBindings = new KeyBindings();
-        keyboardAttributes.addAttribute(new KeyboardAttribute(AttributeName.KEY_BINDINGS.toString(), keyBindings));
+        keyboardAttributes.addAttribute(new KeyboardAttribute(Attribute.KEY_BINDINGS.toString(), keyBindings));
     }
     
     @Override
@@ -84,11 +84,7 @@ public class StandardKeyboard extends IKeyboard {
                     }
                     
                     // Add shifted keys to action map
-                    if(Key.VK_A.getKeyCode() <= k.getKeyCode() && k.getKeyCode() <= Key.VK_Z.getKeyCode()) {
-                        actionMap.put(k.getKeyName() + Key.VK_SHIFT.getKeyName(), new KeyAction(Character.toUpperCase(k.getKeyValue())));
-                    } else {
-                        actionMap.put(k.getKeyName() + Key.VK_SHIFT.getKeyName(), new KeyAction(k.getKeyValue()));
-                    }
+                    actionMap.put(k.getKeyName() + Key.VK_SHIFT.getKeyName(), new KeyAction(k.toUpper()));
                 }
             }
             inputMap.put(KeyStroke.getKeyStroke(Key.VK_SHIFT.getKeyCode(), 0, true), Key.VK_SHIFT_RELEASED.getKeyName());
