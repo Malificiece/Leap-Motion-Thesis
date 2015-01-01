@@ -12,21 +12,23 @@ public class GraphicsUtilities {
     
     // Need to add in all the open GL stuff here to switch perspectives easily from 2D to 3D etc
     // Anything else we might need with open GL as well
-    public void switchToPerspective(GL2 gl, IKeyboard keyboard) {
+    public void switchToPerspective(GL2 gl, IKeyboard keyboard, boolean loadIdentity) {
         if(isOrtho) {
             perspective(gl, keyboard);
+            if(loadIdentity) gl.glLoadIdentity();
             isOrtho = false;
         } else {
-            gl.glLoadIdentity();
+            if(loadIdentity) gl.glLoadIdentity();
         }
     }
     
-    public void switchToOrthogonal(GL2 gl, IKeyboard keyboard) {
+    public void switchToOrthogonal(GL2 gl, IKeyboard keyboard, boolean loadIdentity) {
         if(!isOrtho) {
             orthogonal(gl, keyboard);
+            if(loadIdentity) gl.glLoadIdentity();
             isOrtho = true;
         } else {
-            gl.glLoadIdentity();
+            if(loadIdentity) gl.glLoadIdentity();
         }
     }
     
@@ -40,6 +42,7 @@ public class GraphicsUtilities {
         } else {
             perspective(gl, keyboard);
         }
+        gl.glLoadIdentity();
     }
     
     private void perspective(GL2 gl, IKeyboard keyboard) {
@@ -51,7 +54,6 @@ public class GraphicsUtilities {
    
         // Enable the model-view transform
         gl.glMatrixMode(GL_MODELVIEW);
-        gl.glLoadIdentity();
     }
     
     private void orthogonal(GL2 gl, IKeyboard keyboard) {
@@ -62,6 +64,5 @@ public class GraphicsUtilities {
    
         // Enable the model-view transform
         gl.glMatrixMode(GL_MODELVIEW);
-        gl.glLoadIdentity();
     }
 }

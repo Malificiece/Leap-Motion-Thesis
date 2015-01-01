@@ -88,7 +88,7 @@ public class LeapKeyboard extends IKeyboard implements LeapObserver, Calibration
     
     @Override
     public void render(GL2 gl) {
-        MyUtilities.OPEN_GL_UTILITIES.switchToPerspective(gl, this);
+        MyUtilities.OPEN_GL_UTILITIES.switchToPerspective(gl, this, true);
         gl.glPushMatrix();
         gl.glTranslatef(-keyboardWidth.getValueAsInteger()/2f, -keyboardHeight.getValueAsInteger()/2f, -DIST_TO_CAMERA); // 465 is the magic number that somehow centers the 2D with the 3D
         keyboardRenderables.render(gl);

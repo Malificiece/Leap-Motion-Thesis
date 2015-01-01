@@ -24,11 +24,11 @@ import leap.LeapListener;
 
 public class ControlCenter {
     // Constants
-    private static final int HOURS_MIN = 0;
-    private static final int HOURS_MAX = 24;
-    private static final int HOURS_INIT = 12;
-    private static final CalibrationController CALIBRATION_CONTROLLER = new CalibrationController();
-    private static final ExperimentController EXPERIMENT_CONTROLLER = new ExperimentController();
+    private final int HOURS_MIN = 0;
+    private final int HOURS_MAX = 24;
+    private final int HOURS_INIT = 12;
+    private final CalibrationController CALIBRATION_CONTROLLER = new CalibrationController();
+    private final ExperimentController EXPERIMENT_CONTROLLER = new ExperimentController();
     
     // Not Constants
     //LeapListener leapListener;

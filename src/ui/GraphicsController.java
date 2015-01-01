@@ -14,6 +14,7 @@ import keyboard.KeyboardObserver;
 import static javax.media.opengl.GL.*;  // GL constants
 import static javax.media.opengl.GL2.*; // GL2 constants
 
+import com.jogamp.opengl.util.gl2.GLUT;
 import com.leapmotion.leap.Vector;
 
 import enums.KeyboardType;
@@ -28,6 +29,7 @@ public abstract class GraphicsController implements GLEventListener, KeyboardObs
 	protected Vector dir;
 	protected IKeyboard keyboard;
 	public static GLU glu;
+	public static GLUT glut;
 	
 	public static void init() {
 	    GLProfile.initSingleton();
@@ -58,6 +60,7 @@ public abstract class GraphicsController implements GLEventListener, KeyboardObs
     public void init(GLAutoDrawable drawable) {
         GraphicsController.gl = drawable.getGL().getGL2();  // get the OpenGL graphics context
         glu = new GLU();  // get GL Utilities
+        glut = new GLUT();
         gl.setSwapInterval(1);
         
         // TODO: Make sure this is where I want to register observers.

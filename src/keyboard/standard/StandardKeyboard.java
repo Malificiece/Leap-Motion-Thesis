@@ -42,7 +42,7 @@ public class StandardKeyboard extends IKeyboard {
     
     @Override
     public void render(GL2 gl) {
-        MyUtilities.OPEN_GL_UTILITIES.switchToOrthogonal(gl, this);
+        MyUtilities.OPEN_GL_UTILITIES.switchToOrthogonal(gl, this, true);
         gl.glPushMatrix();
         gl.glTranslatef(0.0f, 0.0f, -0.1f);
         keyboardRenderables.render(gl);

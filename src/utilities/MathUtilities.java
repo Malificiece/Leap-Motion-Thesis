@@ -3,12 +3,37 @@ package utilities;
 import com.leapmotion.leap.Vector;
 
 public class MathUtilities {
-    public Vector midpoint(Vector a, Vector b) {
-        Vector v = new Vector();
-        v.setX((a.getX() + b.getX())/2);
-        v.setY((a.getY() + b.getY())/2);
-        v.setZ((a.getZ() + b.getZ())/2);
-        return v;
+    
+    public boolean findMidpoint(Vector midpoint, Vector[] vectors) {
+        if(vectors.length > 0) {
+            float x = 0, y = 0, z = 0;
+            int numVectors = 0;
+            for(Vector v: vectors) {
+                if(v != null) {
+                    x += v.getX();
+                    y += v.getY();
+                    z += v.getZ();
+                    numVectors++;
+                } else {
+                    break;
+                }
+            }
+            if(numVectors > 0) {
+                midpoint.setX(x/vectors.length);
+                midpoint.setY(y/vectors.length);
+                midpoint.setZ(z/vectors.length);
+                return true; 
+            }
+        }
+        return false;
+    }
+    
+    public Vector findMidpoint(Vector a, Vector b) {
+        Vector midpoint = new Vector();
+        midpoint.setX((a.getX() + b.getX())/2);
+        midpoint.setY((a.getY() + b.getY())/2);
+        midpoint.setZ((a.getZ() + b.getZ())/2);
+        return midpoint;
     }
     
     public float findDistanceToPoint(Vector source, Vector dest) {
