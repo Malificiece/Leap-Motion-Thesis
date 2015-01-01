@@ -4,6 +4,7 @@ import static javax.media.opengl.fixedfunc.GLMatrixFunc.GL_MODELVIEW;
 import static javax.media.opengl.fixedfunc.GLMatrixFunc.GL_PROJECTION;
 
 import javax.media.opengl.GL2;
+import javax.swing.JPanel;
 
 import keyboard.IKeyboard;
 import enums.Attribute;
@@ -12,6 +13,7 @@ import enums.FileName;
 public class ControllerKeyboard extends IKeyboard {
     public static final int KEYBOARD_ID = 3;
     private static final String KEYBOARD_FILE_NAME = FileName.CONTROLLER_NAME.getName();
+    private boolean isCalibrated = false;
     //private VirtualKeyboard virtualKeyboard;
     
     public ControllerKeyboard() {
@@ -57,5 +59,21 @@ public class ControllerKeyboard extends IKeyboard {
         // Possibly for leap we can give it the leap object
         // We'll have to tract that in a different way then rather than passing
         // it to Calibration control/experiment control which don't really care about the leap
+    }
+
+    @Override
+    public void beginCalibration(JPanel textPanel) {
+        finishCalibration();
+    }
+
+    @Override
+    protected void finishCalibration() {
+        isCalibrated = true;
+        notifyListenersCalibrationFinished();
+    }
+    
+    @Override
+    public boolean isCalibrated() {
+        return isCalibrated;
     }
 }

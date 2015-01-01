@@ -14,7 +14,10 @@ public enum Attribute {
     KEY_ROWS("Key Rows"),
     NUMBER_OF_KEYS("Number of Keys"),
     KEY_BINDINGS("Key Bindings"),
-    DIST_TO_CAMERA("Distance to Camera");
+    DIST_TO_CAMERA("Distance to Camera"),
+    LEAP_PLANE_POINT_A("Point A"),
+    LEAP_PLANE_POINT_B("Point B"),
+    LEAP_PLANE_POINT_C("Point C");
 
     private final String name;
     

@@ -4,9 +4,11 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 import javax.media.opengl.GL2;
+import javax.swing.JPanel;
 
 import enums.FileExtension;
 import enums.FilePath;
+import enums.KeyboardType;
 import ui.SaveSettingsObserver;
 import utilities.MyUtilities;
 
@@ -30,6 +32,10 @@ public abstract class IKeyboard implements SaveSettingsObserver {
     
     public abstract void render(GL2 gl);
     public abstract void update();
+    
+    public abstract void beginCalibration(JPanel textPanel);
+    protected abstract void finishCalibration();
+    public abstract boolean isCalibrated();
     
     public int getKeyboardID() {
         return keyboardID;
@@ -71,16 +77,22 @@ public abstract class IKeyboard implements SaveSettingsObserver {
         observers.remove(observer);
     }
 
-    protected void notifyListeners() {
+    protected void notifyListenersKeyEvent() {
         for(KeyboardObserver observer : observers) {
-            observer.keyboardEventObserved(keyPressed);
+            observer.keyboardKeyEventObserved(keyPressed);
+        }
+    }
+    
+    protected void notifyListenersCalibrationFinished() {
+        for(KeyboardObserver observer : observers) {
+            observer.keyboardCalibrationFinishedEventObserved();
         }
     }
     
     public void saveSettingsEventObserved(IKeyboard keyboard) {
         // Save all settings and attributes to file (stored for next time program launched)
         if(keyboardID == keyboard.getKeyboardID()) {
-            System.out.print(keyboard + ": Saving Settings to file - ");
+            System.out.print(KeyboardType.getByID(keyboardID).getKeyboardName() + ": Saving Settings to file - ");
             try {
                 MyUtilities.FILE_IO_UTILITIES.writeSettingsToFile(FilePath.CONFIG_PATH.getPath(), fileName + FileExtension.INI.getExtension(), keyboardSettings);
                 System.out.println("Success.");

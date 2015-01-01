@@ -83,7 +83,7 @@ public class KeyboardImage extends KeyboardRenderable {
             //gl.glPushAttrib( GL.GL_COLOR_BUFFER_BIT );
           
             //gl.glDisable(GL.GL_DEPTH_TEST);
-    	    
+    	    gl.glPushMatrix();
             // enable alpha mask (import from png sets alpha bits)
             gl.glEnable (GL.GL_BLEND);
             gl.glBlendFunc (GL.GL_SRC_ALPHA, GL.GL_ONE_MINUS_SRC_ALPHA);
@@ -93,7 +93,7 @@ public class KeyboardImage extends KeyboardRenderable {
             //gl.glWindowPos2i(150, 100); // moves in screen space
             gl.glPixelZoom( 1.0f, 1.0f ); // x-factor, y-factor
             gl.glDrawPixels(width, height, GL_RGBA, GL_UNSIGNED_BYTE, image);
-    
+            gl.glPopMatrix();
             //gl.glPopAttrib(); 
             //gl.glPopAttrib();
         }

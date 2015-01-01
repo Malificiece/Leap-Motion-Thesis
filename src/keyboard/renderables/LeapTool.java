@@ -78,7 +78,7 @@ public class LeapTool extends KeyboardRenderable {
         axisToDirection = axisToDirection.divide(axisToDirection.magnitude());
     }
     
-    public void scaleTo3DSpace(float planeWidth, float planeHeight) {
+    public void scaleTo3DSpace(/*float planeWidth, float planeHeight*/) {
         //scaledLength = (length / iBox.height()) * planeHeight;
         //scaledRadius = (radius / iBox.width()) * planeWidth;
         scaledLength = length;

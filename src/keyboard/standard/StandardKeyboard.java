@@ -26,6 +26,7 @@ public class StandardKeyboard extends IKeyboard {
     private VirtualKeyboard virtualKeyboard;
     private KeyBindings keyBindings;
     private boolean shiftDown = false;
+    private boolean isCalibrated = false;
     
     public StandardKeyboard() {
         super(KEYBOARD_ID, KEYBOARD_FILE_NAME);
@@ -53,6 +54,22 @@ public class StandardKeyboard extends IKeyboard {
         if(shiftDown) {
             virtualKeyboard.pressed(Key.VK_SHIFT);
         }
+    }
+    
+    @Override
+    public void beginCalibration(JPanel textPanel) {
+        finishCalibration();
+    }
+
+    @Override
+    protected void finishCalibration() {
+        isCalibrated = true;
+        notifyListenersCalibrationFinished();
+    }
+    
+    @Override
+    public boolean isCalibrated() {
+        return isCalibrated;
     }
     
     @SuppressWarnings("serial")
@@ -107,7 +124,7 @@ public class StandardKeyboard extends IKeyboard {
                     virtualKeyboard.pressed(key);
                 }
                 if(key != Key.VK_SHIFT && key != Key.VK_SHIFT_RELEASED) {
-                    notifyListeners();
+                    notifyListenersKeyEvent();
                 }
                 if(key == Key.VK_SHIFT_RELEASED) {
                     shiftDown = false;

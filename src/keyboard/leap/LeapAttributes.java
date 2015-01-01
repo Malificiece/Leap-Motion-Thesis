@@ -39,5 +39,8 @@ public class LeapAttributes extends KeyboardAttributes {
         this.addAttribute(new KeyboardAttribute(Attribute.NUMBER_OF_KEYS.toString(), FIRST_ROW.length + SECOND_ROW.length + THIRD_ROW.length + FOURTH_ROW.length));
         this.addAttribute(new KeyboardAttribute(Attribute.ROW_OFFSETS.toString(), (new int[] {FIRST_ROW_OFFSET,SECOND_ROW_OFFSET,THIRD_ROW_OFFSET,FOURTH_ROW_OFFSET})));
         this.addAttribute(new KeyboardAttribute(Attribute.KEY_ROWS.toString(), new Key[][] {FIRST_ROW, SECOND_ROW, THIRD_ROW, FOURTH_ROW}));
+        this.addAttribute(new KeyboardAttribute(Attribute.LEAP_PLANE_POINT_A.toString(), null));
+        this.addAttribute(new KeyboardAttribute(Attribute.LEAP_PLANE_POINT_B.toString(), null));
+        this.addAttribute(new KeyboardAttribute(Attribute.LEAP_PLANE_POINT_C.toString(), null));
     }
 }

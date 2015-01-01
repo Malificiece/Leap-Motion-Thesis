@@ -1,6 +1,7 @@
 package keyboard;
 
 import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
@@ -21,16 +22,15 @@ public abstract class KeyboardRenderable {
         createCheckboxPanel();
     }
     
-    public void enable() {
+    private void enable() {
         enabled = true;
     }
     
-    public void disable() {
+    private void disable() {
         enabled = false;
     }
     
     public void blockAccess(boolean disable) {
-        System.out.println("turned off");
         if(disable) renderableCheckBox.setSelected(false);
         renderableCheckBox.setEnabled(false);
     }
@@ -58,7 +58,6 @@ public abstract class KeyboardRenderable {
         renderablePanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
         renderableCheckBox = new JCheckBox(name);
         renderableCheckBox.setSelected(true);
-        System.out.println("created");
         renderableCheckBox.addItemListener(new ItemListener() {
             @Override
             public void itemStateChanged(ItemEvent e) {
@@ -75,7 +74,8 @@ public abstract class KeyboardRenderable {
         });
         
         renderablePanel.add(renderableCheckBox);
-        renderablePanel.setMaximumSize(renderablePanel.getPreferredSize());
+        //renderablePanel.setMaximumSize(renderablePanel.getPreferredSize());
+        renderablePanel.setMaximumSize(new Dimension(renderablePanel.getMaximumSize().width, renderablePanel.getMinimumSize().height));
         renderablePanel.setAlignmentX(Component.LEFT_ALIGNMENT);
     }
 }

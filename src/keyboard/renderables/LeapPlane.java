@@ -1,7 +1,12 @@
 package keyboard.renderables;
 
-import javax.media.opengl.GL2;
+import java.util.ArrayList;
 
+import javax.media.opengl.GL2;
+import javax.swing.JPanel;
+import javax.swing.JTextArea;
+
+import static javax.media.opengl.GL.GL_TRIANGLE_FAN;
 import static javax.media.opengl.GL2GL3.GL_QUADS;
 import utilities.MyUtilities;
 
@@ -11,26 +16,35 @@ import com.leapmotion.leap.Vector;
 import enums.Attribute;
 import enums.Renderable;
 import enums.Setting;
+import keyboard.CalibrationObserver;
 import keyboard.IKeyboard;
+import keyboard.KeyboardAttribute;
 import keyboard.KeyboardRenderable;
 import keyboard.KeyboardSetting;
 
 public class LeapPlane extends KeyboardRenderable {
     private static final String RENDER_NAME = Renderable.LEAP_PLANE.toString();
-    private static final float[] COLOR = {0.4f, 0.7f, 1f, 0.5f};
+    private static final float[] COLOR = {0.4f, 0.7f, 1f, 1f};
+    private static final int NUM_VERTICIES = 32;
+    private static final float DELTA_ANGLE = (float) (2.0f * Math.PI / NUM_VERTICIES);
+    private static final float RADIUS = 10f;
     private final KeyboardSetting TOUCH_THRESHOLD; // -0.10f; normalized // -10.0f; not normalized
     private final int KEYBOARD_WIDTH;
     private final int KEYBOARD_HEIGHT;
     private final int DIST_TO_CAMERA;
-    InteractionBox iBox;
-    // TODO: Need to use calibration to detect these points and save these points to file once recorded so we only have to calibrate occasionally
-    // other Leap Point: (-60.117, 196.815, -28.5863)   Normalized: (0.244452, 0.48646, 0.306524)
-    // min Leap Point: (-57.324, 138.28, -32.742)   Normalized: (0.256324, 0.237636, 0.278398)
-    // max Leap Point: (37.5257, 196.318, -26.0687)   Normalized: (0.659516, 0.48435, 0.323563)
-    private Vector pointA = new Vector(); // min
-    private Vector pointB = pointA; // other
-    private Vector pointC = pointA; // max
-    private Vector pointD = pointA; // calculated
+    private final KeyboardAttribute POINT_A_ATTRIBUTE;
+    private final KeyboardAttribute POINT_B_ATTRIBUTE;
+    private final KeyboardAttribute POINT_C_ATTRIBUTE;
+    private ArrayList<CalibrationObserver> observers = new ArrayList<CalibrationObserver>();
+    private InteractionBox iBox;
+    private Vector pointA; // min
+    private Vector pointB; // other
+    private Vector pointC; // max
+    private Vector pointD; // calculated
+    private Vector scaledPointA;
+    private Vector scaledPointB;
+    private Vector scaledPointC;
+    private Vector scaledPointD;
     private Vector planeNormal;
     private Vector planeCenter;
     private float distanceToCameraPlane;
@@ -38,6 +52,7 @@ public class LeapPlane extends KeyboardRenderable {
     private float angleToCamera;
     private Vector axisToCamera;
     private boolean isCalibrated = false;
+    private boolean isCalibrating = false;
     private float distanceToPlane;
     private float normalizedPlaneWidth;
     private float normalizedPlaneHeight;
@@ -47,6 +62,8 @@ public class LeapPlane extends KeyboardRenderable {
     private Vector DA;
     private Vector intersectionPoint = new Vector();
     private float x, y, z = -1;
+    private JPanel textPanel;
+    private JTextArea explinationArea;
     
     public LeapPlane(IKeyboard keyboard) {
         super(RENDER_NAME);
@@ -54,33 +71,73 @@ public class LeapPlane extends KeyboardRenderable {
         KEYBOARD_HEIGHT = keyboard.getAttributes().getAttributeByName(Attribute.KEYBOARD_HEIGHT.toString()).getValueAsInteger();
         DIST_TO_CAMERA = keyboard.getAttributes().getAttributeByName(Attribute.DIST_TO_CAMERA.toString()).getValueAsInteger();
         TOUCH_THRESHOLD = keyboard.getSettings().getSettingByName(Setting.TOUCH_THRESHOLD.toString());
-        // if read A _ B _ C from file
-        // calibrated = true
+        POINT_A_ATTRIBUTE = keyboard.getAttributes().getAttributeByName(Attribute.LEAP_PLANE_POINT_A.toString());
+        POINT_B_ATTRIBUTE = keyboard.getAttributes().getAttributeByName(Attribute.LEAP_PLANE_POINT_B.toString());
+        POINT_C_ATTRIBUTE = keyboard.getAttributes().getAttributeByName(Attribute.LEAP_PLANE_POINT_C.toString());
+        getPlaneAttributes();
+        if(pointA != null && pointB != null && pointC != null) {
+            isCalibrated = true;
+        } else {
+            isCalibrated = false;
+            pointA = new Vector();
+            pointB = new Vector();
+            pointC = new Vector();
+            // Apply points to attributes.
+            setPlaneAttributes();
+        }
         calculatePlaneData();
+        createExplinationArea();
     }
     
+    private void createExplinationArea() {
+        explinationArea = new JTextArea();
+        explinationArea.setWrapStyleWord(true);
+    }
+
     public void setInteractionBox(InteractionBox iBox) {
         this.iBox = iBox;
         calculatePlaneData();
     }
     
-    public void calibrate() {
+    private void getPlaneAttributes() {
+        pointA = POINT_A_ATTRIBUTE.getValueAsVector();
+        pointB = POINT_B_ATTRIBUTE.getValueAsVector();
+        pointC = POINT_C_ATTRIBUTE.getValueAsVector();
+    }
+    
+    private void setPlaneAttributes() {
+        POINT_A_ATTRIBUTE.setVectorValue(pointA);
+        POINT_B_ATTRIBUTE.setVectorValue(pointB);
+        POINT_C_ATTRIBUTE.setVectorValue(pointC);
+    }
+    
+    public void beginCalibration(JPanel textPanel) {
         // Calibrate the leap plane finding the min corner, third corner, and max corner.
-        // We can then use these to set up the plane
-        // the depth/thickness of the plane just depends on what we want it to be.
-        // try to float just above the surface (5 mm maybe?) and then have it go deep into the binder
-        
         // MAKE SURE TO FORCE THE POINTS TO BE RIGHT ANGLE FOR X and Y. Will make things 10000x easier
         
-        // populate frame with canvas/text field
-        // give instructions
+        // populate frame with text field describing what we need to do
+        // give instructions -- find average point of stick as it is moving in leap space
         // grab average point -- render points as they are grabbed
-        // save points to file
-        pointA = new Vector(-57.324f, 138.28f, -32.742f); // min
-        pointB =  new Vector(-60.117f, 196.815f, -28.5863f); // third
-        pointC = new Vector(37.5257f, 196.318f, -26.0687f); // max
-        calculatePlaneData();
-        isCalibrated = true;
+        this.textPanel = textPanel;
+        pointA = new Vector();
+        pointB = new Vector();
+        pointC = new Vector();
+        isCalibrating = true;
+        isCalibrated = false;
+    }
+    
+    public void finishCalibration() {
+        
+        // Remove everything we added to the textPanel.
+        textPanel.removeAll();
+        
+        // Notify the calibration controller that we are done calibrating.
+        isCalibrating = false;
+        notifyListenersCalibrationFinished();
+        
+        // Write the newly calibrated coordinates to file.
+        // add read from file for attributes on creation
+        // add write to file here as well as in IKeyboard for attributes
     }
     
     public boolean isCalibrated() {
@@ -106,6 +163,9 @@ public class LeapPlane extends KeyboardRenderable {
     }
     
     private void calculatePlaneData() {
+        // Get the original attributes for recalculation.
+        getPlaneAttributes();
+        
         // Find the center of the plane
         planeCenter = MyUtilities.MATH_UTILITILES.midpoint(pointA, pointC);
         
@@ -128,8 +188,8 @@ public class LeapPlane extends KeyboardRenderable {
         axisToCamera = planeNormal.cross(n).divide(planeNormal.cross(n).magnitude());
         
         // Calculate the width and height of the plane in real world space.
-        planeWidth = MyUtilities.MATH_UTILITILES.findDistanceToPoint(pointB, pointC);
-        planeHeight = MyUtilities.MATH_UTILITILES.findDistanceToPoint(pointB, pointA);
+        //planeWidth = MyUtilities.MATH_UTILITILES.findDistanceToPoint(pointB, pointC);
+        //planeHeight = MyUtilities.MATH_UTILITILES.findDistanceToPoint(pointB, pointA);
         
         // Rotate all points to face the camera.
         pointA = MyUtilities.MATH_UTILITILES.rotateVector(pointA, axisToCamera, angleToCamera);
@@ -167,6 +227,30 @@ public class LeapPlane extends KeyboardRenderable {
         normalizedPlaneHeight = MyUtilities.MATH_UTILITILES.findDistanceToPoint(pointB, pointA);
         //distanceToCameraPlane = Math.abs((iBox.normalizePoint(iBox.center()).getZ() - 0.5f) - planeCenter.getZ());
         distanceToCameraPlane = 1 - planeCenter.getZ();
+        
+        // Scale the plane to 3D space.
+        scaledPointA = scaleTo3DSpace(pointA);
+        scaledPointB = scaleTo3DSpace(pointB);
+        scaledPointC = scaleTo3DSpace(pointC);
+        scaledPointD = scaleTo3DSpace(pointD);
+        
+        // Move the normalized points to the origin.
+        scaledPointB = scaledPointB.minus(scaledPointA);
+        scaledPointC = scaledPointC.minus(scaledPointA);
+        scaledPointD = scaledPointD.minus(scaledPointA);
+        scaledPointA = scaledPointA.minus(scaledPointA);
+        
+        // Calculate the width and height of the scaled plane in 3D space.
+        planeWidth = MyUtilities.MATH_UTILITILES.findDistanceToPoint(scaledPointB, scaledPointC);
+        planeHeight = MyUtilities.MATH_UTILITILES.findDistanceToPoint(scaledPointB, scaledPointA);
+    }
+    
+    private Vector scaleTo3DSpace(Vector point) {
+        Vector vector = new Vector();
+        vector.setX(point.getX() * KEYBOARD_WIDTH);
+        vector.setY(point.getY() * KEYBOARD_HEIGHT);
+        vector.setZ(point.getZ() * DIST_TO_CAMERA);
+        return vector;
     }
     
     private void calcDistToPlane(Vector point) {
@@ -209,19 +293,37 @@ public class LeapPlane extends KeyboardRenderable {
         point.setZ(z);
     }
     
-    public void update(LeapPoint leapPoint, LeapTool leapTool) {
-        // Find point distance, normalize it, and position it.
-        leapPoint.applyPlaneRotationAndNormalizePoint(axisToCamera, angleToCamera);
-        calcDistToPlane(leapPoint.getNormalizedPoint());
-        applyPlaneNormalization(leapPoint.getNormalizedPoint());
-        leapPoint.scaleTo3DSpace();
-        
-        // Set tool point, scale it, rotate and position it.
-        leapTool.setPoint(leapPoint.getNormalizedPoint());
-        leapTool.calculateOrientation();
-        leapTool.scaleTo3DSpace(planeWidth, planeHeight);
-        
-        // Set gesture location and scale it.
+    public void update(LeapPoint leapPoint, LeapTool leapTool, LeapGesture leapGesture) {
+        if(isCalibrating && isCalibrated) { // means we just finished
+            finishCalibration();
+        }
+        if(isCalibrated) {
+            // Find point distance, normalize it, and position it.
+            leapPoint.applyPlaneRotationAndNormalizePoint(axisToCamera, angleToCamera);
+            calcDistToPlane(leapPoint.getNormalizedPoint());
+            applyPlaneNormalization(leapPoint.getNormalizedPoint());
+            leapPoint.scaleTo3DSpace();
+            
+            // Set tool point, scale it, rotate and position it.
+            leapTool.setPoint(leapPoint.getNormalizedPoint());
+            leapTool.calculateOrientation();
+            leapTool.scaleTo3DSpace(/*planeWidth, planeHeight*/);
+            
+            // Set gesture location and scale it.
+        } else if (isCalibrating) {
+            // average current point with last point
+            // detect stabilized point position average hasn't changed by EPSILON_THRESHOLD --- tiny number
+
+            
+            pointA = new Vector(-57.324f, 138.28f, -32.742f); // min
+            pointB = new Vector(-60.117f, 196.815f, -28.5863f); // third
+            pointC = new Vector(37.5257f, 196.318f, -26.0687f); // max
+            
+            // Apply points to attributes.
+            setPlaneAttributes();
+            calculatePlaneData();
+            isCalibrated = true;
+        }
     }
 
     @Override
@@ -229,23 +331,51 @@ public class LeapPlane extends KeyboardRenderable {
         if(isEnabled()) {
             gl.glPushMatrix();
             gl.glColor4fv(COLOR, 0);
-            gl.glTranslatef(KEYBOARD_WIDTH/2f-normalizedPlaneWidth/2f, KEYBOARD_HEIGHT/2f-normalizedPlaneHeight/2f, DIST_TO_CAMERA-1f);
+            gl.glTranslatef(KEYBOARD_WIDTH/2f-planeWidth/2f, KEYBOARD_HEIGHT/2f-planeHeight/2f, -10f);
             drawRectangle(gl);
+            
+            //drawPoint(gl);
             gl.glPopMatrix();
         }
     }
     
+    private void drawPoint(GL2 gl) {
+        gl.glColor4fv(COLOR, 0);
+        gl.glBegin(GL_TRIANGLE_FAN);
+        // Draw the vertex at the center of the circle
+        gl.glVertex3f(0f, 0f, 0f);
+        for(int i = 0; i < NUM_VERTICIES; i++)
+        {
+          gl.glVertex3d(Math.cos(DELTA_ANGLE * i) * RADIUS, Math.sin(DELTA_ANGLE * i) * RADIUS, 0.0);
+        }
+        gl.glVertex3f(1f * RADIUS, 0f, 0f);
+        gl.glEnd();
+    }
+    
     private void drawRectangle(GL2 gl) {
         // Move points to origin.
-        Vector tmpA = pointA.minus(pointA);
-        Vector tmpB = pointB.minus(pointA);
-        Vector tmpC = pointC.minus(pointA);
-        Vector tmpD = pointD.minus(pointA);
         gl.glBegin(GL_QUADS);
-        gl.glVertex3f(tmpA.getX(), tmpA.getY(), tmpA.getZ());
-        gl.glVertex3f(tmpB.getX(), tmpB.getY(), tmpB.getZ());
-        gl.glVertex3f(tmpC.getX(), tmpC.getY(), tmpC.getZ());
-        gl.glVertex3f(tmpD.getX(), tmpD.getY(), tmpD.getZ());
+        gl.glVertex3f(scaledPointA.getX(), scaledPointA.getY(), scaledPointA.getZ());
+        gl.glVertex3f(scaledPointB.getX(), scaledPointB.getY(), scaledPointB.getZ());
+        gl.glVertex3f(scaledPointC.getX(), scaledPointC.getY(), scaledPointC.getZ());
+        gl.glVertex3f(scaledPointD.getX(), scaledPointD.getY(), scaledPointD.getZ());
         gl.glEnd();
+    }
+    
+    public void registerObserver(CalibrationObserver observer) {
+        if(observers.contains(observer)) {
+            return;
+        }
+        observers.add(observer);
+    }
+    
+    public void removeObserver(CalibrationObserver observer) {
+        observers.remove(observer);
+    }
+    
+    protected void notifyListenersCalibrationFinished() {
+        for(CalibrationObserver observer : observers) {
+            observer.keyboardCalibrationFinishedEventObserved();
+        }
     }
 }

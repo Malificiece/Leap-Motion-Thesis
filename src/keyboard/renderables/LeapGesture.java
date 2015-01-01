@@ -9,14 +9,14 @@ import enums.Renderable;
 import keyboard.KeyboardAttributes;
 import keyboard.KeyboardRenderable;
 
-public class LeapGestures extends KeyboardRenderable {
+public class LeapGesture extends KeyboardRenderable {
     private static final String RENDER_NAME = Renderable.LEAP_GESTURES.toString();
     private final int KEYBOARD_WIDTH;
     private final int KEYBOARD_HEIGHT;
     private InteractionBox iBox;
     //private ArrayList<Gesture> gestures;
 
-    public LeapGestures(KeyboardAttributes keyboardAttributes) {
+    public LeapGesture(KeyboardAttributes keyboardAttributes) {
         super(RENDER_NAME);
         KEYBOARD_WIDTH = keyboardAttributes.getAttributeByName(Attribute.KEYBOARD_WIDTH.toString()).getValueAsInteger();
         KEYBOARD_HEIGHT = keyboardAttributes.getAttributeByName(Attribute.KEYBOARD_HEIGHT.toString()).getValueAsInteger();

@@ -77,12 +77,6 @@ public class ExperimentController extends GraphicsController {
         canvas.addGLEventListener(this);
     }
     
-    @Override
-    public void keyboardEventObserved(char key) {
-        // TODO Auto-generated method stub
-        
-    }
-    
     public void disable() {
         frame.setVisible(false);
     }
@@ -111,5 +105,17 @@ public class ExperimentController extends GraphicsController {
         gl.glColor3f(0, 0, 1);
         gl.glVertex2d(s, -s);
         gl.glEnd();
+    }
+
+    @Override
+    public void keyboardKeyEventObserved(char key) {
+        // TODO Auto-generated method stub
+        
+    }
+    
+    @Override
+    public void keyboardCalibrationFinishedEventObserved() {
+        // TODO Auto-generated method stub
+        
     }
 }

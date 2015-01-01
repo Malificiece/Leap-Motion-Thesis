@@ -1,5 +1,5 @@
 package keyboard;
 
-public interface KeyboardObserver {
-    public void keyboardEventObserved(char key/*CUSTOM KEYBOARD INTERACTION EVENT*/);
+public interface KeyboardObserver extends KeyObserver, CalibrationObserver {
+
 }
