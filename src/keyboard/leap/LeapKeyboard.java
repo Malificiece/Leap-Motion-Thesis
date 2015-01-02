@@ -10,7 +10,9 @@ import utilities.MyUtilities;
 import com.leapmotion.leap.InteractionBox;
 
 import enums.Attribute;
+import enums.FileExtension;
 import enums.FileName;
+import enums.FilePath;
 import enums.Renderable;
 import keyboard.CalibrationObserver;
 import keyboard.IKeyboard;
@@ -26,6 +28,7 @@ import leap.LeapObserver;
 
 public class LeapKeyboard extends IKeyboard implements LeapObserver, CalibrationObserver {
     public static final int KEYBOARD_ID = 1;
+    private static final String KEYBOARD_NAME = "Leap Keyboard";
     private static final String KEYBOARD_FILE_NAME = FileName.LEAP_NAME.getName();
     private static final ReentrantLock LEAP_LOCK = new ReentrantLock();
     private final int DIST_TO_CAMERA;
@@ -38,9 +41,11 @@ public class LeapKeyboard extends IKeyboard implements LeapObserver, Calibration
     private boolean isCalibrated = false;
     
     public LeapKeyboard() {
-        super(KEYBOARD_ID, KEYBOARD_FILE_NAME);
+        super(KEYBOARD_ID, KEYBOARD_NAME, KEYBOARD_FILE_NAME);
+        System.out.println(KEYBOARD_NAME + " - Loading Settings from " + FilePath.CONFIG_PATH.getPath() + KEYBOARD_FILE_NAME + FileExtension.INI.getExtension());
         keyboardAttributes = new LeapAttributes(this);
         keyboardSettings = new LeapSettings(this);
+        System.out.println("-------------------------------------------------------");
         keyboardRenderables = new LeapRenderables(this);
         keyboardWidth = keyboardAttributes.getAttributeByName(Attribute.KEYBOARD_WIDTH.toString());
         keyboardHeight = keyboardAttributes.getAttributeByName(Attribute.KEYBOARD_HEIGHT.toString());
@@ -108,6 +113,8 @@ public class LeapKeyboard extends IKeyboard implements LeapObserver, Calibration
                 if((vKey = virtualKeyboard.isHoveringAny(leapPoint.getNormalizedPoint())) != null && leapPlane.isTouching()) {
                     vKey.pressed();
                 }
+            } else if(leapPlane.isCalibrating()) {
+                leapPlane.update(leapPoint, leapTool, leapGesture);
             } else {
                 virtualKeyboard.clearAll();
             }

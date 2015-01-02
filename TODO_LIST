@@ -1,6 +1,6 @@
 TODO:
 0) Order X-box wireless receiver.  - DONE
-1) Finish implementation of Leap Calibration (save/read calibration). - DONE (mostly)
+1) Finish implementation of Leap Calibration (save/read calibration). - DONE
 2) Implement Gestures/rendering.
 3) Implement Swipe keyboard.
 4) Implement interpolation trail/rendering.

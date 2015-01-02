@@ -1,12 +1,14 @@
 package keyboard.renderables;
 
 import static javax.media.opengl.GL.GL_FRONT;
+import static javax.media.opengl.GL.GL_LINES;
 import static javax.media.opengl.GL2.*; // GL2 constants
 
 import javax.media.opengl.GL2;
 import javax.media.opengl.glu.GLUquadric;
 
 import ui.GraphicsController;
+import utilities.MyUtilities;
 
 import com.leapmotion.leap.Tool;
 import com.leapmotion.leap.Vector;
@@ -23,13 +25,14 @@ public class LeapTool extends KeyboardRenderable {
     private static final float DELTA_ANGLE = (float) (2.0f * Math.PI / NUM_VERTICIES);
     private static final float RADS_TO_DEGREES = (float) (180 / Math.PI);
     private static final float[] COLOR = {0.85f, 0.7f, 0.41f, 1f};
+    private static final float[] RED = {1f, 1f, 0f, 1f};
     private final int DIST_TO_CAMERA;
     private float length;
     private float radius;
     private float scaledLength;
     private float scaledRadius;
-    private Vector tipDirection;
-    private Vector tipPoint = new Vector(0,0,0);
+    private Vector tipDirection = Vector.zero();
+    private Vector tipPoint = Vector.zero();
     private boolean isValid = false;
     private float angleToDirection = 0;
     private Vector axisToDirection = tipPoint;
@@ -89,13 +92,14 @@ public class LeapTool extends KeyboardRenderable {
     public void render(GL2 gl) {
         if(isEnabled()) {
             gl.glPushMatrix();
-            gl.glEnable(GL_CULL_FACE);
-            gl.glEnable(GL_LIGHTING);
             COLOR[3] = (DIST_TO_CAMERA-tipPoint.getZ())/DIST_TO_CAMERA;
             gl.glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, COLOR, 0);
             gl.glTranslatef(tipPoint.getX(), tipPoint.getY(), tipPoint.getZ());
+            drawDottedLine(gl);
             gl.glRotatef(angleToDirection, axisToDirection.getX(), axisToDirection.getY(), axisToDirection.getZ());
             gl.glTranslatef(0, 0, -scaledLength);
+            gl.glEnable(GL_CULL_FACE);
+            gl.glEnable(GL_LIGHTING);
             drawTool(gl);
             gl.glDisable(GL_LIGHTING);
             gl.glDisable(GL_CULL_FACE);
@@ -124,5 +128,24 @@ public class LeapTool extends KeyboardRenderable {
         }
         gl.glVertex3f(1f * scaledRadius, 0f, 0f);
         gl.glEnd();
+    }
+    
+    private void drawDottedLine(GL2 gl) {
+        RED[3] = COLOR[3];
+        gl.glColor4fv(RED, 0);
+        gl.glPushAttrib(GL_ENABLE_BIT);
+        gl.glLineWidth(2);
+        gl.glLineStipple(1, (short) 0xAAAA);
+        gl.glEnable(GL_LINE_STIPPLE);
+        gl.glBegin(GL_LINES);
+        gl.glVertex3f(0f, 0f, 0f);
+        if(tipDirection.isValid()) {
+            float dist = MyUtilities.MATH_UTILITILES.findDistanceToPlane(tipPoint.plus(tipDirection), cylinderDirection, 0f);
+            Vector tmp = tipDirection.times(dist);
+            gl.glVertex3f(tmp.getX(), tmp.getY(), tmp.getZ());
+        }
+        gl.glEnd();
+        gl.glDisable(GL_LINE_STIPPLE);
+        gl.glPopAttrib();
     }
 }

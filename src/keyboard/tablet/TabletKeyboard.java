@@ -8,18 +8,23 @@ import javax.swing.JPanel;
 
 import keyboard.IKeyboard;
 import enums.Attribute;
+import enums.FileExtension;
 import enums.FileName;
+import enums.FilePath;
 
 public class TabletKeyboard extends IKeyboard {
     public static final int KEYBOARD_ID = 2;
+    private static final String KEYBOARD_NAME = "Tablet Keyboard";
     private static final String KEYBOARD_FILE_NAME = FileName.TABLET_NAME.getName();
     private boolean isCalibrated = false;
     //private VirtualKeyboard virtualKeyboard;
     
     public TabletKeyboard() {
-        super(KEYBOARD_ID, KEYBOARD_FILE_NAME);
+        super(KEYBOARD_ID, KEYBOARD_NAME, KEYBOARD_FILE_NAME);
+        System.out.println(KEYBOARD_NAME + " - Loading Settings from " + FilePath.CONFIG_PATH.getPath() + KEYBOARD_FILE_NAME + FileExtension.INI.getExtension());
         keyboardAttributes = new TabletAttributes(this);
         keyboardSettings = new TabletSettings(this);
+        System.out.println("-------------------------------------------------------");
         keyboardRenderables = new TabletRenderables(this);
         keyboardWidth = keyboardAttributes.getAttributeByName(Attribute.KEYBOARD_WIDTH.toString());
         keyboardHeight = keyboardAttributes.getAttributeByName(Attribute.KEYBOARD_HEIGHT.toString());

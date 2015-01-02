@@ -34,8 +34,8 @@ public class KeyboardSetting {
     public KeyboardSetting(IKeyboard keyboard, String settingName, double minimumValue, double defaultValue, double maximumValue, DecimalPrecision decimalPrecision) {
         this.name = settingName;
         try {
-            this.value = MyUtilities.FILE_IO_UTILITIES.readAttributeOrSettingFromFile(FilePath.CONFIG_PATH.getPath(),
-                    keyboard.getKeyboardFileName() + FileExtension.INI.getExtension(), settingName, defaultValue).doubleValue();
+            this.value = MyUtilities.FILE_IO_UTILITIES.readSettingFromFile(FilePath.CONFIG_PATH.getPath(),
+                    keyboard.getKeyboardFileName() + FileExtension.INI.getExtension(), settingName, defaultValue);
         } catch(IOException e) {
             System.err.println("Error occured while trying to read "  + settingName + " from file. Using default value.");
             this.value = defaultValue;

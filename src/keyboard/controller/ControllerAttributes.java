@@ -27,17 +27,17 @@ public class ControllerAttributes extends KeyboardAttributes {
     private static final Key [] FIFTH_ROW = {Key.VK_SPACE};
     
     ControllerAttributes(ControllerKeyboard keyboard) {
-        this.addAttribute(new KeyboardAttribute(Attribute.KEYBOARD_HEIGHT.toString(), KEYBOARD_HEIGHT));
-        this.addAttribute(new KeyboardAttribute(Attribute.KEYBOARD_WIDTH.toString(), KEYBOARD_WIDTH));
-        this.addAttribute(new KeyboardAttribute(Attribute.GAP_SIZE.toString(), GAP_SIZE));
-        this.addAttribute(new KeyboardAttribute(Attribute.KEY_WIDTH.toString(), KEY_WIDTH));
-        this.addAttribute(new KeyboardAttribute(Attribute.KEY_HEIGHT.toString(), KEY_HEIGHT));
-        this.addAttribute(new KeyboardAttribute(Attribute.SPACE_KEY_WIDTH.toString(), SPACE_KEY_WIDTH));
-        this.addAttribute(new KeyboardAttribute(Attribute.BACK_SPACE_KEY_WIDTH.toString(), BACK_SPACE_KEY_WIDTH));
-        this.addAttribute(new KeyboardAttribute(Attribute.ENTER_KEY_WIDTH.toString(), ENTER_KEY_WIDTH));
-        this.addAttribute(new KeyboardAttribute(Attribute.SHIFT_KEY_WIDTH.toString(), SHIFT_KEY_WIDTH));
-        this.addAttribute(new KeyboardAttribute(Attribute.NUMBER_OF_KEYS.toString(), FIRST_ROW.length + SECOND_ROW.length + THIRD_ROW.length + FOURTH_ROW.length + FIFTH_ROW.length));
-        this.addAttribute(new KeyboardAttribute(Attribute.ROW_OFFSETS.toString(), (new int[] {FIRST_ROW_OFFSET,SECOND_ROW_OFFSET,THIRD_ROW_OFFSET,FOURTH_ROW_OFFSET,FIFTH_ROW_OFFSET})));
-        this.addAttribute(new KeyboardAttribute(Attribute.KEY_ROWS.toString(), new Key[][] {FIRST_ROW, SECOND_ROW, THIRD_ROW, FOURTH_ROW, FIFTH_ROW}));
+        this.addAttribute(new KeyboardAttribute(keyboard, Attribute.KEYBOARD_HEIGHT.toString(), KEYBOARD_HEIGHT));
+        this.addAttribute(new KeyboardAttribute(keyboard, Attribute.KEYBOARD_WIDTH.toString(), KEYBOARD_WIDTH));
+        this.addAttribute(new KeyboardAttribute(keyboard, Attribute.GAP_SIZE.toString(), GAP_SIZE));
+        this.addAttribute(new KeyboardAttribute(keyboard, Attribute.KEY_WIDTH.toString(), KEY_WIDTH));
+        this.addAttribute(new KeyboardAttribute(keyboard, Attribute.KEY_HEIGHT.toString(), KEY_HEIGHT));
+        this.addAttribute(new KeyboardAttribute(keyboard, Attribute.SPACE_KEY_WIDTH.toString(), SPACE_KEY_WIDTH));
+        this.addAttribute(new KeyboardAttribute(keyboard, Attribute.BACK_SPACE_KEY_WIDTH.toString(), BACK_SPACE_KEY_WIDTH));
+        this.addAttribute(new KeyboardAttribute(keyboard, Attribute.ENTER_KEY_WIDTH.toString(), ENTER_KEY_WIDTH));
+        this.addAttribute(new KeyboardAttribute(keyboard, Attribute.SHIFT_KEY_WIDTH.toString(), SHIFT_KEY_WIDTH));
+        this.addAttribute(new KeyboardAttribute(keyboard, Attribute.NUMBER_OF_KEYS.toString(), FIRST_ROW.length + SECOND_ROW.length + THIRD_ROW.length + FOURTH_ROW.length + FIFTH_ROW.length));
+        this.addAttribute(new KeyboardAttribute(keyboard, Attribute.ROW_OFFSETS.toString(), (new int[] {FIRST_ROW_OFFSET,SECOND_ROW_OFFSET,THIRD_ROW_OFFSET,FOURTH_ROW_OFFSET,FIFTH_ROW_OFFSET})));
+        this.addAttribute(new KeyboardAttribute(keyboard, Attribute.KEY_ROWS.toString(), new Key[][] {FIRST_ROW, SECOND_ROW, THIRD_ROW, FOURTH_ROW, FIFTH_ROW}));
     }
 }

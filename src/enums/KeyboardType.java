@@ -7,10 +7,10 @@ import keyboard.standard.StandardKeyboard;
 import keyboard.tablet.TabletKeyboard;
 
 public enum KeyboardType {
-    STANDARD(StandardKeyboard.KEYBOARD_ID, "Standard Keyboard", new StandardKeyboard()),
-    LEAP(LeapKeyboard.KEYBOARD_ID, "Leap Keyboard", new LeapKeyboard()),
-    TABLET(TabletKeyboard.KEYBOARD_ID, "Tablet Keyboard", new TabletKeyboard()),
-    CONTROLLER(ControllerKeyboard.KEYBOARD_ID, "Controller Keyboard", new ControllerKeyboard());
+    STANDARD(new StandardKeyboard()),
+    LEAP(new LeapKeyboard()),
+    TABLET(new TabletKeyboard()),
+    CONTROLLER(new ControllerKeyboard());
 
     private final int keyboardID;
     private final String keyboardName;
@@ -19,9 +19,9 @@ public enum KeyboardType {
     private static final KeyboardType[] VALUES = values();
     private static final int SIZE = VALUES.length;
     
-    private KeyboardType(int keyboardID, String keyboardName, IKeyboard keyboard) {
-        this.keyboardID = keyboardID;
-        this.keyboardName = keyboardName;
+    private KeyboardType(IKeyboard keyboard) {
+        this.keyboardID = keyboard.getKeyboardID();
+        this.keyboardName = keyboard.getKeyboardName();
         this.keyboard = keyboard;
     }
     

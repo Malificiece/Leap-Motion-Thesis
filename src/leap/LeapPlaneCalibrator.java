@@ -12,6 +12,8 @@ public class LeapPlaneCalibrator {
     public static final int POINT_C = 0;
     public static final int POINT_A = 1;
     public static final int POINT_B = 2;
+    public static final int POINT_INVALID = 3;
+    public static final int POINT_FIRST = POINT_C;
     private final int CLUSTER_SIZE = 1000;
     private final int START_SEARCH = 500;
     private final float EPSILON = 0.00015f;
@@ -39,20 +41,31 @@ public class LeapPlaneCalibrator {
             }
         }
     }
+    
+    public boolean isValid() {
+        return point < POINT_INVALID;
+    }
+    
+    public boolean doneWithCurrentPoint() {
+        if(doneWithCurrentPoint) {
+            point++;
+            if(point < POINT_INVALID) {
+                reuseCluster();
+                doneWithCurrentPoint = false;
+            } else {
+                clearCluster();
+            }
+            return true;
+        }
+        return false;
+    }
 
-    public int determiningPoint() {
+    public int calibratingPoint() {
         return point;
     }
 
     public Vector getMidPoint() {
-        if(doneWithCurrentPoint && point < POINT_B) {
-            point++;
-            reuseCluster();
-            doneWithCurrentPoint = false;
-            return new Vector(midpoint);
-        } else if(doneWithCurrentPoint && point == POINT_B) {
-            point++;
-            clearCluster();
+        if(doneWithCurrentPoint) {
             return new Vector(midpoint);
         }
         return midpoint;

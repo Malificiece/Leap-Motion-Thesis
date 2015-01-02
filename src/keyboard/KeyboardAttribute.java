@@ -3,11 +3,17 @@ package keyboard;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.io.IOException;
 
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
+import utilities.MyUtilities;
+
 import com.leapmotion.leap.Vector;
+
+import enums.FileExtension;
+import enums.FilePath;
 
 public class KeyboardAttribute {
     private String name;
@@ -15,9 +21,15 @@ public class KeyboardAttribute {
     private JPanel attributesPanel;
     private JLabel valueLabel;
     
-    public KeyboardAttribute(String attributeName, Object defaultValue) {
+    public KeyboardAttribute(IKeyboard keyboard, String attributeName, Object defaultValue) {
         this.name = attributeName;
-        this.value = defaultValue;
+        try {
+            this.value = MyUtilities.FILE_IO_UTILITIES.readAttributeFromFile(FilePath.CONFIG_PATH.getPath(),
+                    keyboard.getKeyboardFileName() + FileExtension.INI.getExtension(), attributeName, defaultValue);
+        } catch(IOException e) {
+            System.err.println("Error occured while trying to read "  + attributeName + " from file. Using default value.");
+            this.value = defaultValue;
+        }
         createAttributePanel();
     }
 

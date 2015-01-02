@@ -109,6 +109,11 @@ public class CalibrationController extends GraphicsController {
                         beginCalibration();
                         keyboard.beginCalibration(typedPanel);
                     }
+                } else {
+                    JOptionPane.showMessageDialog(frame,
+                    "This keyboard cannot be calibrated.",
+                    "Error!",
+                    JOptionPane.ERROR_MESSAGE);
                 }
                 frame.requestFocusInWindow();
             }
@@ -123,14 +128,12 @@ public class CalibrationController extends GraphicsController {
                 if(keyboard != KeyboardType.getByID(selectedIndex).getKeyboard()) {
                     if(KeyboardType.LEAP == KeyboardType.getByID(selectedIndex)) {
                         LeapListener.startListening();
-                        calibrateButton.setVisible(true);
+                        //calibrateButton.setVisible(true);
                         calibrateButton.setEnabled(true);
-                        saveSettingsButton.setEnabled(true);
                     } else {
                         LeapListener.stopListening();
-                        calibrateButton.setVisible(false);
+                        //calibrateButton.setVisible(false);
                         calibrateButton.setEnabled(false);
-                        saveSettingsButton.setEnabled(false);
                     }
                     // Remove all settings, attributes, and renderables from the previous keyboard.
                     typedLabel.setText("");

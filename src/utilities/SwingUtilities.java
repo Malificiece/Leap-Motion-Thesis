@@ -23,4 +23,12 @@ public class SwingUtilities {
         // Set the label's font size to the newly determined size.
         component.setFont(new Font(labelFont.getName(), Font.PLAIN, fontSizeToUse));
     }
+    
+    private String parseHTML(String htmlString) {
+        return htmlString.replaceAll("\\<.*?>|\\s+", "");
+    }
+    
+    public boolean equalsIgnoreHTML(String htmlString0, String htmlString1) {
+        return parseHTML(htmlString0).equals(parseHTML(htmlString1));
+    }
 }

@@ -158,7 +158,7 @@ public class WindowBuilder {
             GLCanvas canvas,
             JLabel typedLabel,
             JComboBox<String> keyboardTypeComboBox,
-            JButton[] buttons,
+            JButton[] buttons, // calibration, settings
             JPanel[] panels) { // typed, settings, render options
         
         JPanel background = new JPanel();
@@ -232,7 +232,6 @@ public class WindowBuilder {
         keyboardButtonsPanel.add(buttons[0]);
         keyboardButtonsPanel.add(buttons[1]);
         buttons[0].setEnabled(false);
-        buttons[1].setEnabled(false);
         
         // 1.5 - Need a special panel to allow the scrollpanes to be the same size.
         JPanel settingsAndRenderPanel = new JPanel(new GridLayout(2,1));

@@ -1,11 +1,11 @@
 package keyboard.renderables;
 
-import java.awt.Color;
+import java.io.IOException;
 import java.util.ArrayList;
 
 import javax.media.opengl.GL2;
+import javax.swing.JEditorPane;
 import javax.swing.JPanel;
-import javax.swing.JTextArea;
 
 import static javax.media.opengl.GL.GL_TRIANGLE_FAN;
 import static javax.media.opengl.GL2GL3.GL_QUADS;
@@ -17,7 +17,8 @@ import com.leapmotion.leap.InteractionBox;
 import com.leapmotion.leap.Vector;
 
 import enums.Attribute;
-import enums.KeyboardType;
+import enums.FileExtension;
+import enums.FilePath;
 import enums.Renderable;
 import enums.Setting;
 import keyboard.CalibrationObserver;
@@ -30,6 +31,7 @@ import leap.LeapPlaneCalibrator;
 public class LeapPlane extends KeyboardRenderable {
     private static final String RENDER_NAME = Renderable.LEAP_PLANE.toString();
     private static final float[] COLOR = {0.4f, 0.7f, 1f, 1f};
+    private static final float[] ACTIVE_COLOR = {1f, 0f, 0f, 1f};
     private static final float[] BLACK = {0f, 0f, 0f, 1f};
     private static final int NUM_VERTICIES = 32;
     private static final float DELTA_ANGLE = (float) (2.0f * Math.PI / NUM_VERTICIES);
@@ -41,6 +43,7 @@ public class LeapPlane extends KeyboardRenderable {
     private final KeyboardAttribute POINT_A_ATTRIBUTE;
     private final KeyboardAttribute POINT_B_ATTRIBUTE;
     private final KeyboardAttribute POINT_C_ATTRIBUTE;
+    private final String FILE_NAME;
     private ArrayList<CalibrationObserver> observers = new ArrayList<CalibrationObserver>();
     private InteractionBox iBox;
     private Vector pointA; // min
@@ -67,10 +70,11 @@ public class LeapPlane extends KeyboardRenderable {
     private float planeHeight;
     private Vector BA;
     private Vector DA;
-    private Vector intersectionPoint = new Vector();
+    private Vector intersectionPoint = Vector.zero();
     private float x, y, z = -1;
     private JPanel textPanel;
-    private JTextArea explinationArea;
+    private JEditorPane explinationPane;
+    private boolean removeTool = false;
     
     public LeapPlane(IKeyboard keyboard) {
         super(RENDER_NAME);
@@ -78,27 +82,20 @@ public class LeapPlane extends KeyboardRenderable {
         KEYBOARD_HEIGHT = keyboard.getAttributes().getAttributeByName(Attribute.KEYBOARD_HEIGHT.toString()).getValueAsInteger();
         DIST_TO_CAMERA = keyboard.getAttributes().getAttributeByName(Attribute.DIST_TO_CAMERA.toString()).getValueAsInteger();
         TOUCH_THRESHOLD = keyboard.getSettings().getSettingByName(Setting.TOUCH_THRESHOLD.toString());
+        FILE_NAME = keyboard.getKeyboardFileName();
         POINT_A_ATTRIBUTE = keyboard.getAttributes().getAttributeByName(Attribute.LEAP_PLANE_POINT_A.toString());
         POINT_B_ATTRIBUTE = keyboard.getAttributes().getAttributeByName(Attribute.LEAP_PLANE_POINT_B.toString());
         POINT_C_ATTRIBUTE = keyboard.getAttributes().getAttributeByName(Attribute.LEAP_PLANE_POINT_C.toString());
         getPlaneAttributes();
-        if(pointA != null && pointB != null && pointC != null) {
+        if(!pointA.equals(Vector.zero()) && !pointB.equals(Vector.zero()) && !pointC.equals(Vector.zero())) {
             isCalibrated = true;
         } else {
             isCalibrated = false;
-            pointA = new Vector();
-            pointB = new Vector();
-            pointC = new Vector();
-            // Apply points to attributes.
-            setPlaneAttributes();
         }
         calculatePlaneData();
-        createExplinationArea();
-    }
-    
-    private void createExplinationArea() {
-        explinationArea = new JTextArea();
-        explinationArea.setWrapStyleWord(true);
+        
+        explinationPane = new JEditorPane("text/html", "");
+        explinationPane.setEditable(false);
     }
 
     public void setInteractionBox(InteractionBox iBox) {
@@ -112,32 +109,27 @@ public class LeapPlane extends KeyboardRenderable {
         pointC = POINT_C_ATTRIBUTE.getValueAsVector();
     }
     
-    private void setPlaneAttributes() {
-        POINT_A_ATTRIBUTE.setVectorValue(pointA);
-        POINT_B_ATTRIBUTE.setVectorValue(pointB);
-        POINT_C_ATTRIBUTE.setVectorValue(pointC);
-    }
-    
-    public void beginCalibration(JPanel textPanel) {
-        // Calibrate the leap plane finding the min corner, third corner, and max corner.
-        // MAKE SURE TO FORCE THE POINTS TO BE RIGHT ANGLE FOR X and Y. Will make things 10000x easier
-        
-        // populate frame with text field describing what we need to do
-        // give instructions -- find average point of stick as it is moving in leap space
-        // grab average point -- render points as they are grabbed
+    public void beginCalibration(JPanel textPanel) {        
         leapPlaneCalibrator = new LeapPlaneCalibrator();
+        //explinationPane = new JEditorPane("text/html", "");
+        //explinationPane.setEditable(false);
         this.textPanel = textPanel;
-        pointA = new Vector();
-        pointB = new Vector();
-        pointC = new Vector();
+        textPanel.add(explinationPane);
+        pointA = Vector.zero();
+        pointB = Vector.zero();
+        pointC = Vector.zero();
         isCalibrating = true;
         isCalibrated = false;
+        removeTool = true;
     }
     
     public void finishCalibration() {
-        
         // Remove everything we added to the textPanel.
+        explinationPane.setText("");
         textPanel.removeAll();
+        explinationPane.setVisible(false);
+        //explinationPane = null;
+        //textPanel = null;
         
         // Notify the calibration controller that we are done calibrating.
         leapPlaneCalibrator = null;
@@ -145,12 +137,54 @@ public class LeapPlane extends KeyboardRenderable {
         notifyListenersCalibrationFinished();
         
         // Write the newly calibrated coordinates to file.
-        // add read from file for attributes on creation
-        // add write to file here as well as in IKeyboard for attributes
+        try {
+            System.out.println("Saving calibrated Leap Motion Interaction Plane points to " + FilePath.CONFIG_PATH.getPath() + FILE_NAME + FileExtension.INI.getExtension());
+            MyUtilities.FILE_IO_UTILITIES.writeAttributeToFile(FilePath.CONFIG_PATH.getPath(), FILE_NAME + FileExtension.INI.getExtension(), POINT_A_ATTRIBUTE);
+            MyUtilities.FILE_IO_UTILITIES.writeAttributeToFile(FilePath.CONFIG_PATH.getPath(), FILE_NAME + FileExtension.INI.getExtension(), POINT_B_ATTRIBUTE);
+            MyUtilities.FILE_IO_UTILITIES.writeAttributeToFile(FilePath.CONFIG_PATH.getPath(), FILE_NAME + FileExtension.INI.getExtension(), POINT_C_ATTRIBUTE);
+            System.out.println("Save Success");
+        } catch (IOException e) {
+            System.out.println("Save Failure. Try using the \"Save Settings\" button to save calibration to file.");
+            e.printStackTrace();
+        }
+    }
+    
+    private void setCalibrationText(int point) {
+        String text;
+        switch(point) {
+            case LeapPlaneCalibrator.POINT_A:
+                text = "<div style=\"white-space: nowrap\"><font size=\"+1\"><b><font color=\"red\">Place and hold</font></b> the tool over the <b><font color=\"red\">bottom-left corner</font></b> of the keyboard.</font></div>";
+                if(!MyUtilities.JAVA_SWING_UTILITIES.equalsIgnoreHTML(text, explinationPane.getText())) {
+                    explinationPane.setText(text);
+                }
+                break;
+            case LeapPlaneCalibrator.POINT_B:
+                text = "<div style=\"white-space: nowrap\"><font size=\"+1\"><b><font color=\"red\">Place and hold</font></b> the tool over the <b><font color=\"red\">top-left corner</font></b> of the keyboard.</font></div>";
+                if(!MyUtilities.JAVA_SWING_UTILITIES.equalsIgnoreHTML(text, explinationPane.getText())) {
+                    explinationPane.setText(text);
+                }
+                break;
+            case LeapPlaneCalibrator.POINT_C:
+                text = "<div style=\"white-space: nowrap\"><font size=\"+1\"><b><font color=\"red\">Place and hold</font></b> the tool over the <b><font color=\"red\">top-right corner</font></b> of the keyboard.</font></div>";
+                if(!MyUtilities.JAVA_SWING_UTILITIES.equalsIgnoreHTML(text, explinationPane.getText())) {
+                    explinationPane.setText(text);
+                }
+                break;
+            default:
+                text = "<div style=\"white-space: nowrap\"><font size=\"+2\"><b><font color=\"red\">Remove the tool</font></b> from the Leap Motinon Interaction Zone.</font></div>";
+                if(!MyUtilities.JAVA_SWING_UTILITIES.equalsIgnoreHTML(text, explinationPane.getText())) {
+                    explinationPane.setText(text);
+                }
+                break;
+        }
     }
     
     public boolean isCalibrated() {
         return isCalibrated;
+    }
+    
+    public boolean isCalibrating() {
+        return isCalibrating;
     }
     
     public float getDistance() {
@@ -266,6 +300,7 @@ public class LeapPlane extends KeyboardRenderable {
     
     private void calcDistToPlane(Vector point) {
         distanceToPlane = MyUtilities.MATH_UTILITILES.findDistanceToPlane(point, planeNormal, planeD);
+        //System.out.println(distanceToPlane);
     }
     
     private void applyPlaneNormalization(Vector point) {
@@ -308,7 +343,7 @@ public class LeapPlane extends KeyboardRenderable {
         if(isCalibrating && isCalibrated) { // means we just finished
             finishCalibration();
         }
-        if(isCalibrated) {
+        if(isCalibrated && leapTool.isValid()) {
             // Find point distance, normalize it, and position it.
             leapPoint.applyPlaneRotationAndNormalizePoint(axisToCamera, angleToCamera);
             calcDistToPlane(leapPoint.getNormalizedPoint());
@@ -321,28 +356,61 @@ public class LeapPlane extends KeyboardRenderable {
             leapTool.scaleTo3DSpace(/*planeWidth, planeHeight*/);
             
             // Set gesture location and scale it.
-        } else if (isCalibrating) { 
-            // On last point, force right angle? Might not need it now that it works for parallelograms
-            leapPlaneCalibrator.addPoint(leapPoint.getPoint());
-            
-            // Find order:
-            // C - top right
-            // A - bottom left
-            // B - top left
-            if(leapPlaneCalibrator.determiningPoint() == LeapPlaneCalibrator.POINT_A) {
-                // Populate text area with correct message.
-                pointA = leapPlaneCalibrator.getMidPoint();
-                POINT_A_ATTRIBUTE.setVectorValue(pointA);
-            } else if(leapPlaneCalibrator.determiningPoint() == LeapPlaneCalibrator.POINT_B) {
-                pointB = leapPlaneCalibrator.getMidPoint();
-                POINT_B_ATTRIBUTE.setVectorValue(pointB);
-            } else if(leapPlaneCalibrator.determiningPoint() == LeapPlaneCalibrator.POINT_C) {
-                pointC = leapPlaneCalibrator.getMidPoint();
-                POINT_C_ATTRIBUTE.setVectorValue(pointC);
-            } else {
-                isCalibrated = true;
+        } else if (isCalibrating) {
+            if(removeTool) {
+                // If tool is removed from area.
+                if(!leapTool.isValid()) {
+                    setCalibrationText(leapPlaneCalibrator.calibratingPoint());
+                    removeTool = false;
+                } else {
+                    // Populate text area with correct message.
+                    setCalibrationText(LeapPlaneCalibrator.POINT_INVALID);
+                }
+            } else if(leapTool.isValid()) {
+                // While calibrating, add each new point to the plane calibrator object.
+                leapPlaneCalibrator.addPoint(leapPoint.getPoint());
+                
+                // Calibration order:
+                // C - top right
+                // A - bottom left
+                // B - top left
+                switch(leapPlaneCalibrator.calibratingPoint()) {
+                    case LeapPlaneCalibrator.POINT_A:
+                        // Get the midpoint and update it.
+                        pointA = leapPlaneCalibrator.getMidPoint();
+                        POINT_A_ATTRIBUTE.setVectorValue(pointA);
+                        
+                        // Remove the tool after finding a point.
+                        if(leapPlaneCalibrator.doneWithCurrentPoint() && leapPlaneCalibrator.isValid()) {
+                            removeTool = true;
+                        }
+                        break;
+                    case LeapPlaneCalibrator.POINT_B:
+                     // Get the midpoint and update it.
+                        pointB = leapPlaneCalibrator.getMidPoint();
+                        POINT_B_ATTRIBUTE.setVectorValue(pointB);
+                        
+                     // Remove the tool after finding a point.
+                        if(leapPlaneCalibrator.doneWithCurrentPoint() && leapPlaneCalibrator.isValid()) {
+                            removeTool = true;
+                        }
+                        break;
+                    case LeapPlaneCalibrator.POINT_C:
+                     // Get the midpoint and update it.
+                        pointC = leapPlaneCalibrator.getMidPoint();
+                        POINT_C_ATTRIBUTE.setVectorValue(pointC);
+                        
+                     // Remove the tool after finding a point.
+                        if(leapPlaneCalibrator.doneWithCurrentPoint() && leapPlaneCalibrator.isValid()) {
+                            removeTool = true;
+                        }
+                        break;
+                    default:
+                        isCalibrated = true;
+                        break;
+                }
+                calculatePlaneData();
             }
-            calculatePlaneData();
         }
     }
 
@@ -353,16 +421,20 @@ public class LeapPlane extends KeyboardRenderable {
             gl.glColor4fv(COLOR, 0);
             gl.glTranslatef(KEYBOARD_WIDTH/2f-planeWidth/2f, KEYBOARD_HEIGHT/2f-planeHeight/2f, -10f);
             drawRectangle(gl);
-            drawPoint(gl, scaledPointA, 'A');
-            drawPoint(gl, scaledPointB, 'B');
-            drawPoint(gl, scaledPointC, 'C');
-            drawPoint(gl, scaledPointD, 'D');
+            drawPoint(gl, scaledPointA, 'A', LeapPlaneCalibrator.POINT_A);
+            drawPoint(gl, scaledPointB, 'B', LeapPlaneCalibrator.POINT_B);
+            drawPoint(gl, scaledPointC, 'C', LeapPlaneCalibrator.POINT_C);
+            drawPoint(gl, scaledPointD, 'D', -1);
             gl.glPopMatrix();
         }
     }
     
-    private void drawPoint(GL2 gl, Vector vector, char pointLetter) {
-        gl.glColor4fv(COLOR, 0);
+    private void drawPoint(GL2 gl, Vector vector, char pointLetter, int point) {
+        if(leapPlaneCalibrator != null) {
+            gl.glColor4fv(point == leapPlaneCalibrator.calibratingPoint() ? ACTIVE_COLOR : COLOR, 0);
+        } else {
+            gl.glColor4fv(COLOR, 0);
+        }
         gl.glTranslatef(vector.getX(), vector.getY(), vector.getZ());
         gl.glBegin(GL_TRIANGLE_FAN);
         // Draw the vertex at the center of the circle
@@ -383,7 +455,6 @@ public class LeapPlane extends KeyboardRenderable {
     }
     
     private void drawRectangle(GL2 gl) {
-        // Move points to origin.
         gl.glBegin(GL_QUADS);
         gl.glVertex3f(scaledPointA.getX(), scaledPointA.getY(), scaledPointA.getZ());
         gl.glVertex3f(scaledPointB.getX(), scaledPointB.getY(), scaledPointB.getZ());

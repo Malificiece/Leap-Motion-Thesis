@@ -13,7 +13,9 @@ import javax.swing.KeyStroke;
 
 import utilities.MyUtilities;
 import enums.Attribute;
+import enums.FileExtension;
 import enums.FileName;
+import enums.FilePath;
 import enums.Renderable;
 import enums.Key;
 import keyboard.IKeyboard;
@@ -22,6 +24,7 @@ import keyboard.renderables.VirtualKeyboard;
 
 public class StandardKeyboard extends IKeyboard {
     public static final int KEYBOARD_ID = 0;
+    private static final String KEYBOARD_NAME = "Standard Keyboard";
     private static final String KEYBOARD_FILE_NAME = FileName.STANDARD_NAME.getName();
     private VirtualKeyboard virtualKeyboard;
     private KeyBindings keyBindings;
@@ -29,15 +32,17 @@ public class StandardKeyboard extends IKeyboard {
     private boolean isCalibrated = false;
     
     public StandardKeyboard() {
-        super(KEYBOARD_ID, KEYBOARD_FILE_NAME);
+        super(KEYBOARD_ID, KEYBOARD_NAME, KEYBOARD_FILE_NAME);
+        System.out.println(KEYBOARD_NAME + " - Loading Settings from " + FilePath.CONFIG_PATH.getPath() + KEYBOARD_FILE_NAME + FileExtension.INI.getExtension());
         keyboardAttributes = new StandardAttributes(this);
         keyboardSettings = new StandardSettings(this);
+        System.out.println("-------------------------------------------------------");
         keyboardRenderables = new StandardRenderables(this);
         keyboardWidth = keyboardAttributes.getAttributeByName(Attribute.KEYBOARD_WIDTH.toString());
         keyboardHeight = keyboardAttributes.getAttributeByName(Attribute.KEYBOARD_HEIGHT.toString());
         virtualKeyboard = (VirtualKeyboard) keyboardRenderables.getRenderableByName(Renderable.VIRTUAL_KEYS.toString());
         keyBindings = new KeyBindings();
-        keyboardAttributes.addAttribute(new KeyboardAttribute(Attribute.KEY_BINDINGS.toString(), keyBindings));
+        keyboardAttributes.addAttribute(new KeyboardAttribute(this, Attribute.KEY_BINDINGS.toString(), keyBindings));
     }
     
     @Override

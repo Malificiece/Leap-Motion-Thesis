@@ -88,7 +88,7 @@ public class LeapPoint extends KeyboardRenderable {
         gl.glEnable(GL_LINE_STIPPLE);
         gl.glBegin(GL_LINES);
         gl.glVertex3f(normalizedPoint.getX(), normalizedPoint.getY(), normalizedPoint.getZ());
-        gl.glVertex3f(normalizedPoint.getX(), normalizedPoint.getY(), 0);
+        gl.glVertex3f(normalizedPoint.getX(), normalizedPoint.getY(), 0f);
         gl.glEnd();
         gl.glDisable(GL_LINE_STIPPLE);
         gl.glPopAttrib();

@@ -8,12 +8,12 @@ import javax.swing.JPanel;
 
 import enums.FileExtension;
 import enums.FilePath;
-import enums.KeyboardType;
 import ui.SaveSettingsObserver;
 import utilities.MyUtilities;
 
 public abstract class IKeyboard implements SaveSettingsObserver {
     private int keyboardID;
+    private String keyboardName;
     private String filePath;
     private String fileName;
     private ArrayList<KeyboardObserver> observers = new ArrayList<KeyboardObserver>();
@@ -24,8 +24,9 @@ public abstract class IKeyboard implements SaveSettingsObserver {
     protected KeyboardAttribute keyboardHeight;
     protected char keyPressed;
     
-    public IKeyboard(int keyboardID, String fileName) {
+    public IKeyboard(int keyboardID, String keyboardName, String fileName) {
         this.keyboardID = keyboardID;
+        this.keyboardName = keyboardName;
         this.fileName = fileName;
         this.filePath = fileName + "/";
     }
@@ -39,6 +40,10 @@ public abstract class IKeyboard implements SaveSettingsObserver {
     
     public int getKeyboardID() {
         return keyboardID;
+    }
+    
+    public String getKeyboardName() {
+        return keyboardName;
     }
     
     public String getKeyboardFilePath() {
@@ -92,12 +97,12 @@ public abstract class IKeyboard implements SaveSettingsObserver {
     public void saveSettingsEventObserved(IKeyboard keyboard) {
         // Save all settings and attributes to file (stored for next time program launched)
         if(keyboardID == keyboard.getKeyboardID()) {
-            System.out.print(KeyboardType.getByID(keyboardID).getKeyboardName() + ": Saving Settings to file - ");
+            System.out.println(keyboardName + " - Saving Settings to " + FilePath.CONFIG_PATH.getPath() + fileName + FileExtension.INI.getExtension());
             try {
-                MyUtilities.FILE_IO_UTILITIES.writeSettingsToFile(FilePath.CONFIG_PATH.getPath(), fileName + FileExtension.INI.getExtension(), keyboardSettings);
-                System.out.println("Success.");
+                MyUtilities.FILE_IO_UTILITIES.writeSettingsAndAttributesToFile(FilePath.CONFIG_PATH.getPath(), fileName + FileExtension.INI.getExtension(), this);
+                System.out.println("Save Success");
             } catch (IOException e) {
-                System.out.println("Failure.");
+                System.out.println("Save Failed");
                 e.printStackTrace();
             }
         }
