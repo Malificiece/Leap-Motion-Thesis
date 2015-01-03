@@ -7,10 +7,11 @@ import enums.FileName;
 import keyboard.KeyboardRenderable;
 import keyboard.KeyboardRenderables;
 import keyboard.renderables.KeyboardImage;
-import keyboard.renderables.LeapGesture;
+import keyboard.renderables.KeyboardGestures;
 import keyboard.renderables.LeapPlane;
 import keyboard.renderables.LeapPoint;
 import keyboard.renderables.LeapTool;
+import keyboard.renderables.LeapTrail;
 import keyboard.renderables.VirtualKeyboard;
 
 public class LeapRenderables extends KeyboardRenderables {
@@ -26,9 +27,10 @@ public class LeapRenderables extends KeyboardRenderables {
         this.addRenderable(new LeapPlane(keyboard));
         this.addRenderable(new KeyboardImage(FileName.KEYBOARD_DEFAULT_IMAGE_NAME.getName() + FileExtension.PNG.getExtension(), keyboard.getKeyboardFilePath()));
         this.addRenderable(new VirtualKeyboard(keyboard.getAttributes()));
-        this.addRenderable(new LeapGesture(keyboard.getAttributes()));
+        this.addRenderable(new KeyboardGestures(keyboard.getAttributes()));
         this.addRenderable(new LeapPoint(keyboard.getAttributes()));
         this.addRenderable(new LeapTool(keyboard.getAttributes()));
+        this.addRenderable(new LeapTrail(keyboard.getAttributes()));
     }
 
     @Override

@@ -24,6 +24,7 @@ import enums.Setting;
 import keyboard.CalibrationObserver;
 import keyboard.IKeyboard;
 import keyboard.KeyboardAttribute;
+import keyboard.KeyboardGesture;
 import keyboard.KeyboardRenderable;
 import keyboard.KeyboardSetting;
 import leap.LeapPlaneCalibrator;
@@ -68,9 +69,9 @@ public class LeapPlane extends KeyboardRenderable {
     private float normalizedPlaneHeight;
     private float planeWidth;
     private float planeHeight;
-    private Vector BA;
-    private Vector DA;
-    private Vector intersectionPoint = Vector.zero();
+    //private Vector BA;
+    //private Vector DA;
+    //private Vector intersectionPoint = Vector.zero();
     private float x, y, z = -1;
     private JPanel textPanel;
     private JEditorPane explinationPane;
@@ -115,6 +116,7 @@ public class LeapPlane extends KeyboardRenderable {
         //explinationPane.setEditable(false);
         this.textPanel = textPanel;
         textPanel.add(explinationPane);
+        explinationPane.setVisible(true);
         pointA = Vector.zero();
         pointB = Vector.zero();
         pointC = Vector.zero();
@@ -126,8 +128,8 @@ public class LeapPlane extends KeyboardRenderable {
     public void finishCalibration() {
         // Remove everything we added to the textPanel.
         explinationPane.setText("");
-        textPanel.removeAll();
         explinationPane.setVisible(false);
+        textPanel.remove(explinationPane);
         //explinationPane = null;
         //textPanel = null;
         
@@ -226,7 +228,7 @@ public class LeapPlane extends KeyboardRenderable {
         pointD = pointA.minus(pointB).plus(pointC);
         
         // Calculate the axis and angle to the camera.
-        Vector n = new Vector(0,0,-1);
+        Vector n = Vector.zAxis().times(-1);
         angleToCamera = planeNormal.angleTo(n);
         axisToCamera = planeNormal.cross(n).divide(planeNormal.cross(n).magnitude());
         
@@ -264,8 +266,8 @@ public class LeapPlane extends KeyboardRenderable {
         planeD = MyUtilities.MATH_UTILITILES.calcPlaneD(planeNormal, planeCenter);
         
         // Precalculate side vectors needed for finding keyboard position.
-        BA = pointA.minus(pointB);
-        DA = pointA.minus(pointD);
+        //BA = pointA.minus(pointB);
+        //DA = pointA.minus(pointD);
         
         // Calculate the width and height of the normalized plane we created.
         normalizedPlaneWidth = MyUtilities.MATH_UTILITILES.findDistanceToPoint(pointB, pointC);
@@ -304,7 +306,7 @@ public class LeapPlane extends KeyboardRenderable {
     }
     
     private void applyPlaneNormalization(Vector point) {
-        // Since all of the Z's should be equal for the plane (this is post rotation). We can throw them out and
+        /*/ Since all of the Z's should be equal for the plane (this is post rotation). We can throw them out and
         // solve for LeMothe's 2D intersecting line equations instead. Makes things much easier.
         
         // Find horizontal position.
@@ -327,6 +329,32 @@ public class LeapPlane extends KeyboardRenderable {
             if(y > 1) {y = 1;} else if(y < 0) {y = 0;}
         } else {
             y = -1;
+        }*/
+        
+        // Alternative Method. The below method is as fast as the method above when the tool is invalid. However,
+        // when the tool is valid and in view, the below method is faster than the above method by about 4-10 microseconds
+        // per cycle. Since finding the distance to a line is always positive, we have to find the distance to both
+        // the top and bottom lines and the left and right lines to determine our position in world space.
+        // The above method and this method return results that are similar but not the same.
+        
+        // Find horizontal position.
+        // Find distance to left and right sides. Use the right side to determine if we should negate the distance to the left side.
+        float distAB = MyUtilities.MATH_UTILITILES.findDistanceToLine(point, pointA, pointB)/normalizedPlaneWidth;
+        float distDC = MyUtilities.MATH_UTILITILES.findDistanceToLine(point, pointD, pointC);
+        if (distDC > normalizedPlaneWidth) {
+            x = -distAB;
+        } else {
+            x = distAB;
+        }
+        
+        // Find vertical position.
+        // Find distance to top and bottom sides. Use the top side to determine if we should negate the distance to the bottom side.
+        float distAD = MyUtilities.MATH_UTILITILES.findDistanceToLine(point, pointA, pointD)/normalizedPlaneHeight;
+        float distBC = MyUtilities.MATH_UTILITILES.findDistanceToLine(point, pointB, pointC);
+        if (distBC > normalizedPlaneHeight) {
+            y = -distAD;
+        } else {
+            y = distAD;
         }
         
         // Use planeCenter and point's Z's to determine %.
@@ -339,11 +367,11 @@ public class LeapPlane extends KeyboardRenderable {
         point.setZ(z);
     }
     
-    public void update(LeapPoint leapPoint, LeapTool leapTool, LeapGesture leapGesture) {
+    public void update(LeapPoint leapPoint, LeapTool leapTool, KeyboardGestures keyboardGestures, LeapTrail leapTrail) {
         if(isCalibrating && isCalibrated) { // means we just finished
             finishCalibration();
         }
-        if(isCalibrated && leapTool.isValid()) {
+        if(isCalibrated) {
             // Find point distance, normalize it, and position it.
             leapPoint.applyPlaneRotationAndNormalizePoint(axisToCamera, angleToCamera);
             calcDistToPlane(leapPoint.getNormalizedPoint());
@@ -351,11 +379,24 @@ public class LeapPlane extends KeyboardRenderable {
             leapPoint.scaleTo3DSpace();
             
             // Set tool point, scale it, rotate and position it.
-            leapTool.setPoint(leapPoint.getNormalizedPoint());
-            leapTool.calculateOrientation();
-            leapTool.scaleTo3DSpace(/*planeWidth, planeHeight*/);
+            leapTool.update(leapPoint.getNormalizedPoint());
             
-            // Set gesture location and scale it.
+            // Set new gesture destination location.
+            for(KeyboardGesture gesture: keyboardGestures.getGestures()) {
+                if(gesture.isValid()) {
+                    gesture.update(leapPoint.getNormalizedPoint());
+                } else {
+                    gesture.update();
+                }
+            }
+            
+            // Set add to trail and set location.
+            if(isTouching() /*&& this.isValid()*/) {
+                leapTrail.update(leapPoint.getNormalizedPoint());
+            } else {
+                leapTrail.update(Vector.zero());
+            }
+            
         } else if (isCalibrating) {
             if(removeTool) {
                 // If tool is removed from area.
@@ -421,15 +462,15 @@ public class LeapPlane extends KeyboardRenderable {
             gl.glColor4fv(COLOR, 0);
             gl.glTranslatef(KEYBOARD_WIDTH/2f-planeWidth/2f, KEYBOARD_HEIGHT/2f-planeHeight/2f, -10f);
             drawRectangle(gl);
-            drawPoint(gl, scaledPointA, 'A', LeapPlaneCalibrator.POINT_A);
-            drawPoint(gl, scaledPointB, 'B', LeapPlaneCalibrator.POINT_B);
-            drawPoint(gl, scaledPointC, 'C', LeapPlaneCalibrator.POINT_C);
-            drawPoint(gl, scaledPointD, 'D', -1);
+            drawPointWithLetter(gl, scaledPointA, 'A', LeapPlaneCalibrator.POINT_A);
+            drawPointWithLetter(gl, scaledPointB, 'B', LeapPlaneCalibrator.POINT_B);
+            drawPointWithLetter(gl, scaledPointC, 'C', LeapPlaneCalibrator.POINT_C);
+            drawPointWithLetter(gl, scaledPointD, 'D', -1);
             gl.glPopMatrix();
         }
     }
     
-    private void drawPoint(GL2 gl, Vector vector, char pointLetter, int point) {
+    private void drawPointWithLetter(GL2 gl, Vector vector, char pointLetter, int point) {
         if(leapPlaneCalibrator != null) {
             gl.glColor4fv(point == leapPlaneCalibrator.calibratingPoint() ? ACTIVE_COLOR : COLOR, 0);
         } else {
@@ -445,13 +486,18 @@ public class LeapPlane extends KeyboardRenderable {
         }
         gl.glVertex3f(1f * RADIUS, 0f, 0f);
         gl.glEnd();
+        drawLetter(gl, pointLetter);
+        gl.glTranslatef(-vector.getX(), -vector.getY(), -vector.getZ());
+    }
+    
+    private void drawLetter(GL2 gl, char letter) {
         gl.glPushMatrix();
         gl.glColor4fv(BLACK, 0);
         gl.glTranslatef(-7f, -7f, 0f);
         gl.glScalef(0.15f, 0.15f, 0.15f);
-        GraphicsController.glut.glutStrokeCharacter(STROKE_ROMAN, pointLetter);
+        gl.glLineWidth(2);
+        GraphicsController.glut.glutStrokeCharacter(STROKE_ROMAN, letter);
         gl.glPopMatrix();
-        gl.glTranslatef(-vector.getX(), -vector.getY(), -vector.getZ());
     }
     
     private void drawRectangle(GL2 gl) {

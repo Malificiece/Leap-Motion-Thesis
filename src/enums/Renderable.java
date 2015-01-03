@@ -3,10 +3,11 @@ package enums;
 public enum Renderable {
     KEYBOARD_IMAGE("Keyboard Image"),
     VIRTUAL_KEYS("Virtual Keys"),
-    LEAP_PLANE("LeapMotion Interaction Plane"),
-    LEAP_TOOL("LeapMotion Tool"),
-    LEAP_POINT("LeapMotion Point"),
-    LEAP_GESTURES("LeapMotion Gestures");
+    LEAP_PLANE("Leap Motion Interaction Plane"),
+    LEAP_TOOL("Leap Motion Tool"),
+    LEAP_POINT("Leap Motion Point"),
+    KEYBOARD_GESTURES("Keyboard Gestures"),
+    LEAP_TRAIL("Leap Motion Interpolation Trail");
 
     private final String name;
     

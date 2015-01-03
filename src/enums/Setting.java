@@ -3,8 +3,8 @@ package enums;
 public enum Setting {
     GESTURE_CIRCLE_MIN_RADIUS("Gesture.Circle.MinRadius", 0.1, 5.0, 25.0, DecimalPrecision.ONE),
     GESTURE_CIRCLE_MIN_ARC("Gesture.Circle.MinArc", 0.1, 1.5, 7.5, DecimalPrecision.ONE),
-    GESTURE_SWIPE_MIN_LENGTH("Gesture.Swipe.MinLength", 1, 150, 750, DecimalPrecision.DEFAULT),
-    GESTURE_SWIPE_MIN_VELOCITY("Gesture.Swipe.MinVelocity", 1, 1000, 5000, DecimalPrecision.DEFAULT),
+    GESTURE_SWIPE_MIN_LENGTH("Gesture.Swipe.MinLength", 15, 150, 750, DecimalPrecision.DEFAULT),
+    GESTURE_SWIPE_MIN_VELOCITY("Gesture.Swipe.MinVelocity", 100, 1000, 5000, DecimalPrecision.DEFAULT),
     TOUCH_THRESHOLD("Touch.Threshold", -0.20, -0.10, 0, DecimalPrecision.TWO);
 
     private final String name;

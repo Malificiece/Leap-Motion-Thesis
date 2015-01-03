@@ -13,13 +13,19 @@ import enums.Attribute;
 import enums.FileExtension;
 import enums.FileName;
 import enums.FilePath;
+import enums.GestureType;
+import enums.Key;
 import enums.Renderable;
+import enums.Setting;
 import keyboard.CalibrationObserver;
 import keyboard.IKeyboard;
-import keyboard.renderables.LeapGesture;
+import keyboard.KeyboardGesture;
+import keyboard.KeyboardSetting;
+import keyboard.renderables.KeyboardGestures;
 import keyboard.renderables.LeapPlane;
 import keyboard.renderables.LeapPoint;
 import keyboard.renderables.LeapTool;
+import keyboard.renderables.LeapTrail;
 import keyboard.renderables.VirtualKey;
 import keyboard.renderables.VirtualKeyboard;
 import leap.LeapData;
@@ -35,10 +41,14 @@ public class LeapKeyboard extends IKeyboard implements LeapObserver, Calibration
     private LeapData leapData;
     private LeapTool leapTool;
     private LeapPoint leapPoint;
-    private LeapGesture leapGesture;
+    private KeyboardGestures keyboardGestures;
     private LeapPlane leapPlane;
+    private LeapTrail leapTrail;
+    private LeapGestures leapGestures;
+    private SwipeKeyboard swipeKeyboard;
     private VirtualKeyboard virtualKeyboard;
     private boolean isCalibrated = false;
+    private boolean shiftDown = false;
     
     public LeapKeyboard() {
         super(KEYBOARD_ID, KEYBOARD_NAME, KEYBOARD_FILE_NAME);
@@ -53,23 +63,26 @@ public class LeapKeyboard extends IKeyboard implements LeapObserver, Calibration
         virtualKeyboard = (VirtualKeyboard) keyboardRenderables.getRenderableByName(Renderable.VIRTUAL_KEYS.toString());
         leapPoint = (LeapPoint) keyboardRenderables.getRenderableByName(Renderable.LEAP_POINT.toString());
         leapTool = (LeapTool) keyboardRenderables.getRenderableByName(Renderable.LEAP_TOOL.toString());
-        leapGesture = (LeapGesture) keyboardRenderables.getRenderableByName(Renderable.LEAP_GESTURES.toString());
+        keyboardGestures = (KeyboardGestures) keyboardRenderables.getRenderableByName(Renderable.KEYBOARD_GESTURES.toString());
+        leapTrail = (LeapTrail) keyboardRenderables.getRenderableByName(Renderable.LEAP_TRAIL.toString());
         leapPlane = (LeapPlane) keyboardRenderables.getRenderableByName(Renderable.LEAP_PLANE.toString());
         leapPlane.registerObserver(this);
         if(!leapPlane.isCalibrated()) {
             leapPoint.blockAccess(true);
             leapTool.blockAccess(true);
-            leapGesture.blockAccess(true);
+            keyboardGestures.blockAccess(true);
         } else {
             isCalibrated = true;
         }
+        leapGestures = new LeapGestures();
+        swipeKeyboard = new SwipeKeyboard();
     }
 
     @Override
     public void beginCalibration(JPanel textPanel) {
         leapPoint.blockAccess(true);
         leapTool.blockAccess(true);
-        leapGesture.blockAccess(true);
+        keyboardGestures.blockAccess(true);
         virtualKeyboard.blockAccess(true);
         keyboardRenderables.getRenderableByName(Renderable.KEYBOARD_IMAGE.toString()).blockAccess(true);
         leapPlane.beginCalibration(textPanel);
@@ -79,7 +92,7 @@ public class LeapKeyboard extends IKeyboard implements LeapObserver, Calibration
     protected void finishCalibration() {
         leapPoint.grantAccess(true);
         leapTool.grantAccess(true);
-        leapGesture.grantAccess(true);
+        keyboardGestures.grantAccess(true);
         virtualKeyboard.grantAccess(true);
         keyboardRenderables.getRenderableByName(Renderable.KEYBOARD_IMAGE.toString()).grantAccess(true);
         isCalibrated = true;
@@ -104,17 +117,29 @@ public class LeapKeyboard extends IKeyboard implements LeapObserver, Calibration
     public void update() {
         LEAP_LOCK.lock();
         try {
+            // Allow leap plane to take over the updates of specific objects that require the plane
+            leapPlane.update(leapPoint, leapTool, keyboardGestures, leapTrail);
+            // Update gestures after plane, we need both normalized and non normalized points.
+            leapGestures.update();
             if(leapTool.isValid()) {
-                //keyPressed = 'l';
-                //notifyListeners();
-                // Allow leap plane to take over the updates of specific objects that require the plane
-                leapPlane.update(leapPoint, leapTool, leapGesture);
                 VirtualKey vKey;
                 if((vKey = virtualKeyboard.isHoveringAny(leapPoint.getNormalizedPoint())) != null && leapPlane.isTouching()) {
                     vKey.pressed();
+                    if(vKey.getKey() != Key.VK_SHIFT) {
+                        if(shiftDown) {
+                            keyPressed = vKey.getKey().toUpper();
+                            shiftDown = false;
+                        } else {
+                            keyPressed = vKey.getKey().getKeyValue();   
+                        }
+                        notifyListenersKeyEvent();
+                    } else {
+                        shiftDown = true;
+                    }
                 }
-            } else if(leapPlane.isCalibrating()) {
-                leapPlane.update(leapPoint, leapTool, leapGesture);
+                if(shiftDown) {
+                    virtualKeyboard.pressed(Key.VK_SHIFT);
+                }
             } else {
                 virtualKeyboard.clearAll();
             }
@@ -138,12 +163,67 @@ public class LeapKeyboard extends IKeyboard implements LeapObserver, Calibration
     public void leapInteractionBoxSet(InteractionBox iBox) {
         leapPoint.setInteractionBox(iBox);
         leapPlane.setInteractionBox(iBox);
-        leapGesture.setInteractionBox(iBox);
-        leapTool.createCylinder();
+        leapTool.createQuadric();
+        keyboardGestures.createQuadric();
     }
 
     @Override
     public void keyboardCalibrationFinishedEventObserved() {
         finishCalibration();
+    }
+    
+    protected class LeapGestures {
+        private final KeyboardSetting GESTURE_SWIPE_MIN_LENGTH;
+        private final KeyboardSetting GESTURE_SWIPE_MIN_VELOCITY;
+        private boolean detectingSwipeGesture = false;
+        private KeyboardGesture gesture;
+        
+        public LeapGestures() {
+            GESTURE_SWIPE_MIN_LENGTH = keyboardSettings.getSettingByName(Setting.GESTURE_SWIPE_MIN_LENGTH.toString());
+            GESTURE_SWIPE_MIN_VELOCITY = keyboardSettings.getSettingByName(Setting.GESTURE_SWIPE_MIN_VELOCITY.toString());
+        }
+        
+        public void update() {
+            // Remove completed gestures.
+            keyboardGestures.removeFinishedGestures();
+            
+            // We have already detected a swipe that was long enough.
+            if(detectingSwipeGesture && gesture != null && keyboardGestures.containsGesture(gesture)) {
+                if(leapTool.getVelocity().magnitude() < GESTURE_SWIPE_MIN_VELOCITY.getValue()) {
+                    gesture.gestureFinshed();
+                    gesture = null;
+                } // else continue detecting it
+            }
+            // We have already detected a swipe but it's not long enough yet.
+            else if (detectingSwipeGesture && gesture != null){
+                // Update the gesture since it's not added to the renderables yet.
+                gesture.update(leapPoint.getNormalizedPoint());
+                // Check that we're still maintaining velocity.
+                if(leapTool.getVelocity().magnitude() >= GESTURE_SWIPE_MIN_VELOCITY.getValue()) {
+                    // Check if we've met minimum length requirement.
+                    if(gesture.getLength() >= GESTURE_SWIPE_MIN_LENGTH.getValue()) {
+                        // Gesture meets all minimum requirements, so add to renderable gestures.
+                        keyboardGestures.addGesture(gesture);
+                    } // else continue detecting it
+                } else if(gesture.getLength() >= GESTURE_SWIPE_MIN_LENGTH.getValue()) {
+                    // We were long enough at the time we lost minimum velocity.
+                    keyboardGestures.addGesture(gesture);
+                } else {
+                    // We lost velocity before reaching minimum length.
+                    detectingSwipeGesture = false;
+                }
+            }
+            // We aren't currently detecting a swipe.
+            else {
+                if(leapTool.getVelocity().magnitude() >= GESTURE_SWIPE_MIN_VELOCITY.getValue()) {
+                    detectingSwipeGesture = true;
+                    gesture = new KeyboardGesture(leapPoint.getNormalizedPoint(), GestureType.SWIPE);
+                }
+            }
+        }
+    }
+    
+    private class SwipeKeyboard {
+        
     }
 }

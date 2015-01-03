@@ -6,6 +6,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.ArrayList;
+import java.util.TimerTask;
 
 import javax.media.opengl.GLAutoDrawable;
 import javax.media.opengl.awt.GLCanvas;
@@ -43,8 +44,25 @@ public class CalibrationController extends GraphicsController {
     private JPanel settingsPanel;
     private JPanel renderOptionsPanel;
     private Timer clearTextTimer;
+    private java.util.Timer fpsTimer;
+    private int frameCount = 0;
     
     public CalibrationController() {
+        TimerTask updateFPS = new TimerTask() {
+
+            @Override
+            public void run() {
+                if(frame != null) {
+                    frame.setTitle("Calibration - FPS: " + frameCount);
+                }
+                frameCount = 0;
+            }
+            
+        };
+        
+        fpsTimer = new java.util.Timer();
+        fpsTimer.scheduleAtFixedRate(updateFPS, 1000, 1000);
+        
         keyboard = KeyboardType.STANDARD.getKeyboard();
         registerObserver(KeyboardType.STANDARD.getKeyboard());
         registerObserver(KeyboardType.LEAP.getKeyboard());
@@ -53,7 +71,7 @@ public class CalibrationController extends GraphicsController {
         canvas = new GLCanvas(capabilities);
         canvas.setPreferredSize(new Dimension(keyboard.getWidth(), keyboard.getHeight()));
         canvas.setSize(keyboard.getWidth(), keyboard.getHeight());
-        frame = new JFrame("Calibration");
+        frame = new JFrame("Calibration - FPS: 0");
         typedLabel = new JLabel();
         typedPanel = new JPanel();
         keyboardTypeComboBox = new JComboBox<String>();
@@ -244,6 +262,7 @@ public class CalibrationController extends GraphicsController {
     public void render(GLAutoDrawable drawable) {
        gl.glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
        keyboard.render(gl);
+       frameCount++;
     }
     
     private void addKeyboardToUI() {

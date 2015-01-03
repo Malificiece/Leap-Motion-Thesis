@@ -31,26 +31,27 @@ public class LeapTool extends KeyboardRenderable {
     private float radius;
     private float scaledLength;
     private float scaledRadius;
+    private Vector tipVelocity = Vector.zero();
     private Vector tipDirection = Vector.zero();
     private Vector tipPoint = Vector.zero();
     private boolean isValid = false;
     private float angleToDirection = 0;
     private Vector axisToDirection = tipPoint;
-    private Vector cylinderDirection = new Vector(0,0,1);
-    private GLUquadric cylinder;
+    private Vector upDirection = Vector.zAxis();
+    private GLUquadric quadric;
     
     public LeapTool(KeyboardAttributes keyboardAttributes) {
         super(RENDER_NAME);
         DIST_TO_CAMERA = keyboardAttributes.getAttributeByName(Attribute.DIST_TO_CAMERA.toString()).getValueAsInteger();
     }
     
-    public void createCylinder() {
+    public void createQuadric() {
         GraphicsController.gl.getContext().makeCurrent();
-        if(cylinder != null) {
-            GraphicsController.glu.gluDeleteQuadric(cylinder);
+        if(quadric != null) {
+            GraphicsController.glu.gluDeleteQuadric(quadric);
         }
-        cylinder = GraphicsController.glu.gluNewQuadric();
-        GraphicsController.glu.gluQuadricNormals(cylinder, GL_TRUE);
+        quadric = GraphicsController.glu.gluNewQuadric();
+        GraphicsController.glu.gluQuadricNormals(quadric, GL_TRUE);
     }
     
     public void setTool(Tool tool) {
@@ -60,10 +61,17 @@ public class LeapTool extends KeyboardRenderable {
             radius = tool.width()/2;
             tipDirection = tool.direction();
         }
+        tipVelocity = tool.tipVelocity();
     }
     
-    public void setPoint(Vector point) {
+    public void update(Vector point) {
         tipPoint = point;
+        calculateOrientation();
+        scaleTo3DSpace();
+    }
+    
+    public Vector getVelocity() {
+        return tipVelocity;
     }
     
     public boolean isValid() {
@@ -75,13 +83,13 @@ public class LeapTool extends KeyboardRenderable {
         this.radius = radius;
     }
     
-    public void calculateOrientation() {
-        angleToDirection = cylinderDirection.angleTo(tipDirection) * RADS_TO_DEGREES;
-        axisToDirection = cylinderDirection.cross(tipDirection);
+    private void calculateOrientation() {
+        angleToDirection = upDirection.angleTo(tipDirection) * RADS_TO_DEGREES;
+        axisToDirection = upDirection.cross(tipDirection);
         axisToDirection = axisToDirection.divide(axisToDirection.magnitude());
     }
     
-    public void scaleTo3DSpace(/*float planeWidth, float planeHeight*/) {
+    private void scaleTo3DSpace(/*float planeWidth, float planeHeight*/) {
         //scaledLength = (length / iBox.height()) * planeHeight;
         //scaledRadius = (radius / iBox.width()) * planeWidth;
         scaledLength = length;
@@ -108,11 +116,10 @@ public class LeapTool extends KeyboardRenderable {
     }
     
     private void drawTool(GL2 gl) {
-        
         gl.glCullFace(GL_FRONT);
         drawCircle(gl);
         gl.glCullFace(GL_BACK);
-        GraphicsController.glu.gluCylinder(cylinder, scaledRadius, scaledRadius, scaledLength, NUM_VERTICIES, NUM_STACKS);
+        GraphicsController.glu.gluCylinder(quadric, scaledRadius, scaledRadius, scaledLength, NUM_VERTICIES, NUM_STACKS);
         gl.glTranslatef(0, 0, scaledLength);
         drawCircle(gl);
         gl.glTranslatef(0, 0, -scaledLength);
@@ -140,7 +147,7 @@ public class LeapTool extends KeyboardRenderable {
         gl.glBegin(GL_LINES);
         gl.glVertex3f(0f, 0f, 0f);
         if(tipDirection.isValid()) {
-            float dist = MyUtilities.MATH_UTILITILES.findDistanceToPlane(tipPoint.plus(tipDirection), cylinderDirection, 0f);
+            float dist = MyUtilities.MATH_UTILITILES.findDistanceToPlane(tipPoint.plus(tipDirection), upDirection, 0f);
             Vector tmp = tipDirection.times(dist);
             gl.glVertex3f(tmp.getX(), tmp.getY(), tmp.getZ());
         }

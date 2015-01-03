@@ -31,7 +31,7 @@ public class LeapPlaneCalibrator {
     
     public void addPoint(Vector point) {
         if(!doneWithCurrentPoint) {
-            cluster[clusterIndex++ % CLUSTER_SIZE] = point;
+            cluster[clusterIndex = ++clusterIndex % CLUSTER_SIZE] = point;
             startSearch = startSearch < START_SEARCH ? ++startSearch : startSearch;
             previousMidpoint = new Vector(midpoint);
             if(MyUtilities.MATH_UTILITILES.findMidpoint(midpoint, cluster)) {

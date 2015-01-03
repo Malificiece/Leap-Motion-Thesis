@@ -146,7 +146,6 @@ public class ControlCenter {
     }
     
     public void render() {
-
         if(expInProgress()) {
             EXPERIMENT_CONTROLLER.display();
         }
