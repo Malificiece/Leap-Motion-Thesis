@@ -2,19 +2,28 @@
 <classpath>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.8"/>
-	<classpathentry kind="lib" path="libs/LeapJava.jar" sourcepath="C:/Users/Garrett/Desktop/Thesis/LeapSDK/lib">
-		<attributes>
-			<attribute name="javadoc_location" value="https://developer.leapmotion.com/documentation/java/index.html"/>
-		</attributes>
-	</classpathentry>
-	<classpathentry kind="lib" path="libs/jogl-all.jar">
-		<attributes>
-			<attribute name="javadoc_location" value="http://jogamp.org/deployment/jogamp-next/javadoc/jogl/javadoc/"/>
-		</attributes>
-	</classpathentry>
-	<classpathentry kind="lib" path="libs/gluegen-rt.jar" sourcepath="C:/Users/Garrett/Desktop/Thesis/jogamp-all-platforms">
+	<classpathentry kind="lib" path="libs/gluegen-rt.jar" sourcepath="C:/Users/Garrett/Desktop/Thesis/resources/javasrc/gluegen-java-src.zip">
 		<attributes>
 			<attribute name="javadoc_location" value="http://jogamp.org/deployment/jogamp-next/javadoc/gluegen/javadoc/"/>
+			<attribute name="org.eclipse.jdt.launching.CLASSPATH_ATTR_LIBRARY_PATH_ENTRY" value="Leap-Motion-Thesis/libs"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="libs/jogl-all.jar" sourcepath="C:/Users/Garrett/Desktop/Thesis/resources/javasrc/jogl-java-src.zip">
+		<attributes>
+			<attribute name="javadoc_location" value="http://jogamp.org/deployment/jogamp-next/javadoc/jogl/javadoc/"/>
+			<attribute name="org.eclipse.jdt.launching.CLASSPATH_ATTR_LIBRARY_PATH_ENTRY" value="Leap-Motion-Thesis/libs"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="libs/LeapJava.jar">
+		<attributes>
+			<attribute name="javadoc_location" value="jar:file:/C:/Users/Garrett/Desktop/Thesis/resources/javadocs/leap-javadocs.zip!/"/>
+			<attribute name="org.eclipse.jdt.launching.CLASSPATH_ATTR_LIBRARY_PATH_ENTRY" value="Leap-Motion-Thesis/libs"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="libs/jinput-2.0.5.jar" sourcepath="C:/Users/Garrett/Desktop/Thesis/resources/javasrc/jinput-2.0.5-sources.jar">
+		<attributes>
+			<attribute name="javadoc_location" value="jar:file:/C:/Users/Garrett/Desktop/Thesis/resources/javadocs/jinput-2.0.5-javadoc.jar!/"/>
+			<attribute name="org.eclipse.jdt.launching.CLASSPATH_ATTR_LIBRARY_PATH_ENTRY" value="Leap-Motion-Thesis/libs"/>
 		</attributes>
 	</classpathentry>
 	<classpathentry kind="output" path="bin"/>
