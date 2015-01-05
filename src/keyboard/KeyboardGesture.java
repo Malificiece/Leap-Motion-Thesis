@@ -4,11 +4,11 @@ import utilities.MyUtilities;
 
 import com.leapmotion.leap.Vector;
 
-import enums.GestureType;
+import enums.Gesture;
 
 public class KeyboardGesture {
     private static final float RADS_TO_DEGREES = (float) (180 / Math.PI);
-    private final GestureType gestureType;
+    private final Gesture gestureType;
     private final int FADE_DURATION = 400;
     private long previousTime;
     private long fadeTimeElapsed = 0;
@@ -22,7 +22,7 @@ public class KeyboardGesture {
     private Vector axisToDirection = Vector.zero();
     private Vector upDirection = Vector.zAxis();
     
-    public KeyboardGesture(Vector sourcePoint, GestureType gestureType) {
+    public KeyboardGesture(Vector sourcePoint, Gesture gestureType) {
         this.sourcePoint = sourcePoint;
         this.destinationPoint = sourcePoint;
         this.gestureType = gestureType;
@@ -67,7 +67,7 @@ public class KeyboardGesture {
         previousTime = System.currentTimeMillis();
     }
 
-    public GestureType getType() {
+    public Gesture getType() {
         return gestureType;
     }
 

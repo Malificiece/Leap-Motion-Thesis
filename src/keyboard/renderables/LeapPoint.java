@@ -18,7 +18,7 @@ import keyboard.KeyboardAttributes;
 import keyboard.KeyboardRenderable;
 
 public class LeapPoint extends KeyboardRenderable {
-    private static final String RENDER_NAME = Renderable.LEAP_POINT.toString();
+    private static final Renderable TYPE = Renderable.LEAP_POINT;
     private static final float[] COLOR = {0f, 0f, 1f, 1f};
     private static final int NUM_VERTICIES = 32;
     private static final float DELTA_ANGLE = (float) (2.0f * Math.PI / NUM_VERTICIES);
@@ -31,10 +31,10 @@ public class LeapPoint extends KeyboardRenderable {
     private InteractionBox iBox;
     
     public LeapPoint(KeyboardAttributes keyboardAttributes) {
-        super(RENDER_NAME);
-        KEYBOARD_WIDTH = keyboardAttributes.getAttributeByName(Attribute.KEYBOARD_WIDTH.toString()).getValueAsInteger();
-        KEYBOARD_HEIGHT = keyboardAttributes.getAttributeByName(Attribute.KEYBOARD_HEIGHT.toString()).getValueAsInteger();
-        DIST_TO_CAMERA = keyboardAttributes.getAttributeByName(Attribute.DIST_TO_CAMERA.toString()).getValueAsInteger();
+        super(TYPE);
+        KEYBOARD_WIDTH = keyboardAttributes.getAttributeAsInteger(Attribute.KEYBOARD_WIDTH);
+        KEYBOARD_HEIGHT = keyboardAttributes.getAttributeAsInteger(Attribute.KEYBOARD_HEIGHT);
+        DIST_TO_CAMERA = keyboardAttributes.getAttributeAsInteger(Attribute.DIST_TO_CAMERA);
     }
     
     public void setPoint(Vector point) {

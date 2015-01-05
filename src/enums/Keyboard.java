@@ -6,7 +6,7 @@ import keyboard.leap.LeapKeyboard;
 import keyboard.standard.StandardKeyboard;
 import keyboard.tablet.TabletKeyboard;
 
-public enum KeyboardType {
+public enum Keyboard {
     STANDARD(new StandardKeyboard()),
     LEAP(new LeapKeyboard()),
     TABLET(new TabletKeyboard()),
@@ -16,20 +16,20 @@ public enum KeyboardType {
     private final String keyboardName;
     private final IKeyboard keyboard;
     
-    private static final KeyboardType[] VALUES = values();
+    private static final Keyboard[] VALUES = values();
     private static final int SIZE = VALUES.length;
     
-    private KeyboardType(IKeyboard keyboard) {
-        this.keyboardID = keyboard.getKeyboardID();
-        this.keyboardName = keyboard.getKeyboardName();
+    private Keyboard(IKeyboard keyboard) {
+        this.keyboardID = keyboard.getID();
+        this.keyboardName = keyboard.getName();
         this.keyboard = keyboard;
     }
     
-    public int getKeyboardID() {
+    public int getID() {
         return keyboardID;
     }
     
-    public String getKeyboardName() {
+    public String getName() {
         return keyboardName;
     }
     
@@ -41,16 +41,16 @@ public enum KeyboardType {
         return SIZE;
     }
     
-    public static KeyboardType getByID(int keyboardID) {
+    public static Keyboard getByID(int keyboardID) {
         if(keyboardID >= 0 && keyboardID < SIZE) {
             return VALUES[keyboardID];
         }
         return null;
     }
     
-    public static KeyboardType getByName(String keyboardName) {
+    public static Keyboard getByName(String keyboardName) {
         for(int i = 0; i < SIZE; i++) {
-            if(VALUES[i].getKeyboardName().equalsIgnoreCase(keyboardName)) return VALUES[i];
+            if(VALUES[i].getName().equalsIgnoreCase(keyboardName)) return VALUES[i];
         }
         return null;
     }

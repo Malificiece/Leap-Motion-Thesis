@@ -1,4 +1,3 @@
-// THIS IS A TEST TO SEE IF EGIT WORKS
 package ui;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -116,7 +115,7 @@ public class WindowBuilder {
         
         // combo box
         for(int i = 0; i < TestType.getSize(); i++) {
-            testComboBox.addItem(TestType.getByID(i).getTestName());
+            testComboBox.addItem(TestType.getByID(i).getName());
         }
         testComboBox.setBackground(Color.WHITE);
         testPanel.add(testComboBox);
@@ -214,8 +213,8 @@ public class WindowBuilder {
         rightPanelSet.add(keyboardTypeSelectionPanel);
         
         // keyboard combo box
-        for(int i = 0; i < KeyboardType.getSize(); i++) {
-            keyboardTypeComboBox.addItem(KeyboardType.getByID(i).getKeyboardName());
+        for(int i = 0; i < Keyboard.getSize(); i++) {
+            keyboardTypeComboBox.addItem(Keyboard.getByID(i).getName());
         }
         keyboardTypeComboBox.setBackground(Color.WHITE);
         keyboardTypeComboBox.setMaximumSize(new Dimension(keyboardTypeComboBox.getMaximumSize().width, keyboardTypeComboBox.getMinimumSize().height));

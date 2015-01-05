@@ -5,15 +5,17 @@ import java.util.LinkedHashMap;
 
 import javax.media.opengl.GL2;
 
+import enums.Renderable;
+
 public abstract class KeyboardRenderables {
-    private LinkedHashMap<String, KeyboardRenderable> keyboardRenderables = new LinkedHashMap<String, KeyboardRenderable>();
+    private LinkedHashMap<Renderable, KeyboardRenderable> keyboardRenderables = new LinkedHashMap<Renderable, KeyboardRenderable>();
     
     public void addRenderable(KeyboardRenderable renderable) {
-        keyboardRenderables.put(renderable.getName(), renderable);
+        keyboardRenderables.put(renderable.getType(), renderable);
     }
     
-    public KeyboardRenderable getRenderableByName(String name) {
-        return keyboardRenderables.get(name);
+    public KeyboardRenderable getRenderable(Renderable renderable) {
+        return keyboardRenderables.get(renderable);
     }
 
     public ArrayList<KeyboardRenderable> getAllRenderables() {

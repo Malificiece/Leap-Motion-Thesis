@@ -12,29 +12,30 @@ import utilities.MyUtilities;
 
 import com.leapmotion.leap.Vector;
 
-import enums.FileExtension;
+import enums.Attribute;
+import enums.FileExt;
 import enums.FilePath;
 
 public class KeyboardAttribute {
-    private String name;
+    private Attribute attribute;
     private Object value;
     private JPanel attributesPanel;
     private JLabel valueLabel;
     
-    public KeyboardAttribute(IKeyboard keyboard, String attributeName, Object defaultValue) {
-        this.name = attributeName;
+    public KeyboardAttribute(IKeyboard keyboard, Attribute attribute, Object defaultValue) {
+        this.attribute = attribute;
         try {
-            this.value = MyUtilities.FILE_IO_UTILITIES.readAttributeFromFile(FilePath.CONFIG_PATH.getPath(),
-                    keyboard.getKeyboardFileName() + FileExtension.INI.getExtension(), attributeName, defaultValue);
+            this.value = MyUtilities.FILE_IO_UTILITIES.readAttributeFromFile(FilePath.CONFIG.getPath(),
+                    keyboard.getFileName() + FileExt.INI.getExt(), attribute.name(), defaultValue);
         } catch(IOException e) {
-            System.err.println("Error occured while trying to read "  + attributeName + " from file. Using default value.");
+            System.err.println("Error occured while trying to read "  + attribute + " from file. Using default value.");
             this.value = defaultValue;
         }
         createAttributePanel();
     }
 
-    public String getName() {
-        return name;
+    public Attribute getType() {
+        return attribute;
     }
     
     
@@ -69,7 +70,7 @@ public class KeyboardAttribute {
     
     private void createAttributePanel() {
         attributesPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        JLabel nameLabel = new JLabel(name+": ");
+        JLabel nameLabel = new JLabel(attribute.name() + ": ");
         if(value != null) {
             valueLabel = new JLabel(value.toString());
         } else {

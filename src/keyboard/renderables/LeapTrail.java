@@ -11,14 +11,14 @@ import com.leapmotion.leap.Vector;
 import enums.Renderable;
 
 public class LeapTrail extends KeyboardRenderable {
-    private static final String RENDER_NAME = Renderable.LEAP_TRAIL.toString();
+    private static final Renderable TYPE = Renderable.LEAP_TRAIL;
     private final float[] COLOR = {1f, 1f, 0f, 1f};
     private final int LINE_SIZE = 50;
     private Vector[] line;
     private int lineIndex = 0;
 
     public LeapTrail(KeyboardAttributes keyboardAttributes) {
-        super(RENDER_NAME);
+        super(TYPE);
         line = new Vector[LINE_SIZE];
         for(int i = 0; i < LINE_SIZE; i++) {
             line[i] = Vector.zero();

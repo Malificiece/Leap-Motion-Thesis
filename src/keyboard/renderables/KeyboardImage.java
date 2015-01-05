@@ -8,6 +8,7 @@ import java.awt.geom.AffineTransform;
 import javax.media.opengl.GL;
 import javax.media.opengl.GL2;
 
+import enums.FileName;
 import enums.FilePath;
 import enums.Renderable;
 import keyboard.KeyboardRenderable;
@@ -15,27 +16,25 @@ import static javax.media.opengl.GL.*;  // GL constants
 //import static javax.media.opengl.GL2.*; // GL2 constants
 
 public class KeyboardImage extends KeyboardRenderable {
-    private static final String RENDER_NAME = Renderable.KEYBOARD_IMAGE.toString();
-    private static final String ASSETS_PATH = FilePath.ASSETS_PATH.getPath();
-    private static final String DEFAULT_FILE_PATH = FilePath.STANDARD_PATH.getPath();
-    private static final String DEFAULT_FILE_NAME = "keyboard.png";
-    private String fullFilename;
+    private static final Renderable TYPE = Renderable.KEYBOARD_IMAGE;
+    private static final String ASSETS_PATH = FilePath.ASSETS.getPath();
+    private static final String DEFAULT_FILE_NAME = FileName.STANDARD.getName() + FileName.KEYBOARD_IMAGE.getName();
+    private String fileName;
     private ByteBuffer image = null;
     private int height;
     private int width;
     
-    public KeyboardImage(String fileName, String filePath) {
-        super(RENDER_NAME);
-        fullFilename = ASSETS_PATH;
-        fullFilename += filePath == null ? DEFAULT_FILE_PATH : filePath;
-        fullFilename += fileName == null ? DEFAULT_FILE_NAME : fileName;
-        loadImage(fullFilename);
+    public KeyboardImage(String fileName) {
+        super(TYPE);
+        this.fileName = ASSETS_PATH;
+        this.fileName += fileName == null ? DEFAULT_FILE_NAME : fileName;
+        loadImage(this.fileName);
     }
 
     private void loadImage(String filename) {
         // Load image and get height and width for raster.
         if(filename == null) {
-            filename = fullFilename;
+            filename = this.fileName;
         }
         // Media tracker is necessary to access img data
         Image img = Toolkit.getDefaultToolkit().createImage(filename);
@@ -76,7 +75,7 @@ public class KeyboardImage extends KeyboardRenderable {
         if(isEnabled()) {
             // Load image, if necessary.
             if(image == null) {
-                loadImage(fullFilename);
+                loadImage(fileName);
             }
     
             //gl.glPushAttrib( GL.GL_DEPTH_BUFFER_BIT );

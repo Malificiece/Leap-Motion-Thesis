@@ -1,5 +1,6 @@
 package keyboard.renderables;
 
+import java.awt.Point;
 import java.util.TreeMap;
 
 import javax.media.opengl.GL2;
@@ -16,27 +17,32 @@ import keyboard.KeyboardRenderable;
 //import static javax.media.opengl.GL2.*; // GL2 constants
 
 public class VirtualKeyboard extends KeyboardRenderable {
-    private static final String RENDER_NAME = Renderable.VIRTUAL_KEYS.toString();
+    private static final Renderable TYPE = Renderable.VIRTUAL_KEYS;
     private TreeMap<Key, VirtualKey> keys = new TreeMap<Key, VirtualKey>();
     //private VirtualKey [] keys;
     
     public VirtualKeyboard(KeyboardAttributes keyboardAttributes) {
-        super(RENDER_NAME);
+        super(TYPE);
         createKeys(keyboardAttributes);
     }
     
     private void createKeys(KeyboardAttributes keyboardAttributes) {
-        int keyboardHeight = (int) keyboardAttributes.getValueByName(Attribute.KEYBOARD_HEIGHT.toString());
-        int gapSize = (int) keyboardAttributes.getValueByName(Attribute.GAP_SIZE.toString());
-        int keyWidth = (int) keyboardAttributes.getValueByName(Attribute.KEY_WIDTH.toString());
-        int keyHeight = (int) keyboardAttributes.getValueByName(Attribute.KEY_HEIGHT.toString());
-        int spaceKeyWidth = (int) keyboardAttributes.getValueByName(Attribute.SPACE_KEY_WIDTH.toString());
-        int backSpaceKeyWidth = (int) keyboardAttributes.getValueByName(Attribute.BACK_SPACE_KEY_WIDTH.toString());
-        int shiftKeyWidth = (int) keyboardAttributes.getValueByName(Attribute.SHIFT_KEY_WIDTH.toString());
-        int enterWidth = (int) keyboardAttributes.getValueByName(Attribute.ENTER_KEY_WIDTH.toString());
-        //int numKeys = (int) keyboardAttributes.getValueByName(AttributeName.NUMBER_OF_KEYS.toString());
-        int[] rowOffsets = (int[]) keyboardAttributes.getValueByName(Attribute.ROW_OFFSETS.toString());
-        Key[][] keyRows = (Key[][]) keyboardAttributes.getValueByName(Attribute.KEY_ROWS.toString());
+        Integer keyboardHeight = (Integer) keyboardAttributes.getAttributeAsInteger(Attribute.KEYBOARD_HEIGHT);
+        Point keyboardSize = (Point) keyboardAttributes.getAttributeValue(Attribute.KEYBOARD_SIZE);
+        if(keyboardSize != null) {
+            System.out.println("Point size works: " + keyboardSize.y);
+            keyboardHeight = keyboardSize.y;
+        }
+        int gapSize = (int) keyboardAttributes.getAttributeAsInteger(Attribute.GAP_SIZE);
+        int keyWidth = (int) keyboardAttributes.getAttributeAsInteger(Attribute.KEY_WIDTH);
+        int keyHeight = (int) keyboardAttributes.getAttributeAsInteger(Attribute.KEY_HEIGHT);
+        int spaceKeyWidth = (int) keyboardAttributes.getAttributeAsInteger(Attribute.SPACE_KEY_WIDTH);
+        int backSpaceKeyWidth = (int) keyboardAttributes.getAttributeAsInteger(Attribute.BACK_SPACE_KEY_WIDTH);
+        int shiftKeyWidth = (int) keyboardAttributes.getAttributeAsInteger(Attribute.SHIFT_KEY_WIDTH);
+        int enterWidth = (int) keyboardAttributes.getAttributeAsInteger(Attribute.ENTER_KEY_WIDTH);
+        //int numKeys = (int) keyboardAttributes.getValueByName(AttributeName.NUMBER_OF_KEYS);
+        int[] rowOffsets = (int[]) keyboardAttributes.getAttributeValue(Attribute.ROW_OFFSETS);
+        Key[][] keyRows = (Key[][]) keyboardAttributes.getAttributeValue(Attribute.KEY_ROWS);
         
         for(int rowIndex = 0, x = 0, y = keyboardHeight + gapSize; rowIndex < keyRows.length; rowIndex++) {
             x = rowOffsets[rowIndex];

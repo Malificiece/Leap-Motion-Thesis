@@ -53,7 +53,7 @@ public enum Key {
         this.keyCode = keyCode;
     }
     
-    public char getKeyValue() {
+    public char getValue() {
         return keyValue;
     }
     
@@ -61,11 +61,11 @@ public enum Key {
         return keyUpperCase;
     }
     
-    public String getKeyName() {
+    public String getName() {
         return keyName;
     }
     
-    public int getKeyCode() {
+    public int getCode() {
         return keyCode;
     }
 
@@ -75,21 +75,21 @@ public enum Key {
     
     public static Key getByValue(int keyValue) {
         for(int i = 0; i < SIZE; i++) {
-            if(VALUES[i].getKeyValue() == keyValue || VALUES[i].toUpper() == keyValue) return VALUES[i];
+            if(VALUES[i].getValue() == keyValue || VALUES[i].toUpper() == keyValue) return VALUES[i];
         }
         return null;
     }
     
     public static Key getByName(String keyName) {
         for(int i = 0; i < SIZE; i++) {
-            if(VALUES[i].getKeyName().equalsIgnoreCase(keyName)) return VALUES[i];
+            if(VALUES[i].getName().equalsIgnoreCase(keyName)) return VALUES[i];
         }
         return null;
     }
     
     public static Key getByCode(int keyCode) {
         for(int i = 0; i < SIZE; i++) {
-            if(VALUES[i].getKeyCode() == keyCode) return VALUES[i];
+            if(VALUES[i].getCode() == keyCode) return VALUES[i];
         }
         return null;
     }

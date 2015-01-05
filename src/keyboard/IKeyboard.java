@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import javax.media.opengl.GL2;
 import javax.swing.JPanel;
 
-import enums.FileExtension;
+import enums.FileExt;
 import enums.FilePath;
 import ui.SaveSettingsObserver;
 import utilities.MyUtilities;
@@ -38,19 +38,19 @@ public abstract class IKeyboard implements SaveSettingsObserver {
     protected abstract void finishCalibration();
     public abstract boolean isCalibrated();
     
-    public int getKeyboardID() {
+    public int getID() {
         return keyboardID;
     }
     
-    public String getKeyboardName() {
+    public String getName() {
         return keyboardName;
     }
     
-    public String getKeyboardFilePath() {
+    public String getFilePath() {
         return filePath;
     }
     
-    public String getKeyboardFileName() {
+    public String getFileName() {
         return fileName;
     }
     
@@ -96,10 +96,10 @@ public abstract class IKeyboard implements SaveSettingsObserver {
     
     public void saveSettingsEventObserved(IKeyboard keyboard) {
         // Save all settings and attributes to file (stored for next time program launched)
-        if(keyboardID == keyboard.getKeyboardID()) {
-            System.out.println(keyboardName + " - Saving Settings to " + FilePath.CONFIG_PATH.getPath() + fileName + FileExtension.INI.getExtension());
+        if(keyboardID == keyboard.getID()) {
+            System.out.println(keyboardName + " - Saving Settings to " + FilePath.CONFIG.getPath() + fileName + FileExt.INI.getExt());
             try {
-                MyUtilities.FILE_IO_UTILITIES.writeSettingsAndAttributesToFile(FilePath.CONFIG_PATH.getPath(), fileName + FileExtension.INI.getExtension(), this);
+                MyUtilities.FILE_IO_UTILITIES.writeSettingsAndAttributesToFile(FilePath.CONFIG.getPath(), fileName + FileExt.INI.getExt(), this);
                 System.out.println("Save Success");
             } catch (IOException e) {
                 System.out.println("Save Failed");

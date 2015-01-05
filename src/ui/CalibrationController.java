@@ -30,7 +30,7 @@ import utilities.MyUtilities;
 import com.leapmotion.leap.Vector;
 
 import enums.Attribute;
-import enums.KeyboardType;
+import enums.Keyboard;
 
 
 public class CalibrationController extends GraphicsController {
@@ -63,11 +63,11 @@ public class CalibrationController extends GraphicsController {
         fpsTimer = new java.util.Timer();
         fpsTimer.scheduleAtFixedRate(updateFPS, 1000, 1000);
         
-        keyboard = KeyboardType.STANDARD.getKeyboard();
-        registerObserver(KeyboardType.STANDARD.getKeyboard());
-        registerObserver(KeyboardType.LEAP.getKeyboard());
-        registerObserver(KeyboardType.TABLET.getKeyboard());
-        registerObserver(KeyboardType.CONTROLLER.getKeyboard());
+        keyboard = Keyboard.STANDARD.getKeyboard();
+        registerObserver(Keyboard.STANDARD.getKeyboard());
+        registerObserver(Keyboard.LEAP.getKeyboard());
+        registerObserver(Keyboard.TABLET.getKeyboard());
+        registerObserver(Keyboard.CONTROLLER.getKeyboard());
         canvas = new GLCanvas(capabilities);
         canvas.setPreferredSize(new Dimension(keyboard.getWidth(), keyboard.getHeight()));
         canvas.setSize(keyboard.getWidth(), keyboard.getHeight());
@@ -107,7 +107,7 @@ public class CalibrationController extends GraphicsController {
         calibrateButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                if(keyboard == KeyboardType.LEAP.getKeyboard()) {
+                if(keyboard == Keyboard.LEAP.getKeyboard()) {
                     if(keyboard.isCalibrated()) {
                         Object[] options = {"Recalibrate", "Cancel"};
                         int selection =
@@ -143,8 +143,8 @@ public class CalibrationController extends GraphicsController {
                 @SuppressWarnings("unchecked")
                 JComboBox<String> comboBox = (JComboBox<String>)e.getSource();
                 int selectedIndex = comboBox.getSelectedIndex();
-                if(keyboard != KeyboardType.getByID(selectedIndex).getKeyboard()) {
-                    if(KeyboardType.LEAP == KeyboardType.getByID(selectedIndex)) {
+                if(keyboard != Keyboard.getByID(selectedIndex).getKeyboard()) {
+                    if(Keyboard.LEAP == Keyboard.getByID(selectedIndex)) {
                         LeapListener.startListening();
                         //calibrateButton.setVisible(true);
                         calibrateButton.setEnabled(true);
@@ -159,7 +159,7 @@ public class CalibrationController extends GraphicsController {
                     renderOptionsPanel.removeAll();
                     
                     // Add all settings, attributes, and renderables from the new keyboard.
-                    keyboard = KeyboardType.getByID(selectedIndex).getKeyboard();
+                    keyboard = Keyboard.getByID(selectedIndex).getKeyboard();
                     addKeyboardToUI();
                 }
                 frame.requestFocusInWindow();
@@ -217,9 +217,9 @@ public class CalibrationController extends GraphicsController {
         clearTextTimer.stop();
         settingsPanel.removeAll();
         KeyboardAttributes ka = keyboard.getAttributes();
-        settingsPanel.add(ka.getAttributeByName(Attribute.LEAP_PLANE_POINT_A.toString()).getAttributePanel());
-        settingsPanel.add(ka.getAttributeByName(Attribute.LEAP_PLANE_POINT_B.toString()).getAttributePanel());
-        settingsPanel.add(ka.getAttributeByName(Attribute.LEAP_PLANE_POINT_C.toString()).getAttributePanel());
+        settingsPanel.add(ka.getAttribute(Attribute.LEAP_PLANE_POINT_A).getAttributePanel());
+        settingsPanel.add(ka.getAttribute(Attribute.LEAP_PLANE_POINT_B).getAttributePanel());
+        settingsPanel.add(ka.getAttribute(Attribute.LEAP_PLANE_POINT_C).getAttributePanel());
     }
     
     private void finishCalibration() {
@@ -230,14 +230,14 @@ public class CalibrationController extends GraphicsController {
         clearTextTimer.start();
         settingsPanel.removeAll();
         KeyboardAttributes ka = keyboard.getAttributes();
-        settingsPanel.add(ka.getAttributeByName(Attribute.KEYBOARD_WIDTH.toString()).getAttributePanel());
-        settingsPanel.add(ka.getAttributeByName(Attribute.KEYBOARD_HEIGHT.toString()).getAttributePanel());
-        if(keyboard == KeyboardType.STANDARD.getKeyboard()) {
-            settingsPanel.add((JPanel) ka.getAttributeByName(Attribute.KEY_BINDINGS.toString()).getValue());
-        } else if(keyboard == KeyboardType.LEAP.getKeyboard()) {
-            settingsPanel.add(ka.getAttributeByName(Attribute.LEAP_PLANE_POINT_A.toString()).getAttributePanel());
-            settingsPanel.add(ka.getAttributeByName(Attribute.LEAP_PLANE_POINT_B.toString()).getAttributePanel());
-            settingsPanel.add(ka.getAttributeByName(Attribute.LEAP_PLANE_POINT_C.toString()).getAttributePanel());
+        settingsPanel.add(ka.getAttribute(Attribute.KEYBOARD_WIDTH).getAttributePanel());
+        settingsPanel.add(ka.getAttribute(Attribute.KEYBOARD_HEIGHT).getAttributePanel());
+        if(keyboard == Keyboard.STANDARD.getKeyboard()) {
+            settingsPanel.add((JPanel) ka.getAttribute(Attribute.KEY_BINDINGS).getValue());
+        } else if(keyboard == Keyboard.LEAP.getKeyboard()) {
+            settingsPanel.add(ka.getAttribute(Attribute.LEAP_PLANE_POINT_A).getAttributePanel());
+            settingsPanel.add(ka.getAttribute(Attribute.LEAP_PLANE_POINT_B).getAttributePanel());
+            settingsPanel.add(ka.getAttribute(Attribute.LEAP_PLANE_POINT_C).getAttributePanel());
         }
         
         for(KeyboardSetting ks: keyboard.getSettings().getAllSettings()) {
@@ -267,14 +267,14 @@ public class CalibrationController extends GraphicsController {
     
     private void addKeyboardToUI() {
         KeyboardAttributes ka = keyboard.getAttributes();
-        settingsPanel.add(ka.getAttributeByName(Attribute.KEYBOARD_WIDTH.toString()).getAttributePanel());
-        settingsPanel.add(ka.getAttributeByName(Attribute.KEYBOARD_HEIGHT.toString()).getAttributePanel());
-        if(keyboard == KeyboardType.STANDARD.getKeyboard()) {
-            settingsPanel.add((JPanel) ka.getAttributeByName(Attribute.KEY_BINDINGS.toString()).getValue());
-        } else if(keyboard == KeyboardType.LEAP.getKeyboard()) {
-            settingsPanel.add(ka.getAttributeByName(Attribute.LEAP_PLANE_POINT_A.toString()).getAttributePanel());
-            settingsPanel.add(ka.getAttributeByName(Attribute.LEAP_PLANE_POINT_B.toString()).getAttributePanel());
-            settingsPanel.add(ka.getAttributeByName(Attribute.LEAP_PLANE_POINT_C.toString()).getAttributePanel());
+        settingsPanel.add(ka.getAttribute(Attribute.KEYBOARD_WIDTH).getAttributePanel());
+        settingsPanel.add(ka.getAttribute(Attribute.KEYBOARD_HEIGHT).getAttributePanel());
+        if(keyboard == Keyboard.STANDARD.getKeyboard()) {
+            settingsPanel.add((JPanel) ka.getAttribute(Attribute.KEY_BINDINGS).getValue());
+        } else if(keyboard == Keyboard.LEAP.getKeyboard()) {
+            settingsPanel.add(ka.getAttribute(Attribute.LEAP_PLANE_POINT_A).getAttributePanel());
+            settingsPanel.add(ka.getAttribute(Attribute.LEAP_PLANE_POINT_B).getAttributePanel());
+            settingsPanel.add(ka.getAttribute(Attribute.LEAP_PLANE_POINT_C).getAttributePanel());
         }
         
         for(KeyboardSetting ks: keyboard.getSettings().getAllSettings()) {

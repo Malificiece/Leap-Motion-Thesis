@@ -1,6 +1,6 @@
 package enums;
 
-public enum FileExtension {
+public enum FileExt {
     INI(".ini"),
     TXT(".txt"),
     PNG(".png"),
@@ -10,11 +10,11 @@ public enum FileExtension {
 
     private final String extension;
     
-    private FileExtension(String extension) {
+    private FileExt(String extension) {
         this.extension = extension;
     }
     
-    public String getExtension() {
+    public String getExt() {
         return extension;
     }
 }

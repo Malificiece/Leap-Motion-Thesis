@@ -2,7 +2,7 @@ package keyboard.leap;
 
 import javax.media.opengl.GL2;
 
-import enums.FileExtension;
+import enums.FileExt;
 import enums.FileName;
 import keyboard.KeyboardRenderable;
 import keyboard.KeyboardRenderables;
@@ -25,7 +25,8 @@ public class LeapRenderables extends KeyboardRenderables {
     LeapRenderables(LeapKeyboard keyboard) {
         // order here determines render order
         this.addRenderable(new LeapPlane(keyboard));
-        this.addRenderable(new KeyboardImage(FileName.KEYBOARD_DEFAULT_IMAGE_NAME.getName() + FileExtension.PNG.getExtension(), keyboard.getKeyboardFilePath()));
+        this.addRenderable(new KeyboardImage(keyboard.getFileName() + FileName.KEYBOARD_IMAGE.getName() + FileExt.PNG.getExt()));
+        this.addRenderable(new KeyboardImage(keyboard.getFileName() + FileName.KEYBOARD_IMAGE_UPPER.getName() + FileExt.PNG.getExt()));
         this.addRenderable(new VirtualKeyboard(keyboard.getAttributes()));
         this.addRenderable(new KeyboardGestures(keyboard.getAttributes()));
         this.addRenderable(new LeapPoint(keyboard.getAttributes()));

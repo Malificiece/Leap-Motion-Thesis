@@ -1,31 +1,22 @@
 package enums;
 
 public enum Attribute {
-    KEYBOARD_WIDTH("Keyboard Width"),
-    KEYBOARD_HEIGHT("Keyboard Height"),
-    GAP_SIZE("Gap Size"),
-    KEY_WIDTH("Key Width"),
-    KEY_HEIGHT("Key Height"),
-    SPACE_KEY_WIDTH("Space Key Width"),
-    BACK_SPACE_KEY_WIDTH("Backspace Key Width"),
-    SHIFT_KEY_WIDTH("Shift Key Width"),
-    ENTER_KEY_WIDTH("Enter Key Width"),
-    ROW_OFFSETS("Row Offsets"),
-    KEY_ROWS("Key Rows"),
-    NUMBER_OF_KEYS("Number of Keys"),
-    KEY_BINDINGS("Key Bindings"),
-    DIST_TO_CAMERA("Distance to Camera"),
-    LEAP_PLANE_POINT_A("Point A"),
-    LEAP_PLANE_POINT_B("Point B"),
-    LEAP_PLANE_POINT_C("Point C");
-
-    private final String name;
-    
-    private Attribute(String name) {
-        this.name = name;
-    }
-    
-    public String getName() {
-        return name;
-    }
+    KEYBOARD_SIZE,
+    KEYBOARD_WIDTH,
+    KEYBOARD_HEIGHT,
+    GAP_SIZE,
+    KEY_WIDTH,
+    KEY_HEIGHT,
+    SPACE_KEY_WIDTH,
+    BACK_SPACE_KEY_WIDTH,
+    SHIFT_KEY_WIDTH,
+    ENTER_KEY_WIDTH,
+    ROW_OFFSETS,
+    KEY_ROWS,
+    NUMBER_OF_KEYS,
+    KEY_BINDINGS,
+    DIST_TO_CAMERA,
+    LEAP_PLANE_POINT_A,
+    LEAP_PLANE_POINT_B,
+    LEAP_PLANE_POINT_C;
 }

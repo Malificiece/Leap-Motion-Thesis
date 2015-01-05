@@ -19,7 +19,7 @@ import keyboard.KeyboardAttributes;
 import keyboard.KeyboardRenderable;
 
 public class LeapTool extends KeyboardRenderable {
-    private static final String RENDER_NAME = Renderable.LEAP_TOOL.toString();
+    private static final Renderable TYPE = Renderable.LEAP_TOOL;
     private static final int NUM_VERTICIES = 32;
     private static final int NUM_STACKS = 32;
     private static final float DELTA_ANGLE = (float) (2.0f * Math.PI / NUM_VERTICIES);
@@ -41,8 +41,8 @@ public class LeapTool extends KeyboardRenderable {
     private GLUquadric quadric;
     
     public LeapTool(KeyboardAttributes keyboardAttributes) {
-        super(RENDER_NAME);
-        DIST_TO_CAMERA = keyboardAttributes.getAttributeByName(Attribute.DIST_TO_CAMERA.toString()).getValueAsInteger();
+        super(TYPE);
+        DIST_TO_CAMERA = keyboardAttributes.getAttributeAsInteger(Attribute.DIST_TO_CAMERA);
     }
     
     public void createQuadric() {

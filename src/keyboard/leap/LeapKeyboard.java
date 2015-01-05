@@ -10,10 +10,10 @@ import utilities.MyUtilities;
 import com.leapmotion.leap.InteractionBox;
 
 import enums.Attribute;
-import enums.FileExtension;
+import enums.FileExt;
 import enums.FileName;
 import enums.FilePath;
-import enums.GestureType;
+import enums.Gesture;
 import enums.Key;
 import enums.Renderable;
 import enums.Setting;
@@ -35,7 +35,7 @@ import leap.LeapObserver;
 public class LeapKeyboard extends IKeyboard implements LeapObserver, CalibrationObserver {
     public static final int KEYBOARD_ID = 1;
     private static final String KEYBOARD_NAME = "Leap Keyboard";
-    private static final String KEYBOARD_FILE_NAME = FileName.LEAP_NAME.getName();
+    private static final String KEYBOARD_FILE_NAME = FileName.LEAP.getName();
     private static final ReentrantLock LEAP_LOCK = new ReentrantLock();
     private final int DIST_TO_CAMERA;
     private LeapData leapData;
@@ -52,20 +52,20 @@ public class LeapKeyboard extends IKeyboard implements LeapObserver, Calibration
     
     public LeapKeyboard() {
         super(KEYBOARD_ID, KEYBOARD_NAME, KEYBOARD_FILE_NAME);
-        System.out.println(KEYBOARD_NAME + " - Loading Settings from " + FilePath.CONFIG_PATH.getPath() + KEYBOARD_FILE_NAME + FileExtension.INI.getExtension());
+        System.out.println(KEYBOARD_NAME + " - Loading Settings from " + FilePath.CONFIG.getPath() + KEYBOARD_FILE_NAME + FileExt.INI.getExt());
         keyboardAttributes = new LeapAttributes(this);
         keyboardSettings = new LeapSettings(this);
         System.out.println("-------------------------------------------------------");
         keyboardRenderables = new LeapRenderables(this);
-        keyboardWidth = keyboardAttributes.getAttributeByName(Attribute.KEYBOARD_WIDTH.toString());
-        keyboardHeight = keyboardAttributes.getAttributeByName(Attribute.KEYBOARD_HEIGHT.toString());
-        DIST_TO_CAMERA = keyboardAttributes.getAttributeByName(Attribute.DIST_TO_CAMERA.toString()).getValueAsInteger();
-        virtualKeyboard = (VirtualKeyboard) keyboardRenderables.getRenderableByName(Renderable.VIRTUAL_KEYS.toString());
-        leapPoint = (LeapPoint) keyboardRenderables.getRenderableByName(Renderable.LEAP_POINT.toString());
-        leapTool = (LeapTool) keyboardRenderables.getRenderableByName(Renderable.LEAP_TOOL.toString());
-        keyboardGestures = (KeyboardGestures) keyboardRenderables.getRenderableByName(Renderable.KEYBOARD_GESTURES.toString());
-        leapTrail = (LeapTrail) keyboardRenderables.getRenderableByName(Renderable.LEAP_TRAIL.toString());
-        leapPlane = (LeapPlane) keyboardRenderables.getRenderableByName(Renderable.LEAP_PLANE.toString());
+        keyboardWidth = keyboardAttributes.getAttribute(Attribute.KEYBOARD_WIDTH);
+        keyboardHeight = keyboardAttributes.getAttribute(Attribute.KEYBOARD_HEIGHT);
+        DIST_TO_CAMERA = keyboardAttributes.getAttribute(Attribute.DIST_TO_CAMERA).getValueAsInteger();
+        virtualKeyboard = (VirtualKeyboard) keyboardRenderables.getRenderable(Renderable.VIRTUAL_KEYS);
+        leapPoint = (LeapPoint) keyboardRenderables.getRenderable(Renderable.LEAP_POINT);
+        leapTool = (LeapTool) keyboardRenderables.getRenderable(Renderable.LEAP_TOOL);
+        keyboardGestures = (KeyboardGestures) keyboardRenderables.getRenderable(Renderable.KEYBOARD_GESTURES);
+        leapTrail = (LeapTrail) keyboardRenderables.getRenderable(Renderable.LEAP_TRAIL);
+        leapPlane = (LeapPlane) keyboardRenderables.getRenderable(Renderable.LEAP_PLANE);
         leapPlane.registerObserver(this);
         if(!leapPlane.isCalibrated()) {
             leapPoint.blockAccess(true);
@@ -84,7 +84,7 @@ public class LeapKeyboard extends IKeyboard implements LeapObserver, Calibration
         leapTool.blockAccess(true);
         keyboardGestures.blockAccess(true);
         virtualKeyboard.blockAccess(true);
-        keyboardRenderables.getRenderableByName(Renderable.KEYBOARD_IMAGE.toString()).blockAccess(true);
+        keyboardRenderables.getRenderable(Renderable.KEYBOARD_IMAGE).blockAccess(true);
         leapPlane.beginCalibration(textPanel);
     }
 
@@ -94,7 +94,7 @@ public class LeapKeyboard extends IKeyboard implements LeapObserver, Calibration
         leapTool.grantAccess(true);
         keyboardGestures.grantAccess(true);
         virtualKeyboard.grantAccess(true);
-        keyboardRenderables.getRenderableByName(Renderable.KEYBOARD_IMAGE.toString()).grantAccess(true);
+        keyboardRenderables.getRenderable(Renderable.KEYBOARD_IMAGE).grantAccess(true);
         isCalibrated = true;
         notifyListenersCalibrationFinished();
     }
@@ -130,7 +130,7 @@ public class LeapKeyboard extends IKeyboard implements LeapObserver, Calibration
                             keyPressed = vKey.getKey().toUpper();
                             shiftDown = false;
                         } else {
-                            keyPressed = vKey.getKey().getKeyValue();   
+                            keyPressed = vKey.getKey().getValue();   
                         }
                         notifyListenersKeyEvent();
                     } else {
@@ -179,8 +179,8 @@ public class LeapKeyboard extends IKeyboard implements LeapObserver, Calibration
         private KeyboardGesture gesture;
         
         public LeapGestures() {
-            GESTURE_SWIPE_MIN_LENGTH = keyboardSettings.getSettingByName(Setting.GESTURE_SWIPE_MIN_LENGTH.toString());
-            GESTURE_SWIPE_MIN_VELOCITY = keyboardSettings.getSettingByName(Setting.GESTURE_SWIPE_MIN_VELOCITY.toString());
+            GESTURE_SWIPE_MIN_LENGTH = keyboardSettings.getSetting(Setting.GESTURE_SWIPE_MIN_LENGTH);
+            GESTURE_SWIPE_MIN_VELOCITY = keyboardSettings.getSetting(Setting.GESTURE_SWIPE_MIN_VELOCITY);
         }
         
         public void update() {
@@ -217,7 +217,7 @@ public class LeapKeyboard extends IKeyboard implements LeapObserver, Calibration
             else {
                 if(leapTool.getVelocity().magnitude() >= GESTURE_SWIPE_MIN_VELOCITY.getValue()) {
                     detectingSwipeGesture = true;
-                    gesture = new KeyboardGesture(leapPoint.getNormalizedPoint(), GestureType.SWIPE);
+                    gesture = new KeyboardGesture(leapPoint.getNormalizedPoint(), Gesture.SWIPE);
                 }
             }
         }

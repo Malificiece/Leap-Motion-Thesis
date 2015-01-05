@@ -14,14 +14,14 @@ import ui.GraphicsController;
 
 import com.leapmotion.leap.Vector;
 
-import enums.GestureType;
+import enums.Gesture;
 import enums.Renderable;
 import keyboard.KeyboardAttributes;
 import keyboard.KeyboardGesture;
 import keyboard.KeyboardRenderable;
 
 public class KeyboardGestures extends KeyboardRenderable {
-    private static final String RENDER_NAME = Renderable.KEYBOARD_GESTURES.toString();
+    private static final Renderable TYPE = Renderable.KEYBOARD_GESTURES;
     private static final int NUM_VERTICIES = 32;
     private static final int NUM_STACKS = 32;
     private static final float DELTA_ANGLE = (float) (2.0f * Math.PI / NUM_VERTICIES);
@@ -33,7 +33,7 @@ public class KeyboardGestures extends KeyboardRenderable {
     private ArrayList<KeyboardGesture> gestures = new ArrayList<KeyboardGesture>();
 
     public KeyboardGestures(KeyboardAttributes keyboardAttributes) {
-        super(RENDER_NAME);
+        super(TYPE);
     }
     
     public void createQuadric() {
@@ -76,7 +76,7 @@ public class KeyboardGestures extends KeyboardRenderable {
         if(isEnabled()) {
             for(KeyboardGesture gesture: gestures) {
                 gl.glPushMatrix();
-                if(gesture.getType() == GestureType.SWIPE) {
+                if(gesture.getType() == Gesture.SWIPE) {
                     gl.glEnable(GL_LIGHTING);
                     gl.glEnable(GL_CULL_FACE);
                     COLOR[3] = gesture.getOpacity();

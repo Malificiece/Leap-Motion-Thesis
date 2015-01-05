@@ -2,7 +2,7 @@ package keyboard.standard;
 
 import javax.media.opengl.GL2;
 
-import enums.FileExtension;
+import enums.FileExt;
 import enums.FileName;
 import keyboard.KeyboardRenderable;
 import keyboard.KeyboardRenderables;
@@ -15,7 +15,7 @@ public class StandardRenderables extends KeyboardRenderables {
 
     StandardRenderables(StandardKeyboard keyboard) {
         // order here determines render order
-        this.addRenderable(new KeyboardImage(FileName.KEYBOARD_DEFAULT_IMAGE_NAME.getName() + FileExtension.PNG.getExtension(), keyboard.getKeyboardFilePath()));
+        this.addRenderable(new KeyboardImage( keyboard.getFileName() + FileName.KEYBOARD_IMAGE_UPPER.getName() + FileExt.PNG.getExt()));
         this.addRenderable(new VirtualKeyboard(keyboard.getAttributes()));
     }
 

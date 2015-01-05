@@ -13,7 +13,7 @@ import javax.swing.KeyStroke;
 
 import utilities.MyUtilities;
 import enums.Attribute;
-import enums.FileExtension;
+import enums.FileExt;
 import enums.FileName;
 import enums.FilePath;
 import enums.Renderable;
@@ -25,7 +25,7 @@ import keyboard.renderables.VirtualKeyboard;
 public class StandardKeyboard extends IKeyboard {
     public static final int KEYBOARD_ID = 0;
     private static final String KEYBOARD_NAME = "Standard Keyboard";
-    private static final String KEYBOARD_FILE_NAME = FileName.STANDARD_NAME.getName();
+    private static final String KEYBOARD_FILE_NAME = FileName.STANDARD.getName();
     private VirtualKeyboard virtualKeyboard;
     private KeyBindings keyBindings;
     private boolean shiftDown = false;
@@ -33,16 +33,16 @@ public class StandardKeyboard extends IKeyboard {
     
     public StandardKeyboard() {
         super(KEYBOARD_ID, KEYBOARD_NAME, KEYBOARD_FILE_NAME);
-        System.out.println(KEYBOARD_NAME + " - Loading Settings from " + FilePath.CONFIG_PATH.getPath() + KEYBOARD_FILE_NAME + FileExtension.INI.getExtension());
+        System.out.println(KEYBOARD_NAME + " - Loading Settings from " + FilePath.CONFIG.getPath() + KEYBOARD_FILE_NAME + FileExt.INI.getExt());
         keyboardAttributes = new StandardAttributes(this);
         keyboardSettings = new StandardSettings(this);
         System.out.println("-------------------------------------------------------");
         keyboardRenderables = new StandardRenderables(this);
-        keyboardWidth = keyboardAttributes.getAttributeByName(Attribute.KEYBOARD_WIDTH.toString());
-        keyboardHeight = keyboardAttributes.getAttributeByName(Attribute.KEYBOARD_HEIGHT.toString());
-        virtualKeyboard = (VirtualKeyboard) keyboardRenderables.getRenderableByName(Renderable.VIRTUAL_KEYS.toString());
+        keyboardWidth = keyboardAttributes.getAttribute(Attribute.KEYBOARD_WIDTH);
+        keyboardHeight = keyboardAttributes.getAttribute(Attribute.KEYBOARD_HEIGHT);
+        virtualKeyboard = (VirtualKeyboard) keyboardRenderables.getRenderable(Renderable.VIRTUAL_KEYS);
         keyBindings = new KeyBindings();
-        keyboardAttributes.addAttribute(new KeyboardAttribute(this, Attribute.KEY_BINDINGS.toString(), keyBindings));
+        keyboardAttributes.addAttribute(new KeyboardAttribute(this, Attribute.KEY_BINDINGS, keyBindings));
     }
     
     @Override
@@ -90,27 +90,27 @@ public class StandardKeyboard extends IKeyboard {
             InputMap inputMap = getInputMap(condition);
             
             for(int i = 0; i < Key.getSize(); i++) {
-                Key k = Key.getByIndex(i);
-                if(k != Key.VK_NULL || k != Key.VK_SHIFT_RELEASED) {
+                Key key = Key.getByIndex(i);
+                if(key != Key.VK_NULL || key != Key.VK_SHIFT_RELEASED) {
                     // Add normal keys to input map
-                    if(k != Key.VK_SHIFT) {
-                        inputMap.put(KeyStroke.getKeyStroke(k.getKeyCode(), 0), k.getKeyName());
+                    if(key != Key.VK_SHIFT) {
+                        inputMap.put(KeyStroke.getKeyStroke(key.getCode(), 0), key.getName());
                     }
                     
                     // Add shifted keys to input map
-                    inputMap.put(KeyStroke.getKeyStroke(k.getKeyCode(), KeyEvent.SHIFT_DOWN_MASK, false), k.getKeyName() + Key.VK_SHIFT.getKeyName());
+                    inputMap.put(KeyStroke.getKeyStroke(key.getCode(), KeyEvent.SHIFT_DOWN_MASK, false), key.getName() + Key.VK_SHIFT.getName());
                     
                     // Add normal keys to action map
-                    if(k != Key.VK_SHIFT) {
-                        actionMap.put(k.getKeyName(), new KeyAction(k.getKeyValue()));
+                    if(key != Key.VK_SHIFT) {
+                        actionMap.put(key.getName(), new KeyAction(key.getValue()));
                     }
                     
                     // Add shifted keys to action map
-                    actionMap.put(k.getKeyName() + Key.VK_SHIFT.getKeyName(), new KeyAction(k.toUpper()));
+                    actionMap.put(key.getName() + Key.VK_SHIFT.getName(), new KeyAction(key.toUpper()));
                 }
             }
-            inputMap.put(KeyStroke.getKeyStroke(Key.VK_SHIFT.getKeyCode(), 0, true), Key.VK_SHIFT_RELEASED.getKeyName());
-            actionMap.put(Key.VK_SHIFT_RELEASED.getKeyName(), new KeyAction(Key.VK_SHIFT_RELEASED.getKeyValue()));
+            inputMap.put(KeyStroke.getKeyStroke(Key.VK_SHIFT.getCode(), 0, true), Key.VK_SHIFT_RELEASED.getName());
+            actionMap.put(Key.VK_SHIFT_RELEASED.getName(), new KeyAction(Key.VK_SHIFT_RELEASED.getValue()));
         }
         
         private class KeyAction extends AbstractAction {

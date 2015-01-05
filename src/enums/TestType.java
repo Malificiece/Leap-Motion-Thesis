@@ -24,11 +24,11 @@ public enum TestType {
         this.handUsed = handUsed;
     }
     
-    public int getTestID() {
+    public int getID() {
         return testID;
     }
     
-    public String getTestName() {
+    public String getName() {
         return testName;
     }
     
@@ -49,7 +49,7 @@ public enum TestType {
     
     public static TestType getByName(String testName) {
         for(int i = 0; i < SIZE; i++) {
-            if(VALUES[i].getTestName().equalsIgnoreCase(testName)) return VALUES[i];
+            if(VALUES[i].getName().equalsIgnoreCase(testName)) return VALUES[i];
         }
         return null;
     }

@@ -1,6 +1,6 @@
 package enums;
 
-public enum GestureType {
+public enum Gesture {
     SWIPE,
     CIRCLE;
 }

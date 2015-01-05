@@ -13,7 +13,7 @@ import java.util.TreeMap;
 
 import com.leapmotion.leap.Vector;
 
-import enums.FileExtension;
+import enums.FileExt;
 import enums.FileName;
 import enums.FilePath;
 import keyboard.IKeyboard;
@@ -28,7 +28,7 @@ public class FileUtilities {
         File file;
         Path path;
         //Create data folder if it doesn't already exist.
-        path = FileSystems.getDefault().getPath(FilePath.DATA_PATH.getPath());
+        path = FileSystems.getDefault().getPath(FilePath.DATA.getPath());
         if(!Files.exists(path)) {
             file = path.toFile();
             file.mkdirs();
@@ -36,13 +36,13 @@ public class FileUtilities {
         
         // Create config/settings path/files if they don't exist.
         // Create config folder.
-        path = FileSystems.getDefault().getPath(FilePath.CONFIG_PATH.getPath());
+        path = FileSystems.getDefault().getPath(FilePath.CONFIG.getPath());
         if(!Files.exists(path)) {
             file = path.toFile();
             file.mkdirs();
         }
         // Create standard.ini
-        path = FileSystems.getDefault().getPath(FilePath.CONFIG_PATH.getPath(), FileName.STANDARD_NAME.getName() + FileExtension.INI.getExtension());
+        path = FileSystems.getDefault().getPath(FilePath.CONFIG.getPath(), FileName.STANDARD.getName() + FileExt.INI.getExt());
         if(!Files.exists(path)) {
             file = path.toFile();
             try {
@@ -50,7 +50,7 @@ public class FileUtilities {
             } catch (IOException e) {e.printStackTrace();}
         }
         // Create leap.ini
-        path = FileSystems.getDefault().getPath(FilePath.CONFIG_PATH.getPath(), FileName.LEAP_NAME.getName() + FileExtension.INI.getExtension());
+        path = FileSystems.getDefault().getPath(FilePath.CONFIG.getPath(), FileName.LEAP.getName() + FileExt.INI.getExt());
         if(!Files.exists(path)) {
             file = path.toFile();
             try {
@@ -58,7 +58,7 @@ public class FileUtilities {
             } catch (IOException e) {e.printStackTrace();}
         }
         // Create controller.ini
-        path = FileSystems.getDefault().getPath(FilePath.CONFIG_PATH.getPath(), FileName.CONTROLLER_NAME.getName() + FileExtension.INI.getExtension());
+        path = FileSystems.getDefault().getPath(FilePath.CONFIG.getPath(), FileName.CONTROLLER.getName() + FileExt.INI.getExt());
         if(!Files.exists(path)) {
             file = path.toFile();
             try {
@@ -66,7 +66,7 @@ public class FileUtilities {
             } catch (IOException e) {e.printStackTrace();}
         }
         // Create tablet.ini
-        path = FileSystems.getDefault().getPath(FilePath.CONFIG_PATH.getPath(), FileName.TABLET_NAME.getName() + FileExtension.INI.getExtension());
+        path = FileSystems.getDefault().getPath(FilePath.CONFIG.getPath(), FileName.TABLET.getName() + FileExt.INI.getExt());
         if(!Files.exists(path)) {
             file = path.toFile();
             try {
@@ -171,11 +171,11 @@ public class FileUtilities {
         parseAndStoreData(savedData, file);
         
         // Change the setting specified.
-        savedData.put(keyboardSetting.getName(), Double.toString(keyboardSetting.getValue()));
+        savedData.put(keyboardSetting.getType().name(), Double.toString(keyboardSetting.getValue()));
         
         // Rewrite settings to file.
         writeDataToFile(file, savedData, false);
-        System.out.println(keyboardSetting.getName() + ": " +  Double.toString(keyboardSetting.getValue()));
+        System.out.println(keyboardSetting.getType().name() + ": " +  Double.toString(keyboardSetting.getValue()));
     }
     
     public void writeSettingsToFile(String filePath, String fileName, KeyboardSettings keyboardSettings) throws IOException {
@@ -188,7 +188,7 @@ public class FileUtilities {
         
         // Change all of the setting's values.
         for(KeyboardSetting keyboardSetting: keyboardSettings.getAllSettings()) {
-            savedData.put(keyboardSetting.getName(), Double.toString(keyboardSetting.getValue()));
+            savedData.put(keyboardSetting.getType().name(), Double.toString(keyboardSetting.getValue()));
         }
         
         // Rewrite settings to file.
@@ -221,11 +221,11 @@ public class FileUtilities {
             parseAndStoreData(savedData, file);
             
             // Change the attribute specified.
-            savedData.put(keyboardAttribute.getName(), keyboardAttribute.getValue().toString());
+            savedData.put(keyboardAttribute.getType().name(), keyboardAttribute.getValue().toString());
             
             // Rewrite attributes to file.
             writeDataToFile(file, savedData, false);
-            System.out.println(keyboardAttribute.getName() + ": " +  keyboardAttribute.getValue());
+            System.out.println(keyboardAttribute.getType().name() + ": " +  keyboardAttribute.getValue());
         }
     }
     
@@ -240,7 +240,7 @@ public class FileUtilities {
             // Change all of the attributes values.
             for(KeyboardAttribute keyboardAttribute: keyboardAttributes.getAllAttributes()) {
                 if(keyboardAttribute.getValueAsInteger() != null || keyboardAttribute.getValueAsVector() != null) {
-                    savedData.put(keyboardAttribute.getName(), keyboardAttribute.getValue().toString());
+                    savedData.put(keyboardAttribute.getType().name(), keyboardAttribute.getValue().toString());
                 }
             }
             
@@ -260,11 +260,11 @@ public class FileUtilities {
         // Change all of the data's values.
         for(KeyboardAttribute keyboardAttribute: keyboard.getAttributes().getAllAttributes()) {
             if(keyboardAttribute.getValueAsInteger() != null || keyboardAttribute.getValueAsVector() != null) {
-                savedData.put(keyboardAttribute.getName(), keyboardAttribute.getValue().toString());
+                savedData.put(keyboardAttribute.getType().name(), keyboardAttribute.getValue().toString());
             }
         }
         for(KeyboardSetting keyboardSetting: keyboard.getSettings().getAllSettings()) {
-            savedData.put(keyboardSetting.getName(), Double.toString(keyboardSetting.getValue()));
+            savedData.put(keyboardSetting.getType().name(), Double.toString(keyboardSetting.getValue()));
         }
         
         // Rewrite data to file.

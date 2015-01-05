@@ -17,7 +17,7 @@ import com.leapmotion.leap.InteractionBox;
 import com.leapmotion.leap.Vector;
 
 import enums.Attribute;
-import enums.FileExtension;
+import enums.FileExt;
 import enums.FilePath;
 import enums.Renderable;
 import enums.Setting;
@@ -30,7 +30,7 @@ import keyboard.KeyboardSetting;
 import leap.LeapPlaneCalibrator;
 
 public class LeapPlane extends KeyboardRenderable {
-    private static final String RENDER_NAME = Renderable.LEAP_PLANE.toString();
+    private static final Renderable TYPE = Renderable.LEAP_PLANE;
     private static final float[] COLOR = {0.4f, 0.7f, 1f, 1f};
     private static final float[] ACTIVE_COLOR = {1f, 0f, 0f, 1f};
     private static final float[] BLACK = {0f, 0f, 0f, 1f};
@@ -78,15 +78,15 @@ public class LeapPlane extends KeyboardRenderable {
     private boolean removeTool = false;
     
     public LeapPlane(IKeyboard keyboard) {
-        super(RENDER_NAME);
-        KEYBOARD_WIDTH = keyboard.getAttributes().getAttributeByName(Attribute.KEYBOARD_WIDTH.toString()).getValueAsInteger();
-        KEYBOARD_HEIGHT = keyboard.getAttributes().getAttributeByName(Attribute.KEYBOARD_HEIGHT.toString()).getValueAsInteger();
-        DIST_TO_CAMERA = keyboard.getAttributes().getAttributeByName(Attribute.DIST_TO_CAMERA.toString()).getValueAsInteger();
-        TOUCH_THRESHOLD = keyboard.getSettings().getSettingByName(Setting.TOUCH_THRESHOLD.toString());
-        FILE_NAME = keyboard.getKeyboardFileName();
-        POINT_A_ATTRIBUTE = keyboard.getAttributes().getAttributeByName(Attribute.LEAP_PLANE_POINT_A.toString());
-        POINT_B_ATTRIBUTE = keyboard.getAttributes().getAttributeByName(Attribute.LEAP_PLANE_POINT_B.toString());
-        POINT_C_ATTRIBUTE = keyboard.getAttributes().getAttributeByName(Attribute.LEAP_PLANE_POINT_C.toString());
+        super(TYPE);
+        KEYBOARD_WIDTH = keyboard.getAttributes().getAttributeAsInteger(Attribute.KEYBOARD_WIDTH);
+        KEYBOARD_HEIGHT = keyboard.getAttributes().getAttributeAsInteger(Attribute.KEYBOARD_HEIGHT);
+        DIST_TO_CAMERA = keyboard.getAttributes().getAttributeAsInteger(Attribute.DIST_TO_CAMERA);
+        TOUCH_THRESHOLD = keyboard.getSettings().getSetting(Setting.TOUCH_THRESHOLD);
+        FILE_NAME = keyboard.getFileName();
+        POINT_A_ATTRIBUTE = keyboard.getAttributes().getAttribute(Attribute.LEAP_PLANE_POINT_A);
+        POINT_B_ATTRIBUTE = keyboard.getAttributes().getAttribute(Attribute.LEAP_PLANE_POINT_B);
+        POINT_C_ATTRIBUTE = keyboard.getAttributes().getAttribute(Attribute.LEAP_PLANE_POINT_C);
         getPlaneAttributes();
         if(!pointA.equals(Vector.zero()) && !pointB.equals(Vector.zero()) && !pointC.equals(Vector.zero())) {
             isCalibrated = true;
@@ -140,10 +140,10 @@ public class LeapPlane extends KeyboardRenderable {
         
         // Write the newly calibrated coordinates to file.
         try {
-            System.out.println("Saving calibrated Leap Motion Interaction Plane points to " + FilePath.CONFIG_PATH.getPath() + FILE_NAME + FileExtension.INI.getExtension());
-            MyUtilities.FILE_IO_UTILITIES.writeAttributeToFile(FilePath.CONFIG_PATH.getPath(), FILE_NAME + FileExtension.INI.getExtension(), POINT_A_ATTRIBUTE);
-            MyUtilities.FILE_IO_UTILITIES.writeAttributeToFile(FilePath.CONFIG_PATH.getPath(), FILE_NAME + FileExtension.INI.getExtension(), POINT_B_ATTRIBUTE);
-            MyUtilities.FILE_IO_UTILITIES.writeAttributeToFile(FilePath.CONFIG_PATH.getPath(), FILE_NAME + FileExtension.INI.getExtension(), POINT_C_ATTRIBUTE);
+            System.out.println("Saving calibrated Leap Motion Interaction Plane points to " + FilePath.CONFIG.getPath() + FILE_NAME + FileExt.INI.getExt());
+            MyUtilities.FILE_IO_UTILITIES.writeAttributeToFile(FilePath.CONFIG.getPath(), FILE_NAME + FileExt.INI.getExt(), POINT_A_ATTRIBUTE);
+            MyUtilities.FILE_IO_UTILITIES.writeAttributeToFile(FilePath.CONFIG.getPath(), FILE_NAME + FileExt.INI.getExt(), POINT_B_ATTRIBUTE);
+            MyUtilities.FILE_IO_UTILITIES.writeAttributeToFile(FilePath.CONFIG.getPath(), FILE_NAME + FileExt.INI.getExt(), POINT_C_ATTRIBUTE);
             System.out.println("Save Success");
         } catch (IOException e) {
             System.out.println("Save Failure. Try using the \"Save Settings\" button to save calibration to file.");

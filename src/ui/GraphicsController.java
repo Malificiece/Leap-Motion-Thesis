@@ -17,7 +17,7 @@ import static javax.media.opengl.GL2.*; // GL2 constants
 import com.jogamp.opengl.util.gl2.GLUT;
 import com.leapmotion.leap.Vector;
 
-import enums.KeyboardType;
+import enums.Keyboard;
 
 
 public abstract class GraphicsController implements GLEventListener, KeyboardObserver {
@@ -64,10 +64,10 @@ public abstract class GraphicsController implements GLEventListener, KeyboardObs
         gl.setSwapInterval(1);
         
         // TODO: Make sure this is where I want to register observers.
-        KeyboardType.STANDARD.getKeyboard().registerObserver(this);
-        KeyboardType.LEAP.getKeyboard().registerObserver(this);
-        KeyboardType.TABLET.getKeyboard().registerObserver(this);
-        KeyboardType.CONTROLLER.getKeyboard().registerObserver(this);
+        Keyboard.STANDARD.getKeyboard().registerObserver(this);
+        Keyboard.LEAP.getKeyboard().registerObserver(this);
+        Keyboard.TABLET.getKeyboard().registerObserver(this);
+        Keyboard.CONTROLLER.getKeyboard().registerObserver(this);
 
         gl.glClearColor(1f, 1f, 1f, 0.0f); // set background (clear) color
         gl.glClearDepth(1.0f);      // set clear depth value to farthest

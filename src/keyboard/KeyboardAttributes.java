@@ -5,27 +5,41 @@ import java.util.TreeMap;
 
 import com.leapmotion.leap.Vector;
 
+import enums.Attribute;
+
 public abstract class KeyboardAttributes {
-    private TreeMap<String, KeyboardAttribute> keyboardAttributes = new TreeMap<String, KeyboardAttribute>();
+    private TreeMap<Attribute, KeyboardAttribute> keyboardAttributes = new TreeMap<Attribute, KeyboardAttribute>();
     
     public void addAttribute(KeyboardAttribute attribute) {
-        keyboardAttributes.put(attribute.getName(), attribute);
+        keyboardAttributes.put(attribute.getType(), attribute);
     }
     
-    public KeyboardAttribute getAttributeByName(String name) {
-        return keyboardAttributes.get(name);
+    public KeyboardAttribute getAttribute(Attribute attribute) {
+        return keyboardAttributes.get(attribute);
     }
     
-    public Object getValueByName(String name) {
-        return keyboardAttributes.get(name).getValue();
+    public Object getAttributeValue(Attribute attribute) {
+        KeyboardAttribute ka = keyboardAttributes.get(attribute);
+        if(ka != null) {
+            return ka.getValue();
+        }
+        return null;
     }
     
-    public Integer getValueByNameAsInteger(String name) {
-        return keyboardAttributes.get(name).getValueAsInteger();
+    public Integer getAttributeAsInteger(Attribute attribute) {
+        KeyboardAttribute ka = keyboardAttributes.get(attribute);
+        if(ka != null) {
+            return ka.getValueAsInteger();
+        }
+        return null;
     }
     
-    public Vector getValueByNameAsVector(String name) {
-        return keyboardAttributes.get(name).getValueAsVector();
+    public Vector getAttributeAsVector(Attribute attribute) {
+        KeyboardAttribute ka = keyboardAttributes.get(attribute);
+        if(ka != null) {
+            return ka.getValueAsVector();
+        }
+        return null;
     }
     
     public ArrayList<KeyboardAttribute> getAllAttributes() {

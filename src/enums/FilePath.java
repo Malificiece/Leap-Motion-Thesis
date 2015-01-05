@@ -1,13 +1,13 @@
 package enums;
 
 public enum FilePath {
-    ASSETS_PATH("./assets/"),
-    CONFIG_PATH("./config/"),
-    DATA_PATH("./data/"),
-    STANDARD_PATH("standard/"),
-    LEAP_PATH("leap/"),
-    TABLET_PATH("tablet/"),
-    CONTROLLER_PATH("controller/");
+    ASSETS("./assets/"),
+    CONFIG("./config/"),
+    DATA("./data/");
+    //STANDARD("standard/"),
+    //LEAP("leap/"),
+    //TABLET("tablet/"),
+    //CONTROLLER("controller/");
 
     private final String path;
     

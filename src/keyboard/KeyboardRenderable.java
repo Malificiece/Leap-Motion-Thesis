@@ -11,14 +11,16 @@ import javax.swing.JCheckBox;
 import javax.swing.JPanel;
 import javax.swing.JRootPane;
 
+import enums.Renderable;
+
 public abstract class KeyboardRenderable {
-    private String name;
+    private Renderable renderable;
     private Boolean enabled = true;
     private JPanel renderablePanel;
     private JCheckBox renderableCheckBox;
     
-    public KeyboardRenderable(String name) {
-        this.name = name;
+    public KeyboardRenderable(Renderable renderable) {
+        this.renderable = renderable;
         createCheckboxPanel();
     }
     
@@ -44,8 +46,8 @@ public abstract class KeyboardRenderable {
         return enabled;
     }
     
-    public String getName() {
-        return name;
+    public Renderable getType() {
+        return renderable;
     }
     
     public JPanel getRenderablePanel() {
@@ -56,7 +58,7 @@ public abstract class KeyboardRenderable {
     
     private void createCheckboxPanel() {
         renderablePanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        renderableCheckBox = new JCheckBox(name);
+        renderableCheckBox = new JCheckBox(renderable.name());
         renderableCheckBox.setSelected(true);
         renderableCheckBox.addItemListener(new ItemListener() {
             @Override
