@@ -5,22 +5,42 @@ import java.awt.event.ActionListener;
 
 import com.leapmotion.leap.Vector;
 
+import enums.Color;
 import enums.Key;
+import static javax.media.opengl.GL2.*;
 
 import javax.media.opengl.GL2;
 import javax.swing.Timer;
 
+import utilities.GLColor;
+
 public class VirtualKey {
-    private final static float[] ACTIVE_COLOR = {0f, 1f, 0f, 0.5f};
-    private final static float[] HOVER_COLOR = {1f, 1f, 0f, 0.5f};
-    private final static float[] NONE_COLOR = {1f, 0f, 0f, 0.5f};
+    private static enum KeyState {
+        ACTIVE(Color.GREEN),
+        HOVER(Color.YELLOW),
+        NONE(Color.RED);
+        
+        private final GLColor color;
+        
+        private KeyState(Color color) {
+            this.color = new GLColor(color);
+        }
+        
+        public void glColor(GL2 gl) {
+            color.glColor(gl);
+        }
+        
+        public void setAlpha(float alpha) {
+            color.setAlpha(alpha);
+        }
+    };
     private Vector max;
     private Vector min; // also equivalent to location (not center)
     private int width;
     private int height;
     private Key key;
-    private float[] color;
     private Timer lightUpKeyTimer;
+    private KeyState keyState;
     
     public VirtualKey(float x, float y, float width, float height, Key key) {
         min = new Vector(x, y, 0);
@@ -28,40 +48,32 @@ public class VirtualKey {
         this.width = (int)width;
         this.height = (int)height;
         this.key = key;
-        color = NONE_COLOR;
+        keyState = KeyState.NONE;
         
         lightUpKeyTimer = new Timer(100, new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 lightUpKeyTimer.stop();
-                color = NONE_COLOR;
+                keyState = KeyState.NONE;
             }
         });
     }
     
     public void pressed() {
-        color = ACTIVE_COLOR;
+        keyState = KeyState.ACTIVE;
         lightUpKeyTimer.restart();
-    }
-    
-    public void render(GL2 gl) {
-        gl.glPushMatrix();
-        gl.glColor4fv(color, 0);
-        gl.glTranslatef(min.getX(), min.getY(), min.getZ());
-        gl.glRecti(0, 0, width, height);
-        gl.glPopMatrix();
     }
     
     public boolean isHovering(Vector point) {
         if(max.getX() < point.getX() || max.getY() < point.getY()) {
-            color = NONE_COLOR;
+            keyState = KeyState.NONE;
             return false;
         }
         if(min.getX() > point.getX() || min.getY() > point.getY()) {
-            color = NONE_COLOR;
+            keyState = KeyState.NONE;
             return false;
         }
-        color = HOVER_COLOR;
+        keyState = KeyState.HOVER;
         return true;
     }
     
@@ -70,6 +82,45 @@ public class VirtualKey {
     }
     
     public void clear() {
-        color = NONE_COLOR;
+        keyState = KeyState.NONE;
+    }
+    
+    public void render(GL2 gl) {
+        gl.glPushMatrix();
+        gl.glNormal3f(0, 0, 1);
+        gl.glTranslatef(min.getX(), min.getY(), min.getZ());
+        keyState.setAlpha(0.3f);
+        keyState.glColor(gl);
+        drawRectangle(gl);
+        gl.glPopMatrix();
+    }
+    
+    private void drawRectangle(GL2 gl) {
+        // Draw the key.
+        gl.glBegin(GL_TRIANGLES);
+        gl.glVertex3i(0, 0, 0);
+        gl.glVertex3i(width, 0, 0);
+        gl.glVertex3i(0, height, 0);
+        
+        gl.glVertex3i(width, height, 0);
+        gl.glVertex3i(width, 0, 0);
+        gl.glVertex3i(0, height, 0);
+        gl.glEnd();
+        
+        if(keyState != KeyState.NONE) {
+            drawHighlight(gl);
+        }
+    }
+    
+    private void drawHighlight(GL2 gl) {
+        keyState.setAlpha(0.8f);
+        keyState.glColor(gl);
+        gl.glLineWidth(3);
+        gl.glBegin(GL_LINE_LOOP);
+        gl.glVertex3i(0, 0, 0);
+        gl.glVertex3i(0, height, 0);
+        gl.glVertex3i(width, height, 0);
+        gl.glVertex3i(width, 0, 0);
+        gl.glEnd();
     }
 }

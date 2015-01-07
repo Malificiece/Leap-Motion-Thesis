@@ -154,7 +154,7 @@ public class WindowBuilder {
     }
 
     public static void buildCalibrationWindow(JFrame frame,
-            GLCanvas canvas,
+            JPanel canvasPanel,
             JLabel typedLabel,
             JComboBox<String> keyboardTypeComboBox,
             JButton[] buttons, // calibration, settings
@@ -192,7 +192,7 @@ public class WindowBuilder {
         //typedLabel.setAlignmentY(Component.CENTER_ALIGNMENT);
         
         // Build canvas preview.
-        previewBackground.add(canvas);
+        previewBackground.add(canvasPanel);
         
         // Right panel (type selection, settings, and render options).
         JPanel rightPanelSet = new JPanel();
@@ -230,7 +230,6 @@ public class WindowBuilder {
         //calibrateButton.setAlignmentX(Component.CENTER_ALIGNMENT);
         keyboardButtonsPanel.add(buttons[0]);
         keyboardButtonsPanel.add(buttons[1]);
-        buttons[0].setEnabled(false);
         
         // 1.5 - Need a special panel to allow the scrollpanes to be the same size.
         JPanel settingsAndRenderPanel = new JPanel(new GridLayout(2,1));

@@ -8,12 +8,14 @@ import javax.media.opengl.GL2;
 import javax.media.opengl.glu.GLUquadric;
 
 import ui.GraphicsController;
+import utilities.GLColor;
 import utilities.MyUtilities;
 
 import com.leapmotion.leap.Tool;
 import com.leapmotion.leap.Vector;
 
 import enums.Attribute;
+import enums.Color;
 import enums.Renderable;
 import keyboard.KeyboardAttributes;
 import keyboard.KeyboardRenderable;
@@ -21,12 +23,12 @@ import keyboard.KeyboardRenderable;
 public class LeapTool extends KeyboardRenderable {
     private static final Renderable TYPE = Renderable.LEAP_TOOL;
     private static final int NUM_VERTICIES = 32;
-    private static final int NUM_STACKS = 32;
+    private static final int NUM_STACKS = 16;
     private static final float DELTA_ANGLE = (float) (2.0f * Math.PI / NUM_VERTICIES);
     private static final float RADS_TO_DEGREES = (float) (180 / Math.PI);
-    private static final float[] COLOR = {0.85f, 0.7f, 0.41f, 1f};
-    private static final float[] RED = {1f, 1f, 0f, 1f};
-    private final int DIST_TO_CAMERA;
+    private static final GLColor TOOL_COLOR = new GLColor(Color.WOOD);
+    private static final GLColor LINE_COLOR = new GLColor(Color.YELLOW);
+    private final float CAMERA_DISTANCE;
     private float length;
     private float radius;
     private float scaledLength;
@@ -42,16 +44,23 @@ public class LeapTool extends KeyboardRenderable {
     
     public LeapTool(KeyboardAttributes keyboardAttributes) {
         super(TYPE);
-        DIST_TO_CAMERA = keyboardAttributes.getAttributeAsInteger(Attribute.DIST_TO_CAMERA);
+        CAMERA_DISTANCE = keyboardAttributes.getAttributeAsFloat(Attribute.CAMERA_DISTANCE);
     }
     
-    public void createQuadric() {
+    private void createQuadric() {
         GraphicsController.gl.getContext().makeCurrent();
         if(quadric != null) {
             GraphicsController.glu.gluDeleteQuadric(quadric);
         }
         quadric = GraphicsController.glu.gluNewQuadric();
         GraphicsController.glu.gluQuadricNormals(quadric, GL_TRUE);
+    }
+    
+    public void deleteQuadric() {
+        if(quadric != null) {
+            GraphicsController.gl.getContext().makeCurrent();
+            GraphicsController.glu.gluDeleteQuadric(quadric);
+        }
     }
     
     public void setTool(Tool tool) {
@@ -100,8 +109,6 @@ public class LeapTool extends KeyboardRenderable {
     public void render(GL2 gl) {
         if(isEnabled()) {
             gl.glPushMatrix();
-            COLOR[3] = (DIST_TO_CAMERA-tipPoint.getZ())/DIST_TO_CAMERA;
-            gl.glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, COLOR, 0);
             gl.glTranslatef(tipPoint.getX(), tipPoint.getY(), tipPoint.getZ());
             drawDottedLine(gl);
             gl.glRotatef(angleToDirection, axisToDirection.getX(), axisToDirection.getY(), axisToDirection.getZ());
@@ -116,11 +123,18 @@ public class LeapTool extends KeyboardRenderable {
     }
     
     private void drawTool(GL2 gl) {
+        TOOL_COLOR.setAlpha(LINE_COLOR.getAlpha());
+        TOOL_COLOR.glColor(gl);
         gl.glCullFace(GL_FRONT);
+        gl.glNormal3f(tipDirection.getX(), tipDirection.getY(), tipDirection.getZ());
         drawCircle(gl);
         gl.glCullFace(GL_BACK);
+        if(quadric == null) {
+            createQuadric();
+        }
         GraphicsController.glu.gluCylinder(quadric, scaledRadius, scaledRadius, scaledLength, NUM_VERTICIES, NUM_STACKS);
         gl.glTranslatef(0, 0, scaledLength);
+        gl.glNormal3f(-tipDirection.getX(), -tipDirection.getY(), -tipDirection.getZ());
         drawCircle(gl);
         gl.glTranslatef(0, 0, -scaledLength);
     }
@@ -138,8 +152,9 @@ public class LeapTool extends KeyboardRenderable {
     }
     
     private void drawDottedLine(GL2 gl) {
-        RED[3] = COLOR[3];
-        gl.glColor4fv(RED, 0);
+        gl.glNormal3f(0, 0, 1);
+        LINE_COLOR.setAlpha((CAMERA_DISTANCE-tipPoint.getZ())/CAMERA_DISTANCE);
+        LINE_COLOR.glColor(gl);
         gl.glPushAttrib(GL_ENABLE_BIT);
         gl.glLineWidth(2);
         gl.glLineStipple(1, (short) 0xAAAA);

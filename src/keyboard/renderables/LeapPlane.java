@@ -1,5 +1,8 @@
 package keyboard.renderables;
 
+import utilities.GLColor;
+import utilities.Point;
+
 import java.io.IOException;
 import java.util.ArrayList;
 
@@ -8,7 +11,7 @@ import javax.swing.JEditorPane;
 import javax.swing.JPanel;
 
 import static javax.media.opengl.GL.GL_TRIANGLE_FAN;
-import static javax.media.opengl.GL2GL3.GL_QUADS;
+import static javax.media.opengl.GL2GL3.GL_TRIANGLES;
 import ui.GraphicsController;
 import utilities.MyUtilities;
 import static com.jogamp.opengl.util.gl2.GLUT.*;
@@ -17,6 +20,7 @@ import com.leapmotion.leap.InteractionBox;
 import com.leapmotion.leap.Vector;
 
 import enums.Attribute;
+import enums.Color;
 import enums.FileExt;
 import enums.FilePath;
 import enums.Renderable;
@@ -31,16 +35,16 @@ import leap.LeapPlaneCalibrator;
 
 public class LeapPlane extends KeyboardRenderable {
     private static final Renderable TYPE = Renderable.LEAP_PLANE;
-    private static final float[] COLOR = {0.4f, 0.7f, 1f, 1f};
-    private static final float[] ACTIVE_COLOR = {1f, 0f, 0f, 1f};
-    private static final float[] BLACK = {0f, 0f, 0f, 1f};
+    private static final GLColor PLANE_COLOR = new GLColor(Color.CYAN);
+    private static final GLColor CALIB_COLOR = new GLColor(Color.RED);
+    private static final GLColor TEXT_COLOR = new GLColor(Color.BLACK);
     private static final int NUM_VERTICIES = 32;
     private static final float DELTA_ANGLE = (float) (2.0f * Math.PI / NUM_VERTICIES);
     private static final float RADIUS = 10f;
-    private final KeyboardSetting TOUCH_THRESHOLD; // -0.10f; normalized // -10.0f; not normalized
-    private final int KEYBOARD_WIDTH;
-    private final int KEYBOARD_HEIGHT;
-    private final int DIST_TO_CAMERA;
+    private final KeyboardSetting TOUCH_THRESHOLD; // -0.10f; normalized // -10.0f; not normalized for defaults
+    private final Point KEYBOARD_SIZE;
+    private final int BORDER_SIZE;
+    private final float CAMERA_DISTANCE;
     private final KeyboardAttribute POINT_A_ATTRIBUTE;
     private final KeyboardAttribute POINT_B_ATTRIBUTE;
     private final KeyboardAttribute POINT_C_ATTRIBUTE;
@@ -79,9 +83,9 @@ public class LeapPlane extends KeyboardRenderable {
     
     public LeapPlane(IKeyboard keyboard) {
         super(TYPE);
-        KEYBOARD_WIDTH = keyboard.getAttributes().getAttributeAsInteger(Attribute.KEYBOARD_WIDTH);
-        KEYBOARD_HEIGHT = keyboard.getAttributes().getAttributeAsInteger(Attribute.KEYBOARD_HEIGHT);
-        DIST_TO_CAMERA = keyboard.getAttributes().getAttributeAsInteger(Attribute.DIST_TO_CAMERA);
+        KEYBOARD_SIZE = keyboard.getAttributes().getAttributeAsPoint(Attribute.KEYBOARD_SIZE);
+        BORDER_SIZE = keyboard.getAttributes().getAttributeAsInteger(Attribute.BORDER_SIZE);
+        CAMERA_DISTANCE = keyboard.getAttributes().getAttributeAsFloat(Attribute.CAMERA_DISTANCE);
         TOUCH_THRESHOLD = keyboard.getSettings().getSetting(Setting.TOUCH_THRESHOLD);
         FILE_NAME = keyboard.getFileName();
         POINT_A_ATTRIBUTE = keyboard.getAttributes().getAttribute(Attribute.LEAP_PLANE_POINT_A);
@@ -155,25 +159,29 @@ public class LeapPlane extends KeyboardRenderable {
         String text;
         switch(point) {
             case LeapPlaneCalibrator.POINT_A:
-                text = "<div style=\"white-space: nowrap\"><font size=\"+1\"><b><font color=\"red\">Place and hold</font></b> the tool over the <b><font color=\"red\">bottom-left corner</font></b> of the keyboard.</font></div>";
+                text = "<div style=\"white-space: nowrap\"><font size=\"+1\"><b><font color=\"red\">Place and hold</font></b> "
+                        + "the tool over the <b><font color=\"red\">bottom-left or \"A\" corner</font></b> of the keyboard.</font></div>";
                 if(!MyUtilities.JAVA_SWING_UTILITIES.equalsIgnoreHTML(text, explinationPane.getText())) {
                     explinationPane.setText(text);
                 }
                 break;
             case LeapPlaneCalibrator.POINT_B:
-                text = "<div style=\"white-space: nowrap\"><font size=\"+1\"><b><font color=\"red\">Place and hold</font></b> the tool over the <b><font color=\"red\">top-left corner</font></b> of the keyboard.</font></div>";
+                text = "<div style=\"white-space: nowrap\"><font size=\"+1\"><b><font color=\"red\">Place and hold</font></b> "
+                        + "the tool over the <b><font color=\"red\">top-left or \"B\" corner</font></b> of the keyboard.</font></div>";
                 if(!MyUtilities.JAVA_SWING_UTILITIES.equalsIgnoreHTML(text, explinationPane.getText())) {
                     explinationPane.setText(text);
                 }
                 break;
             case LeapPlaneCalibrator.POINT_C:
-                text = "<div style=\"white-space: nowrap\"><font size=\"+1\"><b><font color=\"red\">Place and hold</font></b> the tool over the <b><font color=\"red\">top-right corner</font></b> of the keyboard.</font></div>";
+                text = "<div style=\"white-space: nowrap\"><font size=\"+1\"><b><font color=\"red\">Place and hold</font></b> "
+                        + "the tool over the <b><font color=\"red\">top-right or \"C\" corner</font></b> of the keyboard.</font></div>";
                 if(!MyUtilities.JAVA_SWING_UTILITIES.equalsIgnoreHTML(text, explinationPane.getText())) {
                     explinationPane.setText(text);
                 }
                 break;
             default:
-                text = "<div style=\"white-space: nowrap\"><font size=\"+2\"><b><font color=\"red\">Remove the tool</font></b> from the Leap Motinon Interaction Zone.</font></div>";
+                text = "<div style=\"white-space: nowrap\"><font size=\"+2\"><b><font color=\"red\">Remove the tool</font></b> "
+                        + "from the Leap Motinon Interaction Zone.</font></div>";
                 if(!MyUtilities.JAVA_SWING_UTILITIES.equalsIgnoreHTML(text, explinationPane.getText())) {
                     explinationPane.setText(text);
                 }
@@ -294,9 +302,9 @@ public class LeapPlane extends KeyboardRenderable {
     
     private Vector scaleTo3DSpace(Vector point) {
         Vector vector = new Vector();
-        vector.setX(point.getX() * KEYBOARD_WIDTH);
-        vector.setY(point.getY() * KEYBOARD_HEIGHT);
-        vector.setZ(point.getZ() * DIST_TO_CAMERA);
+        vector.setX((point.getX() * KEYBOARD_SIZE.x) + BORDER_SIZE);
+        vector.setY((point.getY() * KEYBOARD_SIZE.y) + BORDER_SIZE);
+        vector.setZ(point.getZ() * CAMERA_DISTANCE);
         return vector;
     }
     
@@ -394,7 +402,7 @@ public class LeapPlane extends KeyboardRenderable {
             if(isTouching() /*&& this.isValid()*/) {
                 leapTrail.update(leapPoint.getNormalizedPoint());
             } else {
-                leapTrail.update(Vector.zero());
+                leapTrail.update();
             }
             
         } else if (isCalibrating) {
@@ -459,22 +467,23 @@ public class LeapPlane extends KeyboardRenderable {
     public void render(GL2 gl) {
         if(isEnabled()) {
             gl.glPushMatrix();
-            gl.glColor4fv(COLOR, 0);
-            gl.glTranslatef(KEYBOARD_WIDTH/2f-planeWidth/2f, KEYBOARD_HEIGHT/2f-planeHeight/2f, -10f);
+            gl.glNormal3f(0, 0, 1);
+            PLANE_COLOR.glColor(gl);
+            gl.glTranslatef((KEYBOARD_SIZE.x+BORDER_SIZE)/2f-planeWidth/2f, (KEYBOARD_SIZE.y+BORDER_SIZE)/2f-planeHeight/2f, -10f);
             drawRectangle(gl);
-            drawPointWithLetter(gl, scaledPointA, 'A', LeapPlaneCalibrator.POINT_A);
-            drawPointWithLetter(gl, scaledPointB, 'B', LeapPlaneCalibrator.POINT_B);
-            drawPointWithLetter(gl, scaledPointC, 'C', LeapPlaneCalibrator.POINT_C);
-            drawPointWithLetter(gl, scaledPointD, 'D', -1);
+            drawCircleWithLetter(gl, scaledPointA, 'A', LeapPlaneCalibrator.POINT_A);
+            drawCircleWithLetter(gl, scaledPointB, 'B', LeapPlaneCalibrator.POINT_B);
+            drawCircleWithLetter(gl, scaledPointC, 'C', LeapPlaneCalibrator.POINT_C);
+            drawCircleWithLetter(gl, scaledPointD, 'D', -1);
             gl.glPopMatrix();
         }
     }
     
-    private void drawPointWithLetter(GL2 gl, Vector vector, char pointLetter, int point) {
-        if(leapPlaneCalibrator != null) {
-            gl.glColor4fv(point == leapPlaneCalibrator.calibratingPoint() ? ACTIVE_COLOR : COLOR, 0);
+    private void drawCircleWithLetter(GL2 gl, Vector vector, char pointLetter, int calibrationPoint) {
+        if(leapPlaneCalibrator != null && calibrationPoint == leapPlaneCalibrator.calibratingPoint()) {
+            CALIB_COLOR.glColor(gl);
         } else {
-            gl.glColor4fv(COLOR, 0);
+            PLANE_COLOR.glColor(gl);
         }
         gl.glTranslatef(vector.getX(), vector.getY(), vector.getZ());
         gl.glBegin(GL_TRIANGLE_FAN);
@@ -492,7 +501,7 @@ public class LeapPlane extends KeyboardRenderable {
     
     private void drawLetter(GL2 gl, char letter) {
         gl.glPushMatrix();
-        gl.glColor4fv(BLACK, 0);
+        TEXT_COLOR.glColor(gl);
         gl.glTranslatef(-7f, -7f, 0f);
         gl.glScalef(0.15f, 0.15f, 0.15f);
         gl.glLineWidth(2);
@@ -501,11 +510,14 @@ public class LeapPlane extends KeyboardRenderable {
     }
     
     private void drawRectangle(GL2 gl) {
-        gl.glBegin(GL_QUADS);
+        gl.glBegin(GL_TRIANGLES);
         gl.glVertex3f(scaledPointA.getX(), scaledPointA.getY(), scaledPointA.getZ());
         gl.glVertex3f(scaledPointB.getX(), scaledPointB.getY(), scaledPointB.getZ());
         gl.glVertex3f(scaledPointC.getX(), scaledPointC.getY(), scaledPointC.getZ());
+        
+        gl.glVertex3f(scaledPointC.getX(), scaledPointC.getY(), scaledPointC.getZ());
         gl.glVertex3f(scaledPointD.getX(), scaledPointD.getY(), scaledPointD.getZ());
+        gl.glVertex3f(scaledPointA.getX(), scaledPointA.getY(), scaledPointA.getZ());
         gl.glEnd();
     }
     

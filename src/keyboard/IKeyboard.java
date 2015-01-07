@@ -1,9 +1,12 @@
 package keyboard;
 
+import utilities.Point;
+
 import java.io.IOException;
 import java.util.ArrayList;
 
 import javax.media.opengl.GL2;
+import javax.media.opengl.awt.GLCanvas;
 import javax.swing.JPanel;
 
 import enums.FileExt;
@@ -17,11 +20,11 @@ public abstract class IKeyboard implements SaveSettingsObserver {
     private String filePath;
     private String fileName;
     private ArrayList<KeyboardObserver> observers = new ArrayList<KeyboardObserver>();
+    protected Point keyboardSize;
+    protected Point imageSize;
     protected KeyboardSettings keyboardSettings;
     protected KeyboardAttributes keyboardAttributes;
     protected KeyboardRenderables keyboardRenderables;
-    protected KeyboardAttribute keyboardWidth;
-    protected KeyboardAttribute keyboardHeight;
     protected char keyPressed;
     
     public IKeyboard(int keyboardID, String keyboardName, String fileName) {
@@ -37,6 +40,9 @@ public abstract class IKeyboard implements SaveSettingsObserver {
     public abstract void beginCalibration(JPanel textPanel);
     protected abstract void finishCalibration();
     public abstract boolean isCalibrated();
+    
+    public abstract void addToUI(JPanel panel, GLCanvas canvas);
+    public abstract void removeFromUI(JPanel panel, GLCanvas canvas);
     
     public int getID() {
         return keyboardID;
@@ -55,10 +61,18 @@ public abstract class IKeyboard implements SaveSettingsObserver {
     }
     
     public int getHeight() {
-        return keyboardHeight.getValueAsInteger();
+        return keyboardSize.y;
     }
     public int getWidth() {
-        return keyboardWidth.getValueAsInteger();
+        return keyboardSize.x;
+    }
+    
+    public int getImageHeight() {
+        return imageSize.y;
+    }
+    
+    public int getImageWidth() {
+        return imageSize.x;
     }
     
     public KeyboardSettings getSettings() {

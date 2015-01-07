@@ -87,12 +87,18 @@ public class FileUtilities {
                     value = Integer.valueOf(words[1]);
                 } else if(value instanceof Double) {
                     value = Double.valueOf(words[1]);
+                } else if(value instanceof Float) {
+                    value = Float.valueOf(words[1]);
                 } else if(value instanceof Vector) {
                     Vector tmpVector = new Vector();
                     tmpVector.setX(Float.valueOf(words[1].substring(1, words[1].length()-1)));
                     tmpVector.setY(Float.valueOf(words[2].substring(0, words[2].length()-1)));
                     tmpVector.setZ(Float.valueOf(words[3].substring(0, words[3].length()-1)));
                     value = tmpVector;
+                } else if(value instanceof Point) {
+                    Point tmpPoint = new Point(0, 0);
+                    tmpPoint.setLocation(Integer.valueOf(words[1].substring(1, words[1].length()-1)), Integer.valueOf(words[2].substring(0, words[2].length()-1)));
+                    value = tmpPoint;
                 }
                 System.out.println(dataName + ": " + value);
                 break;
@@ -212,7 +218,7 @@ public class FileUtilities {
     }
     
     public void writeAttributeToFile(String filePath, String fileName, KeyboardAttribute keyboardAttribute) throws IOException {
-        if(keyboardAttribute.getValueAsInteger() != null || keyboardAttribute.getValueAsVector() != null) {
+        if(keyboardAttribute.isWriteable()) {
             // Attempt to open file, create it if it doesn't exist.
             File file = createFile(filePath, fileName);
             
@@ -239,7 +245,7 @@ public class FileUtilities {
             
             // Change all of the attributes values.
             for(KeyboardAttribute keyboardAttribute: keyboardAttributes.getAllAttributes()) {
-                if(keyboardAttribute.getValueAsInteger() != null || keyboardAttribute.getValueAsVector() != null) {
+                if(keyboardAttribute.isWriteable()) {
                     savedData.put(keyboardAttribute.getType().name(), keyboardAttribute.getValue().toString());
                 }
             }
@@ -259,7 +265,7 @@ public class FileUtilities {
         
         // Change all of the data's values.
         for(KeyboardAttribute keyboardAttribute: keyboard.getAttributes().getAllAttributes()) {
-            if(keyboardAttribute.getValueAsInteger() != null || keyboardAttribute.getValueAsVector() != null) {
+            if(keyboardAttribute.isWriteable()) {
                 savedData.put(keyboardAttribute.getType().name(), keyboardAttribute.getValue().toString());
             }
         }

@@ -3,6 +3,7 @@ package keyboard;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import utilities.Point;
 import java.io.IOException;
 
 import javax.swing.JLabel;
@@ -50,6 +51,13 @@ public class KeyboardAttribute {
         return null;
     }
     
+    public Float getValueAsFloat() {
+        if(value instanceof Float) {
+            return (Float) value;
+        }
+        return null;
+    }
+    
     public Vector getValueAsVector() {
         if(value instanceof Vector) {
             return (Vector) value;
@@ -57,10 +65,25 @@ public class KeyboardAttribute {
         return null;
     }
     
-    public void setVectorValue(Vector value) {
-        if(value != null) {
-            this.value = value;
-            valueLabel.setText(this.value.toString());
+    public boolean isWriteable() {
+        return (value instanceof Integer ||
+                value instanceof Float ||
+                value instanceof Vector ||
+                value instanceof Point);
+    }
+    
+    public Point getValueAsPoint() {
+        if(value instanceof Point) {
+            return (Point) value;
+        }
+        return null;
+    }
+    
+    // Special function used when we're calibrating the leap.
+    public void setVectorValue(Vector vector) {
+        if(vector != null) {
+            value = vector;
+            valueLabel.setText(value.toString());
         }
     }
     

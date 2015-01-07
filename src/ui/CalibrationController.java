@@ -24,10 +24,7 @@ import javax.swing.Timer;
 import keyboard.KeyboardAttributes;
 import keyboard.KeyboardRenderable;
 import keyboard.KeyboardSetting;
-import leap.LeapListener;
 import utilities.MyUtilities;
-
-import com.leapmotion.leap.Vector;
 
 import enums.Attribute;
 import enums.Keyboard;
@@ -36,6 +33,7 @@ import enums.Keyboard;
 public class CalibrationController extends GraphicsController {
     private ArrayList<SaveSettingsObserver> observers = new ArrayList<SaveSettingsObserver>();
     private JFrame frame;
+    private JPanel canvasPanel;
     private JLabel typedLabel;
     private JPanel typedPanel;
     private JComboBox<String> keyboardTypeComboBox;
@@ -68,9 +66,11 @@ public class CalibrationController extends GraphicsController {
         registerObserver(Keyboard.LEAP.getKeyboard());
         registerObserver(Keyboard.TABLET.getKeyboard());
         registerObserver(Keyboard.CONTROLLER.getKeyboard());
+        canvasPanel = new JPanel();
         canvas = new GLCanvas(capabilities);
-        canvas.setPreferredSize(new Dimension(keyboard.getWidth(), keyboard.getHeight()));
-        canvas.setSize(keyboard.getWidth(), keyboard.getHeight());
+        canvas.setPreferredSize(new Dimension(keyboard.getImageWidth(), keyboard.getImageHeight()));
+        canvas.setSize(keyboard.getImageWidth(), keyboard.getImageHeight());
+        canvasPanel.add(canvas);
         frame = new JFrame("Calibration - FPS: 0");
         typedLabel = new JLabel();
         typedPanel = new JPanel();
@@ -84,7 +84,7 @@ public class CalibrationController extends GraphicsController {
         JButton buttons[] = {calibrateButton, saveSettingsButton};      
 
         // Window builder builds window using important fields here. It adds unimportant fields that we won't use for aesthetics only.
-        WindowBuilder.buildCalibrationWindow(frame, canvas, typedLabel, keyboardTypeComboBox, buttons, panels);
+        WindowBuilder.buildCalibrationWindow(frame, canvasPanel, typedLabel, keyboardTypeComboBox, buttons, panels);
         canvas.setFocusable(true);
         addKeyboardToUI();
         
@@ -144,19 +144,8 @@ public class CalibrationController extends GraphicsController {
                 JComboBox<String> comboBox = (JComboBox<String>)e.getSource();
                 int selectedIndex = comboBox.getSelectedIndex();
                 if(keyboard != Keyboard.getByID(selectedIndex).getKeyboard()) {
-                    if(Keyboard.LEAP == Keyboard.getByID(selectedIndex)) {
-                        LeapListener.startListening();
-                        //calibrateButton.setVisible(true);
-                        calibrateButton.setEnabled(true);
-                    } else {
-                        LeapListener.stopListening();
-                        //calibrateButton.setVisible(false);
-                        calibrateButton.setEnabled(false);
-                    }
                     // Remove all settings, attributes, and renderables from the previous keyboard.
-                    typedLabel.setText("");
-                    settingsPanel.removeAll();
-                    renderOptionsPanel.removeAll();
+                    removeKeyboardFromUI();
                     
                     // Add all settings, attributes, and renderables from the new keyboard.
                     keyboard = Keyboard.getByID(selectedIndex).getKeyboard();
@@ -178,9 +167,6 @@ public class CalibrationController extends GraphicsController {
         });
         
         canvas.addGLEventListener(this);
-        
-        pos = new Vector();
-        dir = new Vector();
         
         // Something causes the canvas to resize between the original frame.pack() and this one so we just pack again, no harm done.
         frame.pack();
@@ -229,12 +215,10 @@ public class CalibrationController extends GraphicsController {
         keyboardTypeComboBox.setEnabled(true);
         clearTextTimer.start();
         settingsPanel.removeAll();
+        
         KeyboardAttributes ka = keyboard.getAttributes();
-        settingsPanel.add(ka.getAttribute(Attribute.KEYBOARD_WIDTH).getAttributePanel());
-        settingsPanel.add(ka.getAttribute(Attribute.KEYBOARD_HEIGHT).getAttributePanel());
-        if(keyboard == Keyboard.STANDARD.getKeyboard()) {
-            settingsPanel.add((JPanel) ka.getAttribute(Attribute.KEY_BINDINGS).getValue());
-        } else if(keyboard == Keyboard.LEAP.getKeyboard()) {
+        settingsPanel.add(ka.getAttribute(Attribute.KEYBOARD_SIZE).getAttributePanel());
+        if(keyboard == Keyboard.LEAP.getKeyboard()) {
             settingsPanel.add(ka.getAttribute(Attribute.LEAP_PLANE_POINT_A).getAttributePanel());
             settingsPanel.add(ka.getAttribute(Attribute.LEAP_PLANE_POINT_B).getAttributePanel());
             settingsPanel.add(ka.getAttribute(Attribute.LEAP_PLANE_POINT_C).getAttributePanel());
@@ -265,13 +249,20 @@ public class CalibrationController extends GraphicsController {
        frameCount++;
     }
     
+    private void removeKeyboardFromUI() {
+        typedLabel.setText("");
+        settingsPanel.removeAll();
+        renderOptionsPanel.removeAll();
+        keyboard.removeFromUI(canvasPanel, canvas);
+    }
+    
     private void addKeyboardToUI() {
+        keyboard.addToUI(canvasPanel, canvas);
+        
         KeyboardAttributes ka = keyboard.getAttributes();
-        settingsPanel.add(ka.getAttribute(Attribute.KEYBOARD_WIDTH).getAttributePanel());
-        settingsPanel.add(ka.getAttribute(Attribute.KEYBOARD_HEIGHT).getAttributePanel());
-        if(keyboard == Keyboard.STANDARD.getKeyboard()) {
-            settingsPanel.add((JPanel) ka.getAttribute(Attribute.KEY_BINDINGS).getValue());
-        } else if(keyboard == Keyboard.LEAP.getKeyboard()) {
+        settingsPanel.add(ka.getAttribute(Attribute.KEYBOARD_SIZE).getAttributePanel());
+        
+        if(keyboard == Keyboard.LEAP.getKeyboard()) {
             settingsPanel.add(ka.getAttribute(Attribute.LEAP_PLANE_POINT_A).getAttributePanel());
             settingsPanel.add(ka.getAttribute(Attribute.LEAP_PLANE_POINT_B).getAttributePanel());
             settingsPanel.add(ka.getAttribute(Attribute.LEAP_PLANE_POINT_C).getAttributePanel());
@@ -285,8 +276,8 @@ public class CalibrationController extends GraphicsController {
             renderOptionsPanel.add(kr.getRenderablePanel());
         }
         
-        canvas.setPreferredSize(new Dimension(keyboard.getWidth(), keyboard.getHeight()));
-        canvas.setSize(keyboard.getWidth(), keyboard.getHeight());
+        canvas.setPreferredSize(new Dimension(keyboard.getImageWidth(), keyboard.getImageHeight()));
+        canvas.setSize(keyboard.getImageWidth(), keyboard.getImageHeight());
         frame.pack();
     }
     

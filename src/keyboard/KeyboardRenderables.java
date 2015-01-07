@@ -22,5 +22,27 @@ public abstract class KeyboardRenderables {
         return new ArrayList<KeyboardRenderable>(keyboardRenderables.values());
     }
     
+    public void swapToLowerCaseKeyboard() {
+        KeyboardRenderable krUpper = keyboardRenderables.get(Renderable.KEYBOARD_IMAGE_UPPER);
+        if(krUpper != null && krUpper.isEnabled()) {
+            KeyboardRenderable krLower = keyboardRenderables.get(Renderable.KEYBOARD_IMAGE);
+            if(krLower != null) {
+                krUpper.blockAccess(true);
+                krLower.grantAccess(true);
+            }
+        }
+    }
+    
+    public void swapToUpperCaseKeyboard() {
+        KeyboardRenderable krLower = keyboardRenderables.get(Renderable.KEYBOARD_IMAGE);
+        if(krLower != null && krLower.isEnabled()) {
+            KeyboardRenderable krUpper = keyboardRenderables.get(Renderable.KEYBOARD_IMAGE_UPPER);
+            if(krUpper != null) {
+                krLower.blockAccess(true);
+                krUpper.grantAccess(true);
+            }
+        }
+    }
+    
     public abstract void render(GL2 gl);
 }

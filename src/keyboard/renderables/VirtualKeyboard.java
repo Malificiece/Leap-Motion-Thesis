@@ -1,6 +1,7 @@
 package keyboard.renderables;
 
-import java.awt.Point;
+import utilities.Point;
+
 import java.util.TreeMap;
 
 import javax.media.opengl.GL2;
@@ -27,52 +28,48 @@ public class VirtualKeyboard extends KeyboardRenderable {
     }
     
     private void createKeys(KeyboardAttributes keyboardAttributes) {
-        Integer keyboardHeight = (Integer) keyboardAttributes.getAttributeAsInteger(Attribute.KEYBOARD_HEIGHT);
-        Point keyboardSize = (Point) keyboardAttributes.getAttributeValue(Attribute.KEYBOARD_SIZE);
-        if(keyboardSize != null) {
-            System.out.println("Point size works: " + keyboardSize.y);
-            keyboardHeight = keyboardSize.y;
-        }
-        int gapSize = (int) keyboardAttributes.getAttributeAsInteger(Attribute.GAP_SIZE);
-        int keyWidth = (int) keyboardAttributes.getAttributeAsInteger(Attribute.KEY_WIDTH);
-        int keyHeight = (int) keyboardAttributes.getAttributeAsInteger(Attribute.KEY_HEIGHT);
-        int spaceKeyWidth = (int) keyboardAttributes.getAttributeAsInteger(Attribute.SPACE_KEY_WIDTH);
-        int backSpaceKeyWidth = (int) keyboardAttributes.getAttributeAsInteger(Attribute.BACK_SPACE_KEY_WIDTH);
-        int shiftKeyWidth = (int) keyboardAttributes.getAttributeAsInteger(Attribute.SHIFT_KEY_WIDTH);
-        int enterWidth = (int) keyboardAttributes.getAttributeAsInteger(Attribute.ENTER_KEY_WIDTH);
+        Point keyboardSize = keyboardAttributes.getAttributeAsPoint(Attribute.KEYBOARD_SIZE);
+        Integer borderSize = keyboardAttributes.getAttributeAsInteger(Attribute.BORDER_SIZE);
+        Point gapSize = keyboardAttributes.getAttributeAsPoint(Attribute.GAP_SIZE);
+        Point keySize = keyboardAttributes.getAttributeAsPoint(Attribute.KEY_SIZE);
+        Point spaceKeySize = keyboardAttributes.getAttributeAsPoint(Attribute.SPACE_KEY_SIZE);
+        Point backSpaceKeySize = keyboardAttributes.getAttributeAsPoint(Attribute.BACK_SPACE_KEY_SIZE);
+        Point shiftKeySize = keyboardAttributes.getAttributeAsPoint(Attribute.SHIFT_KEY_SIZE);
+        Point enterKeySize = keyboardAttributes.getAttributeAsPoint(Attribute.ENTER_KEY_SIZE);
         //int numKeys = (int) keyboardAttributes.getValueByName(AttributeName.NUMBER_OF_KEYS);
-        int[] rowOffsets = (int[]) keyboardAttributes.getAttributeValue(Attribute.ROW_OFFSETS);
+        Integer[] rowOffsets = (Integer[]) keyboardAttributes.getAttributeValue(Attribute.ROW_OFFSETS);
         Key[][] keyRows = (Key[][]) keyboardAttributes.getAttributeValue(Attribute.KEY_ROWS);
         
-        for(int rowIndex = 0, x = 0, y = keyboardHeight + gapSize; rowIndex < keyRows.length; rowIndex++) {
-            x = rowOffsets[rowIndex];
-            y -= (keyHeight + gapSize);
+        for(int rowIndex = 0, x = 0, y = keyboardSize.y + gapSize.y + borderSize; rowIndex < keyRows.length; rowIndex++) {
+            x = rowOffsets[rowIndex] + borderSize;
+            y -= (keySize.y + gapSize.y);
             for(int colIndex = 0; colIndex < keyRows[rowIndex].length; colIndex++) {
                 Key key = keyRows[rowIndex][colIndex];
                 if(key == Key.VK_SPACE) {
-                    keys.put(key, new VirtualKey(x, y, spaceKeyWidth, keyHeight, key));
-                    x += spaceKeyWidth + gapSize;
+                    keys.put(key, new VirtualKey(x, y, spaceKeySize.x, spaceKeySize.y, key));
+                    x += spaceKeySize.x + gapSize.x;
                 } else if (key == Key.VK_BACK_SPACE) {
-                    keys.put(key, new VirtualKey(x, y, backSpaceKeyWidth, keyHeight, key));
-                    x += backSpaceKeyWidth + gapSize;
-                } else if (key == Key.VK_SHIFT) {
-                    keys.put(key, new VirtualKey(x, y, shiftKeyWidth, keyHeight, key));
-                    x += shiftKeyWidth + gapSize;
+                    keys.put(key, new VirtualKey(x, y, backSpaceKeySize.x, backSpaceKeySize.y, key));
+                    x += backSpaceKeySize.x + gapSize.x;
+                } else if (key == Key.VK_SHIFT_LEFT || key == Key.VK_SHIFT_RIGHT || key == Key.VK_SHIFT) {
+                    keys.put(key, new VirtualKey(x, y, shiftKeySize.x, shiftKeySize.y, key));
+                    x += shiftKeySize.x + gapSize.x;
                 } else if (key == Key.VK_ENTER) {
-                    keys.put(key, new VirtualKey(x, y, enterWidth, keyHeight, key));
-                    x += enterWidth + gapSize;
+                    keys.put(key, new VirtualKey(x, y, enterKeySize.x, enterKeySize.y, key));
+                    x += enterKeySize.x + gapSize.x;
                 } else if (key == Key.VK_NULL) {
-                    x += keyWidth + gapSize;
+                    // Blank key, don't use it.
+                    x += keySize.x + gapSize.x;
                 } else {
-                    keys.put(key, new VirtualKey(x, y, keyWidth, keyHeight, key));
-                    x += keyWidth + gapSize;
+                    keys.put(key, new VirtualKey(x, y, keySize.x, keySize.y, key));
+                    x += keySize.x + gapSize.x;
                 }
             }
         }
         
     }
     
-    public void pressed(Key key) { // possibly generate key pressed event here with time/key/etc saved. Return the key pressed object.
+    public void pressed(Key key) {
         VirtualKey virtualKey = keys.get(key);
         if(virtualKey != null) {
             virtualKey.pressed();

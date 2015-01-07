@@ -4,16 +4,17 @@ import java.util.ArrayList;
 import java.util.Iterator;
 
 import static javax.media.opengl.GL.*;
-import static javax.media.opengl.fixedfunc.GLLightingFunc.GL_AMBIENT_AND_DIFFUSE;
 import static javax.media.opengl.fixedfunc.GLLightingFunc.GL_LIGHTING;
 
 import javax.media.opengl.GL2;
 import javax.media.opengl.glu.GLUquadric;
 
 import ui.GraphicsController;
+import utilities.GLColor;
 
 import com.leapmotion.leap.Vector;
 
+import enums.Color;
 import enums.Gesture;
 import enums.Renderable;
 import keyboard.KeyboardAttributes;
@@ -28,7 +29,7 @@ public class KeyboardGestures extends KeyboardRenderable {
     private static final float ARROW_LINE_THICKNESS = 2f;
     private static final float ARROW_HEAD_THICKNESS = 4f;
     private static final float ARROW_HEAD_LENGTH = 25f;
-    private final float[] COLOR = {0f, 1f, 0.5f, 1f};
+    private static final GLColor SWIPE_COLOR = new GLColor(Color.TEAL);
     private GLUquadric quadric;
     private ArrayList<KeyboardGesture> gestures = new ArrayList<KeyboardGesture>();
 
@@ -36,13 +37,20 @@ public class KeyboardGestures extends KeyboardRenderable {
         super(TYPE);
     }
     
-    public void createQuadric() {
+    private void createQuadric() {
         GraphicsController.gl.getContext().makeCurrent();
         if(quadric != null) {
             GraphicsController.glu.gluDeleteQuadric(quadric);
         }
         quadric = GraphicsController.glu.gluNewQuadric();
         GraphicsController.glu.gluQuadricNormals(quadric, GL_TRUE);
+    }
+    
+    public void deleteQuadric() {
+        if(quadric != null) {
+            GraphicsController.gl.getContext().makeCurrent();
+            GraphicsController.glu.gluDeleteQuadric(quadric);
+        }
     }
     
     public void addGesture(KeyboardGesture gesture) {
@@ -55,6 +63,14 @@ public class KeyboardGestures extends KeyboardRenderable {
     
     public boolean containsGesture(KeyboardGesture gesture) {
         return gestures.contains(gesture);
+    }
+    
+    public void updateAll() {
+        Iterator<KeyboardGesture> iterator = gestures.iterator();
+        while(iterator.hasNext()) {
+            KeyboardGesture gesture = (KeyboardGesture) iterator.next();
+            gesture.update();
+        }
     }
     
     public void removeFinishedGestures() {
@@ -79,8 +95,8 @@ public class KeyboardGestures extends KeyboardRenderable {
                 if(gesture.getType() == Gesture.SWIPE) {
                     gl.glEnable(GL_LIGHTING);
                     gl.glEnable(GL_CULL_FACE);
-                    COLOR[3] = gesture.getOpacity();
-                    gl.glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, COLOR, 0);
+                    SWIPE_COLOR.setAlpha(gesture.getOpacity());
+                    SWIPE_COLOR.glColor(gl);
                     Vector source = gesture.getSource();
                     gl.glTranslatef(source.getX(), source.getY(), source.getZ());
                     Vector axis = gesture.getAxis();
@@ -95,16 +111,22 @@ public class KeyboardGestures extends KeyboardRenderable {
     }
     
     private void drawArrow(GL2 gl, KeyboardGesture gesture) {
+        Vector direction = gesture.getDirection();
         gl.glCullFace(GL_BACK);
         // draw arrow line
+        if(quadric == null) {
+            createQuadric();
+        }
         GraphicsController.glu.gluCylinder(quadric, ARROW_LINE_THICKNESS, ARROW_LINE_THICKNESS, gesture.getLength(), NUM_VERTICIES, NUM_STACKS);
         gl.glCullFace(GL_FRONT);
+        gl.glNormal3f(direction.getX(), direction.getY(), direction.getZ());
         drawCircle(gl, ARROW_LINE_THICKNESS);
         // draw arrow head
         gl.glCullFace(GL_BACK);
         gl.glTranslatef(0, 0, gesture.getLength());
         GraphicsController.glu.gluCylinder(quadric, ARROW_HEAD_THICKNESS, 0, ARROW_HEAD_LENGTH, NUM_VERTICIES, NUM_STACKS);
         gl.glCullFace(GL_FRONT);
+        gl.glNormal3f(direction.getX(), direction.getY(), direction.getZ());
         drawCircle(gl, ARROW_HEAD_THICKNESS);
     }
     

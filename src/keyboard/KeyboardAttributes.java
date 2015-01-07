@@ -1,5 +1,6 @@
 package keyboard;
 
+import utilities.Point;
 import java.util.ArrayList;
 import java.util.TreeMap;
 
@@ -34,10 +35,26 @@ public abstract class KeyboardAttributes {
         return null;
     }
     
+    public Float getAttributeAsFloat(Attribute attribute) {
+        KeyboardAttribute ka = keyboardAttributes.get(attribute);
+        if(ka != null) {
+            return ka.getValueAsFloat();
+        }
+        return null;
+    }
+    
     public Vector getAttributeAsVector(Attribute attribute) {
         KeyboardAttribute ka = keyboardAttributes.get(attribute);
         if(ka != null) {
             return ka.getValueAsVector();
+        }
+        return null;
+    }
+    
+    public Point getAttributeAsPoint(Attribute attribute) {
+        KeyboardAttribute ka = keyboardAttributes.get(attribute);
+        if(ka != null) {
+            return ka.getValueAsPoint();
         }
         return null;
     }

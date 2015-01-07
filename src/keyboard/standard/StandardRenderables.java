@@ -6,6 +6,7 @@ import enums.FileExt;
 import enums.FileName;
 import keyboard.KeyboardRenderable;
 import keyboard.KeyboardRenderables;
+import keyboard.renderables.KeyboardGestures;
 import keyboard.renderables.KeyboardImage;
 import keyboard.renderables.VirtualKeyboard;
 
@@ -17,6 +18,7 @@ public class StandardRenderables extends KeyboardRenderables {
         // order here determines render order
         this.addRenderable(new KeyboardImage( keyboard.getFileName() + FileName.KEYBOARD_IMAGE_UPPER.getName() + FileExt.PNG.getExt()));
         this.addRenderable(new VirtualKeyboard(keyboard.getAttributes()));
+        this.addRenderable(new KeyboardGestures(keyboard.getAttributes()));
     }
 
     @Override

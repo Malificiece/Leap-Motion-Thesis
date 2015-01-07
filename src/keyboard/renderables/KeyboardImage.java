@@ -16,19 +16,27 @@ import static javax.media.opengl.GL.*;  // GL constants
 //import static javax.media.opengl.GL2.*; // GL2 constants
 
 public class KeyboardImage extends KeyboardRenderable {
-    private static final Renderable TYPE = Renderable.KEYBOARD_IMAGE;
+    private final static String UPPER = "upper";
     private static final String ASSETS_PATH = FilePath.ASSETS.getPath();
     private static final String DEFAULT_FILE_NAME = FileName.STANDARD.getName() + FileName.KEYBOARD_IMAGE.getName();
     private String fileName;
     private ByteBuffer image = null;
-    private int height;
-    private int width;
+    private int imageHeight;
+    private int imageWidth;
     
     public KeyboardImage(String fileName) {
-        super(TYPE);
+        super(fileName.contains(UPPER) ? Renderable.KEYBOARD_IMAGE_UPPER : Renderable.KEYBOARD_IMAGE);
         this.fileName = ASSETS_PATH;
         this.fileName += fileName == null ? DEFAULT_FILE_NAME : fileName;
         loadImage(this.fileName);
+    }
+    
+    public int getHeight() {
+        return imageHeight;
+    }
+    
+    public int getWidth() {
+        return imageWidth;
     }
 
     private void loadImage(String filename) {
@@ -47,12 +55,12 @@ public class KeyboardImage extends KeyboardRenderable {
             ie.printStackTrace();
         }
 
-        height = img.getHeight(null);
-        width = img.getWidth(null);
+        imageHeight = img.getHeight(null);
+        imageWidth = img.getWidth(null);
         //System.out.println( "Image, w = " + width + ", h = " + height );
 
         // Create a raster with correct size and a colorModel and finally a bufImg.
-        WritableRaster raster = Raster.createInterleavedRaster(DataBuffer.TYPE_BYTE, width, height, 4, null); 
+        WritableRaster raster = Raster.createInterleavedRaster(DataBuffer.TYPE_BYTE, imageWidth, imageHeight, 4, null); 
         ComponentColorModel colorModel = new ComponentColorModel(ColorSpace.getInstance(ColorSpace.CS_sRGB),
                 new int[] {8,8,8,8}, true, false, ComponentColorModel.TRANSLUCENT, DataBuffer.TYPE_BYTE);
         BufferedImage bufImg = new BufferedImage(colorModel, raster, false, null);
@@ -60,7 +68,7 @@ public class KeyboardImage extends KeyboardRenderable {
         // Filter img into bufImg and perform coordinate Transformations on the way.
         Graphics2D g = bufImg.createGraphics();
         AffineTransform gt = new AffineTransform();
-        gt.translate (0, height);
+        gt.translate (0, imageHeight);
         gt.scale (1, -1d);
         g.transform (gt);
         g.drawImage (img, null, null);
@@ -77,11 +85,7 @@ public class KeyboardImage extends KeyboardRenderable {
             if(image == null) {
                 loadImage(fileName);
             }
-    
-            //gl.glPushAttrib( GL.GL_DEPTH_BUFFER_BIT );
-            //gl.glPushAttrib( GL.GL_COLOR_BUFFER_BIT );
-          
-            //gl.glDisable(GL.GL_DEPTH_TEST);
+            
     	    gl.glPushMatrix();
             // enable alpha mask (import from png sets alpha bits)
             gl.glEnable (GL.GL_BLEND);
@@ -89,12 +93,9 @@ public class KeyboardImage extends KeyboardRenderable {
     
             // Draw image as bytes.
             gl.glRasterPos2i(0, 0); // moves in object space
-            //gl.glWindowPos2i(150, 100); // moves in screen space
             gl.glPixelZoom( 1.0f, 1.0f ); // x-factor, y-factor
-            gl.glDrawPixels(width, height, GL_RGBA, GL_UNSIGNED_BYTE, image);
+            gl.glDrawPixels(imageWidth, imageHeight, GL_RGBA, GL_UNSIGNED_BYTE, image);
             gl.glPopMatrix();
-            //gl.glPopAttrib(); 
-            //gl.glPopAttrib();
         }
     }
 }

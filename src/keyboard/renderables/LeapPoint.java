@@ -4,6 +4,8 @@ import static javax.media.opengl.GL.GL_LINES;
 import static javax.media.opengl.GL2.GL_ENABLE_BIT;
 import static javax.media.opengl.GL2.GL_LINE_STIPPLE;
 import static javax.media.opengl.GL2GL3.GL_TRIANGLE_FAN;
+import utilities.GLColor;
+import utilities.Point;
 
 import javax.media.opengl.GL2;
 
@@ -13,28 +15,29 @@ import com.leapmotion.leap.InteractionBox;
 import com.leapmotion.leap.Vector;
 
 import enums.Attribute;
+import enums.Color;
 import enums.Renderable;
 import keyboard.KeyboardAttributes;
 import keyboard.KeyboardRenderable;
 
 public class LeapPoint extends KeyboardRenderable {
     private static final Renderable TYPE = Renderable.LEAP_POINT;
-    private static final float[] COLOR = {0f, 0f, 1f, 1f};
+    private static final GLColor COLOR = new GLColor(Color.BLUE);
     private static final int NUM_VERTICIES = 32;
     private static final float DELTA_ANGLE = (float) (2.0f * Math.PI / NUM_VERTICIES);
     private static final float RADIUS = 10f;
-    private final int KEYBOARD_WIDTH;
-    private final int KEYBOARD_HEIGHT;
-    private final int DIST_TO_CAMERA;
+    private final Point KEYBOARD_SIZE;
+    private final int BORDER_SIZE;
+    private final float CAMERA_DISTANCE;
     private Vector point = new Vector();
     private Vector normalizedPoint = point;
     private InteractionBox iBox;
     
     public LeapPoint(KeyboardAttributes keyboardAttributes) {
         super(TYPE);
-        KEYBOARD_WIDTH = keyboardAttributes.getAttributeAsInteger(Attribute.KEYBOARD_WIDTH);
-        KEYBOARD_HEIGHT = keyboardAttributes.getAttributeAsInteger(Attribute.KEYBOARD_HEIGHT);
-        DIST_TO_CAMERA = keyboardAttributes.getAttributeAsInteger(Attribute.DIST_TO_CAMERA);
+        KEYBOARD_SIZE = keyboardAttributes.getAttributeAsPoint(Attribute.KEYBOARD_SIZE);
+        BORDER_SIZE = keyboardAttributes.getAttributeAsInteger(Attribute.BORDER_SIZE);
+        CAMERA_DISTANCE = keyboardAttributes.getAttributeAsFloat(Attribute.CAMERA_DISTANCE);
     }
     
     public void setPoint(Vector point) {
@@ -63,15 +66,16 @@ public class LeapPoint extends KeyboardRenderable {
     }
     
     public void scaleTo3DSpace() {
-        normalizedPoint.setX(normalizedPoint.getX() * KEYBOARD_WIDTH);
-        normalizedPoint.setY(normalizedPoint.getY() * KEYBOARD_HEIGHT);
-        normalizedPoint.setZ(normalizedPoint.getZ() * DIST_TO_CAMERA);
+        normalizedPoint.setX((normalizedPoint.getX() * KEYBOARD_SIZE.x) + BORDER_SIZE);
+        normalizedPoint.setY((normalizedPoint.getY() * KEYBOARD_SIZE.y) + BORDER_SIZE);
+        normalizedPoint.setZ(normalizedPoint.getZ() * CAMERA_DISTANCE);
     }
 
     @Override
     public void render(GL2 gl) {
         if(isEnabled()) {
             gl.glPushMatrix();
+            gl.glNormal3f(0, 0, 1);
             drawDottedLine(gl);
             gl.glTranslatef(normalizedPoint.getX(), normalizedPoint.getY(), normalizedPoint.getZ());
             drawPoint(gl);
@@ -80,8 +84,8 @@ public class LeapPoint extends KeyboardRenderable {
     }
     
     private void drawDottedLine(GL2 gl) {
-        COLOR[3] = 1f;
-        gl.glColor4fv(COLOR, 0);
+        COLOR.setAlpha(1f);
+        COLOR.glColor(gl);
         gl.glPushAttrib(GL_ENABLE_BIT);
         gl.glLineWidth(2);
         gl.glLineStipple(1, (short) 0xAAAA);
@@ -95,8 +99,8 @@ public class LeapPoint extends KeyboardRenderable {
     }
     
     private void drawPoint(GL2 gl) {
-        COLOR[3] = (DIST_TO_CAMERA-normalizedPoint.getZ())/DIST_TO_CAMERA;
-        gl.glColor4fv(COLOR, 0);
+        COLOR.setAlpha((CAMERA_DISTANCE-normalizedPoint.getZ())/CAMERA_DISTANCE);
+        COLOR.glColor(gl);
         gl.glBegin(GL_TRIANGLE_FAN);
         // Draw the vertex at the center of the circle
         gl.glVertex3f(0f, 0f, 0f);

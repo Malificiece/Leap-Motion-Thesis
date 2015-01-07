@@ -21,6 +21,7 @@ public class KeyboardGesture {
     private float angleToDirection = 0;
     private Vector axisToDirection = Vector.zero();
     private Vector upDirection = Vector.zAxis();
+    private Vector direction = Vector.zero();
     
     public KeyboardGesture(Vector sourcePoint, Gesture gestureType) {
         this.sourcePoint = sourcePoint;
@@ -53,7 +54,6 @@ public class KeyboardGesture {
     }
     
     private void calculateOrientation() {
-        Vector direction;
         direction = destinationPoint.minus(sourcePoint);
         angleToDirection = upDirection.angleTo(direction) * RADS_TO_DEGREES;
         axisToDirection = upDirection.cross(direction);
@@ -61,8 +61,6 @@ public class KeyboardGesture {
     }
     
     public void gestureFinshed() {
-        //fadeTimer.start();
-        //isWaiting = true;
         isFading = true;
         previousTime = System.currentTimeMillis();
     }
@@ -89,6 +87,10 @@ public class KeyboardGesture {
     
     public float getAngle() {
         return angleToDirection;
+    }
+    
+    public Vector getDirection() {
+        return direction;
     }
 
     public float getLength() {

@@ -3,6 +3,7 @@ package utilities;
 import com.leapmotion.leap.Vector;
 
 public class MathUtilities {
+    private static final float DEGREES_TO_RADS = (float) (Math.PI / 180f);
     
     public boolean findMidpoint(Vector midpoint, Vector[] vectors) {
         if(vectors.length > 0) {
@@ -89,5 +90,9 @@ public class MathUtilities {
                 + (p2.getX() * p1.getY())
                 - (p2.getY() * p1.getX()))
                 / (float) Math.sqrt(Math.pow(p2.getY() - p1.getY(), 2) + Math.pow(p2.getX() - p1.getX(), 2));
+    }
+    
+    public float findDimensionalAlignment(int height, int borderSize) {
+        return (float) (((height + (borderSize * 2f)) / (Math.tan(DEGREES_TO_RADS*GraphicsUtilities.FOVY/2f))/2f)); // Purposefully leaving out negative
     }
 }

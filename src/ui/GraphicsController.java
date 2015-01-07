@@ -15,8 +15,8 @@ import static javax.media.opengl.GL.*;  // GL constants
 import static javax.media.opengl.GL2.*; // GL2 constants
 
 import com.jogamp.opengl.util.gl2.GLUT;
-import com.leapmotion.leap.Vector;
 
+import enums.Color;
 import enums.Keyboard;
 
 
@@ -25,8 +25,6 @@ public abstract class GraphicsController implements GLEventListener, KeyboardObs
 	protected static GLCapabilities capabilities;
 	protected GLCanvas canvas;
 	public static GL2 gl;
-	protected Vector pos;
-	protected Vector dir;
 	protected IKeyboard keyboard;
 	public static GLU glu;
 	public static GLUT glut;
@@ -79,20 +77,20 @@ public abstract class GraphicsController implements GLEventListener, KeyboardObs
         gl.glPolygonMode(GL_FRONT_AND_BACK, GL_SMOOTH);
    
         // ----- Your OpenGL initialization code here -----
+        float globalAmbient[] = {0.2f, 0.2f, 0.2f, 1f};
         float lightPos[] = {0f, 0f, 1f, 0f};
-        float lightAmbient[] = {0f, 0f, 0f, 1f}; // default ambient light
-        float lightDiffuse[] = {1f, 1f, 1f, 1f}; // default diffuse light
-        float lightSpecular[] = {1f, 1f, 1f, 1f}; // default specular light
-        float materialSpecular[] = { 0f, 0f, 0f, 1f}; // default specular material property
-        float materialShininess[] = {5f}; // default shininess material property\
-        
-        gl.glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, materialSpecular, 0);
-        gl.glMaterialfv(GL_FRONT_AND_BACK, GL_SHININESS, materialShininess, 0);
-        gl.glLightfv(GL_LIGHT0, GL_AMBIENT, lightAmbient, 0);
-        gl.glLightfv(GL_LIGHT0, GL_DIFFUSE, lightDiffuse, 0);
-        gl.glLightfv(GL_LIGHT0, GL_SPECULAR, lightSpecular, 0);
+
+        gl.glLightfv(GL_LIGHT0, GL_AMBIENT, Color.BLACK.getColor(), 0);
+        gl.glLightfv(GL_LIGHT0, GL_DIFFUSE, Color.WHITE.getColor(), 0);
+        gl.glLightfv(GL_LIGHT0, GL_SPECULAR, Color.WHITE.getColor(), 0);
         gl.glLightfv(GL_LIGHT0, GL_POSITION, lightPos, 0);
+        gl.glLightModelfv(GL_AMBIENT, globalAmbient, 0);
         gl.glEnable(GL_LIGHT0);
+        gl.glEnable(GL_LIGHTING);
+        gl.glEnable(GL_COLOR_MATERIAL);
+        gl.glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE);
+        gl.glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, Color.BLACK.getColor(), 0);
+        gl.glMaterialfv(GL_FRONT_AND_BACK, GL_EMISSION, Color.BLACK.getColor(), 0);
         gl.glDisable(GL_LIGHTING);
         
     }
