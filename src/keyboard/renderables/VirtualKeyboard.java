@@ -76,6 +76,27 @@ public class VirtualKeyboard extends KeyboardRenderable {
         }
     }
     
+    public void locked(Key key) {
+        VirtualKey virtualKey = keys.get(key);
+        if(virtualKey != null) {
+            virtualKey.locked();
+        }
+    }
+    
+    public void selected(Key key) {
+        VirtualKey virtualKey = keys.get(key);
+        if(virtualKey != null) {
+            virtualKey.selected();
+        }
+    }
+    
+    public void deselected(Key key) {
+        VirtualKey virtualKey = keys.get(key);
+        if(virtualKey != null) {
+            virtualKey.deselected();
+        }
+    }
+    
     public VirtualKey isHoveringAny(Vector point) {
         VirtualKey vKey = null;
         for(VirtualKey virtualKey: keys.values()) {

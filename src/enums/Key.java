@@ -4,6 +4,8 @@ import java.awt.event.KeyEvent;
 
 public enum Key {
     VK_NULL('\0', '\0', "VK_NULL", -1, false),
+    VK_BLANK_0('\0', '\0', "VK_BLANK", -1, false),
+    VK_BLANK_1('\0', '\0', "VK_BLANK", -1, false),
     VK_A('a', 'A', "VK_A", KeyEvent.VK_A, true),
     VK_B('b', 'B', "VK_B", KeyEvent.VK_B, true),
     VK_C('c', 'C', "VK_C", KeyEvent.VK_C, true),
@@ -90,7 +92,27 @@ public enum Key {
     public boolean isPrintable() {
         return isPrintable;
     }
-
+    
+    public boolean isBlank() {
+        return keyValue == '\0';
+    }
+    
+    public boolean isArrow() {
+        return 37 <= this.keyCode && this.keyCode <= 40;
+    }
+    
+    public boolean isAlphaNumeric() {
+        return this.isNumeric() || this.isAlpha();
+    }
+    
+    public boolean isAlpha() {
+        return 65 <= this.keyCode && this.keyCode <= 90;
+    }
+    
+    public boolean isNumeric() {
+        return 48 <= this.keyCode && this.keyCode <= 57;
+    }
+    
     public static int getSize() {
         return SIZE;
     }

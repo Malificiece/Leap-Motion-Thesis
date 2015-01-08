@@ -65,11 +65,15 @@ public class KeyboardGestures extends KeyboardRenderable {
         return gestures.contains(gesture);
     }
     
-    public void updateAll() {
+    public void removeAndUpdateGestures() {
         Iterator<KeyboardGesture> iterator = gestures.iterator();
         while(iterator.hasNext()) {
             KeyboardGesture gesture = (KeyboardGesture) iterator.next();
-            gesture.update();
+            if(gesture.isDone()) {
+                iterator.remove();
+            } else {
+                gesture.update();
+            }
         }
     }
     

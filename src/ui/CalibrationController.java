@@ -41,7 +41,6 @@ public class CalibrationController extends GraphicsController {
     private JButton saveSettingsButton;
     private JPanel settingsPanel;
     private JPanel renderOptionsPanel;
-    private Timer clearTextTimer;
     private java.util.Timer fpsTimer;
     private int frameCount = 0;
     
@@ -87,14 +86,6 @@ public class CalibrationController extends GraphicsController {
         WindowBuilder.buildCalibrationWindow(frame, canvasPanel, typedLabel, keyboardTypeComboBox, buttons, panels);
         canvas.setFocusable(true);
         addKeyboardToUI();
-        
-        clearTextTimer = new Timer(1000, new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                typedLabel.setText("");
-            }
-        });
-        clearTextTimer.start();
         
         saveSettingsButton.addActionListener(new ActionListener() {
             @Override
@@ -174,7 +165,6 @@ public class CalibrationController extends GraphicsController {
     
     @Override
     public void keyboardKeyEventObserved(char key) {
-        clearTextTimer.restart();
         if(key == '\b' && 0 < typedLabel.getText().length()) {
             typedLabel.setText(typedLabel.getText().substring(0, typedLabel.getText().length()-1));
         } else if(key == '\n') {
@@ -200,7 +190,6 @@ public class CalibrationController extends GraphicsController {
         calibrateButton.setEnabled(false);
         saveSettingsButton.setEnabled(false);
         keyboardTypeComboBox.setEnabled(false);
-        clearTextTimer.stop();
         settingsPanel.removeAll();
         KeyboardAttributes ka = keyboard.getAttributes();
         settingsPanel.add(ka.getAttribute(Attribute.LEAP_PLANE_POINT_A).getAttributePanel());
@@ -213,7 +202,6 @@ public class CalibrationController extends GraphicsController {
         calibrateButton.setEnabled(true);
         saveSettingsButton.setEnabled(true);
         keyboardTypeComboBox.setEnabled(true);
-        clearTextTimer.start();
         settingsPanel.removeAll();
         
         KeyboardAttributes ka = keyboard.getAttributes();

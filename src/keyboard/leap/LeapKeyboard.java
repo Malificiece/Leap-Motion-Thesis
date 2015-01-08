@@ -127,7 +127,9 @@ public class LeapKeyboard extends IKeyboard implements LeapObserver, Calibration
                         keyboardRenderables.swapToLowerCaseKeyboard();
                     }
                 }
-                if(shiftOnce) {
+                if(shiftTwice) {
+                    virtualKeyboard.locked(Key.VK_SHIFT);
+                } else if(shiftOnce) {
                     virtualKeyboard.pressed(Key.VK_SHIFT);
                 }
             } else {

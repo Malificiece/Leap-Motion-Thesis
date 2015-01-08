@@ -16,7 +16,8 @@ import utilities.GLColor;
 
 public class VirtualKey {
     private static enum KeyState {
-        ACTIVE(Color.GREEN),
+        LOCKED(Color.BLUE),
+        PRESSED(Color.GREEN),
         HOVER(Color.YELLOW),
         NONE(Color.RED);
         
@@ -60,8 +61,20 @@ public class VirtualKey {
     }
     
     public void pressed() {
-        keyState = KeyState.ACTIVE;
+        keyState = KeyState.PRESSED;
         lightUpKeyTimer.restart();
+    }
+    
+    public void locked() {
+        keyState = KeyState.LOCKED;
+    }
+    
+    public void selected() {
+        keyState = KeyState.HOVER;
+    }
+    
+    public void deselected() {
+        keyState = KeyState.NONE;
     }
     
     public boolean isHovering(Vector point) {

@@ -2,7 +2,8 @@ package enums;
 
 import com.leapmotion.leap.Vector;
 
-public enum GestureDirection {
+public enum Direction {
+    NONE(Vector.zero()),
     LEFT(Vector.left()),
     RIGHT(Vector.right()),
     UP(Vector.up()),
@@ -10,7 +11,7 @@ public enum GestureDirection {
     
     private Vector direction;
     
-    private GestureDirection(Vector direction) {
+    private Direction(Vector direction) {
         this.direction = direction;
     }
     
