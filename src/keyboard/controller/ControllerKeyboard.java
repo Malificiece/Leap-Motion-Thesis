@@ -31,7 +31,7 @@ public class ControllerKeyboard extends IKeyboard {
     public static final int KEYBOARD_ID = 3;
     private static final String KEYBOARD_NAME = "Controller Keyboard";
     private static final String KEYBOARD_FILE_NAME = FileName.CONTROLLER.getName();
-    private static final float AUTO_REPEAT_DELAY = (750 * 1/3) + 250; // Windows default
+    private static final float AUTO_REPEAT_DELAY = (750 * 1f/3f) + 250; // Windows default
     private static final int AUTO_REPEAT_RATE = 1000 / 31; // Windows default
     private final float HORIZONTAL_GESTURE_LENGTH = 125f;
     private final float VERTICAL_GESTURE_LENGTH;

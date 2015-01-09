@@ -102,18 +102,18 @@ public class LeapKeyboard extends IKeyboard implements LeapObserver, Calibration
             // Update gestures after plane, we need both normalized and non normalized points.
             leapGestures.update();
             if(leapTool.isValid()) {
-                VirtualKey vKey;
-                if((vKey = virtualKeyboard.isHoveringAny(leapPoint.getNormalizedPoint())) != null && leapPlane.isTouching()) {
-                    vKey.pressed();
-                    if(vKey.getKey() != Key.VK_SHIFT) {
+                Key key;
+                swipeKeyboard.update();
+                if((key = swipeKeyboard.isPressed()) != Key.VK_NULL) {
+                    if(key != Key.VK_SHIFT) {
                         if(shiftOnce) {
-                            keyPressed = vKey.getKey().toUpper();
+                            keyPressed = key.toUpper();
                             shiftOnce = shiftTwice;
                             if(!shiftTwice) {
                                 keyboardRenderables.swapToLowerCaseKeyboard();
                             }
                         } else {
-                            keyPressed = vKey.getKey().getValue();   
+                            keyPressed = key.getValue();   
                         }
                         notifyListenersKeyEvent();
                     } else if(!shiftOnce && !shiftTwice) {
@@ -132,9 +132,9 @@ public class LeapKeyboard extends IKeyboard implements LeapObserver, Calibration
                 } else if(shiftOnce) {
                     virtualKeyboard.pressed(Key.VK_SHIFT);
                 }
-            } else {
+            }/* else {
                 virtualKeyboard.clearAll();
-            }
+            }*/
         } finally {
             LEAP_LOCK.unlock();
         }
@@ -252,6 +252,66 @@ public class LeapKeyboard extends IKeyboard implements LeapObserver, Calibration
     }
     
     private class SwipeKeyboard {
+        private static final float AUTO_REPEAT_DELAY = (750 * 1f/3f) + 250; // Windows default
+        private static final int AUTO_REPEAT_RATE = 1000 / 31; // Windows default
+        private VirtualKey virtualKey;
+        private boolean isPressed;
+        private boolean isDown;
+        private boolean isRepeating;
+        private long previousRepeatTime = 0;
+        private long elapsedRepeatTime = 0;
         
+        public void update() {
+            // 1) Determing the vector from either current point to dest key center or from previous key center to next key center.
+            // 2) If deviate by min Arc or Angle then we count keys in our path as pressed even if they are on the path to the next key. This also helps us determine accuracy.
+            // 3) If we touch a key, we considered it pressed only once.
+            // 4) If Swipe is used, then we generate a free space before (if doesn't exit) and after word we swiped.
+            // 5) If key taps are used, then we generate no spaces.
+            // 6) The only key that can be held down is backspace. Just implement it like backspace of other keyboards.
+            
+            if((virtualKey = virtualKeyboard.isHoveringAny(leapPoint.getNormalizedPoint())) != null && leapPlane.isTouching()) {
+                virtualKey.pressed();
+                if(!isPressed && !isDown) {
+                    isPressed = true;
+                    isDown = true;
+                    if(virtualKey.getKey() == Key.VK_BACK_SPACE) {
+                        previousRepeatTime = System.currentTimeMillis();
+                        elapsedRepeatTime = 0;
+                    }
+                } else if(virtualKey.getKey() == Key.VK_BACK_SPACE) {
+                    long now = System.currentTimeMillis();
+                    elapsedRepeatTime += now - previousRepeatTime;
+                    previousRepeatTime = now;
+                    
+                    if(!isRepeating && elapsedRepeatTime > AUTO_REPEAT_DELAY) {
+                        isPressed = true;
+                        isRepeating = true;
+                        elapsedRepeatTime = 0;
+                    } else if(isRepeating && elapsedRepeatTime > AUTO_REPEAT_RATE) {
+                        isPressed = true;
+                        elapsedRepeatTime = 0;
+                    }
+                }
+            } else {
+                if(isPressed || isDown) {
+                    isPressed = false;
+                    isDown = false;
+                    isRepeating = false;
+                }
+            }
+        }
+
+        public Key isPressed() {
+            try {
+                if(isPressed) {
+                    return virtualKey.getKey();
+                } else {
+                    return Key.VK_NULL;
+                }
+            } finally {
+                // Consume the pressed key event.
+                isPressed = false;
+            }
+        }
     }
 }
