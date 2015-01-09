@@ -6,6 +6,8 @@ import javax.media.opengl.GL2;
 import javax.media.opengl.awt.GLCanvas;
 import javax.swing.JPanel;
 
+import com.leapmotion.leap.Vector;
+
 import net.java.games.input.Component;
 import net.java.games.input.Controller;
 import net.java.games.input.ControllerEnvironment;
@@ -13,12 +15,15 @@ import net.java.games.input.DirectAndRawInputEnvironmentPlugin;
 import net.java.games.input.Component.Identifier;
 import utilities.MyUtilities;
 import keyboard.IKeyboard;
+import keyboard.KeyboardGesture;
+import keyboard.renderables.KeyboardGestures;
 import keyboard.renderables.VirtualKeyboard;
 import enums.Attribute;
 import enums.Direction;
 import enums.FileExt;
 import enums.FileName;
 import enums.FilePath;
+import enums.Gesture;
 import enums.Key;
 import enums.Renderable;
 
@@ -28,9 +33,15 @@ public class ControllerKeyboard extends IKeyboard {
     private static final String KEYBOARD_FILE_NAME = FileName.CONTROLLER.getName();
     private static final float AUTO_REPEAT_DELAY = (750 * 1/3) + 250; // Windows default
     private static final int AUTO_REPEAT_RATE = 1000 / 31; // Windows default
+    private final float HORIZONTAL_GESTURE_LENGTH = 125f;
+    private final float VERTICAL_GESTURE_LENGTH;
+    private final float HORIZONTAL_GESTURE_OFFSET = 25f;
+    private final float VERTICAL_GESTURE_OFFSET;
+    private final float CAMERA_DISTANCE;
     private final Point KEY_LAYOUT_SIZE = new Point(5, 14);
     private boolean isCalibrated = false;
     private VirtualKeyboard virtualKeyboard;
+    private KeyboardGestures keyboardGestures;
     private GamePad gamePad;
     private Point selectedKey;
     private Key [][] keyLayout;
@@ -44,10 +55,14 @@ public class ControllerKeyboard extends IKeyboard {
         keyboardSettings = new ControllerSettings(this);
         System.out.println("-------------------------------------------------------");
         keyboardRenderables = new ControllerRenderables(this);
+        CAMERA_DISTANCE = keyboardAttributes.getAttributeAsFloat(Attribute.CAMERA_DISTANCE);
         keyboardSize = keyboardAttributes.getAttributeAsPoint(Attribute.KEYBOARD_SIZE);
         int borderSize = keyboardAttributes.getAttributeAsInteger(Attribute.BORDER_SIZE) * 2;
         imageSize = new Point(keyboardSize.x + borderSize, keyboardSize.y + borderSize);
+        VERTICAL_GESTURE_LENGTH = HORIZONTAL_GESTURE_LENGTH * (imageSize.y/(float)imageSize.x);
+        VERTICAL_GESTURE_OFFSET = HORIZONTAL_GESTURE_OFFSET * (imageSize.y/(float)imageSize.x);
         virtualKeyboard = (VirtualKeyboard) keyboardRenderables.getRenderable(Renderable.VIRTUAL_KEYS);
+        keyboardGestures = (KeyboardGestures) keyboardRenderables.getRenderable(Renderable.KEYBOARD_GESTURES);
         gamePad = new GamePad();
         keyLayout = getKeyLayout((Key[][]) keyboardAttributes.getAttribute(Attribute.KEY_ROWS).getValue());
         selectedKey = new Point(0, 0);
@@ -57,15 +72,18 @@ public class ControllerKeyboard extends IKeyboard {
     
     @Override
     public void render(GL2 gl) {
-        MyUtilities.OPEN_GL_UTILITIES.switchToOrthogonal(gl, this, true);
+        MyUtilities.OPEN_GL_UTILITIES.switchToPerspective(gl, this, true);
         gl.glPushMatrix();
-        gl.glTranslatef(0.0f, 0.0f, -0.1f);
+        gl.glTranslatef(-imageSize.x/2f, -imageSize.y/2f, -CAMERA_DISTANCE);
         keyboardRenderables.render(gl);
         gl.glPopMatrix();
     }
     
     @Override
     public void update() {
+        // Remove finished gestures, update others.
+        keyboardGestures.removeAndUpdateGestures();
+        
         gamePad.update();
         
         // Go through controller inputs and check values
@@ -175,8 +193,7 @@ public class ControllerKeyboard extends IKeyboard {
             virtualKeyboard.deselected(Key.VK_ENTER);
         }
         
-        // if left stick --- pos based on which direction we're pointed the most left, right, up, down
-        // have a getClosestDirection() function in the enum itself that return the Direction
+        // Left Stick, moves keyboard (maybe add gestures)
         switch(Axis.getClosestDirectionLeftStick()) {
             case DOWN:
                 moveSelectedKey(-1, 0);
@@ -193,19 +210,40 @@ public class ControllerKeyboard extends IKeyboard {
             default: break;
         }
         
-        // for gestures we can use dpad or maybe right stick. (might switch to any stick)
-        // will use get exact direction
-        // dpad can return diagnols... figure out what to do here
+        // Right Stick, moves keyboard (maybe add gestures)
+        switch(Axis.getClosestDirectionRightStick()) {
+            case DOWN:
+                moveSelectedKey(-1, 0);
+                break;
+            case LEFT:
+                moveSelectedKey(0, -1);
+                break;
+            case RIGHT:
+                moveSelectedKey(0, 1);
+                break;
+            case UP:
+                moveSelectedKey(1, 0);
+                break;
+            default: break;
+        }
+        
+        // Hat Switch, create gestures
+        for(HatSwitch hatSwitch: HatSwitch.values()) {
+            KeyboardGesture gesture = createSwipeGesture(hatSwitch.isPressed());
+            if(gesture != null) {
+                keyboardGestures.addGesture(gesture);
+            }
+        }
     }
     
     @Override
     public void addToUI(JPanel panel, GLCanvas canvas) {
-        // TODO Auto-generated method stub
+        // Do nothing
     }
 
     @Override
     public void removeFromUI(JPanel panel, GLCanvas canvas) {
-        // TODO Auto-generated method stub
+        // Do nothing
     }
 
     @Override
@@ -222,6 +260,34 @@ public class ControllerKeyboard extends IKeyboard {
     @Override
     public boolean isCalibrated() {
         return isCalibrated;
+    }
+    
+    public KeyboardGesture createSwipeGesture(Direction direction) {
+        KeyboardGesture gesture = null;
+        switch(direction) {
+            case UP:
+                gesture = new KeyboardGesture(new Vector(imageSize.x/2f, imageSize.y/2f + VERTICAL_GESTURE_OFFSET, CAMERA_DISTANCE * 0.5f), Gesture.SWIPE);
+                gesture.update(new Vector(imageSize.x/2f, imageSize.y/2f + VERTICAL_GESTURE_LENGTH, CAMERA_DISTANCE * 0.5f));
+                gesture.gestureFinshed();
+                break;
+            case DOWN:
+                gesture = new KeyboardGesture(new Vector(imageSize.x/2f, imageSize.y/2f - VERTICAL_GESTURE_OFFSET, CAMERA_DISTANCE * 0.5f), Gesture.SWIPE);
+                gesture.update(new Vector(imageSize.x/2f, imageSize.y/2f - VERTICAL_GESTURE_LENGTH, CAMERA_DISTANCE * 0.5f));
+                gesture.gestureFinshed();
+                break;
+            case LEFT:
+                gesture = new KeyboardGesture(new Vector(imageSize.x/2f - HORIZONTAL_GESTURE_OFFSET, imageSize.y/2f, CAMERA_DISTANCE * 0.5f), Gesture.SWIPE);
+                gesture.update(new Vector(imageSize.x/2f - HORIZONTAL_GESTURE_LENGTH, imageSize.y/2f, CAMERA_DISTANCE * 0.5f));
+                gesture.gestureFinshed();
+                break;
+            case RIGHT:
+                gesture = new KeyboardGesture(new Vector(imageSize.x/2f + HORIZONTAL_GESTURE_OFFSET, imageSize.y/2f, CAMERA_DISTANCE * 0.5f), Gesture.SWIPE);
+                gesture.update(new Vector(imageSize.x/2f + HORIZONTAL_GESTURE_LENGTH, imageSize.y/2f, CAMERA_DISTANCE * 0.5f));
+                gesture.gestureFinshed();
+                break;
+            default: break;
+        }
+        return gesture;
     }
     
     private void moveSelectedKey(int rowDelta, int colDelta) {
@@ -310,14 +376,6 @@ public class ControllerKeyboard extends IKeyboard {
             }
             tmpKeyLayout[row] = tmpRow;
         }
-        
-        for(Key [] ks: tmpKeyLayout) {
-            System.out.print(ks + ": ");
-            for(Key k: ks) {
-                System.out.print(k + " ");
-            } System.out.println();
-        }
-        
         return tmpKeyLayout;
     }
     
@@ -358,9 +416,7 @@ public class ControllerKeyboard extends IKeyboard {
                     isDown = true;
                     previousRepeatTime = System.currentTimeMillis();
                     elapsedRepeatTime = 0;
-                    System.out.println(this + " pressed");
                 } else {
-                    // auto repeat interval set pressed = true;
                     long now = System.currentTimeMillis();
                     elapsedRepeatTime += now - previousRepeatTime;
                     previousRepeatTime = now;
@@ -379,8 +435,6 @@ public class ControllerKeyboard extends IKeyboard {
                     isPressed = false;
                     isDown = false;
                     isRepeating = false;
-                    System.out.println(this + " released");
-                    // stop auto press
                 }
             }
         }
@@ -400,15 +454,16 @@ public class ControllerKeyboard extends IKeyboard {
     }
     
     private static enum HatSwitch {
-        LEFT(0.875f, 1.0f, 0.125f),
-        UP(0.125f, 0.25f, 0.375f),
-        RIGHT(0.375f, 0.5f, 0.625f),
-        DOWN(0.625f, 0.75f, 0.875f);
+        LEFT(0.875f, 1.0f, 0.125f, Direction.LEFT),
+        UP(0.125f, 0.25f, 0.375f, Direction.UP),
+        RIGHT(0.375f, 0.5f, 0.625f, Direction.RIGHT),
+        DOWN(0.625f, 0.75f, 0.875f, Direction.DOWN);
         
         public final static Identifier identifier = Component.Identifier.Axis.POV;
         private final float min;
         private final float def;
         private final float max;
+        private final Direction direction;
         private boolean isPressed;
         private boolean isDown;
         private boolean isRepeating;
@@ -418,10 +473,11 @@ public class ControllerKeyboard extends IKeyboard {
         private static final HatSwitch[] VALUES = values();
         private static final int SIZE = VALUES.length;
         
-        private HatSwitch(float min, float def, float max) {
+        private HatSwitch(float min, float def, float max, Direction direction) {
             this.min = min;
             this.def = def;
             this.max = max;
+            this.direction = direction;
             isPressed = false;
         }
         
@@ -438,9 +494,7 @@ public class ControllerKeyboard extends IKeyboard {
                     isDown = true;
                     previousRepeatTime = System.currentTimeMillis();
                     elapsedRepeatTime = 0;
-                    System.out.println(this + " pressed");
                 } else {
-                    // auto repeat interval set pressed = true;
                     long now = System.currentTimeMillis();
                     elapsedRepeatTime += now - previousRepeatTime;
                     previousRepeatTime = now;
@@ -459,15 +513,17 @@ public class ControllerKeyboard extends IKeyboard {
                     isPressed = false;
                     isDown = false;
                     isRepeating = false;
-                    System.out.println(this + " released");
-                    // stop auto press
                 }
             }
         }
         
-        public boolean isPressed() {
+        public Direction isPressed() {
             try {
-                return isPressed;
+                if(isPressed) {
+                    return direction;
+                } else {
+                    return Direction.NONE;
+                }
             } finally {
                 // Consume the pressed key event.
                 isPressed = false;
@@ -512,9 +568,7 @@ public class ControllerKeyboard extends IKeyboard {
                     isDown = true;
                     previousRepeatTime = System.currentTimeMillis();
                     elapsedRepeatTime = 0;
-                    System.out.println(this + " pressed");
                 } else {
-                    // auto repeat interval set pressed = true;
                     long now = System.currentTimeMillis();
                     elapsedRepeatTime += now - previousRepeatTime;
                     previousRepeatTime = now;
@@ -533,8 +587,6 @@ public class ControllerKeyboard extends IKeyboard {
                     this.axisValue = 0f;
                     isDown = false;
                     isRepeating = false;
-                    System.out.println(this + " released");
-                    // stop auto press
                 }
             }
         }

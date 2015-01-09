@@ -242,6 +242,7 @@ public class StandardKeyboard extends IKeyboard {
         private long previousTime;
         private long elapsedTime;
         
+        @SuppressWarnings("unused")
         public float getVelocity() {
             return velocity;
         }

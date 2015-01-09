@@ -14,8 +14,12 @@ public class SwingUtilities {
         // Find out how much the font can grow in width.
         double widthRatio = (double)componentWidth / (double)stringWidth;
 
-        int newFontSize = (int)(labelFont.getSize() * widthRatio);
+        int newFontSize = (int) (labelFont.getSize() * widthRatio);
         int componentHeight = container.getHeight();
+        
+        if(newFontSize == 0) {
+            newFontSize = 1;
+        }
 
         // Pick a new font size so it will not be larger than the height of label.
         int fontSizeToUse = Math.min(newFontSize, componentHeight);
