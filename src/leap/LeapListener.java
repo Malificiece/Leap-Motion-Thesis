@@ -50,7 +50,7 @@ public class LeapListener extends Listener /*implements SaveSettingsObserver*/ {
         
         // Populate leapData with relevant tool data and gestures.
         leapData.setToolData(frame.tools().frontmost());
-        leapData.setTimeStamp(frame.timestamp());
+        leapData.setTimeStamp(System.currentTimeMillis());//frame.timestamp());
     
         notifyListenersDataUpdate();
     }

@@ -60,10 +60,6 @@ public class CalibrationController extends GraphicsController {
         fpsTimer.scheduleAtFixedRate(updateFPS, 1000, 1000);
         
         keyboard = Keyboard.STANDARD.getKeyboard();
-        registerObserver(Keyboard.STANDARD.getKeyboard());
-        registerObserver(Keyboard.LEAP.getKeyboard());
-        registerObserver(Keyboard.TABLET.getKeyboard());
-        registerObserver(Keyboard.CONTROLLER.getKeyboard());
         canvasPanel = new JPanel();
         canvas = new GLCanvas(capabilities);
         canvas.setPreferredSize(new Dimension(keyboard.getImageWidth(), keyboard.getImageHeight()));
@@ -152,11 +148,10 @@ public class CalibrationController extends GraphicsController {
             public void windowClosing(WindowEvent e) {
                 // Change to close experiment window.
                 //System.exit(0);
+                disable();
                 frame.dispose();
             }
         });
-        
-        canvas.addGLEventListener(this);
         
         // Something causes the canvas to resize between the original frame.pack() and this one so we just pack again, no harm done.
         frame.pack();
@@ -219,11 +214,31 @@ public class CalibrationController extends GraphicsController {
     
     public void disable() {
         frame.setVisible(false);
+        canvas.removeGLEventListener(this);
+        removeObserver(Keyboard.STANDARD.getKeyboard());
+        removeObserver(Keyboard.LEAP.getKeyboard());
+        removeObserver(Keyboard.TABLET.getKeyboard());
+        removeObserver(Keyboard.CONTROLLER.getKeyboard());
+        Keyboard.STANDARD.getKeyboard().removeObserver(this);
+        Keyboard.LEAP.getKeyboard().removeObserver(this);
+        Keyboard.TABLET.getKeyboard().removeObserver(this);
+        Keyboard.CONTROLLER.getKeyboard().removeObserver(this);
+        enabled = false;
     }
     
     public void enable() {
         frame.setVisible(true);
         frame.requestFocusInWindow();
+        canvas.addGLEventListener(this);
+        registerObserver(Keyboard.STANDARD.getKeyboard());
+        registerObserver(Keyboard.LEAP.getKeyboard());
+        registerObserver(Keyboard.TABLET.getKeyboard());
+        registerObserver(Keyboard.CONTROLLER.getKeyboard());
+        Keyboard.STANDARD.getKeyboard().registerObserver(this);
+        Keyboard.LEAP.getKeyboard().registerObserver(this);
+        Keyboard.TABLET.getKeyboard().registerObserver(this);
+        Keyboard.CONTROLLER.getKeyboard().registerObserver(this);
+        enabled = true;
     }
     
     public void update() {

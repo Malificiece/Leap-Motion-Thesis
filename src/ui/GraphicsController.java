@@ -17,8 +17,6 @@ import static javax.media.opengl.GL2.*; // GL2 constants
 import com.jogamp.opengl.util.gl2.GLUT;
 
 import enums.Color;
-import enums.Keyboard;
-
 
 public abstract class GraphicsController implements GLEventListener, KeyboardObserver {
 	private static GLProfile profile;
@@ -28,6 +26,7 @@ public abstract class GraphicsController implements GLEventListener, KeyboardObs
 	protected IKeyboard keyboard;
 	public static GLU glu;
 	public static GLUT glut;
+	protected boolean enabled = false;
 	
 	public static void init() {
 	    GLProfile.initSingleton();
@@ -35,11 +34,18 @@ public abstract class GraphicsController implements GLEventListener, KeyboardObs
 		capabilities = new GLCapabilities(profile);
 	}
 	
+	public abstract void enable();
+	public abstract void disable();
 	public abstract void update();
 	public abstract void render(GLAutoDrawable drawable);
 	
+	public boolean isEnabled() {
+	    return enabled;
+	}
+	
 	public void display() {
 	    if(canvas != null) {
+	        System.out.println(canvas);
 	        canvas.display();
 	    }
 	}
@@ -57,15 +63,10 @@ public abstract class GraphicsController implements GLEventListener, KeyboardObs
     @Override
     public void init(GLAutoDrawable drawable) {
         GraphicsController.gl = drawable.getGL().getGL2();  // get the OpenGL graphics context
+        System.out.println(this);
         glu = new GLU();  // get GL Utilities
         glut = new GLUT();
         gl.setSwapInterval(1);
-        
-        // TODO: Make sure this is where I want to register observers.
-        Keyboard.STANDARD.getKeyboard().registerObserver(this);
-        Keyboard.LEAP.getKeyboard().registerObserver(this);
-        Keyboard.TABLET.getKeyboard().registerObserver(this);
-        Keyboard.CONTROLLER.getKeyboard().registerObserver(this);
 
         gl.glClearColor(1f, 1f, 1f, 0.0f); // set background (clear) color
         gl.glClearDepth(1.0f);      // set clear depth value to farthest

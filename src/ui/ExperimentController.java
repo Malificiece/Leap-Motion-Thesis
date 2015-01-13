@@ -5,23 +5,26 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
 import javax.media.opengl.GL;
-import javax.media.opengl.GL2;
 import javax.media.opengl.GLAutoDrawable;
 import javax.media.opengl.awt.GLCanvas;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
+import enums.Keyboard;
 
 public class ExperimentController extends GraphicsController {
     private JFrame frame;
+    private GLCanvas textCanvas;
     
     private double theta = 0;
     private double s = 0;
     private double c = 0;
     
     public ExperimentController() {
+        keyboard = Keyboard.STANDARD.getKeyboard();
         canvas = new GLCanvas(capabilities);
+        textCanvas = new GLCanvas(capabilities);
         frame = new JFrame("Experimental Run -- IMPORTANT DATA HERE");
         frame.setSize(600, 700);
         frame.setLocation(300,75);
@@ -50,18 +53,7 @@ public class ExperimentController extends GraphicsController {
         p2.setBackground(new Color(155, 100, 200));
         frame.getContentPane().add(p2, BorderLayout.SOUTH);
         p2.add(calibrate);
-        
 
-
-        // Add a layout manager so that the button is not placed on top of the label
-        //frame.setLayout(new FlowLayout());
-        // Add a label and a button
-        //frame.add(new JLabel("Hello, world!"));
-        //frame.add(new JButton("Press me!"));
-        // Arrange the components inside the window
-        //frame.pack();
-        
-        //frame.setVisible(true);
         
         // by default, an AWT Frame doesn't do anything when you click
         // the close button; this bit of code will terminate the program when
@@ -69,30 +61,51 @@ public class ExperimentController extends GraphicsController {
         frame.addWindowListener(new WindowAdapter() {
             public void windowClosing(WindowEvent e) {
                 // Change to close experiment window.
-                //frame.dispose();
+                disable();
+                frame.dispose();
                 //System.exit(0);
             }
         });
-        
-        canvas.addGLEventListener(this);
+    }
+    
+    @Override
+    public void display() {
+        super.display();
+        if(textCanvas != null) {
+            textCanvas.display();
+        }
     }
     
     public void disable() {
         frame.setVisible(false);
+        canvas.removeGLEventListener(this);
+        textCanvas.removeGLEventListener(this);
+        Keyboard.STANDARD.getKeyboard().removeObserver(this);
+        Keyboard.LEAP.getKeyboard().removeObserver(this);
+        Keyboard.TABLET.getKeyboard().removeObserver(this);
+        Keyboard.CONTROLLER.getKeyboard().removeObserver(this);
+        enabled = false;
     }
     
     public void enable() {
         frame.setVisible(true);
+        frame.requestFocusInWindow();
+        canvas.addGLEventListener(this);
+        textCanvas.addGLEventListener(this);
+        Keyboard.STANDARD.getKeyboard().registerObserver(this);
+        Keyboard.LEAP.getKeyboard().registerObserver(this);
+        Keyboard.TABLET.getKeyboard().registerObserver(this);
+        Keyboard.CONTROLLER.getKeyboard().registerObserver(this);
+        enabled = true;
     }
     
-    public void update(/*Vector position, Vector direction*/) {
+    public void update() {
         theta += 0.01;
         s = Math.sin(theta);
         c = Math.cos(theta);
     }
     
    public void render(GLAutoDrawable drawable) {
-        GL2 gl = drawable.getGL().getGL2();
 
         gl.glClear(GL.GL_COLOR_BUFFER_BIT);
 

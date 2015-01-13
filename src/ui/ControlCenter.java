@@ -27,8 +27,8 @@ public class ControlCenter {
     private final int HOURS_MIN = 0;
     private final int HOURS_MAX = 24;
     private final int HOURS_INIT = 12;
-    private final CalibrationController CALIBRATION_CONTROLLER = new CalibrationController();
     private final ExperimentController EXPERIMENT_CONTROLLER = new ExperimentController();
+    private final CalibrationController CALIBRATION_CONTROLLER = new CalibrationController();
     
     // Not Constants
     //LeapListener leapListener;
@@ -46,8 +46,6 @@ public class ControlCenter {
     private ButtonGroup handednessGroup;
     private JButton calibrate;
     private JButton experiment;
-    private Boolean expInProgress = false;
-    private Boolean calibInProgress = false;
     private final  ReentrantLock expLock = new ReentrantLock();
     private final ReentrantLock calibLock = new ReentrantLock();
     
@@ -107,7 +105,6 @@ public class ControlCenter {
                 expLock.lock();
                 try {
                     EXPERIMENT_CONTROLLER.enable();
-                    expInProgress = true;
                 } finally {
                     expLock.unlock();
                 }
@@ -123,9 +120,7 @@ public class ControlCenter {
             public void actionPerformed(ActionEvent arg0) {
                 calibLock.lock();
                 try {
-                    //calibControl = null;
                     CALIBRATION_CONTROLLER.enable();
-                    calibInProgress = true;
                 } finally {
                     calibLock.unlock();
                 }
@@ -158,7 +153,7 @@ public class ControlCenter {
     public Boolean calibInProgress() {
         calibLock.lock();
         try {
-            return calibInProgress;
+            return CALIBRATION_CONTROLLER.isEnabled();
         } finally {
             calibLock.unlock();
         }
@@ -167,7 +162,7 @@ public class ControlCenter {
     public Boolean expInProgress() {
         expLock.lock();
         try {
-            return expInProgress;
+            return EXPERIMENT_CONTROLLER.isEnabled();
         } finally {
             expLock.unlock();
         }
