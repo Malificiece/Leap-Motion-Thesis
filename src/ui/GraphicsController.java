@@ -45,7 +45,6 @@ public abstract class GraphicsController implements GLEventListener, KeyboardObs
 	
 	public void display() {
 	    if(canvas != null) {
-	        System.out.println(canvas);
 	        canvas.display();
 	    }
 	}
@@ -63,7 +62,6 @@ public abstract class GraphicsController implements GLEventListener, KeyboardObs
     @Override
     public void init(GLAutoDrawable drawable) {
         GraphicsController.gl = drawable.getGL().getGL2();  // get the OpenGL graphics context
-        System.out.println(this);
         glu = new GLU();  // get GL Utilities
         glut = new GLUT();
         gl.setSwapInterval(1);

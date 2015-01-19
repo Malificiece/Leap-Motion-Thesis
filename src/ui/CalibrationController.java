@@ -6,6 +6,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.ArrayList;
+import java.util.Timer;
 import java.util.TimerTask;
 
 import javax.media.opengl.GLAutoDrawable;
@@ -19,12 +20,12 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.WindowConstants;
 
 import keyboard.KeyboardAttributes;
 import keyboard.KeyboardRenderable;
 import keyboard.KeyboardSetting;
 import utilities.MyUtilities;
-
 import enums.Attribute;
 import enums.Keyboard;
 
@@ -33,32 +34,18 @@ public class CalibrationController extends GraphicsController {
     private ArrayList<SaveSettingsObserver> observers = new ArrayList<SaveSettingsObserver>();
     private JFrame frame;
     private JPanel canvasPanel;
-    private JLabel typedLabel;
-    private JPanel typedPanel;
+    private JLabel wordLabel;
+    private JPanel wordPanel;
     private JComboBox<String> keyboardTypeComboBox;
     private JButton calibrateButton;
     private JButton saveSettingsButton;
     private JPanel settingsPanel;
     private JPanel renderOptionsPanel;
-    private java.util.Timer fpsTimer;
+    private Timer fpsTimer;
     private int frameCount = 0;
+    private boolean runningCalibration = false;
     
     public CalibrationController() {
-        TimerTask updateFPS = new TimerTask() {
-
-            @Override
-            public void run() {
-                if(frame != null) {
-                    frame.setTitle("Calibration - FPS: " + frameCount);
-                }
-                frameCount = 0;
-            }
-            
-        };
-        
-        fpsTimer = new java.util.Timer();
-        fpsTimer.scheduleAtFixedRate(updateFPS, 1000, 1000);
-        
         keyboard = Keyboard.STANDARD.getKeyboard();
         canvasPanel = new JPanel();
         canvas = new GLCanvas(capabilities);
@@ -66,21 +53,21 @@ public class CalibrationController extends GraphicsController {
         canvas.setSize(keyboard.getImageWidth(), keyboard.getImageHeight());
         canvasPanel.add(canvas);
         frame = new JFrame("Calibration - FPS: 0");
-        typedLabel = new JLabel();
-        typedPanel = new JPanel();
+        frame.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
+        wordLabel = new JLabel();
+        wordPanel = new JPanel();
         keyboardTypeComboBox = new JComboBox<String>();
         calibrateButton = new JButton("Calibrate");
         saveSettingsButton = new JButton("Save Settings");
         settingsPanel = new JPanel();
         renderOptionsPanel = new JPanel();
         
-        JPanel panels[] = {typedPanel, settingsPanel, renderOptionsPanel};
+        JPanel panels[] = {wordPanel, settingsPanel, renderOptionsPanel};
         JButton buttons[] = {calibrateButton, saveSettingsButton};      
 
-        // Window builder builds window using important fields here. It adds unimportant fields that we won't use for aesthetics only.
-        WindowBuilder.buildCalibrationWindow(frame, canvasPanel, typedLabel, keyboardTypeComboBox, buttons, panels);
+        // Window builder builds window using important fields here. It adds unimportant fields that we use for aesthetics only.
+        WindowBuilder.buildCalibrationWindow(frame, canvasPanel, wordLabel, keyboardTypeComboBox, buttons, panels);
         canvas.setFocusable(true);
-        addKeyboardToUI();
         
         saveSettingsButton.addActionListener(new ActionListener() {
             @Override
@@ -107,11 +94,11 @@ public class CalibrationController extends GraphicsController {
                                 options[0]);
                         if(selection == JOptionPane.YES_OPTION) {
                             beginCalibration();
-                            keyboard.beginCalibration(typedPanel);
+                            keyboard.beginCalibration(wordPanel);
                         }
                     } else {
                         beginCalibration();
-                        keyboard.beginCalibration(typedPanel);
+                        keyboard.beginCalibration(wordPanel);
                     }
                 } else {
                     JOptionPane.showMessageDialog(frame,
@@ -146,10 +133,9 @@ public class CalibrationController extends GraphicsController {
         // the window is asked to close
         frame.addWindowListener(new WindowAdapter() {
             public void windowClosing(WindowEvent e) {
-                // Change to close experiment window.
-                //System.exit(0);
-                disable();
-                frame.dispose();
+                if(!runningCalibration) {
+                    disable();
+                }
             }
         });
         
@@ -159,14 +145,14 @@ public class CalibrationController extends GraphicsController {
     
     @Override
     public void keyboardKeyEventObserved(char key) {
-        if(key == '\b' && 0 < typedLabel.getText().length()) {
-            typedLabel.setText(typedLabel.getText().substring(0, typedLabel.getText().length()-1));
+        if(key == '\b' && 0 < wordLabel.getText().length()) {
+            wordLabel.setText(wordLabel.getText().substring(0, wordLabel.getText().length()-1));
         } else if(key == '\n') {
-            typedLabel.setText("");
+            wordLabel.setText("");
         } else {
-            typedLabel.setText(typedLabel.getText()+Character.toString(key));
+            wordLabel.setText(wordLabel.getText()+Character.toString(key));
         }
-        MyUtilities.JAVA_SWING_UTILITIES.calculateFontSize(typedLabel.getText(),typedLabel, typedPanel);
+        MyUtilities.JAVA_SWING_UTILITIES.calculateFontSize(wordLabel.getText(),wordLabel, wordPanel);
     }
     
     @Override
@@ -180,19 +166,26 @@ public class CalibrationController extends GraphicsController {
     }
     
     private void beginCalibration() {
-        typedPanel.removeAll();
+        runningCalibration = true;
+        wordLabel.setText("");
+        wordLabel.setVisible(false);
+        wordPanel.removeAll();
         calibrateButton.setEnabled(false);
         saveSettingsButton.setEnabled(false);
         keyboardTypeComboBox.setEnabled(false);
         settingsPanel.removeAll();
-        KeyboardAttributes ka = keyboard.getAttributes();
-        settingsPanel.add(ka.getAttribute(Attribute.LEAP_PLANE_POINT_A).getAttributePanel());
-        settingsPanel.add(ka.getAttribute(Attribute.LEAP_PLANE_POINT_B).getAttributePanel());
-        settingsPanel.add(ka.getAttribute(Attribute.LEAP_PLANE_POINT_C).getAttributePanel());
+        if(keyboard.getID() == Keyboard.LEAP.getID()) {
+            KeyboardAttributes ka = keyboard.getAttributes();
+            settingsPanel.add(ka.getAttribute(Attribute.LEAP_PLANE_POINT_A).getAttributePanel());
+            settingsPanel.add(ka.getAttribute(Attribute.LEAP_PLANE_POINT_B).getAttributePanel());
+            settingsPanel.add(ka.getAttribute(Attribute.LEAP_PLANE_POINT_C).getAttributePanel());
+        }
     }
     
     private void finishCalibration() {
-        typedPanel.add(typedLabel);
+        runningCalibration = false;
+        wordPanel.add(wordLabel);
+        wordLabel.setVisible(true);
         calibrateButton.setEnabled(true);
         saveSettingsButton.setEnabled(true);
         keyboardTypeComboBox.setEnabled(true);
@@ -213,8 +206,9 @@ public class CalibrationController extends GraphicsController {
     }
     
     public void disable() {
+        removeKeyboardFromUI();
         frame.setVisible(false);
-        canvas.removeGLEventListener(this);
+        canvas.disposeGLEventListener(this, true);
         removeObserver(Keyboard.STANDARD.getKeyboard());
         removeObserver(Keyboard.LEAP.getKeyboard());
         removeObserver(Keyboard.TABLET.getKeyboard());
@@ -223,10 +217,12 @@ public class CalibrationController extends GraphicsController {
         Keyboard.LEAP.getKeyboard().removeObserver(this);
         Keyboard.TABLET.getKeyboard().removeObserver(this);
         Keyboard.CONTROLLER.getKeyboard().removeObserver(this);
+        fpsTimer.cancel();
         enabled = false;
     }
     
     public void enable() {
+        addKeyboardToUI();
         frame.setVisible(true);
         frame.requestFocusInWindow();
         canvas.addGLEventListener(this);
@@ -238,6 +234,17 @@ public class CalibrationController extends GraphicsController {
         Keyboard.LEAP.getKeyboard().registerObserver(this);
         Keyboard.TABLET.getKeyboard().registerObserver(this);
         Keyboard.CONTROLLER.getKeyboard().registerObserver(this);
+        TimerTask updateFPS = new TimerTask() {
+            @Override
+            public void run() {
+                if(frame != null) {
+                    frame.setTitle("Calibration - FPS: " + frameCount);
+                }
+                frameCount = 0;
+            }
+        };
+        fpsTimer = new Timer();
+        fpsTimer.scheduleAtFixedRate(updateFPS, 1000, 1000);
         enabled = true;
     }
     
@@ -252,7 +259,7 @@ public class CalibrationController extends GraphicsController {
     }
     
     private void removeKeyboardFromUI() {
-        typedLabel.setText("");
+        wordLabel.setText("");
         settingsPanel.removeAll();
         renderOptionsPanel.removeAll();
         keyboard.removeFromUI(canvasPanel, canvas);

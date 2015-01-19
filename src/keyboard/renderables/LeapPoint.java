@@ -30,7 +30,7 @@ public class LeapPoint extends KeyboardRenderable {
     private final int BORDER_SIZE;
     private final float CAMERA_DISTANCE;
     private Vector point = new Vector();
-    private Vector normalizedPoint = point;
+    private Vector normalizedPoint = Vector.zero();
     private InteractionBox iBox;
     
     public LeapPoint(KeyboardAttributes keyboardAttributes) {
@@ -56,13 +56,18 @@ public class LeapPoint extends KeyboardRenderable {
         this.iBox = iBox;
     }
     
-    private void normalizePoint() {
-        normalizedPoint = iBox.normalizePoint(normalizedPoint);
+    private Vector normalizePoint() {
+        if(iBox != null) {
+            return iBox.normalizePoint(normalizedPoint);
+        }
+        return normalizedPoint;
     }
     
     public void applyPlaneRotationAndNormalizePoint(Vector axis, float angle) {
-        normalizedPoint = MyUtilities.MATH_UTILITILES.rotateVector(point, axis, angle);
-        normalizePoint();
+        if(axis.isValid()) {
+            normalizedPoint = MyUtilities.MATH_UTILITILES.rotateVector(point, axis, angle);
+        }
+        normalizedPoint = normalizePoint();
     }
     
     public void scaleTo3DSpace() {

@@ -98,9 +98,10 @@ public class LeapPlane extends KeyboardRenderable {
             isCalibrated = false;
         }
         calculatePlaneData();
-        
         explinationPane = new JEditorPane("text/html", "");
         explinationPane.setEditable(false);
+        explinationPane.setHighlighter(null);
+        blockAccess(true);
     }
 
     public void setInteractionBox(InteractionBox iBox) {
@@ -114,7 +115,8 @@ public class LeapPlane extends KeyboardRenderable {
         pointC = POINT_C_ATTRIBUTE.getValueAsVector();
     }
     
-    public void beginCalibration(JPanel textPanel) {        
+    public void beginCalibration(JPanel textPanel) {      
+        grantAccess(true);
         leapPlaneCalibrator = new LeapPlaneCalibrator();
         //explinationPane = new JEditorPane("text/html", "");
         //explinationPane.setEditable(false);
@@ -130,6 +132,7 @@ public class LeapPlane extends KeyboardRenderable {
     }
     
     public void finishCalibration() {
+        blockAccess(true);
         // Remove everything we added to the textPanel.
         explinationPane.setText("");
         explinationPane.setVisible(false);
@@ -219,21 +222,24 @@ public class LeapPlane extends KeyboardRenderable {
         // Get the original attributes for recalculation.
         getPlaneAttributes();
         
-        // Find the center of the plane
-        planeCenter = MyUtilities.MATH_UTILITILES.findMidpoint(pointA, pointC);
+        // Compute the 4th point of the plane for drawing.
+        // TODO: Detect D as another point instead of auto calculating it.
+        // This would allow us to take 4 points and use a transformation to create a more accurate plane
+        // Take a look at alvin's work on this.
+        pointD = pointA.minus(pointB).plus(pointC);
         
         // Determine the vectors
         Vector AB = pointB.minus(pointA);
         Vector AC = pointC.minus(pointA);
+        
+        // Find the center of the plane
+        planeCenter = MyUtilities.MATH_UTILITILES.findMidpoint(pointA, pointC);
         
         // Determine the normal of the plane by finding the cross product
         planeNormal = AB.cross(AC);
         
         // Find D, a simple variable that holds our normal time's a point on the plane
         planeD = MyUtilities.MATH_UTILITILES.calcPlaneD(planeNormal, planeCenter);
-        
-        // Compute the 4th point of the plane for drawing.
-        pointD = pointA.minus(pointB).plus(pointC);
         
         // Calculate the axis and angle to the camera.
         Vector n = Vector.zAxis().times(-1);
@@ -243,7 +249,7 @@ public class LeapPlane extends KeyboardRenderable {
         // Calculate the width and height of the plane in real world space.
         //planeWidth = MyUtilities.MATH_UTILITILES.findDistanceToPoint(pointB, pointC);
         //planeHeight = MyUtilities.MATH_UTILITILES.findDistanceToPoint(pointB, pointA);
-
+        
         // Rotate all points to face the camera.
         if(axisToCamera.isValid()) {
             pointA = MyUtilities.MATH_UTILITILES.rotateVector(pointA, axisToCamera, angleToCamera);

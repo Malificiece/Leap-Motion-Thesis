@@ -113,10 +113,6 @@ public enum Key {
         return 48 <= this.keyCode && this.keyCode <= 57;
     }
     
-    public static int getSize() {
-        return SIZE;
-    }
-    
     public static Key getByValue(int keyValue) {
         for(int i = 0; i < SIZE; i++) {
             if(VALUES[i].getValue() == keyValue || VALUES[i].toUpper() == keyValue) return VALUES[i];

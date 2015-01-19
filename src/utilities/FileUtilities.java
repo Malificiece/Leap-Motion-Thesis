@@ -9,6 +9,7 @@ import java.io.PrintWriter;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.TreeMap;
 
 import com.leapmotion.leap.Vector;
@@ -32,6 +33,14 @@ public class FileUtilities {
         if(!Files.exists(path)) {
             file = path.toFile();
             file.mkdirs();
+        }
+        // Create subject_ID_list.
+        path = FileSystems.getDefault().getPath(FilePath.DATA.getPath(), FileName.SUBJECT_ID_LIST.getName() + FileExt.FILE.getExt());
+        if(!Files.exists(path)) {
+            file = path.toFile();
+            try {
+                file.createNewFile();
+            } catch (IOException e) {e.printStackTrace();}
         }
         
         // Create config/settings path/files if they don't exist.
@@ -125,6 +134,16 @@ public class FileUtilities {
                 }
             }
             savedData.put(name, value);
+        }
+        bufferedReader.close();
+    }
+    
+    // Read in contents directly into an array list.
+    private void storeDataAsList(ArrayList<String> dataList, File file) throws IOException {
+        BufferedReader bufferedReader = new BufferedReader(new FileReader(file));
+        String line = null;
+        while((line = bufferedReader.readLine()) != null) {
+            dataList.add(line);
         }
         bufferedReader.close();
     }
@@ -275,5 +294,17 @@ public class FileUtilities {
         
         // Rewrite data to file.
         writeDataToFile(file, savedData, true);
+    }
+
+    // Read contents directly from file into array in memory.
+    public ArrayList<String> readListFromFile(String filePath, String fileName) throws IOException {
+        // Attempt to open file, create it if it doesn't exist.
+        File file = createFile(filePath, fileName);
+        
+        // Read in all stored data from file into an array.
+        ArrayList<String> dataList = new ArrayList<String>();
+        storeDataAsList(dataList, file);
+        
+        return dataList;
     }
 }

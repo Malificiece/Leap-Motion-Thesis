@@ -8,9 +8,6 @@ public enum DecimalPrecision {
     private final int places;
     private final double precision;
     
-    private static final DecimalPrecision[] VALUES = values();
-    private static final int SIZE = VALUES.length;
-    
     private DecimalPrecision(int places, double precision) {
         this.places = places;
         this.precision = precision;
@@ -22,9 +19,5 @@ public enum DecimalPrecision {
     
     public double getPrecision() {
         return precision;
-    }
-    
-    public static int getSize() {
-        return SIZE;
     }
 }

@@ -2,11 +2,11 @@ package ui;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.Font;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.Toolkit;
 
-import javax.media.opengl.awt.GLCanvas;
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
@@ -14,27 +14,84 @@ import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
-import javax.swing.JSlider;
+import javax.swing.JSplitPane;
+import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import javax.swing.UIManager;
+
 import enums.*;
 
 public class WindowBuilder {
     
     public static void buildControlWindow(JFrame frame,
-            JTextField [] subjectTextFields,       // firstname, lastname, age
             JComboBox<String> testComboBox,
-            JButton [] optionsButtons,             // calibrate, run
-            JRadioButton [] subjectRadioButtons,   // male, female, righthanded, lefthanded
-            JSlider hoursSlider) {
+            JTextField subjectField,
+            JButton [] optionsButtons) { // calibrate, run
         
         JPanel background = new JPanel();
         background.setLayout(new BoxLayout(background, BoxLayout.Y_AXIS));
         background.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         frame.add(background);
         
-        // Build layout for Subject information area
+        // Build layout for the subject ID
+        JPanel subjectPanel = new JPanel();
+        subjectPanel.setLayout(new BoxLayout(subjectPanel, BoxLayout.X_AXIS));
+        subjectPanel.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createTitledBorder("Subject Information"), BorderFactory.createEmptyBorder(5, 10, 10, 10)));
+        background.add(subjectPanel);
+        
+        JLabel subjectLabel = new JLabel("Subject ID:");
+        subjectPanel.add(subjectLabel);
+        JPanel padding0 = new JPanel();
+        padding0.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 10));
+        subjectPanel.add(padding0);
+        subjectPanel.add(subjectField);
+        subjectField.setEditable(false);
+        subjectField.setHighlighter(null);
+        subjectField.setHorizontalAlignment(JTextField.CENTER);
+        
+        // Build layout for Test Select area
+        JPanel padding1 = new JPanel();
+        padding1.setBorder(BorderFactory.createEmptyBorder(0, 0, 10, 0));
+        background.add(padding1);
+        
+        JPanel testPanel = new JPanel();
+        testPanel.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createTitledBorder("Test Selection"), BorderFactory.createEmptyBorder(5, 10, 10, 10)));
+        background.add(testPanel);
+        
+        // combo box
+        for(TestType testType: TestType.values()) {
+            testComboBox.addItem(testType.getName());
+        }
+        testComboBox.setBackground(Color.WHITE);
+        testPanel.add(testComboBox);
+        
+        // Build layout for calibration and run buttons
+        JPanel padding2 = new JPanel();
+        padding2.setBorder(BorderFactory.createEmptyBorder(0, 0, 10, 0));
+        background.add(padding2);
+        
+        JPanel optionsPanel = new JPanel();
+        optionsPanel.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createTitledBorder("Options"), BorderFactory.createEmptyBorder(5, 10, 10, 10)));
+        background.add(optionsPanel);
+        
+        optionsPanel.add(optionsButtons[0]);
+        JPanel padding3 = new JPanel();
+        optionsPanel.add(padding3);
+        optionsPanel.add(optionsButtons[1]);
+        
+        // Arrange the components inside the window
+        frame.pack();
+        frame.setResizable(false);
+        
+        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+        Dimension windowSize = frame.getSize();
+        frame.setLocation((int)(screenSize.getWidth()/2 - windowSize.getWidth()/2),
+                          (int)(screenSize.getHeight()/2 - windowSize.getHeight()/2));
+    }
+    
+    public static void buildExitSurveyWindow(JFrame frame) {
+        /*// Build layout for Subject information area
         JPanel subjectPanel = new JPanel();
         subjectPanel.setLayout(new BoxLayout(subjectPanel, BoxLayout.Y_AXIS));
         subjectPanel.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createTitledBorder("Subject Information"), BorderFactory.createEmptyBorder(5, 10, 10, 10)));
@@ -102,69 +159,142 @@ public class WindowBuilder {
         hoursSlider.setPaintLabels(true);
         sliderPanel.add(hoursSlider);
         
-        sliderBackground.add(sliderPanel);
-        
-        // Build layout for Test Select area
-        JPanel padding2 = new JPanel();
-        padding2.setBorder(BorderFactory.createEmptyBorder(0, 0, 10, 0));
-        background.add(padding2);
-        
-        JPanel testPanel = new JPanel();
-        testPanel.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createTitledBorder("Test Selection"), BorderFactory.createEmptyBorder(5, 10, 10, 10)));
-        background.add(testPanel);
-        
-        // combo box
-        for(int i = 0; i < TestType.getSize(); i++) {
-            testComboBox.addItem(TestType.getByID(i).getName());
-        }
-        testComboBox.setBackground(Color.WHITE);
-        testPanel.add(testComboBox);
-        
-        // Build layout for calibration and run buttons
-        JPanel padding3 = new JPanel();
-        padding3.setBorder(BorderFactory.createEmptyBorder(0, 0, 10, 0));
-        background.add(padding3);
-        
-        JPanel optionsPanel = new JPanel();
-        optionsPanel.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createTitledBorder("Options"), BorderFactory.createEmptyBorder(5, 10, 10, 10)));
-        background.add(optionsPanel);
-        
-        optionsPanel.add(optionsButtons[0]);
-        JPanel padding4 = new JPanel();
-        optionsPanel.add(padding4);
-        optionsPanel.add(optionsButtons[1]);
-        
-        // Arrange the components inside the window
-        frame.pack();
-        frame.setResizable(false);
-        
-        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-        Dimension windowSize = frame.getSize();
-        frame.setLocation((int)(screenSize.getWidth()/2 - windowSize.getWidth()/2),
-                          (int)(screenSize.getHeight()/2 - windowSize.getHeight()/2));
-        
+        sliderBackground.add(sliderPanel);*/
     }
     
     public static void buildExperimentWindow(JFrame frame,
-            GLCanvas canvas,
-            JTextField [] textFields,
-            JComboBox<String> combo,
-            JButton [] buttons) {
-        
-    }
-
-    public static void buildCalibrationWindow(JFrame frame,
             JPanel canvasPanel,
-            JLabel typedLabel,
-            JComboBox<String> keyboardTypeComboBox,
-            JButton[] buttons, // calibration, settings
-            JPanel[] panels) { // typed, settings, render options
+            JTextArea descriptionPane,
+            JPanel[] panels, // word, answer, settingsPanel
+            JLabel[] labels, // word, answer
+            JButton [] buttons, // calibration, tutorial, practice, experiment
+            JSplitPane splitPane) {
         
         JPanel background = new JPanel();
         background.setLayout(new BoxLayout(background, BoxLayout.X_AXIS));
         frame.add(background);
         
-        // Left panel (typing preview and keyboard preview).
+        // Add split pane.
+        background.add(splitPane);
+        
+        // Left panel (word and keyboard preview)
+        JPanel leftPanelSetBackground = new JPanel();
+        leftPanelSetBackground.setLayout(new BoxLayout(leftPanelSetBackground, BoxLayout.Y_AXIS));
+        leftPanelSetBackground.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        splitPane.setLeftComponent(leftPanelSetBackground);
+        
+        JPanel previewBackground = new JPanel();
+        previewBackground.setLayout(new BoxLayout(previewBackground, BoxLayout.Y_AXIS));
+        previewBackground.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createTitledBorder("Preview"), BorderFactory.createEmptyBorder(5, 10, 10, 10)));
+        leftPanelSetBackground.add(previewBackground);
+        
+        // Build word panel.
+        panels[0].setBackground(Color.WHITE);
+        panels[0].setLayout(new GridBagLayout());
+        Dimension d0 = panels[0].getPreferredSize();
+        d0.height = 100;
+        panels[0].setPreferredSize(d0);
+        panels[0].setMinimumSize(d0);
+        panels[0].setMaximumSize(new Dimension(1000, d0.height));
+        previewBackground.add(panels[0]);
+        
+        panels[0].add(labels[0]);
+        labels[0].setVerticalAlignment(JLabel.BOTTOM);
+        
+        // Add answer panel.
+        panels[1].setBackground(Color.WHITE);
+        panels[1].setLayout(new GridBagLayout());
+        panels[1].setPreferredSize(d0);
+        panels[1].setMinimumSize(d0);
+        panels[1].setMaximumSize(new Dimension(1000, d0.height));
+        previewBackground.add(panels[1]);
+        
+        panels[1].add(labels[1]);
+        labels[1].setVerticalAlignment(JLabel.BOTTOM);
+        
+        // Add the keyboard canvas.
+        previewBackground.add(canvasPanel);
+        
+        // Right panel (Description and experiment options).
+        JPanel rightPanelSet = new JPanel();
+        rightPanelSet.setLayout(new BoxLayout(rightPanelSet, BoxLayout.Y_AXIS));
+        rightPanelSet.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        Dimension d1 = rightPanelSet.getPreferredSize();
+        d1.width = 375;
+        rightPanelSet.setPreferredSize(d1);
+        rightPanelSet.setMinimumSize(rightPanelSet.getPreferredSize());
+        splitPane.setRightComponent(rightPanelSet);
+        
+        // Add a description panel and add the editor pane.
+        JPanel descriptionPanel = new JPanel();
+        descriptionPanel.setLayout(new BoxLayout(descriptionPanel, BoxLayout.Y_AXIS));
+        descriptionPanel.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createTitledBorder("Info"), BorderFactory.createEmptyBorder(5, 10, 10, 10)));
+        rightPanelSet.add(descriptionPanel);
+        
+        descriptionPane.setEditable(false);
+        descriptionPane.setLineWrap(true);
+        descriptionPane.setHighlighter(null);
+        Font font = new Font(descriptionPane.getFont().getFamily(), Font.BOLD, 13);
+        descriptionPane.setFont(font);
+        descriptionPane.setBackground(UIManager.getColor("Panel.background"));
+        descriptionPanel.add(descriptionPane);
+        
+        // Add the settings panel
+        JPanel settingsPanelMain = new JPanel(new GridLayout(0,1));
+        settingsPanelMain.setPreferredSize(new Dimension(d1.width, 200));
+        settingsPanelMain.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createTitledBorder("Settings"), BorderFactory.createEmptyBorder(5, 10, 10, 10)));
+        rightPanelSet.add(settingsPanelMain);
+        
+        panels[2].setLayout(new BoxLayout(panels[2], BoxLayout.Y_AXIS));
+
+        JScrollPane settingsScrollBar = new JScrollPane(panels[2], JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        settingsScrollBar.getVerticalScrollBar().setUnitIncrement(16);
+        settingsPanelMain.add(settingsScrollBar);
+        
+        // Add the options section with all the buttons we desire.
+        JPanel optionsPanel = new JPanel();
+        optionsPanel.setLayout(new BoxLayout(optionsPanel, BoxLayout.Y_AXIS));
+        optionsPanel.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createTitledBorder("Options"), BorderFactory.createEmptyBorder(5, 10, 10, 10)));
+        rightPanelSet.add(optionsPanel);
+        
+        JPanel buttonsPanel0 = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        buttonsPanel0.add(buttons[0]);
+        optionsPanel.add(buttonsPanel0);
+        
+        JPanel padding0 = new JPanel();
+        optionsPanel.add(padding0);
+        
+        JPanel buttonsPanel1 = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        buttonsPanel1.add(buttons[1]);
+        buttonsPanel1.add(buttons[2]);
+        buttonsPanel1.add(buttons[3]);
+        optionsPanel.add(buttonsPanel1);
+        
+        buttons[2].setEnabled(false);
+        buttons[3].setEnabled(false);
+        
+        // Arrange the components inside the window
+        frame.pack();
+        frame.setResizable(false); 
+        
+        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+        Dimension windowSize = frame.getSize();
+        frame.setLocation((int)(screenSize.getWidth()/2 - windowSize.getWidth()/2),
+                          (int)(screenSize.getHeight()/2 - windowSize.getHeight()/2));
+    }
+
+    public static void buildCalibrationWindow(JFrame frame,
+            JPanel canvasPanel,
+            JLabel wordLabel,
+            JComboBox<String> keyboardTypeComboBox,
+            JButton[] buttons, // calibration, settings
+            JPanel[] panels) { // word, settings, render options
+        
+        JPanel background = new JPanel();
+        background.setLayout(new BoxLayout(background, BoxLayout.X_AXIS));
+        frame.add(background);
+        
+        // Left panel (word preview and keyboard preview).
         JPanel leftPanelSetBackground = new JPanel();
         leftPanelSetBackground.setLayout(new BoxLayout(leftPanelSetBackground, BoxLayout.Y_AXIS));
         leftPanelSetBackground.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
@@ -175,7 +305,7 @@ public class WindowBuilder {
         previewBackground.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createTitledBorder("Preview"), BorderFactory.createEmptyBorder(5, 10, 10, 10)));
         leftPanelSetBackground.add(previewBackground);
         
-        // Build typing preview.
+        // Build word preview.
         panels[0].setBackground(Color.WHITE);
         panels[0].setLayout(new GridBagLayout());
         panels[0].setBorder(BorderFactory.createEtchedBorder());
@@ -187,9 +317,8 @@ public class WindowBuilder {
         previewBackground.add(panels[0]);
         
         // Add our modded label.
-        panels[0].add(typedLabel);
-        typedLabel.setVerticalAlignment(JLabel.BOTTOM); // not sure why but this moves it up a bit
-        //typedLabel.setAlignmentY(Component.CENTER_ALIGNMENT);
+        panels[0].add(wordLabel);
+        wordLabel.setVerticalAlignment(JLabel.BOTTOM);
         
         // Build canvas preview.
         previewBackground.add(canvasPanel);
@@ -213,8 +342,8 @@ public class WindowBuilder {
         rightPanelSet.add(keyboardTypeSelectionPanel);
         
         // keyboard combo box
-        for(int i = 0; i < Keyboard.getSize(); i++) {
-            keyboardTypeComboBox.addItem(Keyboard.getByID(i).getName());
+        for(Keyboard keyboard: Keyboard.values()) {
+            keyboardTypeComboBox.addItem(keyboard.getName());
         }
         keyboardTypeComboBox.setBackground(Color.WHITE);
         keyboardTypeComboBox.setMaximumSize(new Dimension(keyboardTypeComboBox.getMaximumSize().width, keyboardTypeComboBox.getMinimumSize().height));
@@ -226,8 +355,7 @@ public class WindowBuilder {
         JPanel keyboardButtonsPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         keyboardTypeSelectionPanel.add(keyboardButtonsPanel);
         
-        // calibration button (grey out for all but leap) -- calibrates the leap plane
-        //calibrateButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+        // Add the calibration button and save settings button.
         keyboardButtonsPanel.add(buttons[0]);
         keyboardButtonsPanel.add(buttons[1]);
         
@@ -266,6 +394,5 @@ public class WindowBuilder {
         Dimension windowSize = frame.getSize();
         frame.setLocation((int)(screenSize.getWidth()/2 - windowSize.getWidth()/2),
                           (int)(screenSize.getHeight()/2 - windowSize.getHeight()/2));
-        
     }
 }

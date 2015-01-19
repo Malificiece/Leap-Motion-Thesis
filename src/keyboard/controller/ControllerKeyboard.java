@@ -301,7 +301,6 @@ public class ControllerKeyboard extends IKeyboard {
             if (col < 0) { col += KEY_LAYOUT_SIZE.y; }
             selectedKey.x = row;
             selectedKey.y = col;
-            System.out.println("previous: " + previousKey + " selected: " + getSelectedKey() + " notEq: " + (previousKey != getSelectedKey()) + " notNull: " + (getSelectedKey() != Key.VK_NULL));
         } while(previousKey == getSelectedKey() || getSelectedKey() == Key.VK_NULL);
         
         

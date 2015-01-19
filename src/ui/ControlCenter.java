@@ -9,41 +9,28 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.concurrent.locks.ReentrantLock;
 
-import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
-import javax.swing.JRadioButton;
-import javax.swing.JSlider;
 import javax.swing.JTextField;
 
+import utilities.MyUtilities;
 import keyboard.leap.LeapKeyboard;
 import enums.Keyboard;
+import enums.TestType;
 import leap.LeapListener;
-
 
 public class ControlCenter {
     // Constants
-    private final int HOURS_MIN = 0;
-    private final int HOURS_MAX = 24;
-    private final int HOURS_INIT = 12;
     private final ExperimentController EXPERIMENT_CONTROLLER = new ExperimentController();
     private final CalibrationController CALIBRATION_CONTROLLER = new CalibrationController();
+    //private final ExitSurveyController EXIT_SURVEY_CONTROLLER = new ExitSurveyController();
     
     // Not Constants
-    //LeapListener leapListener;
     private JFrame frame;
-    private JTextField firstName;
-    private JTextField lastName;
-    private JTextField age;
-    private JRadioButton male;
-    private JRadioButton female;
-    private ButtonGroup genderGroup;
-    private JSlider hoursOnComputer; //per day
+    private JTextField subjectField;
+    private String subjectID;
     private JComboBox<String> testType;
-    private JRadioButton rightHanded;
-    private JRadioButton leftHanded;
-    private ButtonGroup handednessGroup;
     private JButton calibrate;
     private JButton experiment;
     private final  ReentrantLock expLock = new ReentrantLock();
@@ -52,38 +39,19 @@ public class ControlCenter {
     
     public ControlCenter(LeapListener leapListener) {
         leapListener.registerObserver((LeapKeyboard) Keyboard.LEAP.getKeyboard());
-       // CALIBRATION_CONTROLLER.registerObserver(leapListener); -- Leap can't see tool gestures.
+        // CALIBRATION_CONTROLLER.registerObserver(leapListener); -- Leap can't see tool gestures.
         // Java Swing/AWT important fields and selections
-        frame = new JFrame("Experiment Control Center v0.1");
-        firstName = new JTextField(10);
-        lastName = new JTextField(10);
-        male = new JRadioButton("Male");
-        female = new JRadioButton("Female");   
-        age = new JTextField(10);
-        hoursOnComputer = new JSlider(JSlider.HORIZONTAL, HOURS_MIN, HOURS_MAX, HOURS_INIT);
+        frame = new JFrame("Experiment Control Center");
+        subjectID = MyUtilities.generateSubjectID();
+        subjectField = new JTextField(subjectID);
         testType = new JComboBox<String>();
-        rightHanded = new JRadioButton("Right-handed");
-        leftHanded = new JRadioButton("Left-handed");
         calibrate = new JButton("Calibration");
         experiment = new JButton("Experiment");
         
-        JTextField textFields[] = {firstName, lastName, age};
-        JRadioButton radioButtons[] = {male, female, rightHanded, leftHanded};
         JButton buttons[] = {calibrate, experiment};
         
         // Window builder builds window using important fields here. It adds unimportant fields that we won't use for aesthetics only.
-        WindowBuilder.buildControlWindow(frame, textFields, testType, buttons, radioButtons, hoursOnComputer);
-        
-        handednessGroup = new ButtonGroup();
-        handednessGroup.add(rightHanded);
-        handednessGroup.add(leftHanded);
-        rightHanded.setSelected(true);
-        
-        genderGroup = new ButtonGroup();
-        genderGroup.add(male);
-        genderGroup.add(female);
-        male.setSelected(true);
-        
+        WindowBuilder.buildControlWindow(frame, testType, subjectField, buttons);
         frame.setVisible(true);
         
         // by default, an AWT Frame doesn't do anything when you click
@@ -104,11 +72,13 @@ public class ControlCenter {
             public void actionPerformed(ActionEvent arg0) {
                 expLock.lock();
                 try {
-                    EXPERIMENT_CONTROLLER.enable();
+                    if(!isInProgress()) {
+                        EXPERIMENT_CONTROLLER.enable(subjectID, TestType.getByName((String) testType.getSelectedItem()));
+                        System.out.println("Starting Experiment");
+                    }
                 } finally {
                     expLock.unlock();
                 }
-                System.out.println("Starting Experiment");
             }
             
         });
@@ -120,11 +90,13 @@ public class ControlCenter {
             public void actionPerformed(ActionEvent arg0) {
                 calibLock.lock();
                 try {
-                    CALIBRATION_CONTROLLER.enable();
+                    if(!isInProgress()) {
+                        CALIBRATION_CONTROLLER.enable();
+                        System.out.println("Starting Calibration");
+                    }
                 } finally {
                     calibLock.unlock();
                 }
-                System.out.println("Starting Calibration");
             }
             
         });
@@ -150,7 +122,14 @@ public class ControlCenter {
         }
     }
     
-    public Boolean calibInProgress() {
+    public boolean isInProgress() {
+        if(calibInProgress() || expInProgress()) {
+            return true;
+        }
+        return false;
+    }
+    
+    public boolean calibInProgress() {
         calibLock.lock();
         try {
             return CALIBRATION_CONTROLLER.isEnabled();
@@ -159,7 +138,7 @@ public class ControlCenter {
         }
     }
     
-    public Boolean expInProgress() {
+    public boolean expInProgress() {
         expLock.lock();
         try {
             return EXPERIMENT_CONTROLLER.isEnabled();

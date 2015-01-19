@@ -37,10 +37,6 @@ public enum Keyboard {
         return keyboard;
     }
     
-    public static int getSize() {
-        return SIZE;
-    }
-    
     public static Keyboard getByID(int keyboardID) {
         if(keyboardID >= 0 && keyboardID < SIZE) {
             return VALUES[keyboardID];

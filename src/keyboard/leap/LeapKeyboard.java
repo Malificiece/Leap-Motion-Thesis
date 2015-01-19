@@ -2,7 +2,6 @@ package keyboard.leap;
 
 import utilities.Point;
 
-import java.time.LocalTime;
 import java.util.concurrent.locks.ReentrantLock;
 
 import javax.media.opengl.GL2;
@@ -97,11 +96,11 @@ public class LeapKeyboard extends IKeyboard implements LeapObserver, Calibration
     @Override
     public void update() {
         LEAP_LOCK.lock();
-        System.out.print("System time: " + System.currentTimeMillis());
+        /*System.out.print("System time: " + System.currentTimeMillis());
         if(leapData != null) {
             System.out.print(" Leap time: " + leapData.getTimeStamp());
         }
-        System.out.println(" Local time: " + LocalTime.now().getNano());
+        System.out.println(" Local time: " + LocalTime.now().getNano());*/
         try {
             // Allow leap plane to take over the updates of specific objects that require the plane
             leapPlane.update(leapPoint, leapTool, keyboardGestures, leapTrail);
