@@ -2,6 +2,7 @@ package ui;
 import static javax.media.opengl.GL.GL_COLOR_BUFFER_BIT;
 import static javax.media.opengl.GL.GL_DEPTH_BUFFER_BIT;
 
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.event.ActionEvent;
@@ -34,6 +35,14 @@ public class ExperimentController extends GraphicsController {
             + "TUTORIAL:\nA brief example to familiarize yourself with the keyboard.\n\n"
             + "PRACTICE:\nA small sample of what you should expect from the experiment.\n\n"
             + "EXPERIMENT:\nThe actual experiment with recorded data.";
+    private final int PRACTICE_SIZE = 10;
+    private final int EXPERIMENT_SIZE = 30;
+    private final Color LIGHT_GREEN = new Color(204, 255, 204);
+    private final int FADE_DURATION = 500;
+    private Color currentColor = Color.WHITE;
+    private long previousFadeTime;
+    private long fadeTimeElapsed = 0;
+    private boolean isFading = false;
     private JFrame frame;
     private JSplitPane splitPane;
     private JPanel canvasPanel;
@@ -137,10 +146,6 @@ public class ExperimentController extends GraphicsController {
             @Override
             public void actionPerformed(ActionEvent arg0) {
                 beginPractice();
-                // Begin practice -- detect keyboard but don't record it's key events
-                // show words, show keyboard, DO NOT RECORD DATA
-                // Finish practice
-                // once finished enable experiment
                 frame.requestFocusInWindow();
             }
         });
@@ -231,18 +236,35 @@ public class ExperimentController extends GraphicsController {
     
     private void finishTutorial() {
         runningTutorial = false;
-        ranTutorial = true;
         infoPanel.remove(tutorialManager.getComponent());
         tutorialManager = null;
+        ranTutorial = true;
         enableUI();
     }
     
     private void beginPractice() {
         runningPractice = true;
+        // TODO: Add a delay and a display to show when it's about to begin.
+        // This will give us a head's up before things start
+        wordManager.loadWords(PRACTICE_SIZE);
+        disableUI();
+        splitPane.getRightComponent().setVisible(false);
+        splitPane.setSize(splitPane.getLeftComponent().getSize());
+        splitPane.getLeftComponent().setMaximumSize(splitPane.getLeftComponent().getSize());
+        splitPane.setDividerLocation(splitPane.getLeftComponent().getWidth());
+        frame.setSize(splitPane.getLeftComponent().getWidth(), (int) frame.getSize().getHeight());
+        System.out.println(splitPane.getLeftComponent().getSize());
+        wordLabel.setText(wordManager.currentWord());
     }
     
     private void finishPractice() {
         runningPractice = false;
+        System.out.println(splitPane.getLeftComponent().getSize());
+        splitPane.getRightComponent().setVisible(true);
+        splitPane.setSize(splitPane.getLeftComponent().getWidth() + splitPane.getRightComponent().getWidth(), splitPane.getHeight());
+        splitPane.setDividerLocation(splitPane.getLeftComponent().getWidth());
+        ranPractice = true;
+        enableUI();
     }
     
     private void beginExperiment() {
@@ -269,6 +291,7 @@ public class ExperimentController extends GraphicsController {
     public void enableUI() {
         wordManager.setDefault();
         wordLabel.setText(wordManager.currentWord());
+        MyUtilities.JAVA_SWING_UTILITIES.calculateFontSize(wordLabel.getText(), wordLabel, wordPanel);
         calibrateButton.setEnabled(true);
         tutorialButton.setEnabled(true);
         if(ranTutorial) {
@@ -306,6 +329,8 @@ public class ExperimentController extends GraphicsController {
         Keyboard.LEAP_AIR.getKeyboard().registerObserver(this);
         Keyboard.TABLET.getKeyboard().registerObserver(this);
         Keyboard.CONTROLLER.getKeyboard().registerObserver(this);
+        wordLabel.setText(wordManager.currentWord());
+        MyUtilities.JAVA_SWING_UTILITIES.calculateFontSize(wordLabel.getText(), wordLabel, wordPanel);
         enabled = true;
     }
     
@@ -322,6 +347,7 @@ public class ExperimentController extends GraphicsController {
         answerLabel.setText("");
         settingsPanel.removeAll();
         keyboard.removeFromUI(canvasPanel, canvas);
+        keyboard = null;
     }
     
     private void addKeyboardToUI() {
@@ -342,6 +368,10 @@ public class ExperimentController extends GraphicsController {
         
         canvas.setPreferredSize(new Dimension(keyboard.getImageWidth(), keyboard.getImageHeight()));
         canvas.setSize(keyboard.getImageWidth(), keyboard.getImageHeight());
+        wordPanel.setSize(keyboard.getImageWidth(), wordPanel.getHeight());
+        answerPanel.setSize(keyboard.getImageWidth(), answerPanel.getHeight());
+        wordPanel.setPreferredSize(new Dimension(keyboard.getImageWidth(), wordPanel.getHeight()));
+        answerPanel.setPreferredSize(new Dimension(keyboard.getImageWidth(), answerPanel.getHeight()));
         frame.revalidate();
         frame.repaint();
         frame.pack();
@@ -357,9 +387,6 @@ public class ExperimentController extends GraphicsController {
                 finishTutorial();
             }
         } else if(runningPractice && !wordManager.isValid()) {
-            // if practice selected, a practice experiment is given with a set of words, use default set for all keyboards. Don't record data
-            // after practice is completed enable experiment
-            // tutorial and practice are repeatable any number of times with no effect to experiment
             finishPractice();
         } else if(runningExperiment && !wordManager.isValid()) {
             // if experiment selected, show keyboard, give set of real words, and record data for subject ID
@@ -369,6 +396,29 @@ public class ExperimentController extends GraphicsController {
             finishExperiment();
         }
         // if nothing selected, show keyboard but record nothing -- kind of like calibration
+        
+        if(isFading) {
+            long now = System.currentTimeMillis();
+            fadeTimeElapsed += now - previousFadeTime;
+            previousFadeTime = now;
+
+            if(fadeTimeElapsed <= FADE_DURATION) {
+                float fraction = fadeTimeElapsed/(float)FADE_DURATION;
+                Color color = wordPanel.getBackground();
+                int red = (int)(fraction * currentColor.getRed() + 
+                        (1 - fraction) * color.getRed());
+                int green = (int)(fraction * currentColor.getGreen() + 
+                        (1 - fraction) * color.getGreen());
+                int blue = (int)(fraction * currentColor.getBlue() + 
+                        (1 - fraction) * color.getBlue());
+                color = new Color(red, green, blue);
+                wordPanel.setBackground(color);
+                answerPanel.setBackground(color);
+            } else {
+                isFading = false;
+                fadeTimeElapsed = 0;
+            }
+        }
         
         // consider recording both pressed and released events so that we can just have our data reader
         // fully read the data without much help from the keyboard classes
@@ -387,19 +437,51 @@ public class ExperimentController extends GraphicsController {
         if(runningExperiment) {
             // record data here
         }
-        if(key == '\b' && 0 < answerLabel.getText().length()) {
-            answerLabel.setText(answerLabel.getText().substring(0, answerLabel.getText().length()-1));
+        if(key == '\b') {
+            if(0 < answerLabel.getText().length()) {
+                answerLabel.setText(answerLabel.getText().substring(0, answerLabel.getText().length()-1));
+            }
+            if(wordManager.isMatch(answerLabel.getText())) {
+                currentColor = LIGHT_GREEN;
+                wordPanel.setBackground(currentColor);
+                answerPanel.setBackground(currentColor);
+            } else {
+                if(!wordPanel.getBackground().equals(Color.WHITE)) {
+                    currentColor = Color.WHITE;
+                    wordPanel.setBackground(currentColor);
+                    answerPanel.setBackground(currentColor);
+                }
+            }
         } else if(key == '\n') {
-            // check if input is correct
-            // flash red if no
-            // flash green if yes and move to next word
+            currentColor = Color.WHITE;
+            previousFadeTime = System.currentTimeMillis();
+            fadeTimeElapsed = 0;
+            isFading = true;
+            if(wordManager.isMatch(answerLabel.getText())) {
+                wordPanel.setBackground(Color.GREEN);
+                answerPanel.setBackground(Color.GREEN);
+                wordManager.nextWord();
+                answerLabel.setText("");
+                wordLabel.setText(wordManager.currentWord());
+            } else {
+                wordPanel.setBackground(Color.RED);
+                answerPanel.setBackground(Color.RED);
+            }
         } else {
             answerLabel.setText(answerLabel.getText()+Character.toString(key));
-            // check if input is correct
-            // set background or text to light green if so
-            // 
+            MyUtilities.JAVA_SWING_UTILITIES.calculateFontSize(wordLabel.getText(), answerLabel, answerPanel);
+            if(wordManager.isMatch(answerLabel.getText())) {
+                currentColor = LIGHT_GREEN;
+                wordPanel.setBackground(currentColor);
+                answerPanel.setBackground(currentColor);
+            } else {
+                if(!wordPanel.getBackground().equals(Color.WHITE)) {
+                    currentColor = Color.WHITE;
+                    wordPanel.setBackground(currentColor);
+                    answerPanel.setBackground(currentColor);
+                }
+            }
         }
-        MyUtilities.JAVA_SWING_UTILITIES.calculateFontSize(wordLabel.getText(), answerLabel, answerPanel);
     }
     
     private boolean isLeapKeyboard() {

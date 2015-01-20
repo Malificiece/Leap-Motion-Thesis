@@ -25,6 +25,8 @@ public class ControlCenter {
     private final ExperimentController EXPERIMENT_CONTROLLER = new ExperimentController();
     private final CalibrationController CALIBRATION_CONTROLLER = new CalibrationController();
     //private final ExitSurveyController EXIT_SURVEY_CONTROLLER = new ExitSurveyController();
+    private final  ReentrantLock EXPERIMENT_LOCK = new ReentrantLock();
+    private final ReentrantLock CALIBRATION_LOCK = new ReentrantLock();
     
     // Not Constants
     private JFrame frame;
@@ -33,8 +35,7 @@ public class ControlCenter {
     private JComboBox<String> testTypeComboBox;
     private JButton calibrateButton;
     private JButton experimentButton;
-    private final  ReentrantLock expLock = new ReentrantLock();
-    private final ReentrantLock calibLock = new ReentrantLock();
+    private boolean isLocked = false;
     
     
     public ControlCenter(LeapListener leapListener) {
@@ -85,7 +86,7 @@ public class ControlCenter {
 
             @Override
             public void actionPerformed(ActionEvent arg0) {
-                expLock.lock();
+                EXPERIMENT_LOCK.lock();
                 try {
                     if(!isInProgress()) {
                         EXPERIMENT_CONTROLLER.enable(subjectID, TestType.getByName((String) testTypeComboBox.getSelectedItem()));
@@ -93,7 +94,7 @@ public class ControlCenter {
                         lockUI();
                     }
                 } finally {
-                    expLock.unlock();
+                    EXPERIMENT_LOCK.unlock();
                 }
             }
             
@@ -104,7 +105,7 @@ public class ControlCenter {
 
             @Override
             public void actionPerformed(ActionEvent arg0) {
-                calibLock.lock();
+                CALIBRATION_LOCK.lock();
                 try {
                     if(!isInProgress()) {
                         CALIBRATION_CONTROLLER.enable();
@@ -112,7 +113,7 @@ public class ControlCenter {
                         lockUI();
                     }
                 } finally {
-                    calibLock.unlock();
+                    CALIBRATION_LOCK.unlock();
                 }
             }
             
@@ -124,7 +125,7 @@ public class ControlCenter {
             EXPERIMENT_CONTROLLER.update();
         } else if(calibInProgress()) {
             CALIBRATION_CONTROLLER.update();
-        } else {
+        } else if(isLocked) {
             unlockUI();
         }
     }
@@ -134,8 +135,6 @@ public class ControlCenter {
             EXPERIMENT_CONTROLLER.display();
         } else if(calibInProgress()) {
             CALIBRATION_CONTROLLER.display();
-        } else {
-            unlockUI();
         }
     }
     
@@ -147,30 +146,32 @@ public class ControlCenter {
     }
     
     public boolean calibInProgress() {
-        calibLock.lock();
+        CALIBRATION_LOCK.lock();
         try {
             return CALIBRATION_CONTROLLER.isEnabled();
         } finally {
-            calibLock.unlock();
+            CALIBRATION_LOCK.unlock();
         }
     }
     
     public boolean expInProgress() {
-        expLock.lock();
+        EXPERIMENT_LOCK.lock();
         try {
             return EXPERIMENT_CONTROLLER.isEnabled();
         } finally {
-            expLock.unlock();
+            EXPERIMENT_LOCK.unlock();
         }
     }
     
     private void lockUI() {
+        isLocked = true;
         calibrateButton.setEnabled(false);
         experimentButton.setEnabled(false);
         testTypeComboBox.setEnabled(false);
     }
     
     private void unlockUI() {
+        isLocked = false;
         calibrateButton.setEnabled(true);
         experimentButton.setEnabled(true);
         testTypeComboBox.setEnabled(true);

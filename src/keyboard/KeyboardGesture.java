@@ -10,7 +10,7 @@ public class KeyboardGesture {
     private static final float RADS_TO_DEGREES = (float) (180 / Math.PI);
     private final Gesture gestureType;
     private final int FADE_DURATION = 400;
-    private long previousTime;
+    private long previousFadeTime;
     private long fadeTimeElapsed = 0;
     private boolean isFading = false;
     private boolean isDone = false;
@@ -32,8 +32,8 @@ public class KeyboardGesture {
     public void update() {
         if(isFading && !isDone) {
             long now = System.currentTimeMillis();
-            fadeTimeElapsed += now - previousTime;
-            previousTime = now;
+            fadeTimeElapsed += now - previousFadeTime;
+            previousFadeTime = now;
 
             if(fadeTimeElapsed <= FADE_DURATION) {
                 opacity = 1f - fadeTimeElapsed/(float)FADE_DURATION;
@@ -62,7 +62,7 @@ public class KeyboardGesture {
     
     public void gestureFinshed() {
         isFading = true;
-        previousTime = System.currentTimeMillis();
+        previousFadeTime = System.currentTimeMillis();
     }
 
     public Gesture getType() {

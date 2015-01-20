@@ -10,7 +10,7 @@ import enums.FileName;
 import enums.FilePath;
 
 public class TutorialManager {
-    private final String TUTORIAL_WORD_PATH = FilePath.TUTORIAL.getPath() + FileName.TUTORIAL.getName() + FileExt.DICTIONARY.getExt();
+    private final String TUTORIAL_WORD_PATH = FilePath.DOCS.getPath() + FileName.TUTORIAL.getName() + FileExt.DICTIONARY.getExt();
     private final String[] INSTRUCTIONS = {"This quick tutorial will go over what you need to know.\n\n"
             + "Press the \"Next\" button below to continue.",
             "Once the experiment begins, a random word will appear above the keyboard.\n\n"

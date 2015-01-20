@@ -39,8 +39,8 @@ public enum Keyboard {
     }
     
     public static Keyboard getByID(int keyboardID) {
-        if(keyboardID >= 0 && keyboardID < SIZE) {
-            return VALUES[keyboardID];
+        for(int i = 0; i < SIZE; i++) {
+            if(VALUES[i].getID() == keyboardID) return VALUES[i];
         }
         return null;
     }

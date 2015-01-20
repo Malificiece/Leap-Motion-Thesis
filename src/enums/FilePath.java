@@ -4,7 +4,7 @@ public enum FilePath {
     ASSETS("./assets/"),
     CONFIG("./config/"),
     DATA("./data/"),
-    TUTORIAL(DATA.getPath() + "tutorial/");
+    DOCS("./docs/");
     //STANDARD("standard/"),
     //LEAP("leap/"),
     //TABLET("tablet/"),

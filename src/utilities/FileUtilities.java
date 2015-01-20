@@ -10,6 +10,7 @@ import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Random;
 import java.util.TreeMap;
 
 import com.leapmotion.leap.Vector;
@@ -41,6 +42,13 @@ public class FileUtilities {
             try {
                 file.createNewFile();
             } catch (IOException e) {e.printStackTrace();}
+        }
+        
+        //Create docs folder if it doesn't already exist.
+        path = FileSystems.getDefault().getPath(FilePath.DOCS.getPath());
+        if(!Files.exists(path)) {
+            file = path.toFile();
+            file.mkdirs();
         }
         
         // Create config/settings path/files if they don't exist.
@@ -304,6 +312,7 @@ public class FileUtilities {
         writeDataToFile(file, savedData, true);
     }
 
+    // WORDS
     // Read contents directly from file into array in memory.
     public ArrayList<String> readListFromFile(String filePath, String fileName) throws IOException {
         // Attempt to open file, create it if it doesn't exist.
@@ -314,5 +323,28 @@ public class FileUtilities {
         storeDataAsList(dataList, file);
         
         return dataList;
+    }
+
+    public ArrayList<String> reservoirSampling(int reservoirSize, int dictionarySize, String fileName) throws IOException {
+        // Attempt to open file, create it if it doesn't exist.
+        File file = createFile(FilePath.DOCS.getPath(), fileName);
+        
+        BufferedReader bufferedReader = new BufferedReader(new FileReader(file));
+        ArrayList<String> reservoir = new ArrayList<String>();
+        String line = null;
+        // Read in the first 'size' elements.
+        for(int i = 0; i < reservoirSize && (line = bufferedReader.readLine()) != null; i++) {
+            reservoir.add(line);
+        }
+        Random random = new Random();
+        // Replace elements with gradually decreasing probability.
+        for(int i = reservoirSize; i < dictionarySize && (line = bufferedReader.readLine()) != null; i++) {
+            int j = random.nextInt(i + 1);
+            if(j < reservoirSize) {
+                reservoir.set(j, line);
+            }
+        }
+        bufferedReader.close();
+        return reservoir;
     }
 }

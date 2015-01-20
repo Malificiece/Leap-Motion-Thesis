@@ -1,15 +1,21 @@
 package experiment;
 
+import java.io.IOException;
 import java.util.LinkedList;
 import java.util.Queue;
 
+import enums.FileExt;
+import enums.FileName;
+import utilities.MyUtilities;
+
 public class WordManager {
-    private static final String TEST_WORD = "test";
+    private static final String DEFAULT_WORD = "test";
+    private final int DICTIONARY_SIZE = 118619;
+    private boolean isDefault = false;
     private Queue<String> wordList = new LinkedList<String>();
     
     public WordManager() {
         setDefault();
-        System.out.println(wordList);
     }
     
     public void update() {
@@ -18,7 +24,8 @@ public class WordManager {
     
     public void setDefault() {
         wordList.clear();
-        wordList.add(TEST_WORD);
+        wordList.add(DEFAULT_WORD);
+        isDefault = true;
     }
     
     public String currentWord() {
@@ -30,7 +37,7 @@ public class WordManager {
     }
     
     public void nextWord() {
-        if(!wordList.isEmpty()) {
+        if(!isDefault && !wordList.isEmpty()) {
             wordList.remove();
         }
     }
@@ -40,5 +47,17 @@ public class WordManager {
             return true;
         }
         return false;
+    }
+
+    public void loadWords(int reservoirSize) {
+        wordList.clear();
+        try {
+            isDefault = false;
+            wordList.addAll(MyUtilities.FILE_IO_UTILITIES.reservoirSampling(reservoirSize, DICTIONARY_SIZE, FileName.DICTIONARY.getName() + FileExt.DICTIONARY.getExt()));
+        } catch (IOException e) {
+            setDefault();
+            System.out.println("An error occured while trying to load the words.");
+            e.printStackTrace();
+        }
     }
 }

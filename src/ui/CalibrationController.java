@@ -145,8 +145,10 @@ public class CalibrationController extends GraphicsController {
     
     @Override
     public void keyboardKeyEventObserved(char key) {
-        if(key == '\b' && 0 < wordLabel.getText().length()) {
-            wordLabel.setText(wordLabel.getText().substring(0, wordLabel.getText().length()-1));
+        if(key == '\b') {
+            if(0 < wordLabel.getText().length()) {
+                wordLabel.setText(wordLabel.getText().substring(0, wordLabel.getText().length()-1));
+            }
         } else if(key == '\n') {
             wordLabel.setText("");
         } else {
