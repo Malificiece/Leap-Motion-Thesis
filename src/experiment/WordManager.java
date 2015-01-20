@@ -8,16 +8,37 @@ public class WordManager {
     private Queue<String> wordList = new LinkedList<String>();
     
     public WordManager() {
-        setDefaultWord();
+        setDefault();
         System.out.println(wordList);
     }
     
-    public void setDefaultWord() {
+    public void update() {
+        // use this to paint the words the correct colors using timers
+    }
+    
+    public void setDefault() {
         wordList.clear();
         wordList.add(TEST_WORD);
     }
     
-    public String getCurrentWord() {
+    public String currentWord() {
         return wordList.peek();
+    }
+    
+    public boolean isValid() {
+        return !wordList.isEmpty();
+    }
+    
+    public void nextWord() {
+        if(!wordList.isEmpty()) {
+            wordList.remove();
+        }
+    }
+    
+    public boolean isMatch(String answer) {
+        if(!wordList.isEmpty() && wordList.peek().equals(answer)) {
+            return true;
+        }
+        return false;
     }
 }

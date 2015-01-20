@@ -1,0 +1,67 @@
+package experiment;
+
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+import javax.swing.JButton;
+
+import enums.FileExt;
+import enums.FileName;
+import enums.FilePath;
+
+public class TutorialManager {
+    private final String TUTORIAL_WORD_PATH = FilePath.TUTORIAL.getPath() + FileName.TUTORIAL.getName() + FileExt.DICTIONARY.getExt();
+    private final String[] INSTRUCTIONS = {"This quick tutorial will go over what you need to know.",
+            "Once the experiment begins, a random word will appear above the keyboard.\n\n"
+            + "It is your job to type in the word you see at a rate comfortable to you.",
+            "You will use the specified keyboard to type the seen word.\n\n"
+            + "Any correctly typed letters will show in GREEN while errors will show in RED.",
+            "Once a word has been completed, you will press the ENTER key to move to the next word.\n\n"
+            + "The topmost box will flash GREEN if the word you entered was correct. It will flash RED if the word was incorrect.",
+            "After you've gone through the randomly selected words, the experiment will be complete.\n\n"
+            + "The window will automatically closed.",
+            "Please, take a moment to observe the example on the left and ask if you have any questions.\n\n"
+            + "Press \"Done\" to continue"};
+    private int step = 0;
+    private boolean hasNext = false;
+    private JButton stepButton;
+    
+    public TutorialManager() {
+        stepButton = new JButton("Next");
+        stepButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                step++;
+                hasNext = true;
+                if(step == INSTRUCTIONS.length - 1) {
+                    stepButton.setText("Done");
+                }
+            }
+        });
+    }
+    
+    public boolean hasNext() {
+        try {
+            return hasNext;
+        } finally {
+            // Consume next event
+            hasNext = false;
+        }
+    }
+    
+    public boolean isValid() {
+        return step < INSTRUCTIONS.length;
+    }
+    
+    public String getPath() {
+        return TUTORIAL_WORD_PATH;
+    }
+
+    public String getText() {
+        return INSTRUCTIONS[step];
+    }
+
+    public JButton getComponent() {
+        return stepButton;
+    }
+}

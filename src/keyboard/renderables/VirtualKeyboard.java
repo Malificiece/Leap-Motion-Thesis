@@ -20,7 +20,6 @@ import keyboard.KeyboardRenderable;
 public class VirtualKeyboard extends KeyboardRenderable {
     private static final Renderable TYPE = Renderable.VIRTUAL_KEYS;
     private TreeMap<Key, VirtualKey> keys = new TreeMap<Key, VirtualKey>();
-    //private VirtualKey [] keys;
     
     public VirtualKeyboard(KeyboardAttributes keyboardAttributes) {
         super(TYPE);

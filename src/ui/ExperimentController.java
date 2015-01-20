@@ -8,7 +8,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.util.ArrayList;
 
 import javax.media.opengl.GLAutoDrawable;
 import javax.media.opengl.awt.GLCanvas;
@@ -25,9 +24,9 @@ import utilities.MyUtilities;
 import keyboard.KeyboardAttributes;
 import keyboard.KeyboardSetting;
 import enums.Attribute;
-import enums.FilePath;
 import enums.Keyboard;
 import enums.TestType;
+import experiment.TutorialManager;
 import experiment.WordManager;
 
 public class ExperimentController extends GraphicsController {
@@ -43,6 +42,7 @@ public class ExperimentController extends GraphicsController {
     private JButton practiceButton;
     private JButton experimentButton;
     private JTextArea infoPane;
+    private JPanel infoPanel;
     private JPanel settingsPanel;
     private JPanel wordPanel;
     private JPanel answerPanel;
@@ -55,6 +55,7 @@ public class ExperimentController extends GraphicsController {
     private boolean ranTutorial = false;
     private boolean ranPractice = false;
     private WordManager wordManager = new WordManager();
+    private TutorialManager tutorialManager;
     
     public ExperimentController() {
         keyboard = Keyboard.STANDARD.getKeyboard();
@@ -67,6 +68,7 @@ public class ExperimentController extends GraphicsController {
         frame.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
         splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
         infoPane = new JTextArea(DEFAULT_INFO);
+        infoPanel = new JPanel();
         settingsPanel = new JPanel();
         wordPanel = new JPanel();
         answerPanel = new JPanel();
@@ -79,7 +81,7 @@ public class ExperimentController extends GraphicsController {
         
         JButton buttons[] = {calibrateButton, tutorialButton, practiceButton, experimentButton};
         JLabel labels[] = {wordLabel, answerLabel};
-        JPanel panels[] = {wordPanel, answerPanel, settingsPanel};
+        JPanel panels[] = {wordPanel, answerPanel, settingsPanel, infoPanel};
 
         // Window builder builds window using important fields here. It adds unimportant fields that we use for aesthetics only.
         WindowBuilder.buildExperimentWindow(frame, canvasPanel, infoPane, panels, labels, buttons, splitPane);
@@ -125,14 +127,11 @@ public class ExperimentController extends GraphicsController {
                 if(runningTutorial) {
                     finishTutorial();
                 } else {
-                    // Beging tutorial -- detect keyboard but don't record it's key event
-                    beingTutorial();
+                    beginTutorial();
                     //keyboard.streamDataFromFile(FilePath.TUTORIAL.getPath());
                     // change listener on keyboard to use DATA listener rather than it's classic listener
                     // turn off leap listener, ignore key bindings, don't update controller inputs
                     // turn on when done
-                    
-                    // show tutorial word, show keyboard response, DO NOT RECORD DATA
                 }
                 frame.requestFocusInWindow();
             }
@@ -141,6 +140,7 @@ public class ExperimentController extends GraphicsController {
         practiceButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent arg0) {
+                beginPractice();
                 // Begin practice -- detect keyboard but don't record it's key events
                 // show words, show keyboard, DO NOT RECORD DATA
                 // Finish practice
@@ -152,6 +152,7 @@ public class ExperimentController extends GraphicsController {
         experimentButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent arg0) {
+                beginExperiment();
                 // Begin experiment -- detect keyboard and record it's key events
                 // show words, show keyboard, records data in memory
                 // Finish experiment
@@ -186,16 +187,12 @@ public class ExperimentController extends GraphicsController {
     
     private void beginCalibration() {
         runningCalibration = true;
-        wordLabel.setText("");
+        disableUI();
         wordLabel.setVisible(false);
-        answerLabel.setText("");
         answerLabel.setVisible(false);
         wordPanel.removeAll();
-        calibrateButton.setEnabled(false);
-        tutorialButton.setEnabled(false);
-        practiceButton.setEnabled(false);
-        experimentButton.setEnabled(false);
-        infoPane.setText("Calibration in progress...");
+        infoPane.setText("Calibration in progress...\n\n"
+                + "Please follow the Calibration instructions.");
         settingsPanel.removeAll();
         if(isLeapKeyboard()) {
             KeyboardAttributes ka = keyboard.getAttributes();
@@ -207,20 +204,12 @@ public class ExperimentController extends GraphicsController {
     
     private void finishCalibration() {
         runningCalibration = false;
+        enableUI();
         wordPanel.add(wordLabel);
         wordLabel.setVisible(true);
         wordPanel.add(answerLabel);
         answerLabel.setVisible(true);
-        calibrateButton.setEnabled(true);
-        tutorialButton.setEnabled(true);
-        if(ranTutorial) {
-            practiceButton.setEnabled(true);
-        }
-        if(ranPractice) {
-            experimentButton.setEnabled(true);
-        }
         settingsPanel.removeAll();
-        
         KeyboardAttributes ka = keyboard.getAttributes();
         settingsPanel.add(ka.getAttribute(Attribute.KEYBOARD_SIZE).getAttributePanel());
         if(isLeapKeyboard()) {
@@ -235,36 +224,26 @@ public class ExperimentController extends GraphicsController {
         frame.pack();
     }
     
-    private void beingTutorial() {
+    private void beginTutorial() {
         runningTutorial = true;
-        wordLabel.setText("");
-        answerLabel.setText("");
-        calibrateButton.setEnabled(false);
-        tutorialButton.setText("Done");
-        practiceButton.setEnabled(false);
-        experimentButton.setEnabled(false);
-        infoPane.setText("Tutorial in progress...");
+        tutorialManager = new TutorialManager();
+        infoPanel.add(tutorialManager.getComponent());
+        infoPane.setText(tutorialManager.getText());
         // add instructions as we go through the tutorial
         // show two words at least in the tutorial
-        settingsPanel.setEnabled(false);
+        disableUI();
     }
     
     private void finishTutorial() {
         runningTutorial = false;
         ranTutorial = true;
-        calibrateButton.setEnabled(true);
-        tutorialButton.setText("Tutorial");
-        if(ranTutorial) {
-            practiceButton.setEnabled(true);
-        }
-        if(ranPractice) {
-            experimentButton.setEnabled(true);
-        }
-        infoPane.setText(DEFAULT_INFO);
-        settingsPanel.setEnabled(true);
+        infoPanel.remove(tutorialManager.getComponent());
+        tutorialManager = null;
+        wordManager.setDefault();
+        enableUI();
     }
     
-    private void beingPractice() {
+    private void beginPractice() {
         runningPractice = true;
     }
     
@@ -276,8 +255,31 @@ public class ExperimentController extends GraphicsController {
         runningExperiment = true;
     }
     
-    private void finishExeriment() {
+    private void finishExperiment() {
         runningExperiment = false;
+    }
+    
+    public void disableUI() {
+        wordLabel.setText("");
+        answerLabel.setText("");
+        calibrateButton.setEnabled(false);
+        tutorialButton.setEnabled(false);
+        practiceButton.setEnabled(false);
+        experimentButton.setEnabled(false);
+        settingsPanel.setEnabled(false);
+    }
+    
+    public void enableUI() {
+        calibrateButton.setEnabled(true);
+        tutorialButton.setEnabled(true);
+        if(ranTutorial) {
+            practiceButton.setEnabled(true);
+        }
+        if(ranPractice) {
+            experimentButton.setEnabled(true);
+        }
+        infoPane.setText(DEFAULT_INFO);
+        settingsPanel.setEnabled(true);
     }
     
     public void disable() {
@@ -345,15 +347,17 @@ public class ExperimentController extends GraphicsController {
         if(runningTutorial) {
             // if tutorial selected, read pre-recorded data and display the word/keyboard functioning
             // once tutorial is done, enable practice
-        } else if(runningPractice) {
+        } else if(runningPractice && !wordManager.isValid()) {
             // if practice selected, a practice experiment is given with a set of words, use default set for all keyboards. Don't record data
             // after practice is completed enable experiment
             // tutorial and practice are repeatable any number of times with no effect to experiment
-        } else if(runningExperiment) {
+            finishPractice();
+        } else if(runningExperiment && !wordManager.isValid()) {
             // if experiment selected, show keyboard, give set of real words, and record data for subject ID
             // possibly spawn separate thread for writing? If so, have to make sure that each thread that is
             // spawned works together to write to file. Possibly just have my datawriter on it's own thread
             // and send it events that make it write to file automatically
+            finishExperiment();
         }
         // if nothing selected, show keyboard but record nothing -- kind of like calibration
         

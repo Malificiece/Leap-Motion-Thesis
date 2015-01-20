@@ -165,7 +165,7 @@ public class WindowBuilder {
     public static void buildExperimentWindow(JFrame frame,
             JPanel canvasPanel,
             JTextArea infoPane,
-            JPanel[] panels, // word, answer, settingsPanel
+            JPanel[] panels, // word, answer, settingsPanel, infoPanel
             JLabel[] labels, // word, answer
             JButton [] buttons, // calibration, tutorial, practice, experiment
             JSplitPane splitPane) {
@@ -225,11 +225,10 @@ public class WindowBuilder {
         rightPanelSet.setMinimumSize(rightPanelSet.getPreferredSize());
         splitPane.setRightComponent(rightPanelSet);
         
-        // Add a description panel and add the editor pane.
-        JPanel descriptionPanel = new JPanel();
-        descriptionPanel.setLayout(new BoxLayout(descriptionPanel, BoxLayout.Y_AXIS));
-        descriptionPanel.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createTitledBorder("Info"), BorderFactory.createEmptyBorder(5, 10, 10, 10)));
-        rightPanelSet.add(descriptionPanel);
+        // Add a info panel and add the text area.
+        panels[3].setLayout(new BoxLayout(panels[3], BoxLayout.Y_AXIS));
+        panels[3].setBorder(BorderFactory.createCompoundBorder(BorderFactory.createTitledBorder("Info"), BorderFactory.createEmptyBorder(5, 10, 10, 10)));
+        rightPanelSet.add(panels[3]);
         
         infoPane.setEditable(false);
         infoPane.setLineWrap(true);
@@ -238,7 +237,7 @@ public class WindowBuilder {
         Font font = new Font(infoPane.getFont().getFamily(), Font.BOLD, 13);
         infoPane.setFont(font);
         infoPane.setBackground(UIManager.getColor("Panel.background"));
-        descriptionPanel.add(infoPane);
+        panels[3].add(infoPane);
         
         // Add the settings panel
         JPanel settingsPanelMain = new JPanel(new GridLayout(0,1));
