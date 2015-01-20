@@ -164,7 +164,7 @@ public class WindowBuilder {
     
     public static void buildExperimentWindow(JFrame frame,
             JPanel canvasPanel,
-            JTextArea descriptionPane,
+            JTextArea infoPane,
             JPanel[] panels, // word, answer, settingsPanel
             JLabel[] labels, // word, answer
             JButton [] buttons, // calibration, tutorial, practice, experiment
@@ -231,13 +231,14 @@ public class WindowBuilder {
         descriptionPanel.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createTitledBorder("Info"), BorderFactory.createEmptyBorder(5, 10, 10, 10)));
         rightPanelSet.add(descriptionPanel);
         
-        descriptionPane.setEditable(false);
-        descriptionPane.setLineWrap(true);
-        descriptionPane.setHighlighter(null);
-        Font font = new Font(descriptionPane.getFont().getFamily(), Font.BOLD, 13);
-        descriptionPane.setFont(font);
-        descriptionPane.setBackground(UIManager.getColor("Panel.background"));
-        descriptionPanel.add(descriptionPane);
+        infoPane.setEditable(false);
+        infoPane.setLineWrap(true);
+        infoPane.setWrapStyleWord(true);
+        infoPane.setHighlighter(null);
+        Font font = new Font(infoPane.getFont().getFamily(), Font.BOLD, 13);
+        infoPane.setFont(font);
+        infoPane.setBackground(UIManager.getColor("Panel.background"));
+        descriptionPanel.add(infoPane);
         
         // Add the settings panel
         JPanel settingsPanelMain = new JPanel(new GridLayout(0,1));

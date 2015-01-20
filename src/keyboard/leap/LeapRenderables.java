@@ -16,9 +16,9 @@ import keyboard.renderables.VirtualKeyboard;
 
 public class LeapRenderables extends KeyboardRenderables {
 
-    LeapRenderables(LeapKeyboard keyboard) {
+    LeapRenderables(LeapKeyboard keyboard, boolean air) {
         // order here determines render order
-        this.addRenderable(new LeapPlane(keyboard));
+        this.addRenderable(new LeapPlane(keyboard, air));
         this.addRenderable(new KeyboardImage(keyboard.getFileName() + FileName.KEYBOARD_IMAGE.getName() + FileExt.PNG.getExt()));
         this.addRenderable(new KeyboardImage(keyboard.getFileName() + FileName.KEYBOARD_IMAGE_UPPER.getName() + FileExt.PNG.getExt()));
         this.swapToLowerCaseKeyboard();

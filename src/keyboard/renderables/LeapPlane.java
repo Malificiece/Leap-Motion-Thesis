@@ -49,6 +49,7 @@ public class LeapPlane extends KeyboardRenderable {
     private final KeyboardAttribute POINT_B_ATTRIBUTE;
     private final KeyboardAttribute POINT_C_ATTRIBUTE;
     private final String FILE_NAME;
+    private final boolean AIR_KEYBOARD;
     private ArrayList<CalibrationObserver> observers = new ArrayList<CalibrationObserver>();
     private InteractionBox iBox;
     private Vector pointA; // min
@@ -78,11 +79,12 @@ public class LeapPlane extends KeyboardRenderable {
     //private Vector intersectionPoint = Vector.zero();
     private float x, y, z = -1;
     private JPanel textPanel;
-    private JEditorPane explinationPane;
+    private JEditorPane explinationPane; // TODO: Use JTextPane and character attributes instead of html
     private boolean removeTool = false;
     
-    public LeapPlane(IKeyboard keyboard) {
+    public LeapPlane(IKeyboard keyboard, boolean air) {
         super(TYPE);
+        AIR_KEYBOARD = air;
         KEYBOARD_SIZE = keyboard.getAttributes().getAttributeAsPoint(Attribute.KEYBOARD_SIZE);
         BORDER_SIZE = keyboard.getAttributes().getAttributeAsInteger(Attribute.BORDER_SIZE);
         CAMERA_DISTANCE = keyboard.getAttributes().getAttributeAsFloat(Attribute.CAMERA_DISTANCE);
@@ -117,7 +119,7 @@ public class LeapPlane extends KeyboardRenderable {
     
     public void beginCalibration(JPanel textPanel) {      
         grantAccess(true);
-        leapPlaneCalibrator = new LeapPlaneCalibrator();
+        leapPlaneCalibrator = new LeapPlaneCalibrator(AIR_KEYBOARD);
         //explinationPane = new JEditorPane("text/html", "");
         //explinationPane.setEditable(false);
         this.textPanel = textPanel;

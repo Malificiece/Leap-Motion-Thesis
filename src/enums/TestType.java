@@ -10,8 +10,8 @@ public enum TestType {
     TABLET_L(Keyboard.TABLET.getID(), Keyboard.TABLET.getName() + " (left-handed)", 'l'),
     CONTROLLER(Keyboard.CONTROLLER.getID(), Keyboard.CONTROLLER.getName() + " (both)", 'n');*/
     KEYBOARD(Keyboard.STANDARD.getID(), Keyboard.STANDARD.getName()),
-    LEAP_SURFACE(Keyboard.LEAP.getID(), "Surface " + Keyboard.LEAP.getName()),
-    LEAP_FLOATING(Keyboard.LEAP.getID(), "Floating " + Keyboard.LEAP.getName()),
+    LEAP_SURFACE(Keyboard.LEAP_SURFACE.getID(), Keyboard.LEAP_SURFACE.getName()),
+    LEAP_AIR(Keyboard.LEAP_AIR.getID(), Keyboard.LEAP_AIR.getName()),
     TABLET(Keyboard.TABLET.getID(), Keyboard.TABLET.getName()),
     CONTROLLER(Keyboard.CONTROLLER.getID(), Keyboard.CONTROLLER.getName());
 

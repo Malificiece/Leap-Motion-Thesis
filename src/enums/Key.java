@@ -54,7 +54,7 @@ public enum Key {
     VK_UP((char) KeyEvent.VK_UP, (char) KeyEvent.VK_UP, "VK_UP", KeyEvent.VK_UP, false),
     VK_DOWN((char) KeyEvent.VK_DOWN, (char) KeyEvent.VK_DOWN, "VK_DOWN", KeyEvent.VK_DOWN, false),
     VK_RIGHT((char) KeyEvent.VK_RIGHT, (char) KeyEvent.VK_RIGHT, "VK_RIGHT", KeyEvent.VK_RIGHT, false),
-    VK_LEFT((char) KeyEvent.VK_LEFT, (char) KeyEvent.VK_UP, "VK_LEFT", KeyEvent.VK_LEFT, false);
+    VK_LEFT((char) KeyEvent.VK_LEFT, (char) KeyEvent.VK_LEFT, "VK_LEFT", KeyEvent.VK_LEFT, false);
 
     private final char keyValue;
     private final char keyUpperCase;

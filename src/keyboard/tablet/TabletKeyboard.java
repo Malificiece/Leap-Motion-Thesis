@@ -14,7 +14,7 @@ import enums.FileName;
 import enums.FilePath;
 
 public class TabletKeyboard extends IKeyboard {
-    public static final int KEYBOARD_ID = 2;
+    public static final int KEYBOARD_ID = 4;
     private static final String KEYBOARD_NAME = "Tablet Keyboard";
     private static final String KEYBOARD_FILE_NAME = FileName.TABLET.getName();
     private boolean isCalibrated = false;

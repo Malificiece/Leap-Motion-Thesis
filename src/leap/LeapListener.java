@@ -15,7 +15,7 @@ import com.leapmotion.leap.*;
 public class LeapListener extends Listener /*implements SaveSettingsObserver*/ {
     private static Controller controller;
     private static LeapListener listener;
-    private ArrayList<LeapObserver> observers = new ArrayList<LeapObserver>();
+    private static ArrayList<LeapObserver> observers = new ArrayList<LeapObserver>();
     private LeapData leapData = new LeapData();
     
     public LeapListener(Controller controller) {
@@ -62,14 +62,14 @@ public class LeapListener extends Listener /*implements SaveSettingsObserver*/ {
         controller.addListener(listener);
     }
     
-    public void registerObserver(LeapObserver observer) {
+    public static void registerObserver(LeapObserver observer) {
         if(observers.contains(observer)) {
             return;
         }
         observers.add(observer);
     }
     
-    public void removeObserver(LeapObserver observer) {
+    public static void removeObserver(LeapObserver observer) {
         observers.remove(observer);
     }
 
@@ -86,6 +86,7 @@ public class LeapListener extends Listener /*implements SaveSettingsObserver*/ {
     }
 
     // Leap does not register tool gestures so don't need to calibrate leap gesture settings.
+    // Instead we have to implement our own.
     /*@Override
     public void saveSettingsEventObserved(IKeyboard keyboard) {
         if(keyboard == KeyboardType.LEAP.getKeyboard()) {

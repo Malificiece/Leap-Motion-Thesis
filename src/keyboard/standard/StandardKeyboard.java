@@ -198,7 +198,10 @@ public class StandardKeyboard extends IKeyboard {
             @Override
             public void actionPerformed(ActionEvent e) {
                 keyPressed = e.getActionCommand().charAt(0);
-                Key key = Key.getByCode(keyPressed) == null ? Key.getByValue(keyPressed) : Key.getByCode(keyPressed);
+                Key key = null;
+                if((key = Key.getByCode(keyPressed)) == null) {
+                    key = Key.getByValue(keyPressed);
+                }
                 if((e.getModifiers() & KeyEvent.SHIFT_MASK) != 0 || shiftDown) {
                     shiftDown = true;
                     //keyboardRenderables.swapToUpperCaseKeyboard();

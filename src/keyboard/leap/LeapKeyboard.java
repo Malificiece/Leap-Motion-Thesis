@@ -35,12 +35,11 @@ import leap.LeapData;
 import leap.LeapListener;
 import leap.LeapObserver;
 
-
 public class LeapKeyboard extends IKeyboard implements LeapObserver, CalibrationObserver {
-    public static final int KEYBOARD_ID = 1;
-    private static final String KEYBOARD_NAME = "Leap Keyboard";
-    private static final String KEYBOARD_FILE_NAME = FileName.LEAP.getName();
-    private static final ReentrantLock LEAP_LOCK = new ReentrantLock();
+    public final int KEYBOARD_ID;
+    private final String KEYBOARD_NAME;
+    private final String KEYBOARD_FILE_NAME;
+    private final ReentrantLock LEAP_LOCK = new ReentrantLock();
     private final float CAMERA_DISTANCE;
     private LeapData leapData;
     private LeapTool leapTool;
@@ -55,13 +54,16 @@ public class LeapKeyboard extends IKeyboard implements LeapObserver, Calibration
     private boolean shiftOnce = false;
     private boolean shiftTwice = false;
     
-    public LeapKeyboard() {
-        super(KEYBOARD_ID, KEYBOARD_NAME, KEYBOARD_FILE_NAME);
+    public LeapKeyboard(boolean air) {
+        super(air ? 2 : 1, air ? "Leap Air Keyboard" : "Leap Surface Keyboard", air ?  FileName.LEAP_AIR.getName() : FileName.LEAP_SURFACE.getName());
+        KEYBOARD_ID = air ? 2 : 1;
+        KEYBOARD_NAME = air ? "Leap Air Keyboard" : "Leap Surface Keyboard";
+        KEYBOARD_FILE_NAME = air ?  FileName.LEAP_AIR.getName() : FileName.LEAP_SURFACE.getName();
         System.out.println(KEYBOARD_NAME + " - Loading Settings from " + FilePath.CONFIG.getPath() + KEYBOARD_FILE_NAME + FileExt.INI.getExt());
         keyboardAttributes = new LeapAttributes(this);
         keyboardSettings = new LeapSettings(this);
         System.out.println("-------------------------------------------------------");
-        keyboardRenderables = new LeapRenderables(this);
+        keyboardRenderables = new LeapRenderables(this, air);
         keyboardSize = keyboardAttributes.getAttributeAsPoint(Attribute.KEYBOARD_SIZE);
         int borderSize = keyboardAttributes.getAttributeAsInteger(Attribute.BORDER_SIZE) * 2;
         imageSize = new Point(keyboardSize.x + borderSize, keyboardSize.y + borderSize);
@@ -147,12 +149,14 @@ public class LeapKeyboard extends IKeyboard implements LeapObserver, Calibration
     
     @Override
     public void addToUI(JPanel panel, GLCanvas canvas) {
+        LeapListener.registerObserver(this);
         LeapListener.startListening();
     }
 
     @Override
     public void removeFromUI(JPanel panel, GLCanvas canvas) {
         LeapListener.stopListening();
+        LeapListener.removeObserver(this);
         leapTool.deleteQuadric();
         keyboardGestures.deleteQuadric();
     }

@@ -2,7 +2,8 @@ package enums;
 
 public enum FileName {
     STANDARD("standard"),
-    LEAP("leap"),
+    LEAP_SURFACE("leap_surface"),
+    LEAP_AIR("leap_air"),
     CONTROLLER("controller"),
     TABLET("tablet"),
     KEYBOARD_IMAGE("_keyboard"),

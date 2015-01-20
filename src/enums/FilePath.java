@@ -3,7 +3,8 @@ package enums;
 public enum FilePath {
     ASSETS("./assets/"),
     CONFIG("./config/"),
-    DATA("./data/");
+    DATA("./data/"),
+    TUTORIAL(DATA.getPath() + "tutorial/");
     //STANDARD("standard/"),
     //LEAP("leap/"),
     //TABLET("tablet/"),
