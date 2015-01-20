@@ -291,6 +291,8 @@ public class CalibrationController extends GraphicsController {
         
         canvas.setPreferredSize(new Dimension(keyboard.getImageWidth(), keyboard.getImageHeight()));
         canvas.setSize(keyboard.getImageWidth(), keyboard.getImageHeight());
+        frame.revalidate();
+        frame.repaint();
         frame.pack();
     }
     

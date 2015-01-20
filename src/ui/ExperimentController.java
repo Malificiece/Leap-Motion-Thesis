@@ -124,15 +124,11 @@ public class ExperimentController extends GraphicsController {
         tutorialButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent arg0) {
-                if(runningTutorial) {
-                    finishTutorial();
-                } else {
-                    beginTutorial();
-                    //keyboard.streamDataFromFile(FilePath.TUTORIAL.getPath());
-                    // change listener on keyboard to use DATA listener rather than it's classic listener
-                    // turn off leap listener, ignore key bindings, don't update controller inputs
-                    // turn on when done
-                }
+                beginTutorial();
+                // keyboard.streamDataFromFile(FilePath.TUTORIAL.getPath());
+                // change listener on keyboard to use DATA listener rather than it's classic listener
+                // turn off leap listener, ignore key bindings, don't update controller inputs
+                // turn on when done
                 frame.requestFocusInWindow();
             }
         });
@@ -229,8 +225,7 @@ public class ExperimentController extends GraphicsController {
         tutorialManager = new TutorialManager();
         infoPanel.add(tutorialManager.getComponent());
         infoPane.setText(tutorialManager.getText());
-        // add instructions as we go through the tutorial
-        // show two words at least in the tutorial
+        // set up word manager here
         disableUI();
     }
     
@@ -239,7 +234,6 @@ public class ExperimentController extends GraphicsController {
         ranTutorial = true;
         infoPanel.remove(tutorialManager.getComponent());
         tutorialManager = null;
-        wordManager.setDefault();
         enableUI();
     }
     
@@ -267,9 +261,14 @@ public class ExperimentController extends GraphicsController {
         practiceButton.setEnabled(false);
         experimentButton.setEnabled(false);
         settingsPanel.setEnabled(false);
+        frame.revalidate();
+        frame.repaint();
+        frame.pack();
     }
     
     public void enableUI() {
+        wordManager.setDefault();
+        wordLabel.setText(wordManager.currentWord());
         calibrateButton.setEnabled(true);
         tutorialButton.setEnabled(true);
         if(ranTutorial) {
@@ -280,6 +279,9 @@ public class ExperimentController extends GraphicsController {
         }
         infoPane.setText(DEFAULT_INFO);
         settingsPanel.setEnabled(true);
+        frame.revalidate();
+        frame.repaint();
+        frame.pack();
     }
     
     public void disable() {
@@ -340,6 +342,8 @@ public class ExperimentController extends GraphicsController {
         
         canvas.setPreferredSize(new Dimension(keyboard.getImageWidth(), keyboard.getImageHeight()));
         canvas.setSize(keyboard.getImageWidth(), keyboard.getImageHeight());
+        frame.revalidate();
+        frame.repaint();
         frame.pack();
     }
     
@@ -347,6 +351,11 @@ public class ExperimentController extends GraphicsController {
         if(runningTutorial) {
             // if tutorial selected, read pre-recorded data and display the word/keyboard functioning
             // once tutorial is done, enable practice
+            if(tutorialManager.hasNext() && tutorialManager.isValid()) {
+                infoPane.setText(tutorialManager.getText());
+            } else if(!tutorialManager.isValid()) {
+                finishTutorial();
+            }
         } else if(runningPractice && !wordManager.isValid()) {
             // if practice selected, a practice experiment is given with a set of words, use default set for all keyboards. Don't record data
             // after practice is completed enable experiment
