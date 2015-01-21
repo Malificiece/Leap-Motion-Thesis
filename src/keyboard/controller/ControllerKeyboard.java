@@ -61,8 +61,10 @@ public class ControllerKeyboard extends IKeyboard {
         imageSize = new Point(keyboardSize.x + borderSize, keyboardSize.y + borderSize);
         VERTICAL_GESTURE_LENGTH = HORIZONTAL_GESTURE_LENGTH * (imageSize.y/(float)imageSize.x);
         VERTICAL_GESTURE_OFFSET = HORIZONTAL_GESTURE_OFFSET * (imageSize.y/(float)imageSize.x);
+        if(Gesture.ENABLED) {
+            keyboardGestures = (KeyboardGestures) keyboardRenderables.getRenderable(Renderable.KEYBOARD_GESTURES);
+        }
         virtualKeyboard = (VirtualKeyboard) keyboardRenderables.getRenderable(Renderable.VIRTUAL_KEYS);
-        keyboardGestures = (KeyboardGestures) keyboardRenderables.getRenderable(Renderable.KEYBOARD_GESTURES);
         gamePad = new GamePad();
         keyLayout = getKeyLayout((Key[][]) keyboardAttributes.getAttribute(Attribute.KEY_ROWS).getValue());
         selectedKey = new Point(0, 0);
@@ -81,8 +83,10 @@ public class ControllerKeyboard extends IKeyboard {
     
     @Override
     public void update() {
-        // Remove finished gestures, update others.
-        keyboardGestures.removeAndUpdateGestures();
+        if(Gesture.ENABLED) {
+            // Remove finished gestures, update others.
+            keyboardGestures.removeAndUpdateGestures();
+        }
         
         gamePad.update();
         
@@ -194,44 +198,20 @@ public class ControllerKeyboard extends IKeyboard {
         }
         
         // Left Stick, moves keyboard (maybe add gestures)
-        switch(Axis.getClosestDirectionLeftStick()) {
-            case DOWN:
-                moveSelectedKey(-1, 0);
-                break;
-            case LEFT:
-                moveSelectedKey(0, -1);
-                break;
-            case RIGHT:
-                moveSelectedKey(0, 1);
-                break;
-            case UP:
-                moveSelectedKey(1, 0);
-                break;
-            default: break;
-        }
+        moveSelectedKey(Axis.getClosestDirectionLeftStick());
         
         // Right Stick, moves keyboard (maybe add gestures)
-        switch(Axis.getClosestDirectionRightStick()) {
-            case DOWN:
-                moveSelectedKey(-1, 0);
-                break;
-            case LEFT:
-                moveSelectedKey(0, -1);
-                break;
-            case RIGHT:
-                moveSelectedKey(0, 1);
-                break;
-            case UP:
-                moveSelectedKey(1, 0);
-                break;
-            default: break;
-        }
+        moveSelectedKey(Axis.getClosestDirectionRightStick());
         
         // Hat Switch, create gestures
         for(HatSwitch hatSwitch: HatSwitch.values()) {
-            KeyboardGesture gesture = createSwipeGesture(hatSwitch.isPressed());
-            if(gesture != null) {
-                keyboardGestures.addGesture(gesture);
+            if(Gesture.ENABLED) {
+                KeyboardGesture gesture = createSwipeGesture(hatSwitch.isPressed());
+                if(gesture != null) {
+                    keyboardGestures.addGesture(gesture);
+                }
+            } else {
+                moveSelectedKey(hatSwitch.isPressed());
             }
         }
     }
@@ -263,34 +243,55 @@ public class ControllerKeyboard extends IKeyboard {
     }
     
     public KeyboardGesture createSwipeGesture(Direction direction) {
-        KeyboardGesture gesture = null;
-        switch(direction) {
-            case UP:
-                gesture = new KeyboardGesture(new Vector(imageSize.x/2f, imageSize.y/2f + VERTICAL_GESTURE_OFFSET, CAMERA_DISTANCE * 0.5f), Gesture.SWIPE);
-                gesture.update(new Vector(imageSize.x/2f, imageSize.y/2f + VERTICAL_GESTURE_LENGTH, CAMERA_DISTANCE * 0.5f));
-                gesture.gestureFinshed();
-                break;
-            case DOWN:
-                gesture = new KeyboardGesture(new Vector(imageSize.x/2f, imageSize.y/2f - VERTICAL_GESTURE_OFFSET, CAMERA_DISTANCE * 0.5f), Gesture.SWIPE);
-                gesture.update(new Vector(imageSize.x/2f, imageSize.y/2f - VERTICAL_GESTURE_LENGTH, CAMERA_DISTANCE * 0.5f));
-                gesture.gestureFinshed();
-                break;
-            case LEFT:
-                gesture = new KeyboardGesture(new Vector(imageSize.x/2f - HORIZONTAL_GESTURE_OFFSET, imageSize.y/2f, CAMERA_DISTANCE * 0.5f), Gesture.SWIPE);
-                gesture.update(new Vector(imageSize.x/2f - HORIZONTAL_GESTURE_LENGTH, imageSize.y/2f, CAMERA_DISTANCE * 0.5f));
-                gesture.gestureFinshed();
-                break;
-            case RIGHT:
-                gesture = new KeyboardGesture(new Vector(imageSize.x/2f + HORIZONTAL_GESTURE_OFFSET, imageSize.y/2f, CAMERA_DISTANCE * 0.5f), Gesture.SWIPE);
-                gesture.update(new Vector(imageSize.x/2f + HORIZONTAL_GESTURE_LENGTH, imageSize.y/2f, CAMERA_DISTANCE * 0.5f));
-                gesture.gestureFinshed();
-                break;
-            default: break;
+        if(Gesture.ENABLED) {
+            KeyboardGesture gesture = null;
+            switch(direction) {
+                case UP:
+                    gesture = new KeyboardGesture(new Vector(imageSize.x/2f, imageSize.y/2f + VERTICAL_GESTURE_OFFSET, CAMERA_DISTANCE * 0.5f), Gesture.SWIPE);
+                    gesture.update(new Vector(imageSize.x/2f, imageSize.y/2f + VERTICAL_GESTURE_LENGTH, CAMERA_DISTANCE * 0.5f));
+                    gesture.gestureFinshed();
+                    break;
+                case DOWN:
+                    gesture = new KeyboardGesture(new Vector(imageSize.x/2f, imageSize.y/2f - VERTICAL_GESTURE_OFFSET, CAMERA_DISTANCE * 0.5f), Gesture.SWIPE);
+                    gesture.update(new Vector(imageSize.x/2f, imageSize.y/2f - VERTICAL_GESTURE_LENGTH, CAMERA_DISTANCE * 0.5f));
+                    gesture.gestureFinshed();
+                    break;
+                case LEFT:
+                    gesture = new KeyboardGesture(new Vector(imageSize.x/2f - HORIZONTAL_GESTURE_OFFSET, imageSize.y/2f, CAMERA_DISTANCE * 0.5f), Gesture.SWIPE);
+                    gesture.update(new Vector(imageSize.x/2f - HORIZONTAL_GESTURE_LENGTH, imageSize.y/2f, CAMERA_DISTANCE * 0.5f));
+                    gesture.gestureFinshed();
+                    break;
+                case RIGHT:
+                    gesture = new KeyboardGesture(new Vector(imageSize.x/2f + HORIZONTAL_GESTURE_OFFSET, imageSize.y/2f, CAMERA_DISTANCE * 0.5f), Gesture.SWIPE);
+                    gesture.update(new Vector(imageSize.x/2f + HORIZONTAL_GESTURE_LENGTH, imageSize.y/2f, CAMERA_DISTANCE * 0.5f));
+                    gesture.gestureFinshed();
+                    break;
+                default: break;
+            }
+            return gesture;
         }
-        return gesture;
+        return null;
     }
     
-    private void moveSelectedKey(int rowDelta, int colDelta) {
+    private void moveSelectedKey(Direction direction) {
+        int rowDelta = 0;
+        int colDelta = 0;
+        switch(direction) {
+            case DOWN:
+                rowDelta = 1;
+                break;
+            case LEFT:
+                colDelta = -1;
+                break;
+            case RIGHT:
+                colDelta = 1;
+                break;
+            case UP:
+                rowDelta = -1;
+                break;
+            default: return;
+        }
+        
         virtualKeyboard.deselected(getSelectedKey());
         Key previousKey;
         do {
@@ -611,9 +612,9 @@ public class ControllerKeyboard extends IKeyboard {
                 }
             } else if (Math.abs(x) < Math.abs(y)) {
                 if(y > 0) {
-                    return Direction.UP;
-                } else {
                     return Direction.DOWN;
+                } else {
+                    return Direction.UP;
                 }
             }
             return Direction.NONE;
@@ -631,9 +632,9 @@ public class ControllerKeyboard extends IKeyboard {
                 }
             } else if (Math.abs(x) < Math.abs(y)) {
                 if(y > 0) {
-                    return Direction.UP;
-                } else {
                     return Direction.DOWN;
+                } else {
+                    return Direction.UP;
                 }
             }
             return Direction.NONE;

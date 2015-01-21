@@ -3,6 +3,7 @@ import static javax.media.opengl.GL.GL_COLOR_BUFFER_BIT;
 import static javax.media.opengl.GL.GL_DEPTH_BUFFER_BIT;
 
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.event.ActionEvent;
@@ -27,6 +28,7 @@ import keyboard.KeyboardSetting;
 import enums.Attribute;
 import enums.Keyboard;
 import enums.TestType;
+import experiment.DataManager;
 import experiment.TutorialManager;
 import experiment.WordManager;
 
@@ -35,8 +37,8 @@ public class ExperimentController extends GraphicsController {
             + "TUTORIAL:\nA brief example to familiarize yourself with the keyboard.\n\n"
             + "PRACTICE:\nA small sample of what you should expect from the experiment.\n\n"
             + "EXPERIMENT:\nThe actual experiment with recorded data.";
-    private final int PRACTICE_SIZE = 10;
-    private final int EXPERIMENT_SIZE = 30;
+    private final int PRACTICE_SIZE = 1;
+    private final int EXPERIMENT_SIZE = 3;
     private final Color LIGHT_GREEN = new Color(204, 255, 204);
     private final int FADE_DURATION = 500;
     private Color currentColor = Color.WHITE;
@@ -45,6 +47,7 @@ public class ExperimentController extends GraphicsController {
     private boolean isFading = false;
     private JFrame frame;
     private JSplitPane splitPane;
+    private Component rightComponent;
     private JPanel canvasPanel;
     private JButton calibrateButton;
     private JButton tutorialButton;
@@ -63,7 +66,9 @@ public class ExperimentController extends GraphicsController {
     private boolean runningExperiment = false;
     private boolean ranTutorial = false;
     private boolean ranPractice = false;
+    private String subjectID;
     private WordManager wordManager = new WordManager();
+    private DataManager dataManager;
     private TutorialManager tutorialManager;
     
     public ExperimentController() {
@@ -94,6 +99,7 @@ public class ExperimentController extends GraphicsController {
 
         // Window builder builds window using important fields here. It adds unimportant fields that we use for aesthetics only.
         WindowBuilder.buildExperimentWindow(frame, canvasPanel, infoPane, panels, labels, buttons, splitPane);
+        rightComponent = splitPane.getRightComponent();
         infoPane.setFocusable(false);
         canvas.setFocusable(false);
         
@@ -132,7 +138,7 @@ public class ExperimentController extends GraphicsController {
         
         tutorialButton.addActionListener(new ActionListener() {
             @Override
-            public void actionPerformed(ActionEvent arg0) {
+            public void actionPerformed(ActionEvent e) {
                 beginTutorial();
                 // keyboard.streamDataFromFile(FilePath.TUTORIAL.getPath());
                 // change listener on keyboard to use DATA listener rather than it's classic listener
@@ -144,7 +150,7 @@ public class ExperimentController extends GraphicsController {
         
         practiceButton.addActionListener(new ActionListener() {
             @Override
-            public void actionPerformed(ActionEvent arg0) {
+            public void actionPerformed(ActionEvent e) {
                 beginPractice();
                 frame.requestFocusInWindow();
             }
@@ -152,7 +158,7 @@ public class ExperimentController extends GraphicsController {
         
         experimentButton.addActionListener(new ActionListener() {
             @Override
-            public void actionPerformed(ActionEvent arg0) {
+            public void actionPerformed(ActionEvent e) {
                 beginExperiment();
                 // Begin experiment -- detect keyboard and record it's key events
                 // show words, show keyboard, records data in memory
@@ -244,40 +250,54 @@ public class ExperimentController extends GraphicsController {
     
     private void beginPractice() {
         runningPractice = true;
+        wordManager.loadWords(PRACTICE_SIZE);
         // TODO: Add a delay and a display to show when it's about to begin.
         // This will give us a head's up before things start
-        wordManager.loadWords(PRACTICE_SIZE);
+        splitPane.setRightComponent(null);
         disableUI();
-        splitPane.getRightComponent().setVisible(false);
-        splitPane.setSize(splitPane.getLeftComponent().getSize());
-        splitPane.getLeftComponent().setMaximumSize(splitPane.getLeftComponent().getSize());
-        splitPane.setDividerLocation(splitPane.getLeftComponent().getWidth());
-        frame.setSize(splitPane.getLeftComponent().getWidth(), (int) frame.getSize().getHeight());
-        System.out.println(splitPane.getLeftComponent().getSize());
-        wordLabel.setText(wordManager.currentWord());
+        wordManager.paintLetters(wordLabel, answerLabel);
     }
     
     private void finishPractice() {
         runningPractice = false;
-        System.out.println(splitPane.getLeftComponent().getSize());
-        splitPane.getRightComponent().setVisible(true);
-        splitPane.setSize(splitPane.getLeftComponent().getWidth() + splitPane.getRightComponent().getWidth(), splitPane.getHeight());
-        splitPane.setDividerLocation(splitPane.getLeftComponent().getWidth());
+        splitPane.setRightComponent(rightComponent);
         ranPractice = true;
         enableUI();
     }
     
     private void beginExperiment() {
         runningExperiment = true;
+        dataManager = new DataManager(keyboard);
+        wordManager.loadWords(EXPERIMENT_SIZE);
+        // TODO: Add a delay and a display to show when it's about to begin.
+        // This will give us a head's up before things start
+        splitPane.setRightComponent(null);
+        disableUI();
+        
+        dataManager.startRecording();
+        wordManager.paintLetters(wordLabel, answerLabel);
+        dataManager.startWord(wordManager.currentWord());
     }
     
     private void finishExperiment() {
         runningExperiment = false;
+        splitPane.setRightComponent(rightComponent);
+        dataManager.stopRecording();
+        dataManager.save(subjectID);
+        dataManager = null;
+        enableUI();
+        currentColor = Color.WHITE;
+        wordPanel.setBackground(currentColor);
+        answerPanel.setBackground(currentColor);
+        isFading = false;
+        fadeTimeElapsed = 0;
+        disable();
     }
     
     public void disableUI() {
         wordLabel.setText("");
         answerLabel.setText("");
+        wordManager.setAnswer("");
         calibrateButton.setEnabled(false);
         tutorialButton.setEnabled(false);
         practiceButton.setEnabled(false);
@@ -290,8 +310,8 @@ public class ExperimentController extends GraphicsController {
     
     public void enableUI() {
         wordManager.setDefault();
-        wordLabel.setText(wordManager.currentWord());
-        MyUtilities.JAVA_SWING_UTILITIES.calculateFontSize(wordLabel.getText(), wordLabel, wordPanel);
+        wordManager.paintLetters(wordLabel, answerLabel);
+        MyUtilities.JAVA_SWING_UTILITIES.calculateFontSize(wordManager.currentWord(), wordLabel, wordPanel);
         calibrateButton.setEnabled(true);
         tutorialButton.setEnabled(true);
         if(ranTutorial) {
@@ -329,8 +349,10 @@ public class ExperimentController extends GraphicsController {
         Keyboard.LEAP_AIR.getKeyboard().registerObserver(this);
         Keyboard.TABLET.getKeyboard().registerObserver(this);
         Keyboard.CONTROLLER.getKeyboard().registerObserver(this);
-        wordLabel.setText(wordManager.currentWord());
-        MyUtilities.JAVA_SWING_UTILITIES.calculateFontSize(wordLabel.getText(), wordLabel, wordPanel);
+        wordManager.setDefault();
+        wordManager.paintLetters(wordLabel, answerLabel);
+        MyUtilities.JAVA_SWING_UTILITIES.calculateFontSize(wordManager.currentWord(), wordLabel, wordPanel);
+        MyUtilities.JAVA_SWING_UTILITIES.calculateFontSize(wordManager.currentWord(), answerLabel, answerPanel);
         enabled = true;
     }
     
@@ -338,6 +360,7 @@ public class ExperimentController extends GraphicsController {
         if(frame != null) {
             frame.setTitle("Experiment - Subject ID: " + subjectID + " Test: " + testType.getName());
         }
+        this.subjectID = subjectID;
         keyboard = Keyboard.getByID(testType.getKeyboardID()).getKeyboard();
         enable();
     }
@@ -345,6 +368,7 @@ public class ExperimentController extends GraphicsController {
     private void removeKeyboardFromUI() {
         wordLabel.setText("");
         answerLabel.setText("");
+        wordManager.setAnswer("");
         settingsPanel.removeAll();
         keyboard.removeFromUI(canvasPanel, canvas);
         keyboard = null;
@@ -377,10 +401,13 @@ public class ExperimentController extends GraphicsController {
         frame.pack();
     }
     
-    public void update() {        
+    public void update() {
+        // TODO: Implement a better listener. Send an object that has all the info we need
+        // timestamp, current goal, letter pressed, leap position etc
+        // these listener updates need to be managed as to not cause further delay in the system.
+        keyboard.update();
+        
         if(runningTutorial) {
-            // if tutorial selected, read pre-recorded data and display the word/keyboard functioning
-            // once tutorial is done, enable practice
             if(tutorialManager.hasNext() && tutorialManager.isValid()) {
                 infoPane.setText(tutorialManager.getText());
             } else if(!tutorialManager.isValid()) {
@@ -389,13 +416,8 @@ public class ExperimentController extends GraphicsController {
         } else if(runningPractice && !wordManager.isValid()) {
             finishPractice();
         } else if(runningExperiment && !wordManager.isValid()) {
-            // if experiment selected, show keyboard, give set of real words, and record data for subject ID
-            // possibly spawn separate thread for writing? If so, have to make sure that each thread that is
-            // spawned works together to write to file. Possibly just have my datawriter on it's own thread
-            // and send it events that make it write to file automatically
             finishExperiment();
         }
-        // if nothing selected, show keyboard but record nothing -- kind of like calibration
         
         if(isFading) {
             long now = System.currentTimeMillis();
@@ -419,12 +441,6 @@ public class ExperimentController extends GraphicsController {
                 fadeTimeElapsed = 0;
             }
         }
-        
-        // consider recording both pressed and released events so that we can just have our data reader
-        // fully read the data without much help from the keyboard classes
-        // otherwise perhaps we should implement these functionalities in the keyboard classes themselves via a listener
-        // and the keyboard classes render the recorded data based on what they see. - might be best (still need released events)
-        keyboard.update();
     }
     
     public void render(GLAutoDrawable drawable) {
@@ -435,13 +451,13 @@ public class ExperimentController extends GraphicsController {
     @Override
     public void keyboardKeyEventObserved(char key) {
         if(runningExperiment) {
-            // record data here
+            dataManager.keyPressedEvent(key, wordManager.currentLetter());
         }
         if(key == '\b') {
-            if(0 < answerLabel.getText().length()) {
-                answerLabel.setText(answerLabel.getText().substring(0, answerLabel.getText().length()-1));
+            if(0 < wordManager.getAnswer().length()) {
+                wordManager.setAnswer(wordManager.getAnswer().substring(0, wordManager.getAnswer().length()-1));
             }
-            if(wordManager.isMatch(answerLabel.getText())) {
+            if(wordManager.isMatch()) {
                 currentColor = LIGHT_GREEN;
                 wordPanel.setBackground(currentColor);
                 answerPanel.setBackground(currentColor);
@@ -457,20 +473,30 @@ public class ExperimentController extends GraphicsController {
             previousFadeTime = System.currentTimeMillis();
             fadeTimeElapsed = 0;
             isFading = true;
-            if(wordManager.isMatch(answerLabel.getText())) {
+            if(wordManager.isMatch()) {
                 wordPanel.setBackground(Color.GREEN);
                 answerPanel.setBackground(Color.GREEN);
+                if(runningExperiment) {
+                    dataManager.stopWord();
+                }
                 wordManager.nextWord();
-                answerLabel.setText("");
+                wordManager.setAnswer("");
                 wordLabel.setText(wordManager.currentWord());
+                if(runningExperiment) {
+                    dataManager.startWord(wordManager.currentWord());
+                }
+                if(wordManager.isValid()) {
+                    MyUtilities.JAVA_SWING_UTILITIES.calculateFontSize(wordManager.currentWord(), wordLabel, wordPanel);
+                    MyUtilities.JAVA_SWING_UTILITIES.calculateFontSize(wordManager.currentWord(), answerLabel, answerPanel);
+                }
             } else {
                 wordPanel.setBackground(Color.RED);
                 answerPanel.setBackground(Color.RED);
             }
         } else {
-            answerLabel.setText(answerLabel.getText()+Character.toString(key));
-            MyUtilities.JAVA_SWING_UTILITIES.calculateFontSize(wordLabel.getText(), answerLabel, answerPanel);
-            if(wordManager.isMatch(answerLabel.getText())) {
+            wordManager.setAnswer(wordManager.getAnswer()+Character.toString(key));
+            MyUtilities.JAVA_SWING_UTILITIES.calculateFontSize(wordManager.currentWord(), answerLabel, answerPanel);
+            if(wordManager.isMatch()) {
                 currentColor = LIGHT_GREEN;
                 wordPanel.setBackground(currentColor);
                 answerPanel.setBackground(currentColor);
@@ -482,6 +508,7 @@ public class ExperimentController extends GraphicsController {
                 }
             }
         }
+        wordManager.paintLetters(wordLabel, answerLabel);
     }
     
     private boolean isLeapKeyboard() {

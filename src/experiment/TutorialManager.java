@@ -4,6 +4,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import javax.swing.JButton;
+import javax.swing.JRootPane;
 
 import enums.FileExt;
 import enums.FileName;
@@ -39,6 +40,10 @@ public class TutorialManager {
                 hasNext = true;
                 if(step == INSTRUCTIONS.length - 1) {
                     stepButton.setText("Done");
+                }
+                JRootPane rootPane = stepButton.getRootPane();
+                if(rootPane != null) {
+                    rootPane.requestFocusInWindow();
                 }
             }
         });

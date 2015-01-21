@@ -4,6 +4,7 @@ import javax.media.opengl.GL2;
 
 import enums.FileExt;
 import enums.FileName;
+import enums.Gesture;
 import keyboard.KeyboardRenderable;
 import keyboard.KeyboardRenderables;
 import keyboard.renderables.KeyboardGestures;
@@ -20,7 +21,9 @@ public class ControllerRenderables extends KeyboardRenderables {
         this.addRenderable(new KeyboardImage(keyboard.getFileName() + FileName.KEYBOARD_IMAGE_UPPER.getName() + FileExt.PNG.getExt()));
         this.swapToLowerCaseKeyboard();
         this.addRenderable(new VirtualKeyboard(keyboard.getAttributes()));
-        this.addRenderable(new KeyboardGestures(keyboard.getAttributes()));
+        if(Gesture.ENABLED) {
+            this.addRenderable(new KeyboardGestures(keyboard.getAttributes()));
+        }
     }
 
     @Override

@@ -23,6 +23,7 @@ import enums.Attribute;
 import enums.Color;
 import enums.FileExt;
 import enums.FilePath;
+import enums.Gesture;
 import enums.Renderable;
 import enums.Setting;
 import keyboard.CalibrationObserver;
@@ -397,12 +398,14 @@ public class LeapPlane extends KeyboardRenderable {
             // Set tool point, scale it, rotate and position it.
             leapTool.update(leapPoint.getNormalizedPoint());
             
-            // Set new gesture destination location.
-            for(KeyboardGesture gesture: keyboardGestures.getGestures()) {
-                if(gesture.isValid()) {
-                    gesture.update(leapPoint.getNormalizedPoint());
-                } else {
-                    gesture.update();
+            if(Gesture.ENABLED) {
+                // Set new gesture destination location.
+                for(KeyboardGesture gesture: keyboardGestures.getGestures()) {
+                    if(gesture.isValid()) {
+                        gesture.update(leapPoint.getNormalizedPoint());
+                    } else {
+                        gesture.update();
+                    }
                 }
             }
             

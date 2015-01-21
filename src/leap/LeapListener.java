@@ -11,7 +11,6 @@ import java.util.ArrayList;
 
 import com.leapmotion.leap.*;
 
-
 public class LeapListener extends Listener /*implements SaveSettingsObserver*/ {
     private static Controller controller;
     private static LeapListener listener;
@@ -31,8 +30,9 @@ public class LeapListener extends Listener /*implements SaveSettingsObserver*/ {
 
     public void onConnect(Controller controller) {
         System.out.println("Connected");
-        controller.enableGesture(Gesture.Type.TYPE_SWIPE);
-        controller.enableGesture(Gesture.Type.TYPE_CIRCLE);
+        // Gestures do not work with tools.
+        // controller.enableGesture(Gesture.Type.TYPE_SWIPE);
+        // controller.enableGesture(Gesture.Type.TYPE_CIRCLE);
     }
 
     public void onDisconnect(Controller controller) {

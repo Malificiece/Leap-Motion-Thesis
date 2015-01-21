@@ -49,7 +49,7 @@ public class StandardKeyboard extends IKeyboard {
     private MouseGesture mouseGesture;
     private boolean shiftDown = false;
     private boolean isCalibrated = false;
-    private ReentrantLock gestureLock = new ReentrantLock();
+    private ReentrantLock gestureLock;
     
     public StandardKeyboard() {
         super(KEYBOARD_ID, KEYBOARD_NAME, KEYBOARD_FILE_NAME);
@@ -63,9 +63,12 @@ public class StandardKeyboard extends IKeyboard {
         imageSize = new Point(keyboardSize.x + borderSize, keyboardSize.y + borderSize);
         CAMERA_DISTANCE = keyboardAttributes.getAttributeAsFloat(Attribute.CAMERA_DISTANCE);
         virtualKeyboard = (VirtualKeyboard) keyboardRenderables.getRenderable(Renderable.VIRTUAL_KEYS);
-        keyboardGestures = (KeyboardGestures) keyboardRenderables.getRenderable(Renderable.KEYBOARD_GESTURES);
         keyBindings = new KeyBindings();
-        mouseGesture = new MouseGesture();
+        if(Gesture.ENABLED) {
+            gestureLock = new ReentrantLock();
+            keyboardGestures = (KeyboardGestures) keyboardRenderables.getRenderable(Renderable.KEYBOARD_GESTURES);
+            mouseGesture = new MouseGesture();
+        }
         VERTICAL_GESTURE_LENGTH = HORIZONTAL_GESTURE_LENGTH * (imageSize.y/(float)imageSize.x);
         VERTICAL_GESTURE_OFFSET = HORIZONTAL_GESTURE_OFFSET * (imageSize.y/(float)imageSize.x);
     }
@@ -81,12 +84,14 @@ public class StandardKeyboard extends IKeyboard {
     
     @Override
     public void update() {
-        // Remove completed gestures, update the others.
-        gestureLock.lock();
-        try {
-            keyboardGestures.removeAndUpdateGestures();
-        } finally {
-            gestureLock.unlock();
+        if(Gesture.ENABLED) {
+            // Remove completed gestures, update the others.
+            gestureLock.lock();
+            try {
+                keyboardGestures.removeAndUpdateGestures();
+            } finally {
+                gestureLock.unlock();
+            }
         }
         
         if(shiftDown) {
@@ -98,16 +103,20 @@ public class StandardKeyboard extends IKeyboard {
     @Override
     public void addToUI(JPanel panel, GLCanvas canvas) {
         panel.add(keyBindings);
-        canvas.addMouseListener(mouseGesture);
-        canvas.addMouseMotionListener(mouseGesture);
+        if(Gesture.ENABLED) {
+            canvas.addMouseListener(mouseGesture);
+            canvas.addMouseMotionListener(mouseGesture);
+        }
     }
 
     @Override
     public void removeFromUI(JPanel panel, GLCanvas canvas) {
         panel.remove(keyBindings);
-        canvas.removeMouseListener(mouseGesture);
-        canvas.removeMouseMotionListener(mouseGesture);
-        keyboardGestures.deleteQuadric();
+        if(Gesture.ENABLED) {
+            canvas.removeMouseListener(mouseGesture);
+            canvas.removeMouseMotionListener(mouseGesture);
+            keyboardGestures.deleteQuadric();
+        }
     }
     
     @Override
@@ -127,31 +136,34 @@ public class StandardKeyboard extends IKeyboard {
     }
     
     public KeyboardGesture createSwipeGesture(Direction direction) {
-        KeyboardGesture gesture = null;
-        switch(direction) {
-            case UP:
-                gesture = new KeyboardGesture(new Vector(imageSize.x/2f, imageSize.y/2f + VERTICAL_GESTURE_OFFSET, CAMERA_DISTANCE * 0.5f), Gesture.SWIPE);
-                gesture.update(new Vector(imageSize.x/2f, imageSize.y/2f + VERTICAL_GESTURE_LENGTH, CAMERA_DISTANCE * 0.5f));
-                gesture.gestureFinshed();
-                break;
-            case DOWN:
-                gesture = new KeyboardGesture(new Vector(imageSize.x/2f, imageSize.y/2f - VERTICAL_GESTURE_OFFSET, CAMERA_DISTANCE * 0.5f), Gesture.SWIPE);
-                gesture.update(new Vector(imageSize.x/2f, imageSize.y/2f - VERTICAL_GESTURE_LENGTH, CAMERA_DISTANCE * 0.5f));
-                gesture.gestureFinshed();
-                break;
-            case LEFT:
-                gesture = new KeyboardGesture(new Vector(imageSize.x/2f - HORIZONTAL_GESTURE_OFFSET, imageSize.y/2f, CAMERA_DISTANCE * 0.5f), Gesture.SWIPE);
-                gesture.update(new Vector(imageSize.x/2f - HORIZONTAL_GESTURE_LENGTH, imageSize.y/2f, CAMERA_DISTANCE * 0.5f));
-                gesture.gestureFinshed();
-                break;
-            case RIGHT:
-                gesture = new KeyboardGesture(new Vector(imageSize.x/2f + HORIZONTAL_GESTURE_OFFSET, imageSize.y/2f, CAMERA_DISTANCE * 0.5f), Gesture.SWIPE);
-                gesture.update(new Vector(imageSize.x/2f + HORIZONTAL_GESTURE_LENGTH, imageSize.y/2f, CAMERA_DISTANCE * 0.5f));
-                gesture.gestureFinshed();
-                break;
-            default: break;
+        if(Gesture.ENABLED) {
+            KeyboardGesture gesture = null;
+            switch(direction) {
+                case UP:
+                    gesture = new KeyboardGesture(new Vector(imageSize.x/2f, imageSize.y/2f + VERTICAL_GESTURE_OFFSET, CAMERA_DISTANCE * 0.5f), Gesture.SWIPE);
+                    gesture.update(new Vector(imageSize.x/2f, imageSize.y/2f + VERTICAL_GESTURE_LENGTH, CAMERA_DISTANCE * 0.5f));
+                    gesture.gestureFinshed();
+                    break;
+                case DOWN:
+                    gesture = new KeyboardGesture(new Vector(imageSize.x/2f, imageSize.y/2f - VERTICAL_GESTURE_OFFSET, CAMERA_DISTANCE * 0.5f), Gesture.SWIPE);
+                    gesture.update(new Vector(imageSize.x/2f, imageSize.y/2f - VERTICAL_GESTURE_LENGTH, CAMERA_DISTANCE * 0.5f));
+                    gesture.gestureFinshed();
+                    break;
+                case LEFT:
+                    gesture = new KeyboardGesture(new Vector(imageSize.x/2f - HORIZONTAL_GESTURE_OFFSET, imageSize.y/2f, CAMERA_DISTANCE * 0.5f), Gesture.SWIPE);
+                    gesture.update(new Vector(imageSize.x/2f - HORIZONTAL_GESTURE_LENGTH, imageSize.y/2f, CAMERA_DISTANCE * 0.5f));
+                    gesture.gestureFinshed();
+                    break;
+                case RIGHT:
+                    gesture = new KeyboardGesture(new Vector(imageSize.x/2f + HORIZONTAL_GESTURE_OFFSET, imageSize.y/2f, CAMERA_DISTANCE * 0.5f), Gesture.SWIPE);
+                    gesture.update(new Vector(imageSize.x/2f + HORIZONTAL_GESTURE_LENGTH, imageSize.y/2f, CAMERA_DISTANCE * 0.5f));
+                    gesture.gestureFinshed();
+                    break;
+                default: break;
+            }
+            return gesture;
         }
-        return gesture;
+        return null;
     }
     
     public KeyboardGesture findClosestGesture(Vector direction) {
@@ -170,7 +182,7 @@ public class StandardKeyboard extends IKeyboard {
             InputMap inputMap = getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
             
             for(Key key: Key.values()) {
-                if(key.isPrintable() || key.isArrow()) {
+                if(key.isPrintable() || (key.isArrow() && Gesture.ENABLED)) {
                     // Add normal keys to input map
                     inputMap.put(KeyStroke.getKeyStroke(key.getCode(), 0), key.getName());
                     
@@ -210,29 +222,34 @@ public class StandardKeyboard extends IKeyboard {
                 if(key.isPrintable()) {
                     notifyListenersKeyEvent();
                 } else {
-                    gestureLock.lock();
-                    try {
-                        switch(key) {
-                            case VK_UP:
-                                keyboardGestures.addGesture(createSwipeGesture(Direction.UP));
-                                break;
-                            case VK_DOWN:
-                                keyboardGestures.addGesture(createSwipeGesture(Direction.DOWN));
-                                break;
-                            case VK_LEFT:
-                                keyboardGestures.addGesture(createSwipeGesture(Direction.LEFT));
-                                break;
-                            case VK_RIGHT:
-                                keyboardGestures.addGesture(createSwipeGesture(Direction.RIGHT));
-                                break;
-                            case VK_SHIFT_RELEASED:
-                                shiftDown = false;
-                                //keyboardRenderables.swapToLowerCaseKeyboard();
-                                break;
-                            default: break;
+                    if(Gesture.ENABLED) {
+                        gestureLock.lock();
+                        try {
+                            switch(key) {
+                                case VK_UP:
+                                    keyboardGestures.addGesture(createSwipeGesture(Direction.UP));
+                                    break;
+                                case VK_DOWN:
+                                    keyboardGestures.addGesture(createSwipeGesture(Direction.DOWN));
+                                    break;
+                                case VK_LEFT:
+                                    keyboardGestures.addGesture(createSwipeGesture(Direction.LEFT));
+                                    break;
+                                case VK_RIGHT:
+                                    keyboardGestures.addGesture(createSwipeGesture(Direction.RIGHT));
+                                    break;
+                                case VK_SHIFT_RELEASED:
+                                    shiftDown = false;
+                                    //keyboardRenderables.swapToLowerCaseKeyboard();
+                                    break;
+                                default: break;
+                            }
+                        } finally {
+                            gestureLock.unlock();
                         }
-                    } finally {
-                        gestureLock.unlock();
+                    } else if(key == Key.VK_SHIFT_RELEASED) {
+                        shiftDown = false;
+                        //keyboardRenderables.swapToLowerCaseKeyboard();
                     }
                 }
             }
@@ -241,7 +258,7 @@ public class StandardKeyboard extends IKeyboard {
     
     private class MouseGesture implements MouseListener, MouseMotionListener {
         private KeyboardGesture gesture;
-        private float velocity;
+        private float velocity = 0;
         private long previousTime;
         private long elapsedTime;
         
@@ -267,44 +284,50 @@ public class StandardKeyboard extends IKeyboard {
 
         @Override
         public void mousePressed(MouseEvent e) {
-            Vector start = new Vector(e.getX() + imageSize.x*0.5f, -e.getY() + imageSize.y*1.5f, CAMERA_DISTANCE);
-            gesture = new KeyboardGesture(start.times(0.5f), Gesture.SWIPE);
-            gestureLock.lock();
-            try {
-                keyboardGestures.addGesture(gesture);
-            } finally {
-                gestureLock.unlock();
+            if(Gesture.ENABLED) {
+                Vector start = new Vector(e.getX() + imageSize.x*0.5f, -e.getY() + imageSize.y*1.5f, CAMERA_DISTANCE);
+                gesture = new KeyboardGesture(start.times(0.5f), Gesture.SWIPE);
+                gestureLock.lock();
+                try {
+                    keyboardGestures.addGesture(gesture);
+                } finally {
+                    gestureLock.unlock();
+                }
+                velocity = 0;
+                previousTime = System.currentTimeMillis();
             }
-            velocity = 0;
-            previousTime = System.currentTimeMillis();
         }
 
         @Override
         public void mouseReleased(MouseEvent e) {
-            gesture.gestureFinshed();
-            gesture = null;
+            if(Gesture.ENABLED) {
+                gesture.gestureFinshed();
+                gesture = null;
+            }
         }
 
         @Override
         public void mouseDragged(MouseEvent e) {
-            Vector dest = new Vector(e.getX() + imageSize.x*0.5f, -e.getY() + imageSize.y*1.5f, CAMERA_DISTANCE);
-            
-            dest = dest.times(0.5f);
-            long now = System.currentTimeMillis();
-            elapsedTime = now - previousTime;
-            previousTime = now;
-
-            if(elapsedTime != 0) {
-                velocity = gesture.getDestination().minus(dest).magnitude() / (elapsedTime/1000f);
-            } else {
-                velocity = 0;
-            }
-            
-            gestureLock.lock();
-            try {
-                gesture.update(dest);
-            } finally {
-                gestureLock.unlock();
+            if(Gesture.ENABLED) {
+                Vector dest = new Vector(e.getX() + imageSize.x*0.5f, -e.getY() + imageSize.y*1.5f, CAMERA_DISTANCE);
+                
+                dest = dest.times(0.5f);
+                long now = System.currentTimeMillis();
+                elapsedTime = now - previousTime;
+                previousTime = now;
+    
+                if(elapsedTime != 0) {
+                    velocity = gesture.getDestination().minus(dest).magnitude() / (elapsedTime/1000f);
+                } else {
+                    velocity = 0;
+                }
+                
+                gestureLock.lock();
+                try {
+                    gesture.update(dest);
+                } finally {
+                    gestureLock.unlock();
+                }
             }
         }
 

@@ -14,7 +14,7 @@ public class SwingUtilities {
         // Find out how much the font can grow in width.
         double widthRatio = (double)componentWidth / (double)stringWidth;
 
-        int newFontSize = (int) (labelFont.getSize() * widthRatio);
+        int newFontSize = (int) ((labelFont.getSize() * widthRatio));
         int componentHeight = container.getHeight();
         
         if(newFontSize == 0) {
@@ -28,7 +28,7 @@ public class SwingUtilities {
         component.setFont(new Font(labelFont.getName(), Font.PLAIN, fontSizeToUse));
     }
     
-    private String parseHTML(String htmlString) {
+    public String parseHTML(String htmlString) {
         return htmlString.replaceAll("\\<.*?>|\\s+", "");
     }
     

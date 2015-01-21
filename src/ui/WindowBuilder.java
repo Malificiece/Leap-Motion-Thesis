@@ -192,7 +192,7 @@ public class WindowBuilder {
         panels[0].setBackground(Color.WHITE);
         panels[0].setLayout(new GridBagLayout());
         Dimension d0 = panels[0].getPreferredSize();
-        d0.height = 100;
+        d0.height = 150;
         panels[0].setPreferredSize(d0);
         panels[0].setMinimumSize(d0);
         panels[0].setMaximumSize(new Dimension(1000, d0.height));

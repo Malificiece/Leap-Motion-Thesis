@@ -28,6 +28,7 @@ import keyboard.KeyboardSetting;
 import utilities.MyUtilities;
 import enums.Attribute;
 import enums.Keyboard;
+import enums.TestType;
 
 
 public class CalibrationController extends GraphicsController {
@@ -113,15 +114,13 @@ public class CalibrationController extends GraphicsController {
         keyboardTypeComboBox.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                @SuppressWarnings("unchecked")
-                JComboBox<String> comboBox = (JComboBox<String>)e.getSource();
-                int selectedIndex = comboBox.getSelectedIndex();
-                if(keyboard != Keyboard.getByID(selectedIndex).getKeyboard()) {
+                TestType testType = TestType.getByName((String) keyboardTypeComboBox.getSelectedItem());
+                if(keyboard.getID() != testType.getKeyboardID()) {
                     // Remove all settings, attributes, and renderables from the previous keyboard.
                     removeKeyboardFromUI();
                     
                     // Add all settings, attributes, and renderables from the new keyboard.
-                    keyboard = Keyboard.getByID(selectedIndex).getKeyboard();
+                    keyboard = Keyboard.getByID(testType.getKeyboardID()).getKeyboard();
                     addKeyboardToUI();
                 }
                 frame.requestFocusInWindow();
