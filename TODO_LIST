@@ -1,11 +1,9 @@
 TODO:
-1) Implement Swipe keyboard for Leap. - Needs angle/arc/src/dest key vector etc to determine correctness of path.
-2) Stabilize the leap point based on delta velocity and delta position.
-3) Design Experiment UI / let keyboards know when experimenting to record data.
-4) Create file path relevant to current subject. Add lock-in subject button on Control Center.
-5) Save streamed data in graph-ready format.
-6) Record key presses (mistakes included), reaction time: whole words, each letter, swipe.
-7) Create Survey UI / Save data to relevant data path.
-8) Fine tune settings for minimal calibration during tests.
-9) Get preliminary data.
-10) Create Tutorial UI -- add a tool to read saved data and play it back -- "Tutorial video"
+1) Refine leap swipe for known words. - Needs angle/arc/src/dest key vector etc to determine correctness of path.
+2) Consider stabilizing the leap point based on delta velocity and delta position.
+3) Finish implementing data recording and readback for tutorial/demonstration.
+4) Finish Exit Survey UI / Save data to relevant data path.
+5) Get preliminary data.
+6) Add another UI/button to the control center. We want a data viewer that
+   will allow me to select anything that has been previously recorded and
+   view the playback.

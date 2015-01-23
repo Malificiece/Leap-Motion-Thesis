@@ -89,6 +89,13 @@ public enum Key {
         return keyCode;
     }
     
+    public boolean isUpper() {
+        if(isAlpha()) {
+            return keyValue == keyUpperCase;
+        }
+        return false;
+    }
+    
     public boolean isPrintable() {
         return isPrintable;
     }

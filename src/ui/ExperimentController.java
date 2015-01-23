@@ -256,6 +256,8 @@ public class ExperimentController extends GraphicsController {
         splitPane.setRightComponent(null);
         disableUI();
         wordManager.paintLetters(wordLabel, answerLabel);
+        MyUtilities.JAVA_SWING_UTILITIES.calculateFontSize(wordManager.currentWord(), wordLabel, wordPanel);
+        MyUtilities.JAVA_SWING_UTILITIES.calculateFontSize(wordManager.currentWord(), answerLabel, answerPanel);
     }
     
     private void finishPractice() {
@@ -267,7 +269,7 @@ public class ExperimentController extends GraphicsController {
     
     private void beginExperiment() {
         runningExperiment = true;
-        dataManager = new DataManager(keyboard);
+        dataManager = new DataManager(keyboard, subjectID);
         wordManager.loadWords(EXPERIMENT_SIZE);
         // TODO: Add a delay and a display to show when it's about to begin.
         // This will give us a head's up before things start
@@ -277,13 +279,15 @@ public class ExperimentController extends GraphicsController {
         dataManager.startRecording();
         wordManager.paintLetters(wordLabel, answerLabel);
         dataManager.startWord(wordManager.currentWord());
+        MyUtilities.JAVA_SWING_UTILITIES.calculateFontSize(wordManager.currentWord(), wordLabel, wordPanel);
+        MyUtilities.JAVA_SWING_UTILITIES.calculateFontSize(wordManager.currentWord(), answerLabel, answerPanel);
     }
     
     private void finishExperiment() {
         runningExperiment = false;
         splitPane.setRightComponent(rightComponent);
         dataManager.stopRecording();
-        dataManager.save(subjectID);
+        dataManager.save();
         dataManager = null;
         enableUI();
         currentColor = Color.WHITE;
@@ -336,6 +340,8 @@ public class ExperimentController extends GraphicsController {
         Keyboard.LEAP_AIR.getKeyboard().removeObserver(this);
         Keyboard.TABLET.getKeyboard().removeObserver(this);
         Keyboard.CONTROLLER.getKeyboard().removeObserver(this);
+        ranTutorial = false;
+        ranPractice = false;
         enabled = false;
     }
     
@@ -482,7 +488,7 @@ public class ExperimentController extends GraphicsController {
                 wordManager.nextWord();
                 wordManager.setAnswer("");
                 wordLabel.setText(wordManager.currentWord());
-                if(runningExperiment) {
+                if(runningExperiment && wordManager.isValid()) {
                     dataManager.startWord(wordManager.currentWord());
                 }
                 if(wordManager.isValid()) {

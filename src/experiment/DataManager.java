@@ -1,49 +1,64 @@
 package experiment;
 
+import java.util.ArrayList;
+
+import enums.DataType;
+import enums.FileExt;
+import enums.FilePath;
 import enums.Key;
 import keyboard.IKeyboard;
 
 public class DataManager {
+    private final String FILE_PATH;
+    private final String FILE_NAME;
+    private ArrayList<String> dataList;
     private String word;
     
-    public DataManager(IKeyboard keyboard) {
-        // prepare a new data manager
+    public DataManager(IKeyboard keyboard, String subjectID) {
+        FILE_PATH = FilePath.DATA.getPath() + subjectID + "/";
+        FILE_NAME = keyboard.getFileName() + FileExt.DAT.getExt();
+        dataList = new ArrayList<String>();
         System.out.println("init for " + keyboard + " -- data manager");
     }
     
-    public void save(String subjectID) { // get path and file name from keyboard
+    public void save() { // get path and file name from keyboard
         // print to file
         // clear out current data manager
-        System.out.println("print and clear " + subjectID + " -- data manager");
+        System.out.println("saving to: " + FILE_PATH + FILE_NAME);
     }
     
     public void startRecording() {
-        // time the experiment started
-        System.out.println("start recording -- data manager");
+        dataList.add(DataType.TIME_EXPERIMENT_START.name() + ": " + System.nanoTime());
+        System.out.println(dataList.get(dataList.size()-1));
     }
     
     public void stopRecording() {
-        // time the experiment stopped
-        System.out.println("stop recording -- data manager");
+        dataList.add(DataType.TIME_EXPERIMENT_END.name() + ": " + System.nanoTime());
+        System.out.println(dataList.get(dataList.size()-1));
     }
     
     public void startWord(String currentWord) {
-        // time the word started
         word = currentWord;
-        System.out.println("start word " + word + " -- data manager");
+        dataList.add(DataType.TIME_WORD_START.name() + ": " + System.nanoTime()
+                + " " + DataType.WORD_VALUE.name() + ": " + word);
+        System.out.println(dataList.get(dataList.size()-1));
     }
     
     public void stopWord() {
-        // time the enter was pressed and word finished
-        System.out.println("stop word " + word + " -- data manager");
+        dataList.add(DataType.TIME_WORD_END.name() + ": " + System.nanoTime()
+                + " " + DataType.WORD_VALUE.name() + ": " + word);
+        System.out.println(dataList.get(dataList.size()-1));
     }
     
     public void keyPressedEvent(char pressedKey, char currentKey) {
-        // key press detected
         Key pKey = Key.getByValue(pressedKey);
         Key cKey = Key.getByValue(currentKey);
-        
-        System.out.println("pressed key " + pKey + " -- data manager -- goal: " + cKey);
+        dataList.add(DataType.TIME_PRESSED.name() + ": " + System.nanoTime()
+                + " " + DataType.KEY_PRESSED.name() + ": " + pKey.getName()
+                + " " + DataType.KEY_EXPECTED.name() + ": " + cKey.getName()
+                + " " + DataType.KEY_PRESSED_UPPER.name() + ": " + pKey.isUpper()
+                + " " + DataType.KEY_EXPECTED_UPPER.name() + ": " + cKey.isUpper());
+        System.out.println(dataList.get(dataList.size()-1));
     }
     
     // TODO: controller keyboard needs to know what is selected ----- or maybe not, might be able to record just the joystick movements?

@@ -6,7 +6,9 @@ public enum DataType {
     TIME_WORD_START,
     TIME_WORD_END,
     TIME_PRESSED,
-    KEY_NAME,
-    KEY_VALUE,
-    KEY_EXPECTED;
+    WORD_VALUE,
+    KEY_PRESSED,
+    KEY_PRESSED_UPPER,
+    KEY_EXPECTED,
+    KEY_EXPECTED_UPPER;
 }

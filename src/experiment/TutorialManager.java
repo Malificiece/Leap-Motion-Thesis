@@ -2,6 +2,7 @@ package experiment;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.concurrent.locks.ReentrantLock;
 
 import javax.swing.JButton;
 import javax.swing.JRootPane;
@@ -27,6 +28,7 @@ public class TutorialManager {
             + "Press the \"Next\" button below to continue.",
             "Please, take a moment to observe the example on the left and ask if you have any questions.\n\n"
             + "Press the \"Done\" button below to continue."};
+    private final ReentrantLock tutorialLock = new ReentrantLock();
     private int step = 0;
     private boolean hasNext = false;
     private JButton stepButton;
@@ -36,30 +38,42 @@ public class TutorialManager {
         stepButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                step++;
-                hasNext = true;
-                if(step == INSTRUCTIONS.length - 1) {
-                    stepButton.setText("Done");
-                }
-                JRootPane rootPane = stepButton.getRootPane();
-                if(rootPane != null) {
-                    rootPane.requestFocusInWindow();
+                tutorialLock.lock();
+                try {
+                    step++;
+                    hasNext = true;
+                    if(step == INSTRUCTIONS.length - 1) {
+                        stepButton.setText("Done");
+                    }
+                    JRootPane rootPane = stepButton.getRootPane();
+                    if(rootPane != null) {
+                        rootPane.requestFocusInWindow();
+                    }
+                } finally {
+                    tutorialLock.unlock();
                 }
             }
         });
     }
     
     public boolean hasNext() {
+        tutorialLock.lock();
         try {
             return hasNext;
         } finally {
             // Consume next event
             hasNext = false;
+            tutorialLock.unlock();
         }
     }
     
     public boolean isValid() {
-        return step < INSTRUCTIONS.length;
+        tutorialLock.lock();
+        try {
+            return step < INSTRUCTIONS.length;
+        } finally {
+            tutorialLock.unlock();
+        }
     }
     
     public String getPath() {
