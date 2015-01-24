@@ -13,21 +13,21 @@ import enums.FilePath;
 
 public class TutorialManager {
     private final String TUTORIAL_WORD_PATH = FilePath.DOCS.getPath() + FileName.TUTORIAL.getName() + FileExt.DICTIONARY.getExt();
-    private final String[] INSTRUCTIONS = {"This quick tutorial will go over what you need to know.\n\n"
-            + "Press the \"Next\" button below to continue.",
-            "Once the experiment begins, a random word will appear above the keyboard.\n\n"
-            + "It is your job to type in the word you see at a rate comfortable to you.\n\n"
-            + "Press the \"Next\" button below to continue.",
-            "You will use the specified keyboard to type the seen word.\n\n"
-            + "Any correctly typed letters will show in GREEN while errors will show in RED.\n\n"
-            + "Press the \"Next\" button below to continue.",
-            "Once a word has been completed, you will press the ENTER key to move to the next word.\n\n"
-            + "The topmost box will flash GREEN if the word you entered was correct. It will flash RED if the word was incorrect.\n\n"
-            + "Press the \"Next\" button below to continue.",
-            "After you've gone through the randomly selected words, the experiment will be complete. The window will automatically closed.\n\n"
-            + "Press the \"Next\" button below to continue.",
-            "Please, take a moment to observe the example on the left and ask if you have any questions.\n\n"
-            + "Press the \"Done\" button below to continue."};
+    private final String[] INSTRUCTIONS = {"<font size=+1>This quick tutorial will go over what you need to know.<br><br></font>"
+            + "<font size=+1>Press the <b>NEXT</b> button below to continue.</font>",
+            "<font size=+1>Once the experiment begins, a random word will appear above the keyboard.<br><br></font>"
+            + "<font size=+1>It is your job to type in the word you see at a rate comfortable to you.<br><br></font>"
+            + "<font size=+1>Press the <b>NEXT</b> button below to continue.</font>",
+            "<font size=+1>You will use the specified keyboard to type the seen word.<br><br></font>"
+            + "<font size=+1>Any correctly typed letters will show in <font color=green><b>GREEN</b></font> while errors will show in <font color=red><b>RED</b></font>.<br><br></font>"
+            + "<font size=+1>Press the <b>NEXT</b> button below to continue.</font>",
+            "<font size=+1>Once a word has been completed, you will press the <b>ENTER</b> key to move to the next word.<br><br></font>"
+            + "<font size=+1>The topmost box will flash <font color=green><b>GREEN</b></font> if the word you entered was correct. It will flash <font color=red><b>RED</b></font> if the word was incorrect.<br><br></font>"
+            + "<font size=+1>Press the <b>NEXT</b> button below to continue.</font>",
+            "<font size=+1>After you've gone through the randomly selected words, the experiment will be complete. The window will be automatically closed.<br><br></font>"
+            + "<font size=+1>Press the <b>NEXT</b> button below to continue.</font>",
+            "<font size=+1>Please, take a moment to observe the example on the left and feel free to ask questions if you have any.<br><br></font>"
+            + "<font size=+1>Press the <b>DONE</b> button below to continue.</font>"};
     private final ReentrantLock tutorialLock = new ReentrantLock();
     private int step = 0;
     private boolean hasNext = false;
@@ -81,7 +81,12 @@ public class TutorialManager {
     }
 
     public String getText() {
-        return INSTRUCTIONS[step];
+        tutorialLock.lock();
+        try {
+            return INSTRUCTIONS[step];
+        } finally {
+            tutorialLock.unlock();
+        }
     }
 
     public JButton getComponent() {

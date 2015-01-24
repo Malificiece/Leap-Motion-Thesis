@@ -165,28 +165,28 @@ public class LeapPlane extends KeyboardRenderable {
         String text;
         switch(point) {
             case LeapPlaneCalibrator.POINT_A:
-                text = "<div style=\"white-space: nowrap\"><font size=\"+1\"><b><font color=\"red\">Place and hold</font></b> "
-                        + "the tool over the <b><font color=\"red\">bottom-left or \"A\" corner</font></b> of the keyboard.</font></div>";
+                text = "<div style=\"white-space: nowrap\"><font size=+1><b><font color=red>Place and hold</font></b> "
+                        + "the tool over the <b><font color=red>bottom-left or \"A\" corner</font></b> of the keyboard.</font></div>";
                 if(!MyUtilities.JAVA_SWING_UTILITIES.equalsIgnoreHTML(text, explinationPane.getText())) {
                     explinationPane.setText(text);
                 }
                 break;
             case LeapPlaneCalibrator.POINT_B:
-                text = "<div style=\"white-space: nowrap\"><font size=\"+1\"><b><font color=\"red\">Place and hold</font></b> "
-                        + "the tool over the <b><font color=\"red\">top-left or \"B\" corner</font></b> of the keyboard.</font></div>";
+                text = "<div style=\"white-space: nowrap\"><font size=+1><b><font color=red>Place and hold</font></b> "
+                        + "the tool over the <b><font color=red>top-left or \"B\" corner</font></b> of the keyboard.</font></div>";
                 if(!MyUtilities.JAVA_SWING_UTILITIES.equalsIgnoreHTML(text, explinationPane.getText())) {
                     explinationPane.setText(text);
                 }
                 break;
             case LeapPlaneCalibrator.POINT_C:
-                text = "<div style=\"white-space: nowrap\"><font size=\"+1\"><b><font color=\"red\">Place and hold</font></b> "
-                        + "the tool over the <b><font color=\"red\">top-right or \"C\" corner</font></b> of the keyboard.</font></div>";
+                text = "<div style=\"white-space: nowrap\"><font size=+1><b><font color=red>Place and hold</font></b> "
+                        + "the tool over the <b><font color=red>top-right or \"C\" corner</font></b> of the keyboard.</font></div>";
                 if(!MyUtilities.JAVA_SWING_UTILITIES.equalsIgnoreHTML(text, explinationPane.getText())) {
                     explinationPane.setText(text);
                 }
                 break;
             default:
-                text = "<div style=\"white-space: nowrap\"><font size=\"+2\"><b><font color=\"red\">Remove the tool</font></b> "
+                text = "<div style=\"white-space: nowrap\"><font size=+2><b><font color=red>Remove the tool</font></b> "
                         + "from the Leap Motinon Interaction Zone.</font></div>";
                 if(!MyUtilities.JAVA_SWING_UTILITIES.equalsIgnoreHTML(text, explinationPane.getText())) {
                     explinationPane.setText(text);
@@ -446,21 +446,21 @@ public class LeapPlane extends KeyboardRenderable {
                         }
                         break;
                     case LeapPlaneCalibrator.POINT_B:
-                     // Get the midpoint and update it.
+                        // Get the midpoint and update it.
                         pointB = leapPlaneCalibrator.getMidPoint();
                         POINT_B_ATTRIBUTE.setVectorValue(pointB);
                         
-                     // Remove the tool after finding a point.
+                        // Remove the tool after finding a point.
                         if(leapPlaneCalibrator.doneWithCurrentPoint() && leapPlaneCalibrator.isValid()) {
                             removeTool = true;
                         }
                         break;
                     case LeapPlaneCalibrator.POINT_C:
-                     // Get the midpoint and update it.
+                        // Get the midpoint and update it.
                         pointC = leapPlaneCalibrator.getMidPoint();
                         POINT_C_ATTRIBUTE.setVectorValue(pointC);
-                        
-                     // Remove the tool after finding a point.
+
+                        // Remove the tool after finding a point.
                         if(leapPlaneCalibrator.doneWithCurrentPoint() && leapPlaneCalibrator.isValid()) {
                             removeTool = true;
                         }

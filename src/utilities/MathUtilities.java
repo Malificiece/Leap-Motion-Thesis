@@ -20,9 +20,9 @@ public class MathUtilities {
                 }
             }
             if(numVectors > 0) {
-                midpoint.setX(x/vectors.length);
-                midpoint.setY(y/vectors.length);
-                midpoint.setZ(z/vectors.length);
+                midpoint.setX(x/numVectors);
+                midpoint.setY(y/numVectors);
+                midpoint.setZ(z/numVectors);
                 return true; 
             }
         }

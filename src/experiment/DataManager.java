@@ -21,9 +21,12 @@ public class DataManager {
         System.out.println("init for " + keyboard + " -- data manager");
     }
     
-    public void save() { // get path and file name from keyboard
-        // print to file
-        // clear out current data manager
+    public void save() {
+        // TODO: Print to file, check to make sure it doesn't already exist
+        // That or maybe we can append a (1), (2) etc to file to tell you
+        // that they ran the test again.
+        dataList.clear();
+        dataList = null;
         System.out.println("saving to: " + FILE_PATH + FILE_NAME);
     }
     
@@ -47,6 +50,7 @@ public class DataManager {
     public void stopWord() {
         dataList.add(DataType.TIME_WORD_END.name() + ": " + System.nanoTime()
                 + " " + DataType.WORD_VALUE.name() + ": " + word);
+        word = null;
         System.out.println(dataList.get(dataList.size()-1));
     }
     

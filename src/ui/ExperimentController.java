@@ -14,12 +14,12 @@ import java.awt.event.WindowEvent;
 import javax.media.opengl.GLAutoDrawable;
 import javax.media.opengl.awt.GLCanvas;
 import javax.swing.JButton;
+import javax.swing.JEditorPane;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JSplitPane;
-import javax.swing.JTextArea;
 import javax.swing.WindowConstants;
 
 import utilities.MyUtilities;
@@ -33,10 +33,10 @@ import experiment.TutorialManager;
 import experiment.WordManager;
 
 public class ExperimentController extends GraphicsController {
-    private static final String DEFAULT_INFO = "CALIBRATE:\nCalibrate the keyboard (if available).\n\n"
-            + "TUTORIAL:\nA brief example to familiarize yourself with the keyboard.\n\n"
-            + "PRACTICE:\nA small sample of what you should expect from the experiment.\n\n"
-            + "EXPERIMENT:\nThe actual experiment with recorded data.";
+    private static final String DEFAULT_INFO = "<font><b>CALIBRATE:</b><br>Calibrate the keyboard (if available).<br><br></font>"
+            + "<font><b>TUTORIAL:</b><br>A brief example to familiarize yourself with the keyboard.<br><br></font>"
+            + "<font><b>PRACTICE:</b><br>A small sample of what you should expect from the experiment.<br><br></font>"
+            + "<font><b>EXPERIMENT:</b><br>The actual experiment with recorded data.</font>";
     private final int PRACTICE_SIZE = 1;
     private final int EXPERIMENT_SIZE = 3;
     private final Color LIGHT_GREEN = new Color(204, 255, 204);
@@ -53,7 +53,7 @@ public class ExperimentController extends GraphicsController {
     private JButton tutorialButton;
     private JButton practiceButton;
     private JButton experimentButton;
-    private JTextArea infoPane;
+    private JEditorPane infoPane;
     private JPanel infoPanel;
     private JPanel settingsPanel;
     private JPanel wordPanel;
@@ -81,7 +81,8 @@ public class ExperimentController extends GraphicsController {
         frame = new JFrame();
         frame.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
         splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
-        infoPane = new JTextArea(DEFAULT_INFO);
+        infoPane = new JEditorPane("text/html", "");
+        infoPane.setText(DEFAULT_INFO);
         infoPanel = new JPanel();
         settingsPanel = new JPanel();
         wordPanel = new JPanel();
@@ -257,7 +258,7 @@ public class ExperimentController extends GraphicsController {
         disableUI();
         wordManager.paintLetters(wordLabel, answerLabel);
         MyUtilities.JAVA_SWING_UTILITIES.calculateFontSize(wordManager.currentWord(), wordLabel, wordPanel);
-        MyUtilities.JAVA_SWING_UTILITIES.calculateFontSize(wordManager.currentWord(), answerLabel, answerPanel);
+        MyUtilities.JAVA_SWING_UTILITIES.calculateFontSize(wordManager.getAnswer(), answerLabel, answerPanel);
     }
     
     private void finishPractice() {
@@ -280,7 +281,7 @@ public class ExperimentController extends GraphicsController {
         wordManager.paintLetters(wordLabel, answerLabel);
         dataManager.startWord(wordManager.currentWord());
         MyUtilities.JAVA_SWING_UTILITIES.calculateFontSize(wordManager.currentWord(), wordLabel, wordPanel);
-        MyUtilities.JAVA_SWING_UTILITIES.calculateFontSize(wordManager.currentWord(), answerLabel, answerPanel);
+        MyUtilities.JAVA_SWING_UTILITIES.calculateFontSize(wordManager.getAnswer(), answerLabel, answerPanel);
     }
     
     private void finishExperiment() {
@@ -314,8 +315,9 @@ public class ExperimentController extends GraphicsController {
     
     public void enableUI() {
         wordManager.setDefault();
-        wordManager.paintLetters(wordLabel, answerLabel);
         MyUtilities.JAVA_SWING_UTILITIES.calculateFontSize(wordManager.currentWord(), wordLabel, wordPanel);
+        MyUtilities.JAVA_SWING_UTILITIES.calculateFontSize(wordManager.getAnswer(), answerLabel, answerPanel);
+        wordManager.paintLetters(wordLabel, answerLabel);
         calibrateButton.setEnabled(true);
         tutorialButton.setEnabled(true);
         if(ranTutorial) {
@@ -342,6 +344,7 @@ public class ExperimentController extends GraphicsController {
         Keyboard.CONTROLLER.getKeyboard().removeObserver(this);
         ranTutorial = false;
         ranPractice = false;
+        disableUI();
         enabled = false;
     }
     
@@ -355,10 +358,7 @@ public class ExperimentController extends GraphicsController {
         Keyboard.LEAP_AIR.getKeyboard().registerObserver(this);
         Keyboard.TABLET.getKeyboard().registerObserver(this);
         Keyboard.CONTROLLER.getKeyboard().registerObserver(this);
-        wordManager.setDefault();
-        wordManager.paintLetters(wordLabel, answerLabel);
-        MyUtilities.JAVA_SWING_UTILITIES.calculateFontSize(wordManager.currentWord(), wordLabel, wordPanel);
-        MyUtilities.JAVA_SWING_UTILITIES.calculateFontSize(wordManager.currentWord(), answerLabel, answerPanel);
+        enableUI();
         enabled = true;
     }
     
@@ -377,7 +377,7 @@ public class ExperimentController extends GraphicsController {
         wordManager.setAnswer("");
         settingsPanel.removeAll();
         keyboard.removeFromUI(canvasPanel, canvas);
-        keyboard = null;
+        //keyboard = null;
     }
     
     private void addKeyboardToUI() {
@@ -398,13 +398,16 @@ public class ExperimentController extends GraphicsController {
         
         canvas.setPreferredSize(new Dimension(keyboard.getImageWidth(), keyboard.getImageHeight()));
         canvas.setSize(keyboard.getImageWidth(), keyboard.getImageHeight());
-        wordPanel.setSize(keyboard.getImageWidth(), wordPanel.getHeight());
-        answerPanel.setSize(keyboard.getImageWidth(), answerPanel.getHeight());
+        //canvasPanel.setPreferredSize(canvas.getPreferredSize());
+        //canvasPanel.setSize(canvas.getPreferredSize());
         wordPanel.setPreferredSize(new Dimension(keyboard.getImageWidth(), wordPanel.getHeight()));
         answerPanel.setPreferredSize(new Dimension(keyboard.getImageWidth(), answerPanel.getHeight()));
+        wordPanel.setSize(keyboard.getImageWidth(), wordPanel.getHeight());
+        answerPanel.setSize(keyboard.getImageWidth(), answerPanel.getHeight());
         frame.revalidate();
         frame.repaint();
         frame.pack();
+        System.out.println("set: " + keyboard.getImageWidth() + " size: " + canvasPanel.getSize());
     }
     
     public void update() {
@@ -414,10 +417,13 @@ public class ExperimentController extends GraphicsController {
         keyboard.update();
         
         if(runningTutorial) {
+            //System.out.println(tutorialManager);
             if(tutorialManager.hasNext() && tutorialManager.isValid()) {
                 infoPane.setText(tutorialManager.getText());
             } else if(!tutorialManager.isValid()) {
+                //System.out.println("before finish");
                 finishTutorial();
+                //System.out.println("after finish");
             }
         } else if(runningPractice && !wordManager.isValid()) {
             finishPractice();
@@ -461,7 +467,9 @@ public class ExperimentController extends GraphicsController {
         }
         if(key == '\b') {
             if(0 < wordManager.getAnswer().length()) {
+                String oldAnswer = wordManager.getAnswer();
                 wordManager.setAnswer(wordManager.getAnswer().substring(0, wordManager.getAnswer().length()-1));
+                MyUtilities.JAVA_SWING_UTILITIES.calculateFontSize(oldAnswer, wordManager.getAnswer(), answerLabel, answerPanel);
             }
             if(wordManager.isMatch()) {
                 currentColor = LIGHT_GREEN;
@@ -493,15 +501,16 @@ public class ExperimentController extends GraphicsController {
                 }
                 if(wordManager.isValid()) {
                     MyUtilities.JAVA_SWING_UTILITIES.calculateFontSize(wordManager.currentWord(), wordLabel, wordPanel);
-                    MyUtilities.JAVA_SWING_UTILITIES.calculateFontSize(wordManager.currentWord(), answerLabel, answerPanel);
+                    MyUtilities.JAVA_SWING_UTILITIES.calculateFontSize(wordManager.getAnswer(), answerLabel, answerPanel);
                 }
             } else {
                 wordPanel.setBackground(Color.RED);
                 answerPanel.setBackground(Color.RED);
             }
         } else {
+            String oldAnswer = wordManager.getAnswer();
             wordManager.setAnswer(wordManager.getAnswer()+Character.toString(key));
-            MyUtilities.JAVA_SWING_UTILITIES.calculateFontSize(wordManager.currentWord(), answerLabel, answerPanel);
+            MyUtilities.JAVA_SWING_UTILITIES.calculateFontSize(oldAnswer, wordManager.getAnswer(), answerLabel, answerPanel);
             if(wordManager.isMatch()) {
                 currentColor = LIGHT_GREEN;
                 wordPanel.setBackground(currentColor);

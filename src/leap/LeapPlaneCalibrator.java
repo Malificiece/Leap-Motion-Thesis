@@ -16,7 +16,7 @@ public class LeapPlaneCalibrator {
     public static final int POINT_FIRST = POINT_C;
     private final int CLUSTER_SIZE = 1000;
     private final int START_SEARCH = 500;
-    private final float SURFACE_EPSILON = 0.00015f;
+    private final float SURFACE_EPSILON = 0.0005f;//0.00015f;
     private final float AIR_EPSILON = 0.005f;
     private final float EPSILON;
     private Vector[] cluster;
@@ -34,7 +34,8 @@ public class LeapPlaneCalibrator {
     
     public void addPoint(Vector point) {
         if(!doneWithCurrentPoint) {
-            cluster[clusterIndex = ++clusterIndex % CLUSTER_SIZE] = point;
+            cluster[clusterIndex % CLUSTER_SIZE] = point;
+            clusterIndex++;
             startSearch = startSearch < START_SEARCH ? ++startSearch : startSearch;
             previousMidpoint = new Vector(midpoint);
             if(MyUtilities.MATH_UTILITILES.findMidpoint(midpoint, cluster)) {

@@ -50,12 +50,11 @@ public class WordManager {
     }
     
     public char currentLetter() {
-        if(currentLetter == currentWord().length()) {
-            return Key.VK_ENTER.getValue();
-        } else if(currentLetter > currentWord().length()) {
+        if(currentLetter < answer.length()) {
             return Key.VK_BACK_SPACE.getValue();
-        }
-        else {
+        } else if(currentLetter == currentWord().length()) {
+            return Key.VK_ENTER.getValue();
+        } else {
             return currentWord().charAt(currentLetter);
         }
     }

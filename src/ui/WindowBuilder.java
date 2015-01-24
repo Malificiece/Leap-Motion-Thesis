@@ -1,8 +1,8 @@
 package ui;
+
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
-import java.awt.Font;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.Toolkit;
@@ -11,12 +11,12 @@ import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.JEditorPane;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
-import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.UIManager;
 
@@ -164,7 +164,7 @@ public class WindowBuilder {
     
     public static void buildExperimentWindow(JFrame frame,
             JPanel canvasPanel,
-            JTextArea infoPane,
+            JEditorPane infoPane,
             JPanel[] panels, // word, answer, settingsPanel, infoPanel
             JLabel[] labels, // word, answer
             JButton [] buttons, // calibration, tutorial, practice, experiment
@@ -191,6 +191,7 @@ public class WindowBuilder {
         // Build word panel.
         panels[0].setBackground(Color.WHITE);
         panels[0].setLayout(new GridBagLayout());
+        panels[0].setBorder(BorderFactory.createMatteBorder(2, 2, 1, 2, Color.DARK_GRAY));
         Dimension d0 = panels[0].getPreferredSize();
         d0.height = 150;
         panels[0].setPreferredSize(d0);
@@ -204,6 +205,7 @@ public class WindowBuilder {
         // Add answer panel.
         panels[1].setBackground(Color.WHITE);
         panels[1].setLayout(new GridBagLayout());
+        panels[1].setBorder(BorderFactory.createMatteBorder(1, 2, 2, 2, Color.DARK_GRAY));
         panels[1].setPreferredSize(d0);
         panels[1].setMinimumSize(d0);
         panels[1].setMaximumSize(new Dimension(1000, d0.height));
@@ -231,11 +233,11 @@ public class WindowBuilder {
         rightPanelSet.add(panels[3]);
         
         infoPane.setEditable(false);
-        infoPane.setLineWrap(true);
-        infoPane.setWrapStyleWord(true);
+        //infoPane.setLineWrap(true);
+        //infoPane.setWrapStyleWord(true);
         infoPane.setHighlighter(null);
-        Font font = new Font(infoPane.getFont().getFamily(), Font.BOLD, 13);
-        infoPane.setFont(font);
+        //Font font = new Font(infoPane.getFont().getFamily(), Font.BOLD, 13);
+        //infoPane.setFont(font);
         infoPane.setBackground(UIManager.getColor("Panel.background"));
         panels[3].add(infoPane);
         
@@ -310,7 +312,7 @@ public class WindowBuilder {
         panels[0].setLayout(new GridBagLayout());
         panels[0].setBorder(BorderFactory.createEtchedBorder());
         Dimension d0 = panels[0].getPreferredSize();
-        d0.height = 100;
+        d0.height = 150;
         panels[0].setPreferredSize(d0);
         panels[0].setMinimumSize(d0);
         panels[0].setMaximumSize(new Dimension(1000, d0.height));

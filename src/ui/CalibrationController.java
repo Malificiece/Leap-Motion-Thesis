@@ -69,6 +69,7 @@ public class CalibrationController extends GraphicsController {
         // Window builder builds window using important fields here. It adds unimportant fields that we use for aesthetics only.
         WindowBuilder.buildCalibrationWindow(frame, canvasPanel, wordLabel, keyboardTypeComboBox, buttons, panels);
         canvas.setFocusable(false);
+        MyUtilities.JAVA_SWING_UTILITIES.calculateFontSize(wordLabel.getText(), wordLabel, wordPanel);
         
         saveSettingsButton.addActionListener(new ActionListener() {
             @Override
@@ -144,6 +145,7 @@ public class CalibrationController extends GraphicsController {
     
     @Override
     public void keyboardKeyEventObserved(char key) {
+        String oldString = wordLabel.getText();
         if(key == '\b') {
             if(0 < wordLabel.getText().length()) {
                 wordLabel.setText(wordLabel.getText().substring(0, wordLabel.getText().length()-1));
@@ -153,7 +155,7 @@ public class CalibrationController extends GraphicsController {
         } else {
             wordLabel.setText(wordLabel.getText()+Character.toString(key));
         }
-        MyUtilities.JAVA_SWING_UTILITIES.calculateFontSize(wordLabel.getText(), wordLabel, wordPanel);
+        MyUtilities.JAVA_SWING_UTILITIES.calculateFontSize(oldString, wordLabel.getText(), wordLabel, wordPanel);
     }
     
     @Override
@@ -268,6 +270,7 @@ public class CalibrationController extends GraphicsController {
         settingsPanel.removeAll();
         renderOptionsPanel.removeAll();
         keyboard.removeFromUI(canvasPanel, canvas);
+        // keyboard = null;
     }
     
     private void addKeyboardToUI() {
