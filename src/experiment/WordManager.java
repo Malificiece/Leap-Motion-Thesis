@@ -2,6 +2,7 @@ package experiment;
 
 import java.awt.Color;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Queue;
 
@@ -17,6 +18,7 @@ import utilities.MyUtilities;
 
 public class WordManager {
     private static final String DEFAULT_WORD = "test";
+    private static ArrayList<WordObserver> OBSERVERS = new ArrayList<WordObserver>();
     private final int DICTIONARY_SIZE = 118619;
     private final SimpleAttributeSet RED = new SimpleAttributeSet();
     private final SimpleAttributeSet GREEN = new SimpleAttributeSet();
@@ -39,6 +41,7 @@ public class WordManager {
         wordList.add(DEFAULT_WORD);
         currentLetter = 0;
         isDefault = true;
+        notifyListenersWordSet();
     }
     
     public void setAnswer(String answer) {
@@ -59,6 +62,16 @@ public class WordManager {
         }
     }
     
+    public Key currentLetterAsKey() {
+        if(currentLetter < answer.length()) {
+            return Key.VK_BACK_SPACE;
+        } else if(currentLetter == currentWord().length()) {
+            return Key.VK_ENTER;
+        } else {
+            return Key.getByValue(currentWord().charAt(currentLetter));
+        }
+    }
+    
     public String currentWord() {
         if(isValid()) {
             return wordList.peek();
@@ -72,8 +85,11 @@ public class WordManager {
     }
     
     public void nextWord() {
-        if(!isDefault && !wordList.isEmpty()) {
+        if(!isDefault && isValid()) {
             wordList.remove();
+            if(isValid()) {
+                notifyListenersWordSet();
+            }
         }
     }
     
@@ -90,6 +106,9 @@ public class WordManager {
             isDefault = false;
             wordList.addAll(MyUtilities.FILE_IO_UTILITIES.reservoirSampling(reservoirSize, DICTIONARY_SIZE, FileName.DICTIONARY.getName() + FileExt.DICTIONARY.getExt()));
             currentLetter = 0;
+            if(isValid()) {
+                notifyListenersWordSet();
+            }
         } catch (IOException e) {
             setDefault();
             System.out.println("An error occured while trying to load the words.");
@@ -109,6 +128,7 @@ public class WordManager {
         }
         if(matchIndex < word.length()) {
             currentLetter = matchIndex + 1;
+            notifyListenersLetterIndexChanged();
         }
         if(matchIndex > -1) {
             wordLabel.setText("<html><nobr><font color=green>" + word.substring(0, matchIndex + 1) + "</font>" + word.substring(matchIndex + 1) + "</nobr></html>");
@@ -116,5 +136,28 @@ public class WordManager {
             wordLabel.setText("<html><nobr>" + word + "</nobr></html>");
         }
         answerLabel.setText("<html><nobr><font color=green>" + answer.substring(0, matchIndex + 1) + "</font><font color=red>" + answer.substring(matchIndex + 1) + "</font></nobr></html>");
+    }
+    
+    public static void registerObserver(WordObserver observer) {
+        if(OBSERVERS.contains(observer)) {
+            return;
+        }
+        OBSERVERS.add(observer);
+    }
+    
+    public static void removeObserver(WordObserver observer) {
+        OBSERVERS.remove(observer);
+    }
+
+    protected void notifyListenersWordSet() {
+        for(WordObserver observer : OBSERVERS) {
+            observer.wordSetEventObserved(currentWord());
+        }
+    }
+    
+    protected void notifyListenersLetterIndexChanged() {
+        for(WordObserver observer : OBSERVERS) {
+            observer.currentLetterIndexChangedEventObservered(currentLetter, currentLetterAsKey());
+        }
     }
 }

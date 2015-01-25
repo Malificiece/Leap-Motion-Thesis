@@ -384,7 +384,7 @@ public class LeapPlane extends KeyboardRenderable {
         point.setZ(z);
     }
     
-    public void update(LeapPoint leapPoint, LeapTool leapTool, KeyboardGestures keyboardGestures, LeapTrail leapTrail) {
+    public void update(LeapPoint leapPoint, LeapTool leapTool, KeyboardGestures keyboardGestures, SwipeTrail swipeTrail) {
         if(isCalibrating && isCalibrated) { // means we just finished
             finishCalibration();
         }
@@ -411,9 +411,9 @@ public class LeapPlane extends KeyboardRenderable {
             
             // Set add to trail and set location.
             if(isTouching() /*&& this.isValid()*/) {
-                leapTrail.update(leapPoint.getNormalizedPoint());
+                swipeTrail.update(leapPoint.getNormalizedPoint());
             } else {
-                leapTrail.update();
+                swipeTrail.update();
             }
             
         } else if (isCalibrating) {

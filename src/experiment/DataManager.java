@@ -60,8 +60,8 @@ public class DataManager {
         dataList.add(DataType.TIME_PRESSED.name() + ": " + System.nanoTime()
                 + " " + DataType.KEY_PRESSED.name() + ": " + pKey.getName()
                 + " " + DataType.KEY_EXPECTED.name() + ": " + cKey.getName()
-                + " " + DataType.KEY_PRESSED_UPPER.name() + ": " + pKey.isUpper()
-                + " " + DataType.KEY_EXPECTED_UPPER.name() + ": " + cKey.isUpper());
+                + " " + DataType.KEY_PRESSED_UPPER.name() + ": " + pKey.isUpper(pressedKey)
+                + " " + DataType.KEY_EXPECTED_UPPER.name() + ": " + cKey.isUpper(currentKey));
         System.out.println(dataList.get(dataList.size()-1));
     }
     

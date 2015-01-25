@@ -12,15 +12,15 @@ import java.util.ArrayList;
 import com.leapmotion.leap.*;
 
 public class LeapListener extends Listener /*implements SaveSettingsObserver*/ {
-    private static Controller controller;
-    private static LeapListener listener;
-    private static ArrayList<LeapObserver> observers = new ArrayList<LeapObserver>();
+    private static Controller CONTROLLER;
+    private static LeapListener LISTENER;
+    private static ArrayList<LeapObserver> OBSERVERS = new ArrayList<LeapObserver>();
     private LeapData leapData = new LeapData();
     
     public LeapListener(Controller controller) {
         super();
-        LeapListener.listener = this;
-        LeapListener.controller = controller;
+        LISTENER = this;
+        CONTROLLER = controller;
     }
     
     public void onInit(Controller controller) {
@@ -55,32 +55,32 @@ public class LeapListener extends Listener /*implements SaveSettingsObserver*/ {
     }
     
     public static void stopListening() {
-        controller.removeListener(listener);
+        CONTROLLER.removeListener(LISTENER);
     }
     
     public static void startListening() {
-        controller.addListener(listener);
+        CONTROLLER.addListener(LISTENER);
     }
     
     public static void registerObserver(LeapObserver observer) {
-        if(observers.contains(observer)) {
+        if(OBSERVERS.contains(observer)) {
             return;
         }
-        observers.add(observer);
+        OBSERVERS.add(observer);
     }
     
     public static void removeObserver(LeapObserver observer) {
-        observers.remove(observer);
+        OBSERVERS.remove(observer);
     }
 
     protected void notifyListenersInteractionBoxUpdate(InteractionBox iBox) {
-        for(LeapObserver observer : observers) {
+        for(LeapObserver observer : OBSERVERS) {
             observer.leapInteractionBoxSet(iBox);
         }
     }
     
     protected void notifyListenersDataUpdate() {
-        for(LeapObserver observer : observers) {
+        for(LeapObserver observer : OBSERVERS) {
             observer.leapEventObserved(leapData);
         }
     }

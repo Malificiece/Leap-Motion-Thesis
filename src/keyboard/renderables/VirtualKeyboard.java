@@ -1,5 +1,6 @@
 package keyboard.renderables;
 
+import utilities.MyUtilities;
 import utilities.Point;
 
 import java.util.TreeMap;
@@ -68,6 +69,10 @@ public class VirtualKeyboard extends KeyboardRenderable {
         
     }
     
+    public VirtualKey getVirtualKey(Key key) {
+        return keys.get(key);
+    }
+    
     public void pressed(Key key) {
         VirtualKey virtualKey = keys.get(key);
         if(virtualKey != null) {
@@ -112,6 +117,19 @@ public class VirtualKeyboard extends KeyboardRenderable {
             return virtualKey.isHovering(point);
         }
         return false;
+    }
+    
+    public VirtualKey getNearestKey(Vector point) {
+        VirtualKey vKey = null;
+        float minDistance = Float.MAX_VALUE;
+        for(VirtualKey virtualKey: keys.values()) {
+            float distance = MyUtilities.MATH_UTILITILES.findDistanceToPoint(point, virtualKey.getCenter());
+            if(distance < minDistance) {
+                minDistance = distance;
+                vKey = virtualKey;
+            }
+        }
+        return vKey;
     }
 
     @Override

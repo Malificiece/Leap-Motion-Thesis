@@ -407,7 +407,6 @@ public class ExperimentController extends GraphicsController {
         frame.revalidate();
         frame.repaint();
         frame.pack();
-        System.out.println("set: " + keyboard.getImageWidth() + " size: " + canvasPanel.getSize());
     }
     
     public void update() {
@@ -416,14 +415,11 @@ public class ExperimentController extends GraphicsController {
         // these listener updates need to be managed as to not cause further delay in the system.
         keyboard.update();
         
-        if(runningTutorial) {
-            //System.out.println(tutorialManager);
+        if(runningTutorial && tutorialManager != null) {
             if(tutorialManager.hasNext() && tutorialManager.isValid()) {
                 infoPane.setText(tutorialManager.getText());
             } else if(!tutorialManager.isValid()) {
-                //System.out.println("before finish");
                 finishTutorial();
-                //System.out.println("after finish");
             }
         } else if(runningPractice && !wordManager.isValid()) {
             finishPractice();

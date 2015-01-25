@@ -3,7 +3,7 @@ package utilities;
 import com.leapmotion.leap.Vector;
 
 public class MathUtilities {
-    private static final float DEGREES_TO_RADS = (float) (Math.PI / 180f);
+    public static final float DEGREES_TO_RADS = (float) (Math.PI / 180f);
     
     public boolean findMidpoint(Vector midpoint, Vector[] vectors) {
         if(vectors.length > 0) {

@@ -12,7 +12,7 @@ import keyboard.renderables.KeyboardGestures;
 import keyboard.renderables.LeapPlane;
 import keyboard.renderables.LeapPoint;
 import keyboard.renderables.LeapTool;
-import keyboard.renderables.LeapTrail;
+import keyboard.renderables.SwipeTrail;
 import keyboard.renderables.VirtualKeyboard;
 
 public class LeapRenderables extends KeyboardRenderables {
@@ -29,7 +29,7 @@ public class LeapRenderables extends KeyboardRenderables {
         }
         this.addRenderable(new LeapPoint(keyboard.getAttributes()));
         this.addRenderable(new LeapTool(keyboard.getAttributes()));
-        this.addRenderable(new LeapTrail(keyboard.getAttributes()));
+        this.addRenderable(new SwipeTrail(keyboard.getAttributes()));
     }
 
     @Override

@@ -11,6 +11,7 @@ import javax.swing.JPanel;
 import utilities.MyUtilities;
 
 import com.leapmotion.leap.InteractionBox;
+import com.leapmotion.leap.Vector;
 
 import enums.Attribute;
 import enums.FileExt;
@@ -20,6 +21,8 @@ import enums.Gesture;
 import enums.Key;
 import enums.Renderable;
 import enums.Setting;
+import experiment.WordManager;
+import experiment.WordObserver;
 import keyboard.CalibrationObserver;
 import keyboard.IKeyboard;
 import keyboard.KeyboardGesture;
@@ -28,7 +31,7 @@ import keyboard.renderables.KeyboardGestures;
 import keyboard.renderables.LeapPlane;
 import keyboard.renderables.LeapPoint;
 import keyboard.renderables.LeapTool;
-import keyboard.renderables.LeapTrail;
+import keyboard.renderables.SwipeTrail;
 import keyboard.renderables.VirtualKey;
 import keyboard.renderables.VirtualKeyboard;
 import leap.LeapData;
@@ -45,7 +48,7 @@ public class LeapKeyboard extends IKeyboard implements LeapObserver, Calibration
     private LeapTool leapTool;
     private LeapPoint leapPoint;
     private LeapPlane leapPlane;
-    private LeapTrail leapTrail;
+    private SwipeTrail swipeTrail;
     private LeapGestures leapGestures;
     private KeyboardGestures keyboardGestures;
     private SwipeKeyboard swipeKeyboard;
@@ -74,7 +77,7 @@ public class LeapKeyboard extends IKeyboard implements LeapObserver, Calibration
         if(Gesture.ENABLED) {
             keyboardGestures = (KeyboardGestures) keyboardRenderables.getRenderable(Renderable.KEYBOARD_GESTURES);
         }
-        leapTrail = (LeapTrail) keyboardRenderables.getRenderable(Renderable.LEAP_TRAIL);
+        swipeTrail = (SwipeTrail) keyboardRenderables.getRenderable(Renderable.SWIPE_TRAIL);
         leapPlane = (LeapPlane) keyboardRenderables.getRenderable(Renderable.LEAP_PLANE);
         leapPlane.registerObserver(this);
         if(!leapPlane.isCalibrated()) {
@@ -112,12 +115,12 @@ public class LeapKeyboard extends IKeyboard implements LeapObserver, Calibration
         try {
             if(Gesture.ENABLED) {
                 // Allow leap plane to take over the updates of specific objects that require the plane
-                leapPlane.update(leapPoint, leapTool, keyboardGestures, leapTrail);
+                leapPlane.update(leapPoint, leapTool, keyboardGestures, swipeTrail);
                 // Update gestures after plane, we need both normalized and non normalized points.
                 leapGestures.update();
             } else {
              // Allow leap plane to take over the updates of specific objects that require the plane
-                leapPlane.update(leapPoint, leapTool, null, leapTrail);
+                leapPlane.update(leapPoint, leapTool, null, swipeTrail);
             }
             if(leapTool.isValid()) {
                 Key key;
@@ -162,6 +165,7 @@ public class LeapKeyboard extends IKeyboard implements LeapObserver, Calibration
     public void addToUI(JPanel panel, GLCanvas canvas) {
         LeapListener.registerObserver(this);
         LeapListener.startListening();
+        WordManager.registerObserver(swipeKeyboard);
     }
 
     @Override
@@ -172,6 +176,7 @@ public class LeapKeyboard extends IKeyboard implements LeapObserver, Calibration
         if(Gesture.ENABLED) {
             keyboardGestures.deleteQuadric();
         }
+        WordManager.removeObserver(swipeKeyboard);
     }
 
     @Override
@@ -284,15 +289,27 @@ public class LeapKeyboard extends IKeyboard implements LeapObserver, Calibration
         }
     }
     
-    private class SwipeKeyboard {
+    private class SwipeKeyboard implements WordObserver {
         private static final float AUTO_REPEAT_DELAY = (750 * 1f/3f) + 250; // Windows default
         private static final int AUTO_REPEAT_RATE = 1000 / 31; // Windows default
         private VirtualKey virtualKey;
+        private VirtualKey previousKey = null;
+        private VirtualKey previousPressed = null;
+        private VirtualKey firstKey = null;
         private boolean isPressed;
         private boolean isDown;
-        private boolean isRepeating;
+        private boolean isBackSpacePressed;
+        private boolean isBackSpaceDown;
+        private boolean isBackSpaceRepeating;
         private long previousRepeatTime = 0;
         private long elapsedRepeatTime = 0;
+        private String currentWord = null;
+        private int currentLetter = 0;
+        private Key expectedKey = Key.VK_NULL;
+        private Key previousExpectedKey = expectedKey;
+        private boolean touchPress;
+        private boolean touchDown;
+        private Vector letterPath;
         
         public void update() {
             // TODO: Implement it so that we only record presses of the correct keys
@@ -305,49 +322,154 @@ public class LeapKeyboard extends IKeyboard implements LeapObserver, Calibration
             // 4) If Swipe is used, then we generate a free space before (if doesn't exit) and after word we swiped.
             // 5) If key taps are used, then we generate no spaces.
             // 6) The only key that can be held down is backspace. Just implement it like backspace of other keyboards.
-            
-            if((virtualKey = virtualKeyboard.isHoveringAny(leapPoint.getNormalizedPoint())) != null && leapPlane.isTouching()) {
+            if(leapPlane.isTouching()) {
+                if(!touchPress && !touchDown) {
+                    touchPress = true;
+                    touchDown = true;
+                } else if (touchPress) {
+                    touchPress = false;
+                }
+            } else {
+                if(touchPress || touchDown) {
+                    touchPress = false;
+                    touchDown = false;
+                }
+            }
+
+            if((virtualKey = virtualKeyboard.isHoveringAny(leapPoint.getNormalizedPoint())) != null && touchDown) {
                 virtualKey.pressed();
-                if(!isPressed && !isDown) {
-                    isPressed = true;
-                    isDown = true;
-                    if(virtualKey.getKey() == Key.VK_BACK_SPACE) {
+                if(touchPress) {
+                    firstKey = virtualKey;
+                }
+                if(virtualKey.getKey() == Key.VK_BACK_SPACE) {
+                    if(!isBackSpacePressed && !isBackSpaceDown) {
+                        isBackSpacePressed = true;
+                        isBackSpaceDown = true;
                         previousRepeatTime = System.currentTimeMillis();
                         elapsedRepeatTime = 0;
+                    } else {
+                        long now = System.currentTimeMillis();
+                        elapsedRepeatTime += now - previousRepeatTime;
+                        previousRepeatTime = now;
+                        
+                        if(!isBackSpaceRepeating && elapsedRepeatTime > AUTO_REPEAT_DELAY) {
+                            isBackSpacePressed = true;
+                            isBackSpaceRepeating = true;
+                            elapsedRepeatTime = 0;
+                        } else if(isBackSpaceRepeating && elapsedRepeatTime > AUTO_REPEAT_RATE) {
+                            isBackSpacePressed = true;
+                            elapsedRepeatTime = 0;
+                        }
                     }
-                } else if(virtualKey.getKey() == Key.VK_BACK_SPACE) {
-                    long now = System.currentTimeMillis();
-                    elapsedRepeatTime += now - previousRepeatTime;
-                    previousRepeatTime = now;
-                    
-                    if(!isRepeating && elapsedRepeatTime > AUTO_REPEAT_DELAY) {
+                } else {
+                    if(!isPressed && !isDown && !touchPress && onExpectedLetterDown(virtualKey.getKey())) {
                         isPressed = true;
-                        isRepeating = true;
-                        elapsedRepeatTime = 0;
-                    } else if(isRepeating && elapsedRepeatTime > AUTO_REPEAT_RATE) {
+                        isDown = true;
+                    } else if(!isPressed && !isDown && touchPress && !onExpectedLetterDown(virtualKey.getKey())) {
                         isPressed = true;
-                        elapsedRepeatTime = 0;
+                        isDown = true;
+                    } else if(!isPressed && !isDown && !touchPress) {
+                        isDown = true;
+                    } else if(!isPressed && !onPreviousExpectedLetterDown(virtualKey.getKey())) {
+                        Vector pressedPoint = swipeTrail.isPressed();
+                        if(!pressedPoint.equals(Vector.zero())) {
+                            if(virtualKey.isHovering(pressedPoint)) {
+                                isPressed = true;
+                                isDown = true;
+                                //System.out.println("currKey: " + virtualKey.getKey() + " previousKey: " + previousKey.getKey() + " previousPressed: " + previousPressed.getKey());
+                            } else if(!previousPressed.isHovering(pressedPoint)){
+                                //System.out.println("currKey: " + virtualKey.getKey() + " previousKey: " + previousKey.getKey() + " previousPressed: " + previousPressed.getKey());
+                                virtualKey = virtualKeyboard.getNearestKey(pressedPoint);
+                                virtualKey.pressed();
+                                isPressed = true;
+                            }   
+                        }
                     }
+                }
+                previousKey = virtualKey;
+                if(previousKey != firstKey) {
+                    firstKey = null;
                 }
             } else {
                 if(isPressed || isDown) {
-                    isPressed = false;
-                    isDown = false;
-                    isRepeating = false;
+                    if(!onExpectedLetterRelease()) {
+                        isPressed = true;
+                        isDown = false;
+                    } else {
+                        isPressed = false;
+                        isDown = false;
+                    }
+                } else if(isBackSpacePressed || isBackSpaceDown) {
+                    isBackSpacePressed = false;
+                    isBackSpaceDown = false;
+                    isBackSpaceRepeating = false;
                 }
             }
         }
 
         public Key isPressed() {
             try {
-                if(isPressed) {
-                    return virtualKey.getKey();
+                if(isPressed || isBackSpacePressed) {
+                    previousPressed = previousKey;
+                    return previousKey.getKey();
                 } else {
                     return Key.VK_NULL;
                 }
             } finally {
                 // Consume the pressed key event.
                 isPressed = false;
+                isBackSpacePressed = false;
+            }
+        }
+        
+        private boolean onExpectedLetterDown(Key key) {
+            if(touchDown) {
+                return key == expectedKey;
+            } else {
+                return false;
+            }
+        }
+        
+        private boolean onPreviousExpectedLetterDown(Key key) {
+            if(touchDown) {
+                return key == previousExpectedKey;
+            } else {
+                return false;
+            }
+        }
+        
+        private boolean onExpectedLetterRelease() {
+            if(!touchDown) {
+                if(firstKey != null) {
+                    return previousKey == firstKey;
+                } else {
+                    return previousKey.getKey() == previousExpectedKey;
+                }
+            } else {
+                return true;
+            }
+        }
+        
+        @Override
+        public void wordSetEventObserved(String word) {
+            currentWord = word;
+            currentLetter = 0;
+            expectedKey = Key.getByValue(currentWord.charAt(currentLetter));
+        }
+
+        @Override
+        public void currentLetterIndexChangedEventObservered(int letterIndex, Key key) {
+            currentLetter = letterIndex;
+            previousExpectedKey = expectedKey;
+            expectedKey = key;
+            // Find vector from this expected key to previous expected key
+            if(expectedKey == Key.VK_ENTER || expectedKey == Key.VK_BACK_SPACE) {
+                letterPath = Vector.zero();
+            } else {
+                // USE THIS PATH TO LESSEN ERROR OF DETECTED KEY PRESSES
+                Vector A = virtualKeyboard.getVirtualKey(previousExpectedKey).getCenter();
+                Vector B = virtualKeyboard.getVirtualKey(expectedKey).getCenter();
+                letterPath = A.minus(B);
             }
         }
     }

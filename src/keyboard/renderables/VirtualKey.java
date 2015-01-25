@@ -13,6 +13,7 @@ import javax.media.opengl.GL2;
 import javax.swing.Timer;
 
 import utilities.GLColor;
+import utilities.MyUtilities;
 
 public class VirtualKey {
     private static enum KeyState {
@@ -37,6 +38,7 @@ public class VirtualKey {
     };
     private Vector max;
     private Vector min; // also equivalent to location (not center)
+    private Vector center;
     private int width;
     private int height;
     private Key key;
@@ -46,6 +48,7 @@ public class VirtualKey {
     public VirtualKey(float x, float y, float width, float height, Key key) {
         min = new Vector(x, y, 0);
         max = new Vector(x+width, y+height, 0);
+        center = MyUtilities.MATH_UTILITILES.findMidpoint(min, max);
         this.width = (int)width;
         this.height = (int)height;
         this.key = key;
@@ -58,6 +61,10 @@ public class VirtualKey {
                 keyState = KeyState.NONE;
             }
         });
+    }
+    
+    public Vector getCenter() {
+        return center;
     }
     
     public void pressed() {

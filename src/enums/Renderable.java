@@ -8,5 +8,5 @@ public enum Renderable {
     LEAP_TOOL,
     LEAP_POINT,
     KEYBOARD_GESTURES,
-    LEAP_TRAIL;
+    SWIPE_TRAIL;
 }
