@@ -2,13 +2,16 @@ package experiment;
 
 import java.util.ArrayList;
 
+import com.leapmotion.leap.Vector;
+
 import enums.DataType;
+import enums.Direction;
 import enums.FileExt;
 import enums.FilePath;
 import enums.Key;
 import keyboard.IKeyboard;
 
-public class DataManager {
+public class DataManager implements DataObserver {
     private final String FILE_PATH;
     private final String FILE_NAME;
     private ArrayList<String> dataList;
@@ -64,11 +67,26 @@ public class DataManager {
                 + " " + DataType.KEY_EXPECTED_UPPER.name() + ": " + cKey.isUpper(currentKey));
         System.out.println(dataList.get(dataList.size()-1));
     }
-    
-    // TODO: controller keyboard needs to know what is selected ----- or maybe not, might be able to record just the joystick movements?
-    // determining what is selected might be easiest
-    
-    // TODO: leap keyboard needs to know the position of the leap tip and direction --- we can fudge the length/radius of the tool.
-    
-    // TODO: tablet keyboard needs to know the position of the touch point as it moves around the surface
+
+    @Override
+    public void controllerDataEventObserved(Direction direction) {
+        dataList.add(DataType.TIME_SPECIAL.name() + ": " + System.nanoTime()
+                + " " + DataType.DIRECTION_PRESSED.name() + ": " + direction.name());
+        System.out.println(dataList.get(dataList.size()-1));
+    }
+
+    @Override
+    public void tabletDataEventObserved(Vector touchPoint) {
+        dataList.add(DataType.TIME_SPECIAL.name() + ": " + System.nanoTime()
+                + " " + DataType.POINT_POSITION.name() + ": " + touchPoint);
+        System.out.println(dataList.get(dataList.size()-1));
+    }
+
+    @Override
+    public void leapDataEventObserved(Vector leapPoint, Vector toolDirection) {
+        dataList.add(DataType.TIME_SPECIAL.name() + ": " + System.nanoTime()
+                + " " + DataType.POINT_POSITION.name() + ": " + leapPoint
+                + " " + DataType.TOOL_DIRECTION.name() + ": " + toolDirection);
+        System.out.println(dataList.get(dataList.size()-1));
+    }
 }

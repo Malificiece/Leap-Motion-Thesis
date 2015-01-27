@@ -127,10 +127,8 @@ public class WordManager {
             }
         }
         if(matchIndex < word.length()) {
-            //if(currentLetter != matchIndex + 1) {
-                currentLetter = matchIndex + 1;
-                notifyListenersLetterIndexChanged();
-            //}
+            currentLetter = matchIndex + 1;
+            notifyListenersLetterIndexChanged();
         }
         if(matchIndex > -1) {
             wordLabel.setText("<html><nobr><font color=green>" + word.substring(0, matchIndex + 1) + "</font>" + word.substring(matchIndex + 1) + "</nobr></html>");

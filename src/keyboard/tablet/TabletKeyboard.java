@@ -70,12 +70,11 @@ public class TabletKeyboard extends IKeyboard {
     
     @Override
     public void update() {
-        System.out.println("BEGIN UPDATE");
         // Allow the touchscreen to take over the updates of specific objects that require the screen
         touchScreen.update(swipePoint, swipeTrail);
         
         swipeKeyboard.update(touchScreen.isTouching());
-        System.out.println("FINISH UPDATE");
+
         Key key;
         if((key = swipeKeyboard.isPressed()) != Key.VK_NULL) {
             if(key != Key.VK_SHIFT) {

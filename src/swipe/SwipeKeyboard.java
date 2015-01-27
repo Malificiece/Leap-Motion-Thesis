@@ -77,7 +77,7 @@ public class SwipeKeyboard implements WordObserver {
             if(touchPress) {
                 firstKey = virtualKey;
             }
-            System.out.println("hovering: " + virtualKey.getKey());
+            //System.out.println("hovering: " + virtualKey.getKey());
             if(virtualKey.getKey() == Key.VK_BACK_SPACE) {
                 if(!isBackSpacePressed && !isBackSpaceDown) {
                     isBackSpacePressed = true;
@@ -107,49 +107,49 @@ public class SwipeKeyboard implements WordObserver {
                             (swipeTrail.getPathDistance() <= MAX_CLOSE_KEY_DISTANCE ? MAX_CLOSE_EXPECTED_PRESS_RADIUS : MAX_EXPECTED_PRESS_RADIUS)) {
                         virtualKey = expectedVirtualKey;
                         isDown = false; // set to false since we switch our vKey.
-                        System.out.println("Touch is CLOSE ENOUGH, switch to " + virtualKey.getKey());
+                        //System.out.println("Touch is CLOSE ENOUGH, switch to " + virtualKey.getKey());
                     }
                 }
                 if(!isPressed && !isDown && onExpectedLetterDown(virtualKey.getKey())) {
                     isPressed = true;
                     isDown = true;
-                    System.out.println("detected: touching IS expected key " + virtualKey.getKey());
+                    //System.out.println("detected: touching IS expected key " + virtualKey.getKey());
                 } else if(!isPressed && !isDown && touchPress && !onExpectedLetterDown(virtualKey.getKey())) {
                     isPressed = true;
                     isDown = true;
-                    System.out.println("detected: touching NOT expected key " + virtualKey.getKey());
+                    //System.out.println("detected: touching NOT expected key " + virtualKey.getKey());
                 } else if(!isPressed && !isDown && (onPreviousExpectedLetterDown(virtualKey.getKey()) || virtualKey != previousKey)) {
-                    System.out.print("CHECK angle is pressed ");
+                    //System.out.print("CHECK angle is pressed ");
                     Vector pressedPoint = swipeTrail.isPressed();
-                    System.out.println("-- point: " + pressedPoint);
+                    //System.out.println("-- point: " + pressedPoint);
                     // If we're close enough to our previous expected key when we detect an angle press, then we shouldn't count it.
                     VirtualKey previousExpectedVirtualKey = virtualKeyboard.getVirtualKey(previousExpectedKey);
                     if(!pressedPoint.equals(Vector.zero()) && previousExpectedVirtualKey != null && expectedKey != Key.VK_BACK_SPACE && expectedKey != Key.VK_ENTER &&
                             MyUtilities.MATH_UTILITILES.findDistanceToPoint(swipePoint.getNormalizedPoint(), previousExpectedVirtualKey.getCenter()) <= MAX_EXPECTED_PRESS_RADIUS) {
                         pressedPoint = Vector.zero();
-                        System.out.println("Angle press TOO CLOSE - ignore it");
+                        //System.out.println("Angle press TOO CLOSE - ignore it");
                     }
                     if(!pressedPoint.equals(Vector.zero())) {
                         if(virtualKey.isHovering(pressedPoint)) {
                             isPressed = true;
                             isDown = true;
-                            System.out.println("detected: angle press curr " + virtualKey.getKey());
+                            //System.out.println("detected: angle press curr " + virtualKey.getKey());
                         } else if(expectedKey != Key.VK_ENTER && !previousPressed.isHovering(pressedPoint)){ // checking if enter helps us avoid false angle
                             virtualKey = virtualKeyboard.getNearestKey(pressedPoint);
                             virtualKey.pressed();
                             isPressed = true;
                             isDown = true;
-                            System.out.println("detected: angle press prev " + virtualKey.getKey());
+                            //System.out.println("detected: angle press prev " + virtualKey.getKey());
                         } else {
-                            System.out.println("not detected: ignore the angle press " + virtualKey.getKey());
+                            //System.out.println("not detected: ignore the angle press " + virtualKey.getKey());
                         }
                     } else {
                         // We set down here because we are touching but we detected nothing else.
                         isDown = true;
-                        System.out.println("not detected: set abitrary DOWN + " + virtualKey.getKey());
+                        //System.out.println("not detected: set abitrary DOWN + " + virtualKey.getKey());
                     }
                 } else {
-                    System.out.println("not detected: " + virtualKey.getKey() + " Down: " + isDown + " Pressed: " + isPressed);
+                    //System.out.println("not detected: " + virtualKey.getKey() + " Down: " + isDown + " Pressed: " + isPressed);
                 }
             }
             previousKey = virtualKey;
