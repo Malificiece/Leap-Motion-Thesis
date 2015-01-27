@@ -292,6 +292,7 @@ public class LeapKeyboard extends IKeyboard implements LeapObserver, Calibration
     private class SwipeKeyboard implements WordObserver {
         private static final float AUTO_REPEAT_DELAY = (750 * 1f/3f) + 250; // Windows default
         private static final int AUTO_REPEAT_RATE = 1000 / 31; // Windows default
+        private final int MIN_EXPECTED_PRESS_RADIUS = (int) (keyboardAttributes.getAttributeAsPoint(Attribute.KEY_SIZE).x * 1.25f); // 80;
         private VirtualKey virtualKey;
         private VirtualKey previousKey = null;
         private VirtualKey previousPressed = null;
@@ -309,7 +310,6 @@ public class LeapKeyboard extends IKeyboard implements LeapObserver, Calibration
         private Key previousExpectedKey = expectedKey;
         private boolean touchPress;
         private boolean touchDown;
-        private Vector letterPath;
         
         public void update() {
             // TODO: Implement it so that we only record presses of the correct keys
@@ -337,6 +337,10 @@ public class LeapKeyboard extends IKeyboard implements LeapObserver, Calibration
             }
 
             if((virtualKey = virtualKeyboard.isHoveringAny(leapPoint.getNormalizedPoint())) != null && touchDown) {
+                // Have to force down to be false or else we run into problems when the leap is on a slow computer.
+                if(previousKey != virtualKey) {
+                    isDown = false;
+                }
                 virtualKey.pressed();
                 if(touchPress) {
                     firstKey = virtualKey;
@@ -362,6 +366,14 @@ public class LeapKeyboard extends IKeyboard implements LeapObserver, Calibration
                         }
                     }
                 } else {
+                    // If we're close enough to our expected key when we detect a touch, then that's good enough even if we missed it.
+                    if(virtualKey.getKey() != expectedKey && expectedKey != Key.VK_ENTER && expectedKey != Key.VK_BACK_SPACE) {
+                        VirtualKey expectedVirtualKey = virtualKeyboard.getVirtualKey(expectedKey);
+                        if(expectedVirtualKey != null &&
+                                MyUtilities.MATH_UTILITILES.findDistanceToPoint(leapPoint.getNormalizedPoint(), expectedVirtualKey.getCenter()) <= MIN_EXPECTED_PRESS_RADIUS) {
+                            virtualKey = expectedVirtualKey;
+                        }
+                    }
                     if(!isPressed && !isDown && !touchPress && onExpectedLetterDown(virtualKey.getKey())) {
                         isPressed = true;
                         isDown = true;
@@ -372,13 +384,17 @@ public class LeapKeyboard extends IKeyboard implements LeapObserver, Calibration
                         isDown = true;
                     } else if(!isPressed && !onPreviousExpectedLetterDown(virtualKey.getKey())) {
                         Vector pressedPoint = swipeTrail.isPressed();
+                        // If we're close enough to our previous expected key when we detect an angle press, then we shouldn't count it.
+                        VirtualKey previousExpectedVirtualKey = virtualKeyboard.getVirtualKey(previousExpectedKey);
+                        if(previousExpectedVirtualKey != null &&
+                                MyUtilities.MATH_UTILITILES.findDistanceToPoint(leapPoint.getNormalizedPoint(), previousExpectedVirtualKey.getCenter()) <= MIN_EXPECTED_PRESS_RADIUS) {
+                            pressedPoint = Vector.zero();
+                        }
                         if(!pressedPoint.equals(Vector.zero())) {
                             if(virtualKey.isHovering(pressedPoint)) {
                                 isPressed = true;
                                 isDown = true;
-                                //System.out.println("currKey: " + virtualKey.getKey() + " previousKey: " + previousKey.getKey() + " previousPressed: " + previousPressed.getKey());
                             } else if(!previousPressed.isHovering(pressedPoint)){
-                                //System.out.println("currKey: " + virtualKey.getKey() + " previousKey: " + previousKey.getKey() + " previousPressed: " + previousPressed.getKey());
                                 virtualKey = virtualKeyboard.getNearestKey(pressedPoint);
                                 virtualKey.pressed();
                                 isPressed = true;
@@ -391,9 +407,17 @@ public class LeapKeyboard extends IKeyboard implements LeapObserver, Calibration
                     firstKey = null;
                 }
             } else {
+                // TODO: Fix the hitting 'l' when releasing backspace problem.
                 if(isPressed || isDown) {
                     if(!onExpectedLetterRelease()) {
-                        isPressed = true;
+                        // If we're close enough to our previous expected key when we detect a key release, then we shouldn't count it.
+                        VirtualKey previousExpectedVirtualKey = virtualKeyboard.getVirtualKey(previousExpectedKey);
+                        if(previousExpectedVirtualKey != null &&
+                                MyUtilities.MATH_UTILITILES.findDistanceToPoint(leapPoint.getNormalizedPoint(), previousExpectedVirtualKey.getCenter()) <= MIN_EXPECTED_PRESS_RADIUS) {
+                            isPressed = false;
+                        } else {
+                            isPressed = true;
+                        }
                         isDown = false;
                     } else {
                         isPressed = false;
@@ -464,12 +488,10 @@ public class LeapKeyboard extends IKeyboard implements LeapObserver, Calibration
             expectedKey = key;
             // Find vector from this expected key to previous expected key
             if(expectedKey == Key.VK_ENTER || expectedKey == Key.VK_BACK_SPACE) {
-                letterPath = Vector.zero();
+                swipeTrail.setExpectedPath(Vector.zero(), Vector.zero());
             } else {
-                // USE THIS PATH TO LESSEN ERROR OF DETECTED KEY PRESSES
-                Vector A = virtualKeyboard.getVirtualKey(previousExpectedKey).getCenter();
-                Vector B = virtualKeyboard.getVirtualKey(expectedKey).getCenter();
-                letterPath = A.minus(B);
+                // Use this path to lessen the risk of accident presses in a straight line.
+                swipeTrail.setExpectedPath(virtualKeyboard.getVirtualKey(previousExpectedKey).getCenter(), virtualKeyboard.getVirtualKey(expectedKey).getCenter());
             }
         }
     }

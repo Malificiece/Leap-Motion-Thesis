@@ -46,22 +46,22 @@ public class VirtualKeyboard extends KeyboardRenderable {
             for(int colIndex = 0; colIndex < keyRows[rowIndex].length; colIndex++) {
                 Key key = keyRows[rowIndex][colIndex];
                 if(key == Key.VK_SPACE) {
-                    keys.put(key, new VirtualKey(x, y, spaceKeySize.x, spaceKeySize.y, key));
+                    keys.put(key, new VirtualKey(x, y, spaceKeySize, gapSize, key));
                     x += spaceKeySize.x + gapSize.x;
                 } else if (key == Key.VK_BACK_SPACE) {
-                    keys.put(key, new VirtualKey(x, y, backSpaceKeySize.x, backSpaceKeySize.y, key));
+                    keys.put(key, new VirtualKey(x, y, backSpaceKeySize, gapSize, key));
                     x += backSpaceKeySize.x + gapSize.x;
                 } else if (key == Key.VK_SHIFT_LEFT || key == Key.VK_SHIFT_RIGHT || key == Key.VK_SHIFT) {
-                    keys.put(key, new VirtualKey(x, y, shiftKeySize.x, shiftKeySize.y, key));
+                    keys.put(key, new VirtualKey(x, y, shiftKeySize, gapSize, key));
                     x += shiftKeySize.x + gapSize.x;
                 } else if (key == Key.VK_ENTER) {
-                    keys.put(key, new VirtualKey(x, y, enterKeySize.x, enterKeySize.y, key));
+                    keys.put(key, new VirtualKey(x, y, enterKeySize, gapSize, key));
                     x += enterKeySize.x + gapSize.x;
                 } else if (key == Key.VK_NULL) {
                     // Blank key, don't use it.
                     x += keySize.x + gapSize.x;
                 } else {
-                    keys.put(key, new VirtualKey(x, y, keySize.x, keySize.y, key));
+                    keys.put(key, new VirtualKey(x, y, keySize, gapSize, key));
                     x += keySize.x + gapSize.x;
                 }
             }

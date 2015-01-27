@@ -14,6 +14,7 @@ import javax.swing.Timer;
 
 import utilities.GLColor;
 import utilities.MyUtilities;
+import utilities.Point;
 
 public class VirtualKey {
     private static enum KeyState {
@@ -41,16 +42,18 @@ public class VirtualKey {
     private Vector center;
     private int width;
     private int height;
+    private Point paddingSize;
     private Key key;
     private Timer lightUpKeyTimer;
     private KeyState keyState;
     
-    public VirtualKey(float x, float y, float width, float height, Key key) {
+    public VirtualKey(float x, float y, Point size, Point gapSize, Key key) {
+        width = size.x;
+        height = size.y;
         min = new Vector(x, y, 0);
-        max = new Vector(x+width, y+height, 0);
+        max = new Vector(x + width, y + height, 0);
         center = MyUtilities.MATH_UTILITILES.findMidpoint(min, max);
-        this.width = (int)width;
-        this.height = (int)height;
+        paddingSize = new Point((int) (gapSize.getX()/2), (int) (gapSize.getY()/2));
         this.key = key;
         keyState = KeyState.NONE;
         
@@ -84,12 +87,13 @@ public class VirtualKey {
         keyState = KeyState.NONE;
     }
     
+    // Hovering is only called by the surface/leap interaction so we need to include the padding between keys.
     public boolean isHovering(Vector point) {
-        if(max.getX() < point.getX() || max.getY() < point.getY()) {
+        if(max.getX() + paddingSize.x < point.getX() || max.getY() + paddingSize.y < point.getY()) {
             keyState = KeyState.NONE;
             return false;
         }
-        if(min.getX() > point.getX() || min.getY() > point.getY()) {
+        if(min.getX() - paddingSize.x > point.getX() || min.getY() - paddingSize.y > point.getY()) {
             keyState = KeyState.NONE;
             return false;
         }

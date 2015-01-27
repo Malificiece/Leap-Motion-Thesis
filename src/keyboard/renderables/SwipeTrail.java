@@ -16,6 +16,7 @@ import keyboard.KeyboardRenderable;
 
 import com.leapmotion.leap.Vector;
 
+import enums.Attribute;
 import enums.Color;
 import enums.Renderable;
 
@@ -40,9 +41,13 @@ public class SwipeTrail extends KeyboardRenderable {
     
     // Variables used in determining if our movements constitue a press event
     // TODO: convert these to saveable settings
-    private final int MIN_INTERPOLATED_DISTANCE = 16;
-    private final int MIN_PRESSED_DISTANCE = 48;
-    private final float MIN_PRESSED_ANGLE = 165 * MathUtilities.DEGREES_TO_RADS;
+    private final int MIN_INTERPOLATED_DISTANCE;
+    private final int MIN_PRESSED_DISTANCE;
+    private final float MIN_PRESSED_ANGLE_OFF_PATH = 165 * MathUtilities.DEGREES_TO_RADS;
+    private final float MIN_PRESSED_ANGLE_ON_PATH = 90 * MathUtilities.DEGREES_TO_RADS; // 115 isn't bad but still hit false positives
+    private final int MIN_EXPECTED_PATH_DISTANCE;
+    private Vector expectedPathSource = Vector.zero();
+    private Vector expectedPathDestination = Vector.zero();
     private boolean isPressed;
     private Vector lastPoint;
     private ArrayList<Vector> interpolatedPoints = new ArrayList<Vector>();
@@ -51,6 +56,10 @@ public class SwipeTrail extends KeyboardRenderable {
 
     public SwipeTrail(KeyboardAttributes keyboardAttributes) {
         super(TYPE);
+        int keyWidth = keyboardAttributes.getAttributeAsPoint(Attribute.KEY_SIZE).x;
+        MIN_INTERPOLATED_DISTANCE = (int) (keyWidth * 0.25f); // 16
+        MIN_PRESSED_DISTANCE = (int) (keyWidth * 0.75f); // 48
+        MIN_EXPECTED_PATH_DISTANCE = (int) (keyWidth * 0.75f); // 48
         line = new Vector[LINE_SIZE];
     }
     
@@ -180,6 +189,11 @@ public class SwipeTrail extends KeyboardRenderable {
         }
     }
     
+    public void setExpectedPath(Vector source, Vector destination) {
+        expectedPathSource = source;
+        expectedPathDestination = destination;
+    }
+    
     private void checkPressed(Vector point) {
         if(pressedPoints.isEmpty()) {
             pressedPoints.add(point);
@@ -193,7 +207,8 @@ public class SwipeTrail extends KeyboardRenderable {
                 Vector AB = getLast(interpolatedPoints).minus(point); // B - A
                 Vector CB = getLast(interpolatedPoints).minus(getSecondLast(interpolatedPoints)); // B - C
                 float angle = AB.angleTo(CB);
-                if(angle < MIN_PRESSED_ANGLE) {
+                boolean onPath = MyUtilities.MATH_UTILITILES.findDistanceToLine(point, expectedPathSource, expectedPathDestination) <= MIN_EXPECTED_PATH_DISTANCE;
+                if(angle < (onPath ? MIN_PRESSED_ANGLE_ON_PATH : MIN_PRESSED_ANGLE_OFF_PATH)) {
                     pressedPoints.add(point);
                     isPressed = true;
                 }

@@ -58,7 +58,7 @@ public class LeapTool extends KeyboardRenderable {
     
     public void deleteQuadric() {
         if(quadric != null) {
-            GraphicsController.gl.getContext().makeCurrent();
+            //GraphicsController.gl.getContext().makeCurrent();
             GraphicsController.glu.gluDeleteQuadric(quadric);
         }
     }
