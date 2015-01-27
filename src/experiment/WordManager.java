@@ -17,7 +17,7 @@ import enums.Key;
 import utilities.MyUtilities;
 
 public class WordManager {
-    private static final String DEFAULT_WORD = "test";
+    private static final String DEFAULT_WORD = "frazzled";
     private static ArrayList<WordObserver> OBSERVERS = new ArrayList<WordObserver>();
     private final int DICTIONARY_SIZE = 118619;
     private final SimpleAttributeSet RED = new SimpleAttributeSet();
@@ -119,7 +119,7 @@ public class WordManager {
     public void paintLetters(JLabel wordLabel, JLabel answerLabel) {
         String word = currentWord();
         int matchIndex = -1;
-        for(int i = 0; i < word.length() && i < answer.length(); i ++) {
+        for(int i = 0; i < word.length() && i < answer.length(); i++) {
             if(word.charAt(i) == answer.charAt(i)) {
                 matchIndex = i;
             } else {
@@ -127,8 +127,10 @@ public class WordManager {
             }
         }
         if(matchIndex < word.length()) {
-            currentLetter = matchIndex + 1;
-            notifyListenersLetterIndexChanged();
+            //if(currentLetter != matchIndex + 1) {
+                currentLetter = matchIndex + 1;
+                notifyListenersLetterIndexChanged();
+            //}
         }
         if(matchIndex > -1) {
             wordLabel.setText("<html><nobr><font color=green>" + word.substring(0, matchIndex + 1) + "</font>" + word.substring(matchIndex + 1) + "</nobr></html>");

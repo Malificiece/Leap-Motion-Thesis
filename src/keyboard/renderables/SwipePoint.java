@@ -20,8 +20,8 @@ import enums.Renderable;
 import keyboard.KeyboardAttributes;
 import keyboard.KeyboardRenderable;
 
-public class LeapPoint extends KeyboardRenderable {
-    private static final Renderable TYPE = Renderable.LEAP_POINT;
+public class SwipePoint extends KeyboardRenderable {
+    private static final Renderable TYPE = Renderable.SWIPE_POINT;
     private static final GLColor COLOR = new GLColor(Color.BLUE);
     private static final int NUM_VERTICIES = 32;
     private static final float DELTA_ANGLE = (float) (2.0f * Math.PI / NUM_VERTICIES);
@@ -33,7 +33,7 @@ public class LeapPoint extends KeyboardRenderable {
     private Vector normalizedPoint = Vector.zero();
     private InteractionBox iBox;
     
-    public LeapPoint(KeyboardAttributes keyboardAttributes) {
+    public SwipePoint(KeyboardAttributes keyboardAttributes) {
         super(TYPE);
         KEYBOARD_SIZE = keyboardAttributes.getAttributeAsPoint(Attribute.KEYBOARD_SIZE);
         BORDER_SIZE = keyboardAttributes.getAttributeAsInteger(Attribute.BORDER_SIZE);
@@ -42,6 +42,10 @@ public class LeapPoint extends KeyboardRenderable {
     
     public void setPoint(Vector point) {
         this.point = point;
+    }
+    
+    public void setNormalizedPoint(Vector point) {
+        this.normalizedPoint = point;
     }
     
     public Vector getPoint() {

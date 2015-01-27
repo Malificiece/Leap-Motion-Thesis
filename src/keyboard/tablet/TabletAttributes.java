@@ -1,7 +1,7 @@
 package keyboard.tablet;
 
+import utilities.MyUtilities;
 import utilities.Point;
-
 import keyboard.KeyboardAttribute;
 import keyboard.KeyboardAttributes;
 import enums.Attribute;
@@ -10,6 +10,7 @@ import enums.Key;
 public class TabletAttributes extends KeyboardAttributes {
     private static final Point KEYBOARD_SIZE = new Point(730, 360);
     private static final Integer BORDER_SIZE = 10;
+    private static final Float CAMERA_DISTANCE = MyUtilities.MATH_UTILITILES.findDimensionalAlignment(KEYBOARD_SIZE.y, BORDER_SIZE); // Align 2D with 3D
     private static final Point GAP_SIZE = new Point(10, 10);
     private static final Point KEY_SIZE = new Point(64, 64);
     private static final Point SPACE_KEY_SIZE = new Point(286, 64);
@@ -30,6 +31,7 @@ public class TabletAttributes extends KeyboardAttributes {
     TabletAttributes(TabletKeyboard keyboard) {
         this.addAttribute(new KeyboardAttribute(keyboard, Attribute.KEYBOARD_SIZE, KEYBOARD_SIZE));
         this.addAttribute(new KeyboardAttribute(keyboard, Attribute.BORDER_SIZE, BORDER_SIZE));
+        this.addAttribute(new KeyboardAttribute(keyboard, Attribute.CAMERA_DISTANCE, CAMERA_DISTANCE));
         this.addAttribute(new KeyboardAttribute(keyboard, Attribute.GAP_SIZE, GAP_SIZE));
         this.addAttribute(new KeyboardAttribute(keyboard, Attribute.KEY_SIZE, KEY_SIZE));
         this.addAttribute(new KeyboardAttribute(keyboard, Attribute.SPACE_KEY_SIZE, SPACE_KEY_SIZE));

@@ -10,7 +10,7 @@ import keyboard.KeyboardRenderables;
 import keyboard.renderables.KeyboardImage;
 import keyboard.renderables.KeyboardGestures;
 import keyboard.renderables.LeapPlane;
-import keyboard.renderables.LeapPoint;
+import keyboard.renderables.SwipePoint;
 import keyboard.renderables.LeapTool;
 import keyboard.renderables.SwipeTrail;
 import keyboard.renderables.VirtualKeyboard;
@@ -27,7 +27,7 @@ public class LeapRenderables extends KeyboardRenderables {
         if(Gesture.ENABLED) {
             this.addRenderable(new KeyboardGestures(keyboard.getAttributes()));
         }
-        this.addRenderable(new LeapPoint(keyboard.getAttributes()));
+        this.addRenderable(new SwipePoint(keyboard.getAttributes()));
         this.addRenderable(new LeapTool(keyboard.getAttributes()));
         this.addRenderable(new SwipeTrail(keyboard.getAttributes()));
     }

@@ -19,7 +19,7 @@ import keyboard.KeyboardRenderable;
 //import static javax.media.opengl.GL2.*; // GL2 constants
 
 public class VirtualKeyboard extends KeyboardRenderable {
-    private static final Renderable TYPE = Renderable.VIRTUAL_KEYS;
+    private static final Renderable TYPE = Renderable.VIRTUAL_KEYBOARD;
     private TreeMap<Key, VirtualKey> keys = new TreeMap<Key, VirtualKey>();
     
     public VirtualKeyboard(KeyboardAttributes keyboardAttributes) {

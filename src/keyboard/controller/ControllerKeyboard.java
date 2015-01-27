@@ -64,7 +64,7 @@ public class ControllerKeyboard extends IKeyboard {
         if(Gesture.ENABLED) {
             keyboardGestures = (KeyboardGestures) keyboardRenderables.getRenderable(Renderable.KEYBOARD_GESTURES);
         }
-        virtualKeyboard = (VirtualKeyboard) keyboardRenderables.getRenderable(Renderable.VIRTUAL_KEYS);
+        virtualKeyboard = (VirtualKeyboard) keyboardRenderables.getRenderable(Renderable.VIRTUAL_KEYBOARD);
         gamePad = new GamePad();
         keyLayout = getKeyLayout((Key[][]) keyboardAttributes.getAttribute(Attribute.KEY_ROWS).getValue());
         selectedKey = new Point(0, 0);

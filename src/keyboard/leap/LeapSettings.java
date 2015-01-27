@@ -7,7 +7,6 @@ import keyboard.KeyboardSettings;
 
 public class LeapSettings extends KeyboardSettings {
     LeapSettings(LeapKeyboard keyboard) {
-        // For now this loop is okay. But this need to change if other keyboards require settings that can change.
         if(Gesture.ENABLED) {
             this.addSetting(new KeyboardSetting(keyboard, Setting.GESTURE_CIRCLE_MIN_ARC));
             this.addSetting(new KeyboardSetting(keyboard, Setting.GESTURE_CIRCLE_MIN_RADIUS));

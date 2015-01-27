@@ -384,7 +384,7 @@ public class LeapPlane extends KeyboardRenderable {
         point.setZ(z);
     }
     
-    public void update(LeapPoint leapPoint, LeapTool leapTool, KeyboardGestures keyboardGestures, SwipeTrail swipeTrail) {
+    public void update(SwipePoint leapPoint, LeapTool leapTool, KeyboardGestures keyboardGestures, SwipeTrail swipeTrail) {
         if(isCalibrating && isCalibrated) { // means we just finished
             finishCalibration();
         }

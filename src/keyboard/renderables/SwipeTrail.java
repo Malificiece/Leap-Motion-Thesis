@@ -23,7 +23,8 @@ import enums.Renderable;
 public class SwipeTrail extends KeyboardRenderable {
     private static final Renderable TYPE = Renderable.SWIPE_TRAIL;
     private final GLColor TRAIL_COLOR = new GLColor(Color.YELLOW);
-    private final GLColor INTERPOLATED_COLOR = new GLColor(Color.TEAL);
+    private final GLColor INTERPOLATED_COLOR = new GLColor(Color.RED);
+    private final GLColor PRESSED_COLOR = new GLColor(Color.CYAN);
     private static final int NUM_VERTICIES = 32;
     private static final float DELTA_ANGLE = (float) (2.0f * Math.PI / NUM_VERTICIES);
     private static final float RADIUS = 5f;
@@ -39,15 +40,16 @@ public class SwipeTrail extends KeyboardRenderable {
     private long previousTime;
     private long fadeTimeElapsed = 0;
     
-    // Variables used in determining if our movements constitue a press event
-    // TODO: convert these to saveable settings
+    // Variables used in determining if our movements constitute a press event
+    // TODO: Convert these to settings we can save/modify with the program.
     private final int MIN_INTERPOLATED_DISTANCE;
     private final int MIN_PRESSED_DISTANCE;
     private final float MIN_PRESSED_ANGLE_OFF_PATH = 165 * MathUtilities.DEGREES_TO_RADS;
-    private final float MIN_PRESSED_ANGLE_ON_PATH = 90 * MathUtilities.DEGREES_TO_RADS; // 115 isn't bad but still hit false positives
+    private final float MIN_PRESSED_ANGLE_ON_PATH = 90 * MathUtilities.DEGREES_TO_RADS; // 115 good, but still hit false positives, 90 almost gets rid of false positives
     private final int MIN_EXPECTED_PATH_DISTANCE;
     private Vector expectedPathSource = Vector.zero();
     private Vector expectedPathDestination = Vector.zero();
+    private float pathDistance = 0;
     private boolean isPressed;
     private Vector lastPoint;
     private ArrayList<Vector> interpolatedPoints = new ArrayList<Vector>();
@@ -108,6 +110,7 @@ public class SwipeTrail extends KeyboardRenderable {
         isCleared = true;
         interpolatedPoints.clear();
         pressedPoints.clear();
+        isPressed = false;
         lastPoint = null;
     }
 
@@ -126,7 +129,30 @@ public class SwipeTrail extends KeyboardRenderable {
                     }
                 }
             }
+            
+            // Draw interpolated line.
             INTERPOLATED_COLOR.glColor(gl);
+            gl.glLineWidth(1);
+            for(int i = 0; i < interpolatedPoints.size() - 1; i++) {
+                int j = i + 1;
+                Vector v = interpolatedPoints.get(i);
+                drawDottedLine(gl, v, interpolatedPoints.get(j));
+                gl.glPushMatrix();
+                gl.glTranslatef(v.getX(), v.getY(), v.getZ());
+                drawPoint(gl);
+                gl.glPopMatrix();
+            }
+            if(!interpolatedPoints.isEmpty()) {
+                Vector v = getLast(interpolatedPoints);
+                drawDottedLine(gl, v, line[lineIndex]);
+                gl.glPushMatrix();
+                gl.glTranslatef(v.getX(), v.getY(), v.getZ());
+                drawPoint(gl);
+                gl.glPopMatrix();
+            }
+            
+            // Draw interpreted key presses.
+            PRESSED_COLOR.glColor(gl);
             gl.glLineWidth(1);
             for(int i = 0; i < pressedPoints.size() - 1; i++) {
                 int j = i + 1;
@@ -192,6 +218,11 @@ public class SwipeTrail extends KeyboardRenderable {
     public void setExpectedPath(Vector source, Vector destination) {
         expectedPathSource = source;
         expectedPathDestination = destination;
+        pathDistance = MyUtilities.MATH_UTILITILES.findDistanceToPoint(expectedPathSource, expectedPathDestination);
+    }
+    
+    public float getPathDistance() {
+        return pathDistance;
     }
     
     private void checkPressed(Vector point) {
@@ -209,8 +240,9 @@ public class SwipeTrail extends KeyboardRenderable {
                 float angle = AB.angleTo(CB);
                 boolean onPath = MyUtilities.MATH_UTILITILES.findDistanceToLine(point, expectedPathSource, expectedPathDestination) <= MIN_EXPECTED_PATH_DISTANCE;
                 if(angle < (onPath ? MIN_PRESSED_ANGLE_ON_PATH : MIN_PRESSED_ANGLE_OFF_PATH)) {
-                    pressedPoints.add(point);
+                    pressedPoints.add(getLast(interpolatedPoints));
                     isPressed = true;
+                    System.out.println("SWIPE_TRAIL: detected angle press"); // TODO: REMOVE ME
                 }
             }
             interpolatedPoints.add(point);
@@ -232,6 +264,7 @@ public class SwipeTrail extends KeyboardRenderable {
                 return getLast(pressedPoints);
             }
             return Vector.zero();
+            
         } finally {
             // consumed pressed event
             isPressed = false;

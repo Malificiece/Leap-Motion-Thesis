@@ -62,7 +62,7 @@ public class StandardKeyboard extends IKeyboard {
         int borderSize = keyboardAttributes.getAttributeAsInteger(Attribute.BORDER_SIZE) * 2;
         imageSize = new Point(keyboardSize.x + borderSize, keyboardSize.y + borderSize);
         CAMERA_DISTANCE = keyboardAttributes.getAttributeAsFloat(Attribute.CAMERA_DISTANCE);
-        virtualKeyboard = (VirtualKeyboard) keyboardRenderables.getRenderable(Renderable.VIRTUAL_KEYS);
+        virtualKeyboard = (VirtualKeyboard) keyboardRenderables.getRenderable(Renderable.VIRTUAL_KEYBOARD);
         keyBindings = new KeyBindings();
         if(Gesture.ENABLED) {
             gestureLock = new ReentrantLock();
@@ -266,21 +266,6 @@ public class StandardKeyboard extends IKeyboard {
         public float getVelocity() {
             return velocity;
         }
-        
-        @Override
-        public void mouseClicked(MouseEvent e) {
-            // Do nothing on quick click.
-        }
-
-        @Override
-        public void mouseEntered(MouseEvent e) {
-            // Do nothing on mouse enter
-        }
-
-        @Override
-        public void mouseExited(MouseEvent e) {
-            // Do nothing on mouse exit.
-        }
 
         @Override
         public void mousePressed(MouseEvent e) {
@@ -336,5 +321,19 @@ public class StandardKeyboard extends IKeyboard {
             // Do nothing when only moving the mouse.
         }
         
+        @Override
+        public void mouseClicked(MouseEvent e) {
+            // Do nothing on quick click.
+        }
+
+        @Override
+        public void mouseEntered(MouseEvent e) {
+            // Do nothing on mouse enter
+        }
+
+        @Override
+        public void mouseExited(MouseEvent e) {
+            // Do nothing on mouse exit.
+        }
     }
 }

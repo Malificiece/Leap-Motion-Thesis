@@ -1,6 +1,6 @@
 package leap;
 
-import keyboard.renderables.LeapPoint;
+import keyboard.renderables.SwipePoint;
 import keyboard.renderables.LeapTool;
 
 import com.leapmotion.leap.Tool;
@@ -22,7 +22,7 @@ public class LeapData {
         return toolData;
     }
     
-    public void populateData(LeapPoint leapPoint, LeapTool leapTool) {
+    public void populateData(SwipePoint leapPoint, LeapTool leapTool) {
         populateData(leapPoint);
         populateData(leapTool);
     }
@@ -31,7 +31,7 @@ public class LeapData {
         leapTool.setTool(toolData);
     }
     
-    public void populateData(LeapPoint leapPoint) {
+    public void populateData(SwipePoint leapPoint) {
         leapPoint.setPoint(toolData.stabilizedTipPosition());
     }
 }
