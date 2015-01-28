@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.math.BigInteger;
 import java.security.SecureRandom;
 import java.util.ArrayList;
+import java.util.Set;
+import java.util.TreeSet;
 
 import enums.FileExt;
 import enums.FileName;
@@ -33,5 +35,41 @@ public class MyUtilities {
         } while(subjectIDList.contains(subjectID));
         
         return subjectID;
+    }
+    
+    public static boolean checkForUniqueSubjectID(String subjectID) {
+        ArrayList<String> subjectIDList = new ArrayList<String>();
+        try {
+            subjectIDList = FILE_IO_UTILITIES.readListFromFile(FilePath.DATA.getPath(), FileName.SUBJECT_ID_LIST.getName() + FileExt.FILE.getExt());
+        } catch (IOException e) {
+            System.out.println("Unable to read existing ID's from file.");
+            e.printStackTrace();
+        }
+        
+        if(subjectIDList.contains(subjectID)) {
+            return false;
+        } else {
+            return true;
+        }
+    }
+    
+    public static void addSubjectIDToList(String subjectID) {
+        Set<String> subjectIDList = new TreeSet<String>();
+        try {
+            subjectIDList.addAll(FILE_IO_UTILITIES.readListFromFile(FilePath.DATA.getPath(), FileName.SUBJECT_ID_LIST.getName() + FileExt.FILE.getExt()));
+        } catch (IOException e) {
+            System.out.println("Unable to read existing ID's from file.");
+            e.printStackTrace();
+        }
+        
+        subjectIDList.add(subjectID);
+        ArrayList<String> savedData = new ArrayList<String>();
+        savedData.addAll(subjectIDList);
+        try {
+            FILE_IO_UTILITIES.writeListToFile(savedData, FilePath.DATA.getPath(),  FileName.SUBJECT_ID_LIST.getName() + FileExt.FILE.getExt());
+        } catch (IOException e) {
+            System.out.println("Unable to write new ID to file.");
+            e.printStackTrace();
+        }
     }
 }

@@ -61,7 +61,7 @@ public class SwipeTrail extends KeyboardRenderable {
         int keyWidth = keyboardAttributes.getAttributeAsPoint(Attribute.KEY_SIZE).x;
         MIN_INTERPOLATED_DISTANCE = (int) (keyWidth * 0.25f); // 16
         MIN_PRESSED_DISTANCE = (int) (keyWidth * 0.75f); // 48
-        MIN_EXPECTED_PATH_DISTANCE = (int) (keyWidth * 0.75f); // 48
+        MIN_EXPECTED_PATH_DISTANCE = (int) (keyWidth * 0.8125f); // 52
         line = new Vector[LINE_SIZE];
     }
     
@@ -211,6 +211,7 @@ public class SwipeTrail extends KeyboardRenderable {
         if(lastPoint != null) {
             pressedPoints.add(lastPoint);
             interpolatedPoints.add(lastPoint);
+            isPressed = false;
             //System.out.println("released");
         }
     }
@@ -234,7 +235,7 @@ public class SwipeTrail extends KeyboardRenderable {
             interpolatedPoints.add(point);
         } else if(MyUtilities.MATH_UTILITILES.findDistanceToPoint(getLast(interpolatedPoints), point) > MIN_INTERPOLATED_DISTANCE) {
             // find the thresholds needed to determine a press here!
-            if(MyUtilities.MATH_UTILITILES.findDistanceToPoint(getLast(pressedPoints), point) > MIN_PRESSED_DISTANCE) {
+            if(MyUtilities.MATH_UTILITILES.findDistanceToPoint(getLast(pressedPoints), getLast(interpolatedPoints)) > MIN_PRESSED_DISTANCE) {
                 Vector AB = getLast(interpolatedPoints).minus(point); // B - A
                 Vector CB = getLast(interpolatedPoints).minus(getSecondLast(interpolatedPoints)); // B - C
                 float angle = AB.angleTo(CB);
@@ -242,7 +243,7 @@ public class SwipeTrail extends KeyboardRenderable {
                 if(angle < (onPath ? MIN_PRESSED_ANGLE_ON_PATH : MIN_PRESSED_ANGLE_OFF_PATH)) {
                     pressedPoints.add(getLast(interpolatedPoints));
                     isPressed = true;
-                    System.out.println("SWIPE_TRAIL: detected angle press"); // TODO: REMOVE ME
+                    //System.out.println("SWIPE_TRAIL: detected angle press"); // TODO: REMOVE ME
                 }
             }
             interpolatedPoints.add(point);
@@ -269,5 +270,14 @@ public class SwipeTrail extends KeyboardRenderable {
             // consumed pressed event
             isPressed = false;
         }
+    }
+    
+    public void setPressedPoint(Vector point) {
+        pressedPoints.add(point);
+        isPressed = false;
+    }
+    
+    public boolean detectPressed() {
+        return isPressed;
     }
 }

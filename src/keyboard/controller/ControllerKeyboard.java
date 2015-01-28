@@ -1,5 +1,8 @@
 package keyboard.controller;
 
+import java.util.ArrayList;
+import java.util.concurrent.locks.ReentrantLock;
+
 import utilities.Point;
 
 import javax.media.opengl.GL2;
@@ -26,6 +29,8 @@ import enums.FilePath;
 import enums.Gesture;
 import enums.Key;
 import enums.Renderable;
+import experiment.ControllerDataObserver;
+import experiment.DataManager;
 
 public class ControllerKeyboard extends IKeyboard {
     public static final int KEYBOARD_ID = 3;
@@ -39,6 +44,8 @@ public class ControllerKeyboard extends IKeyboard {
     private final float VERTICAL_GESTURE_OFFSET;
     private final float CAMERA_DISTANCE;
     private final Point KEY_LAYOUT_SIZE = new Point(5, 14);
+    private final ReentrantLock CONTROLLER_LOCK = new ReentrantLock();
+    private ArrayList<ControllerDataObserver> observers = new ArrayList<ControllerDataObserver>();
     private boolean isCalibrated = false;
     private VirtualKeyboard virtualKeyboard;
     private KeyboardGestures keyboardGestures;
@@ -83,36 +90,74 @@ public class ControllerKeyboard extends IKeyboard {
     
     @Override
     public void update() {
-        if(Gesture.ENABLED) {
-            // Remove finished gestures, update others.
-            keyboardGestures.removeAndUpdateGestures();
-        }
-        
-        gamePad.update();
-        
-        // Go through controller inputs and check values
-        // if held, will press, then delay, then spam at interval --- the enums will take care of this logic
-        // if a - press selected key (and do whatever we're supposed to do)
-        // if b - press backspace
-        // if x - press shift, lock shift, unlock shift
-        // if y - press space
-        // if start - press enter
-        Key key = getSelectedKey();
-        if(Button.A.isDown() && !key.isBlank()) {
-            virtualKeyboard.pressed(key);
-            if(Button.A.isPressed()) {
-                if(key != Key.VK_SHIFT) {
+        CONTROLLER_LOCK.lock();
+        try {
+            if(Gesture.ENABLED) {
+                // Remove finished gestures, update others.
+                keyboardGestures.removeAndUpdateGestures();
+            }
+            
+            gamePad.update();
+            
+            // Go through controller inputs and check values
+            // if held, will press, then delay, then spam at interval --- the enums will take care of this logic
+            // if a - press selected key (and do whatever we're supposed to do)
+            // if b - press backspace
+            // if x - press shift, lock shift, unlock shift
+            // if y - press space
+            // if start - press enter
+            Key key = getSelectedKey();
+            if(Button.A.isDown() && !key.isBlank()) {
+                virtualKeyboard.pressed(key);
+                if(Button.A.isPressed()) {
+                    if(key != Key.VK_SHIFT) {
+                        if(shiftOnce) {
+                            keyPressed = key.toUpper();
+                            shiftOnce = shiftTwice;
+                            if(!shiftTwice) {
+                                keyboardRenderables.swapToLowerCaseKeyboard();
+                            }
+                        } else {
+                            keyPressed = key.getValue();   
+                        }
+                        notifyListenersKeyEvent();
+                    } else {
+                        if(!shiftOnce && !shiftTwice) {
+                            shiftOnce = true;
+                            keyboardRenderables.swapToUpperCaseKeyboard();
+                        } else if(shiftOnce && !shiftTwice) {
+                            shiftTwice = true;
+                        } else {
+                            shiftTwice = false;
+                            shiftOnce = false;
+                            keyboardRenderables.swapToLowerCaseKeyboard();
+                        }
+                    }
+                }
+            } else {
+                virtualKeyboard.selected(key);
+            }
+            
+            if(Button.B.isDown()) {
+                virtualKeyboard.pressed(Key.VK_BACK_SPACE);
+                if(Button.B.isPressed()) {
                     if(shiftOnce) {
-                        keyPressed = key.toUpper();
+                        keyPressed = Key.VK_BACK_SPACE.toUpper();
                         shiftOnce = shiftTwice;
                         if(!shiftTwice) {
                             keyboardRenderables.swapToLowerCaseKeyboard();
                         }
                     } else {
-                        keyPressed = key.getValue();   
+                        keyPressed = Key.VK_BACK_SPACE.getValue();   
                     }
                     notifyListenersKeyEvent();
-                } else {
+                }
+            } else if(key != Key.VK_BACK_SPACE) {
+                virtualKeyboard.deselected(Key.VK_BACK_SPACE);
+            }
+            
+            if(Button.X.isDown()) {
+                if(Button.X.isPressed()) {
                     if(!shiftOnce && !shiftTwice) {
                         shiftOnce = true;
                         keyboardRenderables.swapToUpperCaseKeyboard();
@@ -124,95 +169,62 @@ public class ControllerKeyboard extends IKeyboard {
                         keyboardRenderables.swapToLowerCaseKeyboard();
                     }
                 }
+            } else if(key != Key.VK_SHIFT) {
+                virtualKeyboard.deselected(Key.VK_SHIFT);
             }
-        } else {
-            virtualKeyboard.selected(key);
-        }
-        
-        if(Button.B.isDown()) {
-            virtualKeyboard.pressed(Key.VK_BACK_SPACE);
-            if(Button.B.isPressed()) {
-                if(shiftOnce) {
-                    keyPressed = Key.VK_BACK_SPACE.toUpper();
-                    shiftOnce = shiftTwice;
-                    if(!shiftTwice) {
-                        keyboardRenderables.swapToLowerCaseKeyboard();
+            if(shiftTwice) {
+                virtualKeyboard.locked(Key.VK_SHIFT);
+            } else if(shiftOnce) {
+                virtualKeyboard.pressed(Key.VK_SHIFT);
+            }
+            
+            if(Button.Y.isDown()) {
+                virtualKeyboard.pressed(Key.VK_SPACE);
+                if(Button.Y.isPressed()) {
+                    if(shiftOnce) {
+                        keyPressed = Key.VK_SPACE.toUpper();
+                        shiftOnce = shiftTwice;
+                        if(!shiftTwice) {
+                            keyboardRenderables.swapToLowerCaseKeyboard();
+                        }
+                    } else {
+                        keyPressed = Key.VK_SPACE.getValue();   
+                    }
+                    notifyListenersKeyEvent();
+                }
+            } else if(key != Key.VK_SPACE) {
+                virtualKeyboard.deselected(Key.VK_SPACE);
+            }
+            
+            if(Button.START.isDown()) {
+                virtualKeyboard.pressed(Key.VK_ENTER);
+                if(Button.START.isPressed()) {
+                    keyPressed = Key.VK_ENTER.getValue();
+                    notifyListenersKeyEvent();
+                }
+            } else if(key != Key.VK_ENTER) {
+                virtualKeyboard.deselected(Key.VK_ENTER);
+            }
+            
+            // Left Stick, moves keyboard (maybe add gestures)
+            moveSelectedKey(Axis.getClosestDirectionLeftStick());
+            
+            // Right Stick, moves keyboard (maybe add gestures)
+            moveSelectedKey(Axis.getClosestDirectionRightStick());
+            
+            // Hat Switch, create gestures
+            for(HatSwitch hatSwitch: HatSwitch.values()) {
+                if(Gesture.ENABLED) {
+                    KeyboardGesture gesture = createSwipeGesture(hatSwitch.isPressed());
+                    if(gesture != null) {
+                        keyboardGestures.addGesture(gesture);
                     }
                 } else {
-                    keyPressed = Key.VK_BACK_SPACE.getValue();   
-                }
-                notifyListenersKeyEvent();
-            }
-        } else if(key != Key.VK_BACK_SPACE) {
-            virtualKeyboard.deselected(Key.VK_BACK_SPACE);
-        }
-        
-        if(Button.X.isDown()) {
-            if(Button.X.isPressed()) {
-                if(!shiftOnce && !shiftTwice) {
-                    shiftOnce = true;
-                    keyboardRenderables.swapToUpperCaseKeyboard();
-                } else if(shiftOnce && !shiftTwice) {
-                    shiftTwice = true;
-                } else {
-                    shiftTwice = false;
-                    shiftOnce = false;
-                    keyboardRenderables.swapToLowerCaseKeyboard();
+                    moveSelectedKey(hatSwitch.isPressed());
                 }
             }
-        } else if(key != Key.VK_SHIFT) {
-            virtualKeyboard.deselected(Key.VK_SHIFT);
-        }
-        if(shiftTwice) {
-            virtualKeyboard.locked(Key.VK_SHIFT);
-        } else if(shiftOnce) {
-            virtualKeyboard.pressed(Key.VK_SHIFT);
-        }
-        
-        if(Button.Y.isDown()) {
-            virtualKeyboard.pressed(Key.VK_SPACE);
-            if(Button.Y.isPressed()) {
-                if(shiftOnce) {
-                    keyPressed = Key.VK_SPACE.toUpper();
-                    shiftOnce = shiftTwice;
-                    if(!shiftTwice) {
-                        keyboardRenderables.swapToLowerCaseKeyboard();
-                    }
-                } else {
-                    keyPressed = Key.VK_SPACE.getValue();   
-                }
-                notifyListenersKeyEvent();
-            }
-        } else if(key != Key.VK_SPACE) {
-            virtualKeyboard.deselected(Key.VK_SPACE);
-        }
-        
-        if(Button.START.isDown()) {
-            virtualKeyboard.pressed(Key.VK_ENTER);
-            if(Button.START.isPressed()) {
-                keyPressed = Key.VK_ENTER.getValue();
-                notifyListenersKeyEvent();
-            }
-        } else if(key != Key.VK_ENTER) {
-            virtualKeyboard.deselected(Key.VK_ENTER);
-        }
-        
-        // Left Stick, moves keyboard (maybe add gestures)
-        moveSelectedKey(Axis.getClosestDirectionLeftStick());
-        
-        // Right Stick, moves keyboard (maybe add gestures)
-        moveSelectedKey(Axis.getClosestDirectionRightStick());
-        
-        // Hat Switch, create gestures
-        for(HatSwitch hatSwitch: HatSwitch.values()) {
-            if(Gesture.ENABLED) {
-                KeyboardGesture gesture = createSwipeGesture(hatSwitch.isPressed());
-                if(gesture != null) {
-                    keyboardGestures.addGesture(gesture);
-                }
-            } else {
-                moveSelectedKey(hatSwitch.isPressed());
-            }
+        } finally {
+            CONTROLLER_LOCK.unlock();
         }
     }
     
@@ -224,6 +236,65 @@ public class ControllerKeyboard extends IKeyboard {
     @Override
     public void removeFromUI(JPanel panel, GLCanvas canvas) {
         // Do nothing
+    }
+    
+    public void registerObserver(ControllerDataObserver observer) {
+        if(observers.contains(observer)) {
+            return;
+        }
+        observers.add(observer);
+    }
+    
+    public void removeObserver(ControllerDataObserver observer) {
+        observers.remove(observer);
+    }
+
+    protected void notifyListenersDirectionEvent(Direction direction) {
+        for(ControllerDataObserver observer : observers) {
+            observer.controllerDataEventObserved(direction);
+        }
+    }
+    
+    @Override
+    public void beginTutorial() {
+        CONTROLLER_LOCK.lock();
+        try {
+            // TODO: read from data reader
+            selectKey(Key.VK_Q);
+        } finally {
+            CONTROLLER_LOCK.unlock();
+        }
+    }
+    
+    @Override
+    public void finishTutorial() {
+        CONTROLLER_LOCK.lock();
+        try {
+            // TODO: remove from data reader
+        } finally {
+            CONTROLLER_LOCK.unlock();
+        }
+    }
+    
+    @Override
+    public void beginExperiment(DataManager dataManager) {
+        CONTROLLER_LOCK.lock();
+        try {
+            selectKey(Key.VK_Q);
+            this.registerObserver(dataManager);
+        } finally {
+            CONTROLLER_LOCK.unlock();
+        }
+    }
+    
+    @Override
+    public void finishExperiment(DataManager dataManager) {
+        CONTROLLER_LOCK.lock();
+        try {
+            this.removeObserver(dataManager);
+        } finally {
+            CONTROLLER_LOCK.unlock();
+        }
     }
 
     @Override
@@ -279,15 +350,19 @@ public class ControllerKeyboard extends IKeyboard {
         switch(direction) {
             case DOWN:
                 rowDelta = 1;
+                notifyListenersDirectionEvent(Direction.DOWN);
                 break;
             case LEFT:
                 colDelta = -1;
+                notifyListenersDirectionEvent(Direction.LEFT);
                 break;
             case RIGHT:
                 colDelta = 1;
+                notifyListenersDirectionEvent(Direction.RIGHT);
                 break;
             case UP:
                 rowDelta = -1;
+                notifyListenersDirectionEvent(Direction.UP);
                 break;
             default: return;
         }

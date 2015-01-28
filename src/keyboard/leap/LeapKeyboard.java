@@ -3,6 +3,7 @@ package keyboard.leap;
 import swipe.SwipeKeyboard;
 import utilities.Point;
 
+import java.util.ArrayList;
 import java.util.concurrent.locks.ReentrantLock;
 
 import javax.media.opengl.GL2;
@@ -12,6 +13,7 @@ import javax.swing.JPanel;
 import utilities.MyUtilities;
 
 import com.leapmotion.leap.InteractionBox;
+import com.leapmotion.leap.Vector;
 
 import enums.Attribute;
 import enums.FileExt;
@@ -21,6 +23,8 @@ import enums.Gesture;
 import enums.Key;
 import enums.Renderable;
 import enums.Setting;
+import experiment.DataManager;
+import experiment.LeapDataObserver;
 import experiment.WordManager;
 import keyboard.CalibrationObserver;
 import keyboard.IKeyboard;
@@ -42,6 +46,7 @@ public class LeapKeyboard extends IKeyboard implements LeapObserver, Calibration
     private final String KEYBOARD_FILE_NAME;
     private final ReentrantLock LEAP_LOCK = new ReentrantLock();
     private final float CAMERA_DISTANCE;
+    private ArrayList<LeapDataObserver> observers = new ArrayList<LeapDataObserver>();
     private SwipePoint leapPoint;
     private SwipeTrail swipeTrail;
     private LeapData leapData;
@@ -116,6 +121,8 @@ public class LeapKeyboard extends IKeyboard implements LeapObserver, Calibration
                 leapPlane.update(leapPoint, leapTool, null, swipeTrail);
             }
             if(leapTool.isValid()) {
+                notifyListenersLeapEvent(leapPoint.getNormalizedPoint(), leapTool.getDirection());
+                
                 Key key;
                 swipeKeyboard.update(leapPlane.isTouching());
                 if((key = swipeKeyboard.isPressed()) != Key.VK_NULL) {
@@ -170,6 +177,65 @@ public class LeapKeyboard extends IKeyboard implements LeapObserver, Calibration
             keyboardGestures.deleteQuadric();
         }
         WordManager.removeObserver(swipeKeyboard);
+    }
+    
+    public void registerObserver(LeapDataObserver observer) {
+        if(observers.contains(observer)) {
+            return;
+        }
+        observers.add(observer);
+    }
+    
+    public void removeObserver(LeapDataObserver observer) {
+        observers.remove(observer);
+    }
+
+    protected void notifyListenersLeapEvent(Vector leapPoint, Vector toolDirection) {
+        for(LeapDataObserver observer : observers) {
+            observer.leapDataEventObserved(leapPoint, toolDirection);
+        }
+    }
+    
+    @Override
+    public void beginTutorial() {
+        LEAP_LOCK.lock();
+        try {
+            // Change plane to plane used to create tutorial
+            // TODO: read from data reader
+        } finally {
+            LEAP_LOCK.unlock();
+        }
+    }
+    
+    @Override
+    public void finishTutorial() {
+        LEAP_LOCK.lock();
+        try {
+            // Change plane back to plane used in calibration or from file
+            // TODO: remove from data reader
+        } finally {
+            LEAP_LOCK.unlock();
+        }
+    }
+    
+    @Override
+    public void beginExperiment(DataManager dataManager) {
+        LEAP_LOCK.lock();
+        try {
+            this.registerObserver(dataManager);
+        } finally {
+            LEAP_LOCK.unlock();
+        }
+    }
+    
+    @Override
+    public void finishExperiment(DataManager dataManager) {
+        LEAP_LOCK.lock();
+        try {
+            this.removeObserver(dataManager);
+        } finally {
+            LEAP_LOCK.unlock();
+        }
     }
 
     @Override

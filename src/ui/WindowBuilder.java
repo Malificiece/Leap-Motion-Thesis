@@ -27,7 +27,7 @@ public class WindowBuilder {
     public static void buildControlWindow(JFrame frame,
             JComboBox<String> testComboBox,
             JTextField subjectField,
-            JButton [] optionsButtons) { // calibrate, run
+            JButton [] optionsButtons) { // calibrate, run, edit
         
         JPanel background = new JPanel();
         background.setLayout(new BoxLayout(background, BoxLayout.Y_AXIS));
@@ -50,10 +50,15 @@ public class WindowBuilder {
         subjectField.setHighlighter(null);
         subjectField.setHorizontalAlignment(JTextField.CENTER);
         
-        // Build layout for Test Select area
         JPanel padding1 = new JPanel();
-        padding1.setBorder(BorderFactory.createEmptyBorder(0, 0, 10, 0));
-        background.add(padding1);
+        padding1.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 10));
+        subjectPanel.add(padding1);
+        subjectPanel.add(optionsButtons[2]);
+        
+        // Build layout for Test Select area
+        JPanel padding2 = new JPanel();
+        padding2.setBorder(BorderFactory.createEmptyBorder(0, 0, 10, 0));
+        background.add(padding2);
         
         JPanel testPanel = new JPanel();
         testPanel.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createTitledBorder("Test Selection"), BorderFactory.createEmptyBorder(5, 10, 10, 10)));
@@ -67,17 +72,17 @@ public class WindowBuilder {
         testPanel.add(testComboBox);
         
         // Build layout for calibration and run buttons
-        JPanel padding2 = new JPanel();
-        padding2.setBorder(BorderFactory.createEmptyBorder(0, 0, 10, 0));
-        background.add(padding2);
+        JPanel padding3 = new JPanel();
+        padding3.setBorder(BorderFactory.createEmptyBorder(0, 0, 10, 0));
+        background.add(padding3);
         
         JPanel optionsPanel = new JPanel();
         optionsPanel.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createTitledBorder("Options"), BorderFactory.createEmptyBorder(5, 10, 10, 10)));
         background.add(optionsPanel);
         
         optionsPanel.add(optionsButtons[0]);
-        JPanel padding3 = new JPanel();
-        optionsPanel.add(padding3);
+        JPanel padding4 = new JPanel();
+        optionsPanel.add(padding4);
         optionsPanel.add(optionsButtons[1]);
         
         // Arrange the components inside the window

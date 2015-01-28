@@ -15,6 +15,7 @@ import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JTextField;
 import javax.swing.WindowConstants;
+import javax.swing.text.DefaultHighlighter;
 
 import utilities.MyUtilities;
 import enums.TestType;
@@ -33,6 +34,7 @@ public class ControlCenter {
     private JTextField subjectField;
     private String subjectID;
     private JComboBox<String> testTypeComboBox;
+    private JButton editSubjectIDButton;
     private JButton calibrateButton;
     private JButton experimentButton;
     private boolean isLocked = false;
@@ -45,10 +47,11 @@ public class ControlCenter {
         subjectID = MyUtilities.generateSubjectID();
         subjectField = new JTextField(subjectID);
         testTypeComboBox = new JComboBox<String>();
+        editSubjectIDButton = new JButton("Edit");
         calibrateButton = new JButton("Calibration");
         experimentButton = new JButton("Experiment");
         
-        JButton buttons[] = {calibrateButton, experimentButton};
+        JButton buttons[] = {calibrateButton, experimentButton, editSubjectIDButton};
         
         // Window builder builds window using important fields here. It adds unimportant fields that we won't use for aesthetics only.
         WindowBuilder.buildControlWindow(frame, testTypeComboBox, subjectField, buttons);
@@ -77,6 +80,52 @@ public class ControlCenter {
                         frame.dispose();
                         System.exit(0);
                     }
+                }
+            }
+        });
+        
+        // Edit the subject ID if we want to redo a test or add to an old test.
+        editSubjectIDButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if(editSubjectIDButton.getText().equals("Edit")) {
+                    subjectField.setEditable(true);
+                    subjectField.setHighlighter(new DefaultHighlighter());
+                    subjectField.requestFocusInWindow();
+                    editSubjectIDButton.setText("Save");
+                } else if(!MyUtilities.checkForUniqueSubjectID(subjectField.getText())) {
+                    Object[] options = {"Save", "Randomize", "Cancel"};
+                    int selection =
+                            JOptionPane.showOptionDialog(frame,
+                            "A duplicate subjectID was selected.\nContinue anyway?",
+                            "Warning!",
+                            JOptionPane.YES_NO_CANCEL_OPTION,
+                            JOptionPane.WARNING_MESSAGE,
+                            null,
+                            options,
+                            options[0]);
+                    if(selection == JOptionPane.YES_OPTION) {
+                        subjectField.setEditable(false);
+                        subjectField.setHighlighter(null);
+                        editSubjectIDButton.setText("Edit");
+                        subjectID = subjectField.getText();
+                    } else if(selection == JOptionPane.NO_OPTION) {
+                        subjectField.setEditable(false);
+                        subjectField.setHighlighter(null);
+                        editSubjectIDButton.setText("Edit");
+                        subjectID = MyUtilities.generateSubjectID();
+                        subjectField.setText(subjectID);
+                    } else {
+                        subjectField.setEditable(false);
+                        subjectField.setHighlighter(null);
+                        editSubjectIDButton.setText("Edit");
+                        subjectField.setText(subjectID);
+                    }
+                } else {
+                    subjectField.setEditable(false);
+                    subjectField.setHighlighter(null);
+                    editSubjectIDButton.setText("Edit");
+                    subjectID = subjectField.getText();
                 }
             }
         });

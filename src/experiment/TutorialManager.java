@@ -7,12 +7,7 @@ import java.util.concurrent.locks.ReentrantLock;
 import javax.swing.JButton;
 import javax.swing.JRootPane;
 
-import enums.FileExt;
-import enums.FileName;
-import enums.FilePath;
-
 public class TutorialManager {
-    private final String TUTORIAL_WORD_PATH = FilePath.DOCS.getPath() + FileName.TUTORIAL.getName() + FileExt.DICTIONARY.getExt();
     private final String[] INSTRUCTIONS = {"<font size=+1>This quick tutorial will go over what you need to know.<br><br></font>"
             + "<font size=+1>Press the <b>NEXT</b> button below to continue.</font>",
             "<font size=+1>Once the experiment begins, a random word will appear above the keyboard.<br><br></font>"
@@ -74,10 +69,6 @@ public class TutorialManager {
         } finally {
             tutorialLock.unlock();
         }
-    }
-    
-    public String getPath() {
-        return TUTORIAL_WORD_PATH;
     }
 
     public String getText() {

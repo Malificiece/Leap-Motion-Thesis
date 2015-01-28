@@ -29,6 +29,7 @@ import enums.Gesture;
 import enums.Direction;
 import enums.Renderable;
 import enums.Key;
+import experiment.DataManager;
 import keyboard.IKeyboard;
 import keyboard.KeyboardGesture;
 import keyboard.renderables.KeyboardGestures;
@@ -43,6 +44,7 @@ public class StandardKeyboard extends IKeyboard {
     private final float HORIZONTAL_GESTURE_OFFSET = 25f;
     private final float VERTICAL_GESTURE_OFFSET;
     private final float CAMERA_DISTANCE;
+    private final ReentrantLock STANDARD_LOCK = new ReentrantLock();
     private VirtualKeyboard virtualKeyboard;
     private KeyBindings keyBindings;
     private KeyboardGestures keyboardGestures;
@@ -117,6 +119,38 @@ public class StandardKeyboard extends IKeyboard {
             canvas.removeMouseMotionListener(mouseGesture);
             keyboardGestures.deleteQuadric();
         }
+    }
+    
+    @Override
+    public void beginTutorial() {
+        // Need to only put this lock around the if statements for tutorial data, not the whole thing honestly....FIX TABLET and CONTROLLER TOO!
+        // 
+        STANDARD_LOCK.lock();
+        try {
+            // TODO: read from data reader
+        } finally {
+            STANDARD_LOCK.unlock();
+        }
+    }
+    
+    @Override
+    public void finishTutorial() {
+        STANDARD_LOCK.lock();
+        try {
+            // TODO: remove from data reader
+        } finally {
+            STANDARD_LOCK.unlock();
+        }
+    }
+    
+    @Override
+    public void beginExperiment(DataManager dataManager) {
+        // No special data needs to be recorded for Standard Keyboard.
+    }
+    
+    @Override
+    public void finishExperiment(DataManager dataManager) {
+        // No special data needs to be recorded for Standard Keyboard.
     }
     
     @Override

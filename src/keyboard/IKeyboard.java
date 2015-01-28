@@ -11,6 +11,7 @@ import javax.swing.JPanel;
 
 import enums.FileExt;
 import enums.FilePath;
+import experiment.DataManager;
 import ui.SaveSettingsObserver;
 import utilities.MyUtilities;
 
@@ -36,6 +37,12 @@ public abstract class IKeyboard implements SaveSettingsObserver {
     
     public abstract void render(GL2 gl);
     public abstract void update();
+    
+    public abstract void beginTutorial();
+    public abstract void finishTutorial();
+    
+    public abstract void beginExperiment(DataManager dataManager);
+    public abstract void finishExperiment(DataManager dataManager);
     
     public abstract void beginCalibration(JPanel textPanel);
     protected abstract void finishCalibration();

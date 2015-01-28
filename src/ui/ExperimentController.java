@@ -10,6 +10,9 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 
 import javax.media.opengl.GLAutoDrawable;
 import javax.media.opengl.awt.GLCanvas;
@@ -141,10 +144,7 @@ public class ExperimentController extends GraphicsController {
             @Override
             public void actionPerformed(ActionEvent e) {
                 beginTutorial();
-                // keyboard.streamDataFromFile(FilePath.TUTORIAL.getPath());
-                // change listener on keyboard to use DATA listener rather than it's classic listener
-                // turn off leap listener, ignore key bindings, don't update controller inputs
-                // turn on when done
+                keyboard.beginTutorial();
                 frame.requestFocusInWindow();
             }
         });
@@ -161,10 +161,7 @@ public class ExperimentController extends GraphicsController {
             @Override
             public void actionPerformed(ActionEvent e) {
                 beginExperiment();
-                // Begin experiment -- detect keyboard and record it's key events
-                // show words, show keyboard, records data in memory
-                // Finish experiment
-                // once finished write data from memory to file
+                keyboard.beginExperiment(dataManager);
                 frame.requestFocusInWindow();
             }
         });
@@ -237,8 +234,11 @@ public class ExperimentController extends GraphicsController {
         tutorialManager = new TutorialManager();
         infoPanel.add(tutorialManager.getComponent());
         infoPane.setText(tutorialManager.getText());
-        // set up word manager here
+        wordManager.loadTutorialWords();
         disableUI();
+        wordManager.paintLetters(wordLabel, answerLabel);
+        MyUtilities.JAVA_SWING_UTILITIES.calculateFontSize(wordManager.currentWord(), wordLabel, wordPanel);
+        MyUtilities.JAVA_SWING_UTILITIES.calculateFontSize(wordManager.getAnswer(), answerLabel, answerPanel);
     }
     
     private void finishTutorial() {
@@ -270,8 +270,12 @@ public class ExperimentController extends GraphicsController {
     
     private void beginExperiment() {
         runningExperiment = true;
-        dataManager = new DataManager(keyboard, subjectID);
+        String timeStarted = "_";
+        timeStarted += LocalDate.now().format(DateTimeFormatter.BASIC_ISO_DATE);
+        timeStarted += "_" + LocalTime.now().format(DateTimeFormatter.ofPattern("kkmm"));
+        dataManager = new DataManager(keyboard, subjectID, timeStarted);
         wordManager.loadWords(EXPERIMENT_SIZE);
+        //wordManager.loadTutorialWords();
         // TODO: Add a delay and a display to show when it's about to begin.
         // This will give us a head's up before things start
         splitPane.setRightComponent(null);
@@ -419,11 +423,13 @@ public class ExperimentController extends GraphicsController {
             if(tutorialManager.hasNext() && tutorialManager.isValid()) {
                 infoPane.setText(tutorialManager.getText());
             } else if(!tutorialManager.isValid()) {
+                keyboard.finishTutorial();
                 finishTutorial();
             }
         } else if(runningPractice && !wordManager.isValid()) {
             finishPractice();
         } else if(runningExperiment && !wordManager.isValid()) {
+            keyboard.finishExperiment(dataManager);
             finishExperiment();
         }
         

@@ -30,11 +30,8 @@ public class FileUtilities {
         File file;
         Path path;
         //Create data folder if it doesn't already exist.
-        path = FileSystems.getDefault().getPath(FilePath.DATA.getPath());
-        if(!Files.exists(path)) {
-            file = path.toFile();
-            file.mkdirs();
-        }
+        createDirectory(FilePath.DATA.getPath());
+
         // Create subject_ID_list.
         path = FileSystems.getDefault().getPath(FilePath.DATA.getPath(), FileName.SUBJECT_ID_LIST.getName() + FileExt.FILE.getExt());
         if(!Files.exists(path)) {
@@ -45,19 +42,12 @@ public class FileUtilities {
         }
         
         //Create docs folder if it doesn't already exist.
-        path = FileSystems.getDefault().getPath(FilePath.DOCS.getPath());
-        if(!Files.exists(path)) {
-            file = path.toFile();
-            file.mkdirs();
-        }
+        createDirectory(FilePath.DOCS.getPath());
         
         // Create config/settings path/files if they don't exist.
         // Create config folder.
-        path = FileSystems.getDefault().getPath(FilePath.CONFIG.getPath());
-        if(!Files.exists(path)) {
-            file = path.toFile();
-            file.mkdirs();
-        }
+        createDirectory(FilePath.CONFIG.getPath());
+
         // Create standard.ini
         path = FileSystems.getDefault().getPath(FilePath.CONFIG.getPath(), FileName.STANDARD.getName() + FileExt.INI.getExt());
         if(!Files.exists(path)) {
@@ -168,10 +158,23 @@ public class FileUtilities {
     private void writeDataToFile(File file, TreeMap<String, String> savedData, boolean report) throws IOException {
         FileWriter fileWriter = new FileWriter(file);
         PrintWriter out = new PrintWriter(fileWriter);
-        for(String settingName: savedData.keySet()) {
-            String output = settingName + ": " + savedData.get(settingName);
+        for(String name: savedData.keySet()) {
+            String output = name + ": " + savedData.get(name);
             out.println(output);
             if(report) System.out.println(output);
+        }
+        out.flush();
+        out.close();
+        fileWriter.close();
+    }
+    
+    // Write data to file.
+    private void writeDataToFile(File file, ArrayList<String> savedData, boolean report) throws IOException {
+        FileWriter fileWriter = new FileWriter(file);
+        PrintWriter out = new PrintWriter(fileWriter);
+        for(String data: savedData) {
+            out.println(data);
+            if(report) System.out.println(data);
         }
         out.flush();
         out.close();
@@ -185,6 +188,16 @@ public class FileUtilities {
             throw new IOException("Error creating new file: " + file.getAbsolutePath());
         }
         return file;
+    }
+    
+    // Attempt to open directory, create it if it doesn't exist
+    private void createDirectory(String filePath) {
+        //Create data folder if it doesn't already exist.
+        Path path = FileSystems.getDefault().getPath(filePath);
+        if(!Files.exists(path)) {
+            File file = path.toFile();
+            file.mkdirs();
+        }
     }
     
     // SETTINGS READ AND WRITE
@@ -312,7 +325,7 @@ public class FileUtilities {
         writeDataToFile(file, savedData, true);
     }
 
-    // WORDS
+    // Experiment file utilities
     // Read contents directly from file into array in memory.
     public ArrayList<String> readListFromFile(String filePath, String fileName) throws IOException {
         // Attempt to open file, create it if it doesn't exist.
@@ -325,9 +338,9 @@ public class FileUtilities {
         return dataList;
     }
 
-    public ArrayList<String> reservoirSampling(int reservoirSize, int dictionarySize, String fileName) throws IOException {
+    public ArrayList<String> reservoirSampling(int reservoirSize, int dictionarySize, String filePath, String fileName) throws IOException {
         // Attempt to open file, create it if it doesn't exist.
-        File file = createFile(FilePath.DOCS.getPath(), fileName);
+        File file = createFile(filePath, fileName);
         
         BufferedReader bufferedReader = new BufferedReader(new FileReader(file));
         ArrayList<String> reservoir = new ArrayList<String>();
@@ -346,5 +359,16 @@ public class FileUtilities {
         }
         bufferedReader.close();
         return reservoir;
+    }
+
+    public void writeListToFile(ArrayList<String> savedData, String filePath, String fileName) throws IOException {
+        // Attempt to open directory, create it if it doesn't exist.
+        createDirectory(filePath);
+        
+        // Attempt to open file, create it if it doesn't exist.
+        File file = createFile(filePath, fileName);
+        
+        // Write our data to file.
+        writeDataToFile(file, savedData, true);
     }
 }

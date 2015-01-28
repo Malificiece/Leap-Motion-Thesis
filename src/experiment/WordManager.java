@@ -1,28 +1,22 @@
 package experiment;
 
-import java.awt.Color;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Queue;
 
 import javax.swing.JLabel;
-import javax.swing.UIManager;
-import javax.swing.text.SimpleAttributeSet;
-import javax.swing.text.StyleConstants;
 
 import enums.FileExt;
 import enums.FileName;
+import enums.FilePath;
 import enums.Key;
 import utilities.MyUtilities;
 
 public class WordManager {
-    private static final String DEFAULT_WORD = "frazzled";
+    private static final String DEFAULT_WORD = "test"; // ced, frazzled, test, calumnies --- check that A doesn't trigger when hit enter.....
     private static ArrayList<WordObserver> OBSERVERS = new ArrayList<WordObserver>();
     private final int DICTIONARY_SIZE = 118619;
-    private final SimpleAttributeSet RED = new SimpleAttributeSet();
-    private final SimpleAttributeSet GREEN = new SimpleAttributeSet();
-    private final SimpleAttributeSet DEFAULT = new SimpleAttributeSet();
     private boolean isDefault = false;
     private Queue<String> wordList = new LinkedList<String>();
     private int currentLetter = 0;
@@ -30,10 +24,6 @@ public class WordManager {
     
     public WordManager() {
         setDefault();
-        StyleConstants.setForeground(RED, Color.RED);
-        StyleConstants.setForeground(GREEN, Color.GREEN);
-        StyleConstants.setForeground(DEFAULT, UIManager.getColor("TabbedPane.foreground"));
-        StyleConstants.setSpaceBelow(RED, 100);
     }
     
     public void setDefault() {
@@ -99,12 +89,29 @@ public class WordManager {
         }
         return false;
     }
+    
+    public void loadTutorialWords() {
+        wordList.clear();
+        try {
+            isDefault = false;
+            wordList.addAll(MyUtilities.FILE_IO_UTILITIES.readListFromFile(FilePath.DOCS.getPath(), FileName.TUTORIAL.getName() + FileExt.DICTIONARY.getExt()));
+            currentLetter = 0;
+            if(isValid()) {
+                notifyListenersWordSet();
+            }
+        } catch (IOException e) {
+            setDefault();
+            System.out.println("An error occured while trying to load the words.");
+            e.printStackTrace();
+        }
+    }
 
     public void loadWords(int reservoirSize) {
         wordList.clear();
         try {
             isDefault = false;
-            wordList.addAll(MyUtilities.FILE_IO_UTILITIES.reservoirSampling(reservoirSize, DICTIONARY_SIZE, FileName.DICTIONARY.getName() + FileExt.DICTIONARY.getExt()));
+            wordList.addAll(MyUtilities.FILE_IO_UTILITIES.reservoirSampling(reservoirSize, DICTIONARY_SIZE,
+                    FilePath.DOCS.getPath(), FileName.DICTIONARY.getName() + FileExt.DICTIONARY.getExt()));
             currentLetter = 0;
             if(isValid()) {
                 notifyListenersWordSet();

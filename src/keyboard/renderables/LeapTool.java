@@ -83,6 +83,10 @@ public class LeapTool extends KeyboardRenderable {
         return tipVelocity;
     }
     
+    public Vector getDirection() {
+        return tipDirection;
+    }
+    
     public boolean isValid() {
         return isValid;
     }

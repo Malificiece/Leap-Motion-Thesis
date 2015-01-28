@@ -38,6 +38,7 @@ public class SwipeKeyboard implements WordObserver {
     private int currentLetter = 0;
     private Key expectedKey = Key.VK_NULL;
     private Key previousExpectedKey = expectedKey;
+    private Key previousPreviousExpectedKey = previousExpectedKey;
     private boolean touchPress;
     private boolean touchDown;
     
@@ -72,6 +73,7 @@ public class SwipeKeyboard implements WordObserver {
             // Have to force down to be false or else we run into problems when the leap is on a slow computer.
             if(previousKey != virtualKey) {
                 isDown = false;
+                //System.out.println("Turning off isDown " + virtualKey.getKey());
             }
             virtualKey.pressed();
             if(touchPress) {
@@ -113,43 +115,22 @@ public class SwipeKeyboard implements WordObserver {
                 if(!isPressed && !isDown && onExpectedLetterDown(virtualKey.getKey())) {
                     isPressed = true;
                     isDown = true;
-                    //System.out.println("detected: touching IS expected key " + virtualKey.getKey());
+                    if(!touchPress) {
+                        swipeTrail.setPressedPoint(virtualKey.getCenter());
+                    }
+                    //System.out.println("pressed: touching IS expected key " + virtualKey.getKey());
                 } else if(!isPressed && !isDown && touchPress && !onExpectedLetterDown(virtualKey.getKey())) {
                     isPressed = true;
                     isDown = true;
-                    //System.out.println("detected: touching NOT expected key " + virtualKey.getKey());
+                    //System.out.println("pressed: touching NOT expected key " + virtualKey.getKey());
                 } else if(!isPressed && !isDown && (onPreviousExpectedLetterDown(virtualKey.getKey()) || virtualKey != previousKey)) {
-                    //System.out.print("CHECK angle is pressed ");
-                    Vector pressedPoint = swipeTrail.isPressed();
-                    //System.out.println("-- point: " + pressedPoint);
-                    // If we're close enough to our previous expected key when we detect an angle press, then we shouldn't count it.
-                    VirtualKey previousExpectedVirtualKey = virtualKeyboard.getVirtualKey(previousExpectedKey);
-                    if(!pressedPoint.equals(Vector.zero()) && previousExpectedVirtualKey != null && expectedKey != Key.VK_BACK_SPACE && expectedKey != Key.VK_ENTER &&
-                            MyUtilities.MATH_UTILITILES.findDistanceToPoint(swipePoint.getNormalizedPoint(), previousExpectedVirtualKey.getCenter()) <= MAX_EXPECTED_PRESS_RADIUS) {
-                        pressedPoint = Vector.zero();
-                        //System.out.println("Angle press TOO CLOSE - ignore it");
-                    }
-                    if(!pressedPoint.equals(Vector.zero())) {
-                        if(virtualKey.isHovering(pressedPoint)) {
-                            isPressed = true;
-                            isDown = true;
-                            //System.out.println("detected: angle press curr " + virtualKey.getKey());
-                        } else if(expectedKey != Key.VK_ENTER && !previousPressed.isHovering(pressedPoint)){ // checking if enter helps us avoid false angle
-                            virtualKey = virtualKeyboard.getNearestKey(pressedPoint);
-                            virtualKey.pressed();
-                            isPressed = true;
-                            isDown = true;
-                            //System.out.println("detected: angle press prev " + virtualKey.getKey());
-                        } else {
-                            //System.out.println("not detected: ignore the angle press " + virtualKey.getKey());
-                        }
-                    } else {
-                        // We set down here because we are touching but we detected nothing else.
-                        isDown = true;
-                        //System.out.println("not detected: set abitrary DOWN + " + virtualKey.getKey());
-                    }
+                    handleTrailPressDetection();
+                } else if(swipeTrail.detectPressed()) {
+                    isDown = false;
+                    //System.out.println("not pressed: detected new swipe trail press " + virtualKey.getKey());
+                    handleTrailPressDetection();
                 } else {
-                    //System.out.println("not detected: " + virtualKey.getKey() + " Down: " + isDown + " Pressed: " + isPressed);
+                    //System.out.println("not pressed: " + virtualKey.getKey() + " Down: " + isDown + " Pressed: " + isPressed);
                 }
             }
             previousKey = virtualKey;
@@ -158,7 +139,7 @@ public class SwipeKeyboard implements WordObserver {
             }
         } else {
             // TODO: The 'l' issue
-            // For the leap only, when done pressing the backspace, the 'l' key just above it sometimes gets accidently hit because
+            // For the leap only, when done pressing any key, the key just above it sometimes gets accidently hit because
             // of the natural motion of pulling away from a surface, as well as dealing with the fact that our touch plane
             // has a specific threshold (may be corrected with improved transformation matrix of leap plane or further calibration
             // of plane flatness based on trying to press corner buttons.
@@ -166,11 +147,17 @@ public class SwipeKeyboard implements WordObserver {
                 if(!onExpectedLetterRelease()) {
                     // If we're close enough to our previous expected key when we detect a key release, then we shouldn't count it.
                     VirtualKey previousExpectedVirtualKey = virtualKeyboard.getVirtualKey(previousExpectedKey);
-                    if(previousExpectedVirtualKey != null && expectedKey != Key.VK_BACK_SPACE && expectedKey != Key.VK_ENTER &&
+                    if(previousExpectedVirtualKey != null && expectedKey != Key.VK_BACK_SPACE /*&& expectedKey != Key.VK_ENTER*/ &&
                             MyUtilities.MATH_UTILITILES.findDistanceToPoint(swipePoint.getNormalizedPoint(), previousExpectedVirtualKey.getCenter()) <= MAX_EXPECTED_PRESS_RADIUS) {
                         isPressed = false;
+                        //System.out.println("not pressed: ignoring prev key release " + previousKey.getKey());
+                    } else if((previousExpectedVirtualKey = virtualKeyboard.getVirtualKey(previousPreviousExpectedKey)) != null && expectedKey != Key.VK_BACK_SPACE &&
+                            MyUtilities.MATH_UTILITILES.findDistanceToPoint(swipePoint.getNormalizedPoint(), previousExpectedVirtualKey.getCenter()) <= MAX_EXPECTED_PRESS_RADIUS) {
+                        isPressed = false;
+                        //System.out.println("not pressed: ignoring prev x 2 key release " + previousKey.getKey());
                     } else {
                         isPressed = true;
+                        //System.out.println("pressed: not ignoring key release " + previousKey.getKey());
                     }
                     isDown = false;
                 } else {
@@ -182,6 +169,42 @@ public class SwipeKeyboard implements WordObserver {
                 isBackSpaceDown = false;
                 isBackSpaceRepeating = false;
             }
+        }
+    }
+    
+    private void handleTrailPressDetection() {
+        //System.out.print("CHECK angle is pressed ");
+        Vector pressedPoint = swipeTrail.isPressed();
+        //System.out.println("-- point: " + pressedPoint);
+        // If we're close enough to our previous expected key when we detect an angle press, then we shouldn't count it.
+        VirtualKey previousExpectedVirtualKey = virtualKeyboard.getVirtualKey(previousExpectedKey);
+        if(!pressedPoint.equals(Vector.zero()) && previousExpectedVirtualKey != null && expectedKey != Key.VK_BACK_SPACE /*&& expectedKey != Key.VK_ENTER*/ &&
+                MyUtilities.MATH_UTILITILES.findDistanceToPoint(swipePoint.getNormalizedPoint(), previousExpectedVirtualKey.getCenter()) <= MAX_EXPECTED_PRESS_RADIUS) {
+            pressedPoint = Vector.zero();
+            //System.out.println("Angle press TOO CLOSE to prev expected - ignore it");
+        } else if(!pressedPoint.equals(Vector.zero()) && (previousExpectedVirtualKey = virtualKeyboard.getVirtualKey(previousPreviousExpectedKey)) != null &&
+                expectedKey != Key.VK_BACK_SPACE && MyUtilities.MATH_UTILITILES.findDistanceToPoint(swipePoint.getNormalizedPoint(), previousExpectedVirtualKey.getCenter()) <= MAX_EXPECTED_PRESS_RADIUS) {
+            pressedPoint = Vector.zero();
+            //System.out.println("Angle press TOO CLOSE to prev x 2 expected - ignore it");
+        }
+        if(!pressedPoint.equals(Vector.zero())) {
+            if(virtualKey.isHovering(pressedPoint)) {
+                isPressed = true;
+                isDown = true;
+                //System.out.println("pressed: angle press curr " + virtualKey.getKey());
+            } else if(expectedKey != Key.VK_ENTER && !previousPressed.isHovering(pressedPoint)){ // checking if enter helps us avoid false angle
+                virtualKey = virtualKeyboard.getNearestKey(pressedPoint);
+                virtualKey.pressed();
+                isPressed = true;
+                isDown = true;
+                //System.out.println("pressed: angle press prev " + virtualKey.getKey());
+            } else {
+                //System.out.println("not pressed: ignore the angle press " + virtualKey.getKey());
+            }
+        } else {
+            // We set down here because we are touching but we detected nothing else.
+            isDown = true;
+            //System.out.println("not pressed: set abitrary DOWN + " + virtualKey.getKey());
         }
     }
     
@@ -238,9 +261,17 @@ public class SwipeKeyboard implements WordObserver {
     @Override
     public void currentLetterIndexChangedEventObservered(int letterIndex, Key key) {
         currentLetter = letterIndex;
-        Key previousPreviousKey = previousExpectedKey;
+        previousPreviousExpectedKey = previousExpectedKey;
         previousExpectedKey = expectedKey;
         expectedKey = key;
+
+        VirtualKey previousExpectedVirtualKey = virtualKeyboard.getVirtualKey(previousExpectedKey);
+        VirtualKey previousPreviousExpectedVirtualKey = virtualKeyboard.getVirtualKey(previousPreviousExpectedKey);
+        if(previousExpectedVirtualKey != null && previousPreviousExpectedVirtualKey != null && 
+                MyUtilities.MATH_UTILITILES.findDistanceToPoint(previousExpectedVirtualKey.getCenter(), previousPreviousExpectedVirtualKey.getCenter()) > MAX_CLOSE_KEY_DISTANCE) {
+            previousPreviousExpectedKey = previousExpectedKey;
+        }
+        
         // This will allow us to deal with double letters without gestures. - No delay in detection but gives recursive call, too much work to fix.
         /*if(currentLetter > 0 && previousExpectedKey == expectedKey && previousExpectedKey != Key.VK_BACK_SPACE && previousExpectedKey != Key.VK_ENTER && previousKey.getKey() != Key.VK_BACK_SPACE) {
             if(shiftOnce) {
@@ -258,7 +289,7 @@ public class SwipeKeyboard implements WordObserver {
         if(previousExpectedKey == expectedKey) {
             //isDown = false;
             if(currentLetter > 0) {
-                previousExpectedKey = previousPreviousKey;
+                previousExpectedKey = previousPreviousExpectedKey;
             }
         }
         isDown = false;

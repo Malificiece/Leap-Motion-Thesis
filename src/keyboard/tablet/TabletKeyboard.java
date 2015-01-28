@@ -3,6 +3,7 @@ package keyboard.tablet;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
+import java.util.ArrayList;
 import java.util.concurrent.locks.ReentrantLock;
 
 import swipe.SwipeKeyboard;
@@ -25,6 +26,8 @@ import enums.FileName;
 import enums.FilePath;
 import enums.Key;
 import enums.Renderable;
+import experiment.DataManager;
+import experiment.TabletDataObserver;
 import experiment.WordManager;
 
 public class TabletKeyboard extends IKeyboard {
@@ -32,6 +35,8 @@ public class TabletKeyboard extends IKeyboard {
     private static final String KEYBOARD_NAME = "Tablet Keyboard";
     private static final String KEYBOARD_FILE_NAME = FileName.TABLET.getName();
     private final float CAMERA_DISTANCE;
+    private final ReentrantLock TABLET_LOCK = new ReentrantLock();
+    private ArrayList<TabletDataObserver> observers = new ArrayList<TabletDataObserver>();
     private SwipePoint swipePoint;
     private SwipeTrail swipeTrail;
     private SwipeKeyboard swipeKeyboard;
@@ -70,39 +75,48 @@ public class TabletKeyboard extends IKeyboard {
     
     @Override
     public void update() {
-        // Allow the touchscreen to take over the updates of specific objects that require the screen
-        touchScreen.update(swipePoint, swipeTrail);
-        
-        swipeKeyboard.update(touchScreen.isTouching());
-
-        Key key;
-        if((key = swipeKeyboard.isPressed()) != Key.VK_NULL) {
-            if(key != Key.VK_SHIFT) {
-                if(shiftOnce) {
-                    keyPressed = key.toUpper();
-                    shiftOnce = shiftTwice;
-                    if(!shiftTwice) {
-                        keyboardRenderables.swapToLowerCaseKeyboard();
-                    }
-                } else {
-                    keyPressed = key.getValue();   
-                }
-                notifyListenersKeyEvent();
-            } else if(!shiftOnce && !shiftTwice) {
-                shiftOnce = true;
-                keyboardRenderables.swapToUpperCaseKeyboard();
-            } else if(shiftOnce && !shiftTwice) {
-                shiftTwice = true;
-            } else {
-                shiftTwice = false;
-                shiftOnce = false;
-                keyboardRenderables.swapToLowerCaseKeyboard();
+        TABLET_LOCK.lock();
+        try {
+            // Allow the touchscreen to take over the updates of specific objects that require the screen
+            touchScreen.update(swipePoint, swipeTrail);
+            
+            if(!swipePoint.getNormalizedPoint().equals(Vector.zero())) {
+                notifyListenersTouchEvent(swipePoint.getNormalizedPoint());
             }
-        }
-        if(shiftTwice) {
-            virtualKeyboard.locked(Key.VK_SHIFT);
-        } else if(shiftOnce) {
-            virtualKeyboard.pressed(Key.VK_SHIFT);
+            
+            swipeKeyboard.update(touchScreen.isTouching());
+    
+            Key key;
+            if((key = swipeKeyboard.isPressed()) != Key.VK_NULL) {
+                if(key != Key.VK_SHIFT) {
+                    if(shiftOnce) {
+                        keyPressed = key.toUpper();
+                        shiftOnce = shiftTwice;
+                        if(!shiftTwice) {
+                            keyboardRenderables.swapToLowerCaseKeyboard();
+                        }
+                    } else {
+                        keyPressed = key.getValue();   
+                    }
+                    notifyListenersKeyEvent();
+                } else if(!shiftOnce && !shiftTwice) {
+                    shiftOnce = true;
+                    keyboardRenderables.swapToUpperCaseKeyboard();
+                } else if(shiftOnce && !shiftTwice) {
+                    shiftTwice = true;
+                } else {
+                    shiftTwice = false;
+                    shiftOnce = false;
+                    keyboardRenderables.swapToLowerCaseKeyboard();
+                }
+            }
+            if(shiftTwice) {
+                virtualKeyboard.locked(Key.VK_SHIFT);
+            } else if(shiftOnce) {
+                virtualKeyboard.pressed(Key.VK_SHIFT);
+            }
+        } finally {
+            TABLET_LOCK.unlock();
         }
     }
     
@@ -118,6 +132,63 @@ public class TabletKeyboard extends IKeyboard {
         WordManager.removeObserver(swipeKeyboard);
         canvas.removeMouseListener(touchScreen);
         canvas.removeMouseMotionListener(touchScreen);
+    }
+    
+    public void registerObserver(TabletDataObserver observer) {
+        if(observers.contains(observer)) {
+            return;
+        }
+        observers.add(observer);
+    }
+    
+    public void removeObserver(TabletDataObserver observer) {
+        observers.remove(observer);
+    }
+
+    protected void notifyListenersTouchEvent(Vector touchPoint) {
+        for(TabletDataObserver observer : observers) {
+            observer.tabletDataEventObserved(touchPoint);
+        }
+    }
+    
+    @Override
+    public void beginTutorial() {
+        TABLET_LOCK.lock();
+        try {
+            // TODO: read from data reader
+        } finally {
+            TABLET_LOCK.unlock();
+        }
+    }
+    
+    @Override
+    public void finishTutorial() {
+        TABLET_LOCK.lock();
+        try {
+            // TODO: remove from data reader
+        } finally {
+            TABLET_LOCK.unlock();
+        }
+    }
+    
+    @Override
+    public void beginExperiment(DataManager dataManager) {
+        TABLET_LOCK.lock();
+        try {
+            this.registerObserver(dataManager);
+        } finally {
+            TABLET_LOCK.unlock();
+        }
+    }
+    
+    @Override
+    public void finishExperiment(DataManager dataManager) {
+        TABLET_LOCK.lock();
+        try {
+            this.removeObserver(dataManager);
+        } finally {
+            TABLET_LOCK.unlock();
+        }
     }
 
     @Override
