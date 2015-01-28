@@ -30,9 +30,10 @@ import enums.Gesture;
 import enums.Key;
 import enums.Renderable;
 import experiment.ControllerDataObserver;
+import experiment.ControllerPlaybackObserver;
 import experiment.DataManager;
 
-public class ControllerKeyboard extends IKeyboard {
+public class ControllerKeyboard extends IKeyboard implements ControllerPlaybackObserver {
     public static final int KEYBOARD_ID = 3;
     private static final String KEYBOARD_NAME = "Controller Keyboard";
     private static final String KEYBOARD_FILE_NAME = FileName.CONTROLLER.getName();
@@ -265,6 +266,16 @@ public class ControllerKeyboard extends IKeyboard {
             CONTROLLER_LOCK.unlock();
         }
     }
+    
+	@Override
+	public void pressedEventObserved(Key key, boolean upper) {
+		// TODO Auto-generated method stub
+	}
+
+	@Override
+	public void directionEventObserver(Direction direction) {
+		// TODO Auto-generated method stub
+	}
     
     @Override
     public void finishPlayback() {

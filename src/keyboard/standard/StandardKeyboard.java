@@ -30,12 +30,13 @@ import enums.Direction;
 import enums.Renderable;
 import enums.Key;
 import experiment.DataManager;
+import experiment.PlaybackObserver;
 import keyboard.IKeyboard;
 import keyboard.KeyboardGesture;
 import keyboard.renderables.KeyboardGestures;
 import keyboard.renderables.VirtualKeyboard;
 
-public class StandardKeyboard extends IKeyboard {
+public class StandardKeyboard extends IKeyboard implements PlaybackObserver {
     public static final int KEYBOARD_ID = 0;
     private static final String KEYBOARD_NAME = "Standard Keyboard";
     private static final String KEYBOARD_FILE_NAME = FileName.STANDARD.getName();
@@ -132,6 +133,11 @@ public class StandardKeyboard extends IKeyboard {
             STANDARD_LOCK.unlock();
         }
     }
+    
+	@Override
+	public void pressedEventObserved(Key key, boolean upper) {
+		// TODO Auto-generated method stub
+	}
     
     @Override
     public void finishPlayback() {

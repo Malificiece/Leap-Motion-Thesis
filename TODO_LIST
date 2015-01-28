@@ -1,7 +1,7 @@
 TODO:
-1) Refine leap swipe for known words. - Needs angle/arc/src/dest key vector etc to determine correctness of path.
-2) Consider stabilizing the leap point based on delta velocity and delta position.
-3) Finish implementing data recording and readback for tutorial/demonstration.
+1) Fine-tune swipe keyboard. Fix the rest of the edge cases.
+2) Consider further stabilizing the leap point based on delta velocity and delta position.
+3) Implement playback of tutorial
 4) Finish Exit Survey UI / Save data to relevant data path.
 5) Get preliminary data.
 6) Add another UI/button to the control center. We want a data viewer that

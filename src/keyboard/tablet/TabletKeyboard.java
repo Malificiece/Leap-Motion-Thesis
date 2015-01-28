@@ -28,9 +28,10 @@ import enums.Key;
 import enums.Renderable;
 import experiment.DataManager;
 import experiment.TabletDataObserver;
+import experiment.TabletPlaybackObserver;
 import experiment.WordManager;
 
-public class TabletKeyboard extends IKeyboard {
+public class TabletKeyboard extends IKeyboard implements TabletPlaybackObserver {
     public static final int KEYBOARD_ID = 4;
     private static final String KEYBOARD_NAME = "Tablet Keyboard";
     private static final String KEYBOARD_FILE_NAME = FileName.TABLET.getName();
@@ -160,6 +161,16 @@ public class TabletKeyboard extends IKeyboard {
             TABLET_LOCK.unlock();
         }
     }
+    
+	@Override
+	public void pressedEventObserved(Key key, boolean upper) {
+		// TODO Auto-generated method stub
+	}
+
+	@Override
+	public void touchEventObserved(Vector touchPoint) {
+		// TODO Auto-generated method stub
+	}
     
     @Override
     public void finishPlayback() {

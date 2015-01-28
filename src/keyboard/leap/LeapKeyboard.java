@@ -25,6 +25,7 @@ import enums.Renderable;
 import enums.Setting;
 import experiment.DataManager;
 import experiment.LeapDataObserver;
+import experiment.LeapPlaybackObserver;
 import experiment.WordManager;
 import keyboard.CalibrationObserver;
 import keyboard.IKeyboard;
@@ -40,7 +41,7 @@ import leap.LeapData;
 import leap.LeapListener;
 import leap.LeapObserver;
 
-public class LeapKeyboard extends IKeyboard implements LeapObserver, CalibrationObserver {
+public class LeapKeyboard extends IKeyboard implements LeapObserver, CalibrationObserver, LeapPlaybackObserver {
     public final int KEYBOARD_ID;
     private final String KEYBOARD_NAME;
     private final String KEYBOARD_FILE_NAME;
@@ -206,6 +207,16 @@ public class LeapKeyboard extends IKeyboard implements LeapObserver, Calibration
             LEAP_LOCK.unlock();
         }
     }
+    
+	@Override
+	public void pressedEventObserved(Key key, boolean upper) {
+		// TODO Auto-generated method stub
+	}
+
+	@Override
+	public void positionEventObservered(Vector leapPoint, Vector toolDirection) {
+		// TODO Auto-generated method stub
+	}
     
     @Override
     public void finishPlayback() {
