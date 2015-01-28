@@ -152,7 +152,7 @@ public class TabletKeyboard extends IKeyboard {
     }
     
     @Override
-    public void beginTutorial() {
+    public void beginPlayback(boolean repeat) {
         TABLET_LOCK.lock();
         try {
             // TODO: read from data reader
@@ -162,7 +162,7 @@ public class TabletKeyboard extends IKeyboard {
     }
     
     @Override
-    public void finishTutorial() {
+    public void finishPlayback() {
         TABLET_LOCK.lock();
         try {
             // TODO: remove from data reader

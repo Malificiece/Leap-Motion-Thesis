@@ -256,7 +256,7 @@ public class ControllerKeyboard extends IKeyboard {
     }
     
     @Override
-    public void beginTutorial() {
+    public void beginPlayback(boolean repeat) {
         CONTROLLER_LOCK.lock();
         try {
             // TODO: read from data reader
@@ -267,7 +267,7 @@ public class ControllerKeyboard extends IKeyboard {
     }
     
     @Override
-    public void finishTutorial() {
+    public void finishPlayback() {
         CONTROLLER_LOCK.lock();
         try {
             // TODO: remove from data reader

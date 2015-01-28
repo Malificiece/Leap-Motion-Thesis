@@ -38,8 +38,8 @@ public abstract class IKeyboard implements SaveSettingsObserver {
     public abstract void render(GL2 gl);
     public abstract void update();
     
-    public abstract void beginTutorial();
-    public abstract void finishTutorial();
+    public abstract void beginPlayback(boolean repeat);
+    public abstract void finishPlayback();
     
     public abstract void beginExperiment(DataManager dataManager);
     public abstract void finishExperiment(DataManager dataManager);

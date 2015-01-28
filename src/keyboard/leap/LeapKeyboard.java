@@ -197,7 +197,7 @@ public class LeapKeyboard extends IKeyboard implements LeapObserver, Calibration
     }
     
     @Override
-    public void beginTutorial() {
+    public void beginPlayback(boolean repeat) {
         LEAP_LOCK.lock();
         try {
             // Change plane to plane used to create tutorial
@@ -208,7 +208,7 @@ public class LeapKeyboard extends IKeyboard implements LeapObserver, Calibration
     }
     
     @Override
-    public void finishTutorial() {
+    public void finishPlayback() {
         LEAP_LOCK.lock();
         try {
             // Change plane back to plane used in calibration or from file

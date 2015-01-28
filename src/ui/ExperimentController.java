@@ -144,7 +144,7 @@ public class ExperimentController extends GraphicsController {
             @Override
             public void actionPerformed(ActionEvent e) {
                 beginTutorial();
-                keyboard.beginTutorial();
+                keyboard.beginPlayback(true);
                 frame.requestFocusInWindow();
             }
         });
@@ -423,7 +423,7 @@ public class ExperimentController extends GraphicsController {
             if(tutorialManager.hasNext() && tutorialManager.isValid()) {
                 infoPane.setText(tutorialManager.getText());
             } else if(!tutorialManager.isValid()) {
-                keyboard.finishTutorial();
+                keyboard.finishPlayback();
                 finishTutorial();
             }
         } else if(runningPractice && !wordManager.isValid()) {

@@ -122,7 +122,7 @@ public class StandardKeyboard extends IKeyboard {
     }
     
     @Override
-    public void beginTutorial() {
+    public void beginPlayback(boolean repeat) {
         // Need to only put this lock around the if statements for tutorial data, not the whole thing honestly....FIX TABLET and CONTROLLER TOO!
         // 
         STANDARD_LOCK.lock();
@@ -134,7 +134,7 @@ public class StandardKeyboard extends IKeyboard {
     }
     
     @Override
-    public void finishTutorial() {
+    public void finishPlayback() {
         STANDARD_LOCK.lock();
         try {
             // TODO: remove from data reader
