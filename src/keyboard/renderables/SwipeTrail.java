@@ -1,8 +1,6 @@
 package keyboard.renderables;
 
 import static javax.media.opengl.GL.GL_LINES;
-import static javax.media.opengl.GL.GL_TRIANGLE_FAN;
-import static javax.media.opengl.GL2.*;
 
 import java.util.ArrayList;
 
@@ -23,14 +21,15 @@ import enums.Renderable;
 public class SwipeTrail extends KeyboardRenderable {
     private static final Renderable TYPE = Renderable.SWIPE_TRAIL;
     private final GLColor TRAIL_COLOR = new GLColor(Color.YELLOW);
-    private final GLColor INTERPOLATED_COLOR = new GLColor(Color.RED);
-    private final GLColor PRESSED_COLOR = new GLColor(Color.CYAN);
-    private static final int NUM_VERTICIES = 32;
-    private static final float DELTA_ANGLE = (float) (2.0f * Math.PI / NUM_VERTICIES);
-    private static final float RADIUS = 5f;
+    //private final GLColor INTERPOLATED_COLOR = new GLColor(Color.RED);
+    //private final GLColor PRESSED_COLOR = new GLColor(Color.CYAN);
+    //private static final int NUM_VERTICIES = 32;
+    //private static final float DELTA_ANGLE = (float) (2.0f * Math.PI / NUM_VERTICIES);
+    //private static final float RADIUS = 5f;
     private final int SHRINK_DURATION = 250;
     private final float LINE_WIDTH = 7;
     private final int LINE_SIZE = 50;
+    //private final int PRESSED_SIZE = 3;
     private Vector[] line;
     private int lineIndex = 0;
     private boolean isTouching = false;
@@ -131,7 +130,7 @@ public class SwipeTrail extends KeyboardRenderable {
             }
             
             // Draw interpolated line.
-            INTERPOLATED_COLOR.glColor(gl);
+            /*INTERPOLATED_COLOR.glColor(gl);
             gl.glLineWidth(1);
             for(int i = 0; i < interpolatedPoints.size() - 1; i++) {
                 int j = i + 1;
@@ -149,12 +148,12 @@ public class SwipeTrail extends KeyboardRenderable {
                 gl.glTranslatef(v.getX(), v.getY(), v.getZ());
                 drawPoint(gl);
                 gl.glPopMatrix();
-            }
+            }*/
             
             // Draw interpreted key presses.
-            PRESSED_COLOR.glColor(gl);
+            /*PRESSED_COLOR.glColor(gl);
             gl.glLineWidth(1);
-            for(int i = 0; i < pressedPoints.size() - 1; i++) {
+            for(int i = (pressedPoints.size() >= PRESSED_SIZE ? pressedPoints.size() - PRESSED_SIZE : 0); i < pressedPoints.size() - 1; i++) {
                 int j = i + 1;
                 Vector v = pressedPoints.get(i);
                 drawDottedLine(gl, v, pressedPoints.get(j));
@@ -170,7 +169,7 @@ public class SwipeTrail extends KeyboardRenderable {
                 gl.glTranslatef(v.getX(), v.getY(), v.getZ());
                 drawPoint(gl);
                 gl.glPopMatrix();
-            }
+            }*/
             gl.glPopMatrix();
         }
     }
@@ -182,7 +181,7 @@ public class SwipeTrail extends KeyboardRenderable {
         gl.glEnd();
     }
     
-    private void drawDottedLine(GL2 gl, Vector source, Vector dest) {
+    /*private void drawDottedLine(GL2 gl, Vector source, Vector dest) {
         gl.glPushAttrib(GL_ENABLE_BIT);
         gl.glLineWidth(2);
         gl.glLineStipple(1, (short) 0xAAAA);
@@ -205,7 +204,7 @@ public class SwipeTrail extends KeyboardRenderable {
         }
         gl.glVertex3f(1f * RADIUS, 0f, 0f);
         gl.glEnd();
-    }
+    }*/
     
     private void checkPressed() {
         if(lastPoint != null) {
