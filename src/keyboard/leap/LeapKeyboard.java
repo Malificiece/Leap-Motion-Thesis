@@ -113,54 +113,86 @@ public class LeapKeyboard extends IKeyboard implements LeapObserver, Calibration
     public void update() {
         LEAP_LOCK.lock();
         try {
-            if(Gesture.ENABLED) {
-                // Allow leap plane to take over the updates of specific objects that require the plane
-                leapPlane.update(leapPoint, leapTool, keyboardGestures, swipeTrail);
-                // Update gestures after plane, we need both normalized and non normalized points.
-                leapGestures.update();
-            } else {
-                // Allow leap plane to take over the updates of specific objects that require the plane
-                leapPlane.update(leapPoint, leapTool, null, swipeTrail);
+            if(leapData != null) {
+                leapData.populateData(leapPoint, leapTool);
             }
-            if(leapTool.isValid()) {
-                notifyListenersLeapEvent(leapPoint.getNormalizedPoint(), leapTool.getDirection());
-                
-                Key key;
-                swipeKeyboard.update(leapPlane.isTouching());
-                if((key = swipeKeyboard.isPressed()) != Key.VK_NULL) {
-                    if(key != Key.VK_SHIFT) {
-                        if(shiftOnce) {
-                            keyPressed = key.toUpper();
-                            shiftOnce = shiftTwice;
-                            if(!shiftTwice) {
-                                keyboardRenderables.swapToLowerCaseKeyboard();
-                            }
-                        } else {
-                            keyPressed = key.getValue();   
-                        }
-                        notifyListenersKeyEvent();
-                    } else if(!shiftOnce && !shiftTwice) {
-                        shiftOnce = true;
-                        keyboardRenderables.swapToUpperCaseKeyboard();
-                    } else if(shiftOnce && !shiftTwice) {
-                        shiftTwice = true;
-                    } else {
-                        shiftTwice = false;
-                        shiftOnce = false;
-                        keyboardRenderables.swapToLowerCaseKeyboard();
-                    }
-                }
-                if(shiftTwice) {
-                    virtualKeyboard.locked(Key.VK_SHIFT);
-                } else if(shiftOnce) {
-                    virtualKeyboard.pressed(Key.VK_SHIFT);
-                }
-            }/* else {
-                virtualKeyboard.clearAll();
-            }*/
         } finally {
             LEAP_LOCK.unlock();
         }
+        
+
+        if(isPlayingBack()) {
+            playbackManager.update();
+            
+            boolean isTouching = leapPlane.isNormalizedTouching(leapPoint.getNormalizedPoint().getZ()); //<= 40; // FIGURE OUT APPROPRIATE THRESHOLD HERE
+            // Set tool point, scale it, rotate and position it.
+            leapTool.update(leapPoint.getNormalizedPoint());
+            
+            if(Gesture.ENABLED) {
+                // Set new gesture destination location.
+                for(KeyboardGesture gesture: keyboardGestures.getGestures()) {
+                    if(gesture.isValid()) {
+                        gesture.update(leapPoint.getNormalizedPoint());
+                    } else {
+                        gesture.update();
+                    }
+                }
+            }
+            
+            // Set add to trail and set location.
+            if(isTouching) {
+                swipeTrail.update(leapPoint.getNormalizedPoint());
+            } else {
+                swipeTrail.update();
+            }
+            
+            // Update gestures after plane, we need both normalized and non normalized points.
+            if(Gesture.ENABLED) leapGestures.update();
+            
+            swipeKeyboard.update(isTouching);
+        } else {
+            // Allow leap plane to take over the updates of specific objects that require the plane
+            leapPlane.update(leapPoint, leapTool, Gesture.ENABLED ? keyboardGestures : null, swipeTrail);
+            
+            // Update gestures after plane, we need both normalized and non normalized points.
+            if(Gesture.ENABLED) leapGestures.update();
+            
+            if(leapTool.isValid()) swipeKeyboard.update(leapPlane.isTouching());
+        }
+        
+        //if(leapTool.isValid()) {
+            if(leapTool.isValid()) notifyListenersLeapEvent(leapPoint.getNormalizedPoint(), leapTool.getDirection());
+            
+            Key key;
+            if((key = swipeKeyboard.isPressed()) != Key.VK_NULL) {
+                if(key != Key.VK_SHIFT) {
+                    if(shiftOnce) {
+                        keyPressed = key.toUpper();
+                        shiftOnce = shiftTwice;
+                        if(!shiftTwice) {
+                            keyboardRenderables.swapToLowerCaseKeyboard();
+                        }
+                    } else {
+                        keyPressed = key.getValue();   
+                    }
+                    notifyListenersKeyEvent();
+                } else if(!shiftOnce && !shiftTwice) {
+                    shiftOnce = true;
+                    keyboardRenderables.swapToUpperCaseKeyboard();
+                } else if(shiftOnce && !shiftTwice) {
+                    shiftTwice = true;
+                } else {
+                    shiftTwice = false;
+                    shiftOnce = false;
+                    keyboardRenderables.swapToLowerCaseKeyboard();
+                }
+            }
+            if(shiftTwice) {
+                virtualKeyboard.locked(Key.VK_SHIFT);
+            } else if(shiftOnce) {
+                virtualKeyboard.pressed(Key.VK_SHIFT);
+            }
+        //}
     }
     
     @Override
@@ -199,32 +231,61 @@ public class LeapKeyboard extends IKeyboard implements LeapObserver, Calibration
     }
     
     @Override
+    protected boolean isPlayingBack() {
+        LEAP_LOCK.lock();
+        try {
+            return isPlayback;
+        } finally {
+            LEAP_LOCK.unlock();
+        }
+    }
+    
+    @Override
     public void beginPlayback(PlaybackManager playbackManager) {
         LEAP_LOCK.lock();
         try {
-            // Change plane to plane used to create tutorial
-            // TODO: read from data reader
+            // TODO: Change plane to plane used to create tutorial
+            LeapListener.stopListening();
+            LeapListener.removeObserver(this);
+            isPlayback = true;
+            playbackManager.registerObserver(this);
+            this.playbackManager = playbackManager;
         } finally {
             LEAP_LOCK.unlock();
         }
     }
     
 	@Override
-	public void pressedEventObserved(Key key, boolean upper) {
-		// TODO Auto-generated method stub
+	public void pressedEventObserved(Key key) {
+		// Able to ignore pressed events on this one.
 	}
+	
+    @Override
+    public void upperEventObserved(boolean upper) {
+        // Ignoring SHIFT for now
+    }
 
 	@Override
-	public void positionEventObservered(Vector leapPoint, Vector toolDirection) {
-		// TODO Auto-generated method stub
+	public void positionEventObserved(Vector pointPosition) {
+		// Add point from the leap
+	    leapPoint.setNormalizedPoint(pointPosition);
 	}
+	
+    @Override
+    public void directionEventObserved(Vector toolDirection) {
+        leapTool.setTool(toolDirection);
+    }
     
     @Override
     public void finishPlayback(PlaybackManager playbackManager) {
         LEAP_LOCK.lock();
         try {
-            // Change plane back to plane used in calibration or from file
-            // TODO: remove from data reader
+            // TODO: Change plane back to plane used in calibration or from file
+            playbackManager.removeObserver(this);
+            isPlayback = false;
+            this.playbackManager = null;
+            LeapListener.registerObserver(this);
+            LeapListener.startListening();
         } finally {
             LEAP_LOCK.unlock();
         }
@@ -285,7 +346,6 @@ public class LeapKeyboard extends IKeyboard implements LeapObserver, Calibration
         LEAP_LOCK.lock();
         try {
             this.leapData = leapData;
-            this.leapData.populateData(leapPoint, leapTool);
         } finally {
             LEAP_LOCK.unlock();
         }

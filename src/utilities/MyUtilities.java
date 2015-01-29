@@ -64,7 +64,7 @@ public class MyUtilities {
         ArrayList<String> savedData = new ArrayList<String>();
         savedData.addAll(subjectIDList);
         try {
-            FILE_IO_UTILITIES.writeListToFile(savedData, FilePath.DATA.getPath(),  FileName.SUBJECT_ID_LIST.getName() + FileExt.FILE.getExt());
+            FILE_IO_UTILITIES.writeListToFile(savedData, FilePath.DATA.getPath(),  FileName.SUBJECT_ID_LIST.getName() + FileExt.FILE.getExt(), false);
         } catch (IOException e) {
             System.out.println("Unable to write new ID to file.");
             e.printStackTrace();

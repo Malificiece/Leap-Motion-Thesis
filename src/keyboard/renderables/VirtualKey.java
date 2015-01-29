@@ -37,6 +37,7 @@ public class VirtualKey {
             color.setAlpha(alpha);
         }
     };
+    private static final int LIGHT_UP_TIME = 100;
     private Vector max;
     private Vector min; // also equivalent to location (not center)
     private Vector center;
@@ -57,7 +58,7 @@ public class VirtualKey {
         this.key = key;
         keyState = KeyState.NONE;
         
-        lightUpKeyTimer = new Timer(100, new ActionListener() {
+        lightUpKeyTimer = new Timer(LIGHT_UP_TIME, new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 lightUpKeyTimer.stop();

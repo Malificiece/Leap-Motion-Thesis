@@ -28,6 +28,8 @@ public class LeapTool extends KeyboardRenderable {
     private static final float RADS_TO_DEGREES = (float) (180 / Math.PI);
     private static final GLColor TOOL_COLOR = new GLColor(Color.WOOD);
     private static final GLColor LINE_COLOR = new GLColor(Color.YELLOW);
+    private final int DEFAULT_LENGTH = 150;
+    private final float DEFAULT_RADIUS = 3.15f;
     private final float CAMERA_DISTANCE;
     private float length;
     private float radius;
@@ -61,6 +63,12 @@ public class LeapTool extends KeyboardRenderable {
             //GraphicsController.gl.getContext().makeCurrent();
             GraphicsController.glu.gluDeleteQuadric(quadric);
         }
+    }
+    
+    public void setTool(Vector direction) {
+        length = DEFAULT_LENGTH;
+        radius = DEFAULT_RADIUS;
+        tipDirection = direction;
     }
     
     public void setTool(Tool tool) {

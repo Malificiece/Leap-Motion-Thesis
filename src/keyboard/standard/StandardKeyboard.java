@@ -88,19 +88,23 @@ public class StandardKeyboard extends IKeyboard implements PlaybackObserver {
     
     @Override
     public void update() {
-        if(Gesture.ENABLED) {
-            // Remove completed gestures, update the others.
-            gestureLock.lock();
-            try {
-                keyboardGestures.removeAndUpdateGestures();
-            } finally {
-                gestureLock.unlock();
+        if(isPlayingBack()) {
+            playbackManager.update();
+        } else {
+            if(Gesture.ENABLED) {
+                // Remove completed gestures, update the others.
+                gestureLock.lock();
+                try {
+                    keyboardGestures.removeAndUpdateGestures();
+                } finally {
+                    gestureLock.unlock();
+                }
             }
-        }
-        
-        if(shiftDown) {
-            virtualKeyboard.pressed(Key.VK_SHIFT_LEFT);
-            virtualKeyboard.pressed(Key.VK_SHIFT_RIGHT);
+            
+            if(shiftDown) {
+                virtualKeyboard.pressed(Key.VK_SHIFT_LEFT);
+                virtualKeyboard.pressed(Key.VK_SHIFT_RIGHT);
+            }
         }
     }
     
@@ -124,27 +128,46 @@ public class StandardKeyboard extends IKeyboard implements PlaybackObserver {
     }
     
     @Override
-    public void beginPlayback(PlaybackManager playbackManager) {
-        // Need to only put this lock around the if statements for tutorial data, not the whole thing honestly....FIX TABLET and CONTROLLER TOO!
-        // 
+    protected boolean isPlayingBack() {
         STANDARD_LOCK.lock();
         try {
-            // TODO: read from data reader
+            return isPlayback;
+        } finally {
+            STANDARD_LOCK.unlock();
+        }
+    }
+    
+    @Override
+    public void beginPlayback(PlaybackManager playbackManager) {
+        STANDARD_LOCK.lock();
+        try {
+            isPlayback = true;
+            playbackManager.registerObserver(this);
+            this.playbackManager = playbackManager;
         } finally {
             STANDARD_LOCK.unlock();
         }
     }
     
 	@Override
-	public void pressedEventObserved(Key key, boolean upper) {
-		// TODO Auto-generated method stub
+	public void pressedEventObserved(Key key) {
+	    keyPressed = key.getValue();
+	    notifyListenersKeyEvent();
+	    virtualKeyboard.pressed(key);
 	}
+	
+	@Override
+    public void upperEventObserved(boolean upper) {
+        // Ignoring SHIFT for now
+    }
     
     @Override
     public void finishPlayback(PlaybackManager playbackManager) {
         STANDARD_LOCK.lock();
         try {
-            // TODO: remove from data reader
+            playbackManager.removeObserver(this);
+            isPlayback = false;
+            this.playbackManager = null;
         } finally {
             STANDARD_LOCK.unlock();
         }
@@ -250,47 +273,49 @@ public class StandardKeyboard extends IKeyboard implements PlaybackObserver {
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                keyPressed = e.getActionCommand().charAt(0);
-                Key key = null;
-                if((key = Key.getByCode(keyPressed)) == null) {
-                    key = Key.getByValue(keyPressed);
-                }
-                if((e.getModifiers() & KeyEvent.SHIFT_MASK) != 0 || shiftDown) {
-                    shiftDown = true;
-                    //keyboardRenderables.swapToUpperCaseKeyboard();
-                }
-                virtualKeyboard.pressed(key);
-                if(key.isPrintable()) {
-                    notifyListenersKeyEvent();
-                } else {
-                    if(Gesture.ENABLED) {
-                        gestureLock.lock();
-                        try {
-                            switch(key) {
-                                case VK_UP:
-                                    keyboardGestures.addGesture(createSwipeGesture(Direction.UP));
-                                    break;
-                                case VK_DOWN:
-                                    keyboardGestures.addGesture(createSwipeGesture(Direction.DOWN));
-                                    break;
-                                case VK_LEFT:
-                                    keyboardGestures.addGesture(createSwipeGesture(Direction.LEFT));
-                                    break;
-                                case VK_RIGHT:
-                                    keyboardGestures.addGesture(createSwipeGesture(Direction.RIGHT));
-                                    break;
-                                case VK_SHIFT_RELEASED:
-                                    shiftDown = false;
-                                    //keyboardRenderables.swapToLowerCaseKeyboard();
-                                    break;
-                                default: break;
+                if(!isPlayingBack()) {
+                    keyPressed = e.getActionCommand().charAt(0);
+                    Key key = null;
+                    if((key = Key.getByCode(keyPressed)) == null) {
+                        key = Key.getByValue(keyPressed);
+                    }
+                    if((e.getModifiers() & KeyEvent.SHIFT_MASK) != 0 || shiftDown) {
+                        shiftDown = true;
+                        //keyboardRenderables.swapToUpperCaseKeyboard();
+                    }
+                    virtualKeyboard.pressed(key);
+                    if(key.isPrintable()) {
+                        notifyListenersKeyEvent();
+                    } else {
+                        if(Gesture.ENABLED) {
+                            gestureLock.lock();
+                            try {
+                                switch(key) {
+                                    case VK_UP:
+                                        keyboardGestures.addGesture(createSwipeGesture(Direction.UP));
+                                        break;
+                                    case VK_DOWN:
+                                        keyboardGestures.addGesture(createSwipeGesture(Direction.DOWN));
+                                        break;
+                                    case VK_LEFT:
+                                        keyboardGestures.addGesture(createSwipeGesture(Direction.LEFT));
+                                        break;
+                                    case VK_RIGHT:
+                                        keyboardGestures.addGesture(createSwipeGesture(Direction.RIGHT));
+                                        break;
+                                    case VK_SHIFT_RELEASED:
+                                        shiftDown = false;
+                                        //keyboardRenderables.swapToLowerCaseKeyboard();
+                                        break;
+                                    default: break;
+                                }
+                            } finally {
+                                gestureLock.unlock();
                             }
-                        } finally {
-                            gestureLock.unlock();
+                        } else if(key == Key.VK_SHIFT_RELEASED) {
+                            shiftDown = false;
+                            //keyboardRenderables.swapToLowerCaseKeyboard();
                         }
-                    } else if(key == Key.VK_SHIFT_RELEASED) {
-                        shiftDown = false;
-                        //keyboardRenderables.swapToLowerCaseKeyboard();
                     }
                 }
             }

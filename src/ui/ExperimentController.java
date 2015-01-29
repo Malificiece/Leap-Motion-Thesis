@@ -42,6 +42,7 @@ public class ExperimentController extends GraphicsController {
             + "<font><b>TUTORIAL:</b><br>A brief example to familiarize yourself with the keyboard.<br><br></font>"
             + "<font><b>PRACTICE:</b><br>A small sample of what you should expect from the experiment.<br><br></font>"
             + "<font><b>EXPERIMENT:</b><br>The actual experiment with recorded data.</font>";
+    public final String TUTORIAL = FileName.TUTORIAL.getName();
     private final int PRACTICE_SIZE = 1;
     private final int EXPERIMENT_SIZE = 3;
     private final Color LIGHT_GREEN = new Color(204, 255, 204);
@@ -234,7 +235,7 @@ public class ExperimentController extends GraphicsController {
     
     private void beginTutorial() {
         runningTutorial = true;
-        playbackManager = new PlaybackManager(true, FileName.TUTORIAL.getName(), keyboard);
+        playbackManager = new PlaybackManager(true, TUTORIAL, keyboard);
         tutorialManager = new TutorialManager();
         infoPanel.add(tutorialManager.getComponent());
         infoPane.setText(tutorialManager.getText());
@@ -251,6 +252,8 @@ public class ExperimentController extends GraphicsController {
         tutorialManager = null;
         playbackManager = null;
         ranTutorial = true;
+        answerLabel.setText("");
+        wordManager.setAnswer("");
         enableUI();
     }
     
@@ -279,8 +282,11 @@ public class ExperimentController extends GraphicsController {
         timeStarted += LocalDate.now().format(DateTimeFormatter.BASIC_ISO_DATE);
         timeStarted += "_" + LocalTime.now().format(DateTimeFormatter.ofPattern("kkmm"));
         dataManager = new DataManager(keyboard, subjectID, timeStarted);
-        wordManager.loadWords(EXPERIMENT_SIZE);
-        //wordManager.loadTutorialWords();
+        if(TUTORIAL.equals(subjectID)) {
+            wordManager.loadTutorialWords();
+        } else {
+            wordManager.loadWords(EXPERIMENT_SIZE);
+        }
         // TODO: Add a delay and a display to show when it's about to begin.
         // This will give us a head's up before things start
         splitPane.setRightComponent(null);
@@ -425,6 +431,12 @@ public class ExperimentController extends GraphicsController {
         keyboard.update();
         
         if(runningTutorial && tutorialManager != null) {
+            if(tutorialManager.isValid() && wordManager.isDefault()) {
+                wordManager.loadTutorialWords();
+                wordManager.paintLetters(wordLabel, answerLabel);
+                MyUtilities.JAVA_SWING_UTILITIES.calculateFontSize(wordManager.currentWord(), wordLabel, wordPanel);
+                MyUtilities.JAVA_SWING_UTILITIES.calculateFontSize(wordManager.getAnswer(), answerLabel, answerPanel);
+            }
             if(tutorialManager.hasNext() && tutorialManager.isValid()) {
                 infoPane.setText(tutorialManager.getText());
             } else if(!tutorialManager.isValid()) {

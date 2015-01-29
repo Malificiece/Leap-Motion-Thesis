@@ -77,48 +77,56 @@ public class TabletKeyboard extends IKeyboard implements TabletPlaybackObserver 
     
     @Override
     public void update() {
-        TABLET_LOCK.lock();
-        try {
+        if(isPlayingBack()) {
+            playbackManager.update();
+            
+            boolean isTouching = false;
+            // Set add to trail and set location.
+            if(!swipePoint.getNormalizedPoint().equals(Vector.zero())) {
+                swipeTrail.update(swipePoint.getNormalizedPoint());
+                isTouching = true;
+            } else {
+                swipeTrail.update();
+            }
+            
+            swipeKeyboard.update(isTouching);
+        } else {
             // Allow the touchscreen to take over the updates of specific objects that require the screen
             touchScreen.update(swipePoint, swipeTrail);
             
-            if(!swipePoint.getNormalizedPoint().equals(Vector.zero())) {
-                notifyListenersTouchEvent(swipePoint.getNormalizedPoint());
-            }
+            notifyListenersTouchEvent(swipePoint.getNormalizedPoint()); // record even when zero
             
             swipeKeyboard.update(touchScreen.isTouching());
-    
-            Key key;
-            if((key = swipeKeyboard.isPressed()) != Key.VK_NULL) {
-                if(key != Key.VK_SHIFT) {
-                    if(shiftOnce) {
-                        keyPressed = key.toUpper();
-                        shiftOnce = shiftTwice;
-                        if(!shiftTwice) {
-                            keyboardRenderables.swapToLowerCaseKeyboard();
-                        }
-                    } else {
-                        keyPressed = key.getValue();   
+        }
+
+        Key key;
+        if((key = swipeKeyboard.isPressed()) != Key.VK_NULL) {
+            if(key != Key.VK_SHIFT) {
+                if(shiftOnce) {
+                    keyPressed = key.toUpper();
+                    shiftOnce = shiftTwice;
+                    if(!shiftTwice) {
+                        keyboardRenderables.swapToLowerCaseKeyboard();
                     }
-                    notifyListenersKeyEvent();
-                } else if(!shiftOnce && !shiftTwice) {
-                    shiftOnce = true;
-                    keyboardRenderables.swapToUpperCaseKeyboard();
-                } else if(shiftOnce && !shiftTwice) {
-                    shiftTwice = true;
                 } else {
-                    shiftTwice = false;
-                    shiftOnce = false;
-                    keyboardRenderables.swapToLowerCaseKeyboard();
+                    keyPressed = key.getValue();   
                 }
+                notifyListenersKeyEvent();
+            } else if(!shiftOnce && !shiftTwice) {
+                shiftOnce = true;
+                keyboardRenderables.swapToUpperCaseKeyboard();
+            } else if(shiftOnce && !shiftTwice) {
+                shiftTwice = true;
+            } else {
+                shiftTwice = false;
+                shiftOnce = false;
+                keyboardRenderables.swapToLowerCaseKeyboard();
             }
-            if(shiftTwice) {
-                virtualKeyboard.locked(Key.VK_SHIFT);
-            } else if(shiftOnce) {
-                virtualKeyboard.pressed(Key.VK_SHIFT);
-            }
-        } finally {
-            TABLET_LOCK.unlock();
+        }
+        if(shiftTwice) {
+            virtualKeyboard.locked(Key.VK_SHIFT);
+        } else if(shiftOnce) {
+            virtualKeyboard.pressed(Key.VK_SHIFT);
         }
     }
     
@@ -154,30 +162,50 @@ public class TabletKeyboard extends IKeyboard implements TabletPlaybackObserver 
     }
     
     @Override
+    protected boolean isPlayingBack() {
+        TABLET_LOCK.lock();
+        try {
+            return isPlayback;
+        } finally {
+            TABLET_LOCK.unlock();
+        }
+    }
+    
+    @Override
     public void beginPlayback(PlaybackManager playbackManager) {
         TABLET_LOCK.lock();
         try {
-            // TODO: read from data reader
+            isPlayback = true;
+            playbackManager.registerObserver(this);
+            this.playbackManager = playbackManager;
         } finally {
             TABLET_LOCK.unlock();
         }
     }
     
 	@Override
-	public void pressedEventObserved(Key key, boolean upper) {
-		// TODO Auto-generated method stub
+	public void pressedEventObserved(Key key) {
+	    // Might be able to ignore pressed events from file
 	}
+	
+    @Override
+    public void upperEventObserved(boolean upper) {
+        // Ignoring SHIFT for now
+    }
 
 	@Override
 	public void touchEventObserved(Vector touchPoint) {
-		// TODO Auto-generated method stub
+        // Add the touch point from the screen.
+        swipePoint.setNormalizedPoint(touchPoint);
 	}
     
     @Override
     public void finishPlayback(PlaybackManager playbackManager) {
         TABLET_LOCK.lock();
         try {
-            // TODO: remove from data reader
+            playbackManager.removeObserver(this);
+            isPlayback = false;
+            this.playbackManager = null;
         } finally {
             TABLET_LOCK.unlock();
         }

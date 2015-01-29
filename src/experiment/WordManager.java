@@ -34,6 +34,10 @@ public class WordManager {
         notifyListenersWordSet();
     }
     
+    public boolean isDefault() {
+        return isDefault;
+    }
+    
     public void setAnswer(String answer) {
         this.answer = answer;
     }
@@ -66,6 +70,7 @@ public class WordManager {
         if(isValid()) {
             return wordList.peek();
         } else {
+            isDefault = true;
             return DEFAULT_WORD;
         }
     }

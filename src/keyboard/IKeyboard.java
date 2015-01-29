@@ -28,6 +28,8 @@ public abstract class IKeyboard implements SaveSettingsObserver {
     protected KeyboardAttributes keyboardAttributes;
     protected KeyboardRenderables keyboardRenderables;
     protected char keyPressed;
+    protected boolean isPlayback = false;
+    protected PlaybackManager playbackManager;
     
     public IKeyboard(int keyboardID, String keyboardName, String fileName) {
         this.keyboardID = keyboardID;
@@ -39,6 +41,7 @@ public abstract class IKeyboard implements SaveSettingsObserver {
     public abstract void render(GL2 gl);
     public abstract void update();
     
+    protected abstract boolean isPlayingBack();
     public abstract void beginPlayback(PlaybackManager playbackManager);
     public abstract void finishPlayback(PlaybackManager playbackManager);
     

@@ -52,6 +52,8 @@ public class SwipeKeyboard implements WordObserver {
                 virtualKeyboard.getVirtualKey(Key.VK_B).getCenter());
         swipePoint = (SwipePoint) keyboard.getRenderables().getRenderable(Renderable.SWIPE_POINT);
         swipeTrail = (SwipeTrail) keyboard.getRenderables().getRenderable(Renderable.SWIPE_TRAIL);
+        
+        previousPressed = virtualKeyboard.getVirtualKey(Key.VK_ENTER);
     }
     
     public void update(boolean isTouching) {

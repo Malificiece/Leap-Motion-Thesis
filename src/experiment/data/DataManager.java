@@ -34,7 +34,7 @@ public class DataManager implements DataObserver {
         int saveAttempts = 5;
         do {
             try {
-                MyUtilities.FILE_IO_UTILITIES.writeListToFile(dataList, FILE_PATH, FILE_NAME);
+                MyUtilities.FILE_IO_UTILITIES.writeListToFile(dataList, FILE_PATH, FILE_NAME, true);
                 if(MyUtilities.checkForUniqueSubjectID(SUBJECT_ID)) {
                     MyUtilities.addSubjectIDToList(SUBJECT_ID);
                 }
@@ -63,13 +63,13 @@ public class DataManager implements DataObserver {
     public void startWord(String currentWord) {
         word = currentWord;
         dataList.add(DataType.TIME_WORD_START.name() + ": " + System.nanoTime()
-                + " " + DataType.WORD_VALUE.name() + ": " + word);
+                + "; " + DataType.WORD_VALUE.name() + ": " + word);
         //System.out.println(dataList.get(dataList.size()-1));
     }
     
     public void stopWord() {
         dataList.add(DataType.TIME_WORD_END.name() + ": " + System.nanoTime()
-                + " " + DataType.WORD_VALUE.name() + ": " + word);
+                + "; " + DataType.WORD_VALUE.name() + ": " + word);
         word = null;
         //System.out.println(dataList.get(dataList.size()-1));
     }
@@ -78,32 +78,32 @@ public class DataManager implements DataObserver {
         Key pKey = Key.getByValue(pressedKey);
         Key cKey = Key.getByValue(currentKey);
         dataList.add(DataType.TIME_PRESSED.name() + ": " + System.nanoTime()
-                + " " + DataType.KEY_PRESSED.name() + ": " + pKey.getName()
-                + " " + DataType.KEY_EXPECTED.name() + ": " + cKey.getName()
-                + " " + DataType.KEY_PRESSED_UPPER.name() + ": " + pKey.isUpper(pressedKey)
-                + " " + DataType.KEY_EXPECTED_UPPER.name() + ": " + cKey.isUpper(currentKey));
+                + "; " + DataType.KEY_PRESSED.name() + ": " + pKey.getName()
+                + "; " + DataType.KEY_EXPECTED.name() + ": " + cKey.getName()
+                + "; " + DataType.KEY_PRESSED_UPPER.name() + ": " + pKey.isUpper(pressedKey)
+                + "; " + DataType.KEY_EXPECTED_UPPER.name() + ": " + cKey.isUpper(currentKey));
         //System.out.println(dataList.get(dataList.size()-1));
     }
 
     @Override
     public void controllerDataEventObserved(Direction direction) {
         dataList.add(DataType.TIME_SPECIAL.name() + ": " + System.nanoTime()
-                + " " + DataType.DIRECTION_PRESSED.name() + ": " + direction.name());
+                + "; " + DataType.DIRECTION_PRESSED.name() + ": " + direction.name());
         //System.out.println(dataList.get(dataList.size()-1));
     }
 
     @Override
     public void tabletDataEventObserved(Vector touchPoint) {
         dataList.add(DataType.TIME_SPECIAL.name() + ": " + System.nanoTime()
-                + " " + DataType.POINT_POSITION.name() + ": " + touchPoint);
+                + "; " + DataType.POINT_POSITION.name() + ": " + touchPoint);
         //System.out.println(dataList.get(dataList.size()-1));
     }
 
     @Override
     public void leapDataEventObserved(Vector leapPoint, Vector toolDirection) {
         dataList.add(DataType.TIME_SPECIAL.name() + ": " + System.nanoTime()
-                + " " + DataType.POINT_POSITION.name() + ": " + leapPoint
-                + " " + DataType.TOOL_DIRECTION.name() + ": " + toolDirection);
+                + "; " + DataType.POINT_POSITION.name() + ": " + leapPoint
+                + "; " + DataType.TOOL_DIRECTION.name() + ": " + toolDirection);
         //System.out.println(dataList.get(dataList.size()-1));
     }
 }

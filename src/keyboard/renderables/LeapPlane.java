@@ -207,11 +207,15 @@ public class LeapPlane extends KeyboardRenderable {
         return distanceToPlane;
     }
     
+    public boolean isNormalizedTouching(float normalizedZ) {
+        float normalizedThreshold = (float) ((-TOUCH_THRESHOLD.getValue()) / distanceToCameraPlane);
+        if(normalizedThreshold > 1) {normalizedThreshold = 1;} else if(normalizedThreshold < 0) {normalizedThreshold = 0;}
+        normalizedThreshold *= CAMERA_DISTANCE;
+        return normalizedZ < normalizedThreshold;
+    }
+    
     public boolean isTouching() {
-        if(distanceToPlane > TOUCH_THRESHOLD.getValue()) {
-            return true;
-        }
-        return false;
+        return distanceToPlane > TOUCH_THRESHOLD.getValue();
     }
     
     public boolean isValid() {

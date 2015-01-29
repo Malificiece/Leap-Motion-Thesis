@@ -394,7 +394,7 @@ public class FileUtilities {
         return reservoir;
     }
 
-    public void writeListToFile(ArrayList<String> savedData, String filePath, String fileName) throws IOException {
+    public void writeListToFile(ArrayList<String> savedData, String filePath, String fileName, boolean report) throws IOException {
         // Attempt to open directory, create it if it doesn't exist.
         createDirectory(filePath);
         
@@ -402,6 +402,6 @@ public class FileUtilities {
         File file = createFile(filePath, fileName);
         
         // Write our data to file.
-        writeDataToFile(file, savedData, true);
+        writeDataToFile(file, savedData, report);
     }
 }
