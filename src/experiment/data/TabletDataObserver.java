@@ -1,4 +1,4 @@
-package experiment;
+package experiment.data;
 
 import com.leapmotion.leap.Vector;
 

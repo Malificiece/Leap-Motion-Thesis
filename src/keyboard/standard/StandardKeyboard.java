@@ -29,8 +29,9 @@ import enums.Gesture;
 import enums.Direction;
 import enums.Renderable;
 import enums.Key;
-import experiment.DataManager;
-import experiment.PlaybackObserver;
+import experiment.data.DataManager;
+import experiment.playback.PlaybackManager;
+import experiment.playback.PlaybackObserver;
 import keyboard.IKeyboard;
 import keyboard.KeyboardGesture;
 import keyboard.renderables.KeyboardGestures;
@@ -123,7 +124,7 @@ public class StandardKeyboard extends IKeyboard implements PlaybackObserver {
     }
     
     @Override
-    public void beginPlayback(boolean repeat) {
+    public void beginPlayback(PlaybackManager playbackManager) {
         // Need to only put this lock around the if statements for tutorial data, not the whole thing honestly....FIX TABLET and CONTROLLER TOO!
         // 
         STANDARD_LOCK.lock();
@@ -140,7 +141,7 @@ public class StandardKeyboard extends IKeyboard implements PlaybackObserver {
 	}
     
     @Override
-    public void finishPlayback() {
+    public void finishPlayback(PlaybackManager playbackManager) {
         STANDARD_LOCK.lock();
         try {
             // TODO: remove from data reader

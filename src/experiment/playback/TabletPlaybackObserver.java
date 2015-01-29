@@ -1,4 +1,4 @@
-package experiment;
+package experiment.playback;
 
 import com.leapmotion.leap.Vector;
 

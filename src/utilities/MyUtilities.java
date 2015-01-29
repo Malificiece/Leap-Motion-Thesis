@@ -4,13 +4,11 @@ import java.io.IOException;
 import java.math.BigInteger;
 import java.security.SecureRandom;
 import java.util.ArrayList;
-import java.util.Set;
 import java.util.TreeSet;
 
 import enums.FileExt;
 import enums.FileName;
 import enums.FilePath;
-
 
 public class MyUtilities {
     public static final SwingUtilities JAVA_SWING_UTILITIES = new SwingUtilities();
@@ -54,7 +52,7 @@ public class MyUtilities {
     }
     
     public static void addSubjectIDToList(String subjectID) {
-        Set<String> subjectIDList = new TreeSet<String>();
+        TreeSet<String> subjectIDList = new TreeSet<String>();
         try {
             subjectIDList.addAll(FILE_IO_UTILITIES.readListFromFile(FilePath.DATA.getPath(), FileName.SUBJECT_ID_LIST.getName() + FileExt.FILE.getExt()));
         } catch (IOException e) {

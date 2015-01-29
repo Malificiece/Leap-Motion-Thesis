@@ -1,4 +1,4 @@
-package experiment;
+package experiment.data;
 
 import java.io.IOException;
 import java.util.ArrayList;

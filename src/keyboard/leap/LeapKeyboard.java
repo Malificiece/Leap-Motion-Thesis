@@ -23,10 +23,11 @@ import enums.Gesture;
 import enums.Key;
 import enums.Renderable;
 import enums.Setting;
-import experiment.DataManager;
-import experiment.LeapDataObserver;
-import experiment.LeapPlaybackObserver;
 import experiment.WordManager;
+import experiment.data.DataManager;
+import experiment.data.LeapDataObserver;
+import experiment.playback.LeapPlaybackObserver;
+import experiment.playback.PlaybackManager;
 import keyboard.CalibrationObserver;
 import keyboard.IKeyboard;
 import keyboard.KeyboardGesture;
@@ -198,7 +199,7 @@ public class LeapKeyboard extends IKeyboard implements LeapObserver, Calibration
     }
     
     @Override
-    public void beginPlayback(boolean repeat) {
+    public void beginPlayback(PlaybackManager playbackManager) {
         LEAP_LOCK.lock();
         try {
             // Change plane to plane used to create tutorial
@@ -219,7 +220,7 @@ public class LeapKeyboard extends IKeyboard implements LeapObserver, Calibration
 	}
     
     @Override
-    public void finishPlayback() {
+    public void finishPlayback(PlaybackManager playbackManager) {
         LEAP_LOCK.lock();
         try {
             // Change plane back to plane used in calibration or from file

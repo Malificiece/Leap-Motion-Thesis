@@ -29,11 +29,13 @@ import utilities.MyUtilities;
 import keyboard.KeyboardAttributes;
 import keyboard.KeyboardSetting;
 import enums.Attribute;
+import enums.FileName;
 import enums.Keyboard;
 import enums.TestType;
-import experiment.DataManager;
 import experiment.TutorialManager;
 import experiment.WordManager;
+import experiment.data.DataManager;
+import experiment.playback.PlaybackManager;
 
 public class ExperimentController extends GraphicsController {
     private static final String DEFAULT_INFO = "<font><b>CALIBRATE:</b><br>Calibrate the keyboard (if available).<br><br></font>"
@@ -71,6 +73,7 @@ public class ExperimentController extends GraphicsController {
     private boolean ranPractice = false;
     private String subjectID;
     private WordManager wordManager = new WordManager();
+    private PlaybackManager playbackManager;
     private DataManager dataManager;
     private TutorialManager tutorialManager;
     
@@ -144,7 +147,7 @@ public class ExperimentController extends GraphicsController {
             @Override
             public void actionPerformed(ActionEvent e) {
                 beginTutorial();
-                keyboard.beginPlayback(true);
+                keyboard.beginPlayback(playbackManager);
                 frame.requestFocusInWindow();
             }
         });
@@ -231,6 +234,7 @@ public class ExperimentController extends GraphicsController {
     
     private void beginTutorial() {
         runningTutorial = true;
+        playbackManager = new PlaybackManager(true, FileName.TUTORIAL.getName(), keyboard);
         tutorialManager = new TutorialManager();
         infoPanel.add(tutorialManager.getComponent());
         infoPane.setText(tutorialManager.getText());
@@ -245,6 +249,7 @@ public class ExperimentController extends GraphicsController {
         runningTutorial = false;
         infoPanel.remove(tutorialManager.getComponent());
         tutorialManager = null;
+        playbackManager = null;
         ranTutorial = true;
         enableUI();
     }
@@ -423,7 +428,7 @@ public class ExperimentController extends GraphicsController {
             if(tutorialManager.hasNext() && tutorialManager.isValid()) {
                 infoPane.setText(tutorialManager.getText());
             } else if(!tutorialManager.isValid()) {
-                keyboard.finishPlayback();
+                keyboard.finishPlayback(playbackManager);
                 finishTutorial();
             }
         } else if(runningPractice && !wordManager.isValid()) {

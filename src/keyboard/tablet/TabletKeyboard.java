@@ -26,10 +26,11 @@ import enums.FileName;
 import enums.FilePath;
 import enums.Key;
 import enums.Renderable;
-import experiment.DataManager;
-import experiment.TabletDataObserver;
-import experiment.TabletPlaybackObserver;
 import experiment.WordManager;
+import experiment.data.DataManager;
+import experiment.data.TabletDataObserver;
+import experiment.playback.PlaybackManager;
+import experiment.playback.TabletPlaybackObserver;
 
 public class TabletKeyboard extends IKeyboard implements TabletPlaybackObserver {
     public static final int KEYBOARD_ID = 4;
@@ -153,7 +154,7 @@ public class TabletKeyboard extends IKeyboard implements TabletPlaybackObserver 
     }
     
     @Override
-    public void beginPlayback(boolean repeat) {
+    public void beginPlayback(PlaybackManager playbackManager) {
         TABLET_LOCK.lock();
         try {
             // TODO: read from data reader
@@ -173,7 +174,7 @@ public class TabletKeyboard extends IKeyboard implements TabletPlaybackObserver 
 	}
     
     @Override
-    public void finishPlayback() {
+    public void finishPlayback(PlaybackManager playbackManager) {
         TABLET_LOCK.lock();
         try {
             // TODO: remove from data reader

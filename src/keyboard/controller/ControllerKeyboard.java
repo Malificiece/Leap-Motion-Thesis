@@ -29,9 +29,10 @@ import enums.FilePath;
 import enums.Gesture;
 import enums.Key;
 import enums.Renderable;
-import experiment.ControllerDataObserver;
-import experiment.ControllerPlaybackObserver;
-import experiment.DataManager;
+import experiment.data.ControllerDataObserver;
+import experiment.data.DataManager;
+import experiment.playback.ControllerPlaybackObserver;
+import experiment.playback.PlaybackManager;
 
 public class ControllerKeyboard extends IKeyboard implements ControllerPlaybackObserver {
     public static final int KEYBOARD_ID = 3;
@@ -257,7 +258,7 @@ public class ControllerKeyboard extends IKeyboard implements ControllerPlaybackO
     }
     
     @Override
-    public void beginPlayback(boolean repeat) {
+    public void beginPlayback(PlaybackManager playbackManager) {
         CONTROLLER_LOCK.lock();
         try {
             // TODO: read from data reader
@@ -278,7 +279,7 @@ public class ControllerKeyboard extends IKeyboard implements ControllerPlaybackO
 	}
     
     @Override
-    public void finishPlayback() {
+    public void finishPlayback(PlaybackManager playbackManager) {
         CONTROLLER_LOCK.lock();
         try {
             // TODO: remove from data reader

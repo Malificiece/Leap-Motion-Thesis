@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.nio.file.FileSystems;
@@ -25,6 +26,7 @@ import keyboard.KeyboardSetting;
 import keyboard.KeyboardSettings;
 
 public class FileUtilities {
+    public static final String WILDCARD = "*";
     
     public FileUtilities() {
         File file;
@@ -190,13 +192,33 @@ public class FileUtilities {
         return file;
     }
     
+    // Attempt to open wildcard file, do nothing if it doesn't exist
+    private File openWildcardFile(String filePath, String fileName) throws IOException {
+        // Attempt to open directory, create it if it doesn't exist
+        File directory = createDirectory(filePath);
+        for(File file: directory.listFiles(new FilenameFilter() {
+            @Override
+            public boolean accept(File dir, String name) {
+                String[] parts = fileName.split("\\" + WILDCARD);
+                return name.contains(parts[0]) && name.endsWith(FileExt.DAT.getExt());
+            }
+        })) {
+            // Currently we return the first match, but later I might need to get the most recent or specific selection.
+            return file;
+        }
+        return null;
+    }
+    
     // Attempt to open directory, create it if it doesn't exist
-    private void createDirectory(String filePath) {
+    private File createDirectory(String filePath) {
         //Create data folder if it doesn't already exist.
         Path path = FileSystems.getDefault().getPath(filePath);
         if(!Files.exists(path)) {
             File file = path.toFile();
             file.mkdirs();
+            return file;
+        } else {
+            return path.toFile();
         }
     }
     
@@ -330,6 +352,17 @@ public class FileUtilities {
     public ArrayList<String> readListFromFile(String filePath, String fileName) throws IOException {
         // Attempt to open file, create it if it doesn't exist.
         File file = createFile(filePath, fileName);
+        
+        // Read in all stored data from file into an array.
+        ArrayList<String> dataList = new ArrayList<String>();
+        storeDataAsList(dataList, file);
+        
+        return dataList;
+    }
+    
+    public ArrayList<String> readListFromWildcardFile(String filePath, String wildcardFileName) throws IOException {
+        // Attempt to open the wildcard file. Create directory if it doesn't exist
+        File file = openWildcardFile(filePath, wildcardFileName);
         
         // Read in all stored data from file into an array.
         ArrayList<String> dataList = new ArrayList<String>();
