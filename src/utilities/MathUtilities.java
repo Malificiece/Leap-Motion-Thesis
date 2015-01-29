@@ -23,7 +23,7 @@ public class MathUtilities {
                 midpoint.setX(x/numVectors);
                 midpoint.setY(y/numVectors);
                 midpoint.setZ(z/numVectors);
-                return true; 
+                return true;
             }
         }
         return false;

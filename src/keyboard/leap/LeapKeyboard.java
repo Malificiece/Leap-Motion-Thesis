@@ -124,7 +124,7 @@ public class LeapKeyboard extends IKeyboard implements LeapObserver, Calibration
         if(isPlayingBack()) {
             playbackManager.update();
             
-            boolean isTouching = leapPlane.isNormalizedTouching(leapPoint.getNormalizedPoint().getZ()); //<= 40; // FIGURE OUT APPROPRIATE THRESHOLD HERE
+            boolean isTouching = leapPoint.getNormalizedPoint().getZ() < 40f;//leapPlane.isNormalizedTouching(leapPoint.getNormalizedPoint().getZ()); //<= 40; // FIGURE OUT APPROPRIATE THRESHOLD HERE
             // Set tool point, scale it, rotate and position it.
             leapTool.update(leapPoint.getNormalizedPoint());
             
@@ -247,6 +247,7 @@ public class LeapKeyboard extends IKeyboard implements LeapObserver, Calibration
             // TODO: Change plane to plane used to create tutorial
             LeapListener.stopListening();
             LeapListener.removeObserver(this);
+        	leapPoint.setNormalizedPoint(Vector.zero());
             isPlayback = true;
             playbackManager.registerObserver(this);
             this.playbackManager = playbackManager;
