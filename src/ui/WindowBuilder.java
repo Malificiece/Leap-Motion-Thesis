@@ -238,11 +238,7 @@ public class WindowBuilder {
         rightPanelSet.add(panels[3]);
         
         infoPane.setEditable(false);
-        //infoPane.setLineWrap(true);
-        //infoPane.setWrapStyleWord(true);
         infoPane.setHighlighter(null);
-        //Font font = new Font(infoPane.getFont().getFamily(), Font.BOLD, 13);
-        //infoPane.setFont(font);
         infoPane.setBackground(UIManager.getColor("Panel.background"));
         panels[3].add(infoPane);
         

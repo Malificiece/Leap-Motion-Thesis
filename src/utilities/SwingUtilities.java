@@ -3,16 +3,16 @@ package utilities;
 import java.awt.Container;
 import java.awt.Font;
 
-import javax.swing.JLabel;
+import javax.swing.JComponent;
 
 public class SwingUtilities {
     private static final int OFFSET = 38;
     
-    public void calculateFontSize(String text, JLabel label, Container container) {
-        Font labelFont = label.getFont();
+    public void calculateFontSize(String text, JComponent component, Container container) {
+        Font labelFont = component.getFont();
         
         // Find out how the sizes of the old font.
-        int newStringWidth = label.getFontMetrics(labelFont).stringWidth(text);
+        int newStringWidth = component.getFontMetrics(labelFont).stringWidth(text);
         int componentWidth = container.getWidth() - OFFSET;
         
         // Find out how much the font can grow in width.
@@ -30,15 +30,15 @@ public class SwingUtilities {
         int fontSizeToUse = Math.min(newFontSize, componentHeight);
 
         // Set the label's font size to the newly determined size.
-        label.setFont(new Font(labelFont.getName(), Font.PLAIN, fontSizeToUse));
+        component.setFont(new Font(labelFont.getName(), Font.PLAIN, fontSizeToUse));
     }
     
-    public void calculateFontSize(String oldText, String newText, JLabel label, Container container) {
-        Font labelFont = label.getFont();
+    public void calculateFontSize(String oldText, String newText, JComponent component, Container container) {
+        Font labelFont = component.getFont();
         
         // Find out how the sizes of the old font.
-        int oldStringWidth = label.getFontMetrics(labelFont).stringWidth(oldText);
-        int newStringWidth = label.getFontMetrics(labelFont).stringWidth(newText);
+        int oldStringWidth = component.getFontMetrics(labelFont).stringWidth(oldText);
+        int newStringWidth = component.getFontMetrics(labelFont).stringWidth(newText);
         int componentWidth = container.getWidth() - OFFSET;
         
         // Find out how much the font can grow in width.
@@ -67,7 +67,7 @@ public class SwingUtilities {
         int fontSizeToUse = Math.min(chosenFontSize, componentHeight);
 
         // Set the label's font size to the newly determined size.
-        label.setFont(new Font(labelFont.getName(), Font.PLAIN, fontSizeToUse));
+        component.setFont(new Font(labelFont.getName(), Font.PLAIN, fontSizeToUse));
     }
     
     public String parseHTML(String htmlString) {
