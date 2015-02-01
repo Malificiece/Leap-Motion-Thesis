@@ -111,7 +111,9 @@ public class TabletKeyboard extends IKeyboard implements TabletPlaybackObserver 
                 } else {
                     keyPressed = key.getValue();   
                 }
-                notifyListenersKeyEvent();
+                if(!isPlayingBack()) {
+                    notifyListenersKeyEvent();
+                }
             } else if(!shiftOnce && !shiftTwice) {
                 shiftOnce = true;
                 keyboardRenderables.swapToUpperCaseKeyboard();
@@ -185,7 +187,8 @@ public class TabletKeyboard extends IKeyboard implements TabletPlaybackObserver 
     
 	@Override
 	public void pressedEventObserved(Key key) {
-	    // Might be able to ignore pressed events from file
+        keyPressed = key.getValue();
+        notifyListenersKeyEvent();
 	}
 	
     @Override

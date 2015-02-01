@@ -175,7 +175,9 @@ public class LeapKeyboard extends IKeyboard implements LeapObserver, Calibration
                     } else {
                         keyPressed = key.getValue();   
                     }
-                    notifyListenersKeyEvent();
+                    if(!isPlayingBack()) {
+                        notifyListenersKeyEvent();
+                    }
                 } else if(!shiftOnce && !shiftTwice) {
                     shiftOnce = true;
                     keyboardRenderables.swapToUpperCaseKeyboard();
@@ -258,7 +260,8 @@ public class LeapKeyboard extends IKeyboard implements LeapObserver, Calibration
     
 	@Override
 	public void pressedEventObserved(Key key) {
-		// Able to ignore pressed events on this one.
+        keyPressed = key.getValue();
+        notifyListenersKeyEvent();
 	}
 	
     @Override
