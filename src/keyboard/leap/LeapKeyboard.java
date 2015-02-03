@@ -3,6 +3,7 @@ package keyboard.leap;
 import swipe.SwipeKeyboard;
 import utilities.Point;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -67,9 +68,15 @@ public class LeapKeyboard extends IKeyboard implements LeapObserver, Calibration
         KEYBOARD_ID = air ? 2 : 1;
         KEYBOARD_NAME = air ? "Leap Air Keyboard" : "Leap Surface Keyboard";
         KEYBOARD_FILE_NAME = air ?  FileName.LEAP_AIR.getName() : FileName.LEAP_SURFACE.getName();
-        System.out.println(KEYBOARD_NAME + " - Loading Settings from " + FilePath.CONFIG.getPath() + KEYBOARD_FILE_NAME + FileExt.INI.getExt());
         keyboardAttributes = new LeapAttributes(this);
         keyboardSettings = new LeapSettings(this);
+        System.out.println(KEYBOARD_NAME + " - Loading Settings from " + FilePath.CONFIG.getPath() + KEYBOARD_FILE_NAME + FileExt.INI.getExt());
+        try {
+            MyUtilities.FILE_IO_UTILITIES.readSettingsAndAttributesFromFile(FilePath.CONFIG.getPath(), KEYBOARD_FILE_NAME + FileExt.INI.getExt(), this);
+        } catch (IOException e) {
+            System.out.println("Error occured while reading settings from file. Using default values on unreached settings.");
+            e.printStackTrace();
+        }
         System.out.println("-------------------------------------------------------");
         keyboardRenderables = new LeapRenderables(this, air);
         keyboardSize = keyboardAttributes.getAttributeAsPoint(Attribute.KEYBOARD_SIZE);
@@ -123,8 +130,7 @@ public class LeapKeyboard extends IKeyboard implements LeapObserver, Calibration
 
         if(isPlayingBack()) {
             playbackManager.update();
-            
-            boolean isTouching = leapPoint.getNormalizedPoint().getZ() < 40f;//leapPlane.isNormalizedTouching(leapPoint.getNormalizedPoint().getZ()); //<= 40; // FIGURE OUT APPROPRIATE THRESHOLD HERE
+            boolean isTouching = leapPlane.isNormalizedTouching(leapPoint.getNormalizedPoint().getZ()); //<= 40; // FIGURE OUT APPROPRIATE THRESHOLD HERE
             // Set tool point, scale it, rotate and position it.
             leapTool.update(leapPoint.getNormalizedPoint());
             
@@ -246,7 +252,14 @@ public class LeapKeyboard extends IKeyboard implements LeapObserver, Calibration
     public void beginPlayback(PlaybackManager playbackManager) {
         LEAP_LOCK.lock();
         try {
-            // TODO: Change plane to plane used to create tutorial
+            System.out.println(KEYBOARD_NAME + " - Loading playback settings from " + playbackManager.getFilePath() + KEYBOARD_FILE_NAME + FileExt.INI.getExt());
+            try {
+                MyUtilities.FILE_IO_UTILITIES.readSettingsAndAttributesFromFile(playbackManager.getFilePath(), KEYBOARD_FILE_NAME + FileExt.INI.getExt(), this);
+            } catch (IOException e) {
+                System.out.println("Error occured while reading settings from file. Using default values on unreached settings.");
+                e.printStackTrace();
+            }
+            System.out.println("-------------------------------------------------------");
             LeapListener.stopListening();
             LeapListener.removeObserver(this);
         	leapPoint.setNormalizedPoint(Vector.zero());
@@ -284,7 +297,14 @@ public class LeapKeyboard extends IKeyboard implements LeapObserver, Calibration
     public void finishPlayback(PlaybackManager playbackManager) {
         LEAP_LOCK.lock();
         try {
-            // TODO: Change plane back to plane used in calibration or from file
+            System.out.println(KEYBOARD_NAME + " - Loading default settings from " + FilePath.CONFIG.getPath() + KEYBOARD_FILE_NAME + FileExt.INI.getExt());
+            try {
+                MyUtilities.FILE_IO_UTILITIES.readSettingsAndAttributesFromFile(FilePath.CONFIG.getPath(), KEYBOARD_FILE_NAME + FileExt.INI.getExt(), this);
+            } catch (IOException e) {
+                System.out.println("Error occured while reading settings from file. Using default values on unreached settings.");
+                e.printStackTrace();
+            }
+            System.out.println("-------------------------------------------------------");
             playbackManager.removeObserver(this);
             isPlayback = false;
             this.playbackManager = null;

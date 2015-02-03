@@ -6,6 +6,7 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.EventQueue;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
@@ -13,6 +14,7 @@ import java.awt.event.WindowEvent;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+import java.util.concurrent.locks.ReentrantLock;
 
 import javax.media.opengl.GLAutoDrawable;
 import javax.media.opengl.awt.GLCanvas;
@@ -44,7 +46,8 @@ public class ExperimentController extends GraphicsController {
             + "<font><b>TUTORIAL:</b><br>A brief example to familiarize yourself with the keyboard.<br><br></font>"
             + "<font><b>PRACTICE:</b><br>A small sample of what you should expect from the experiment.<br><br></font>"
             + "<font><b>EXPERIMENT:</b><br>The actual experiment with recorded data.</font>";
-    public final String TUTORIAL = FileName.TUTORIAL.getName();
+    private final String TUTORIAL = FileName.TUTORIAL.getName();
+    private final ReentrantLock EXPERIMENT_LOCK = new ReentrantLock();
     private final int ONE_SECOND = 1000;
     private final int COUNTDOWN_TIME = 5;
     private final int PRACTICE_SIZE = 1;
@@ -153,8 +156,13 @@ public class ExperimentController extends GraphicsController {
         tutorialButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                beginTutorial();
-                keyboard.beginPlayback(playbackManager);
+                EXPERIMENT_LOCK.lock();
+                try {
+                    beginTutorial();
+                    keyboard.beginPlayback(playbackManager);
+                } finally {
+                    EXPERIMENT_LOCK.unlock();
+                }
                 frame.requestFocusInWindow();
             }
         });
@@ -162,10 +170,15 @@ public class ExperimentController extends GraphicsController {
         practiceButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                runningPractice = true;
-                wordManager.loadWords(PRACTICE_SIZE);
-                disableUI();
-                delayedStart();
+                EXPERIMENT_LOCK.lock();
+                try {
+                    runningPractice = true;
+                    wordManager.loadWords(PRACTICE_SIZE);
+                    disableUI();
+                    delayedStart();
+                } finally {
+                    EXPERIMENT_LOCK.unlock();
+                }
                 frame.requestFocusInWindow();
             }
         });
@@ -173,14 +186,19 @@ public class ExperimentController extends GraphicsController {
         experimentButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                runningExperiment = true;
-                if(TUTORIAL.equals(subjectID)) {
-                    wordManager.loadTutorialWords();
-                } else {
-                    wordManager.loadWords(EXPERIMENT_SIZE);
+                EXPERIMENT_LOCK.lock();
+                try {
+                    runningExperiment = true;
+                    if(TUTORIAL.equals(subjectID)) {
+                        wordManager.loadTutorialWords();
+                    } else {
+                        wordManager.loadWords(EXPERIMENT_SIZE);
+                    }
+                    disableUI();
+                    delayedStart();
+                } finally {
+                    EXPERIMENT_LOCK.unlock();
                 }
-                disableUI();
-                delayedStart();
                 frame.requestFocusInWindow();
             }
         });
@@ -190,8 +208,13 @@ public class ExperimentController extends GraphicsController {
         // the window is asked to close
         frame.addWindowListener(new WindowAdapter() {
             public void windowClosing(WindowEvent e) {
-                if(!runningCalibration && !runningTutorial && !runningPractice && !runningExperiment) {
-                    disable();
+                EXPERIMENT_LOCK.lock();
+                try {
+                    if(!runningCalibration && !runningTutorial && !runningPractice && !runningExperiment) {
+                        disable();
+                    }
+                } finally {
+                    EXPERIMENT_LOCK.unlock();
                 }
             }
         });
@@ -275,7 +298,6 @@ public class ExperimentController extends GraphicsController {
     }
     
     private void beginPractice() {
-        System.out.println("IN BEGIN PRACTICE");
         delayedStart = null;
         enableUI();
         splitPane.setRightComponent(null);
@@ -294,7 +316,6 @@ public class ExperimentController extends GraphicsController {
     }
     
     private void beginExperiment() {
-        System.out.println("IN BEGIN EXPERIMENT");
         delayedStart = null;
         String timeStarted = "_";
         timeStarted += LocalDate.now().format(DateTimeFormatter.BASIC_ISO_DATE);
@@ -314,7 +335,7 @@ public class ExperimentController extends GraphicsController {
         runningExperiment = false;
         splitPane.setRightComponent(rightComponent);
         dataManager.stopRecording();
-        dataManager.save();
+        dataManager.save(keyboard);
         dataManager = null;
         wordManager.setDefault();
         enableUI();
@@ -335,8 +356,6 @@ public class ExperimentController extends GraphicsController {
         practiceButton.setEnabled(false);
         experimentButton.setEnabled(false);
         settingsPanel.setEnabled(false);
-        frame.revalidate();
-        frame.repaint();
         frame.pack();
     }
     
@@ -358,8 +377,6 @@ public class ExperimentController extends GraphicsController {
         ((HTMLDocument)infoPane.getDocument()).getStyleSheet().addRule("body { font-size: 15pt; }");
         infoPane.setText(DEFAULT_INFO);
         settingsPanel.setEnabled(true);
-        frame.revalidate();
-        frame.repaint();
         frame.pack();
     }
     
@@ -438,32 +455,38 @@ public class ExperimentController extends GraphicsController {
         frame.revalidate();
         frame.repaint();
         frame.pack();
+        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+        Dimension windowSize = frame.getSize();
+        frame.setLocation((int)(screenSize.getWidth()/2 - windowSize.getWidth()/2),
+                          (int)(screenSize.getHeight()/2 - windowSize.getHeight()/2));
     }
     
     public void update() {
-        // TODO: Implement a better listener. Send an object that has all the info we need
-        // timestamp, current goal, letter pressed, leap position etc
-        // these listener updates need to be managed as to not cause further delay in the system.
         keyboard.update();
         
-        if(runningTutorial && tutorialManager != null) {
-            if(tutorialManager.isValid() && wordManager.isDefault()) {
-                wordManager.loadTutorialWords();
-                wordManager.paintLetters(wordLabel, answerLabel);
-                MyUtilities.JAVA_SWING_UTILITIES.calculateFontSize(wordManager.currentWord(), wordLabel, wordPanel);
-                MyUtilities.JAVA_SWING_UTILITIES.calculateFontSize(wordManager.getAnswer(), answerLabel, answerPanel);
+        EXPERIMENT_LOCK.lock();
+        try {
+            if(runningTutorial) {
+                if(tutorialManager.isValid() && wordManager.isDefault()) {
+                    wordManager.loadTutorialWords();
+                    wordManager.paintLetters(wordLabel, answerLabel);
+                    MyUtilities.JAVA_SWING_UTILITIES.calculateFontSize(wordManager.currentWord(), wordLabel, wordPanel);
+                    MyUtilities.JAVA_SWING_UTILITIES.calculateFontSize(wordManager.getAnswer(), answerLabel, answerPanel);
+                }
+                if(tutorialManager.hasNext() && tutorialManager.isValid()) {
+                    infoPane.setText(tutorialManager.getText());
+                } else if(!tutorialManager.isValid()) {
+                    keyboard.finishPlayback(playbackManager);
+                    finishTutorial();
+                }
+            } else if(runningPractice && !wordManager.isValid() && delayedStart == null) {
+                finishPractice();
+            } else if(runningExperiment && !wordManager.isValid() && delayedStart == null) {
+                keyboard.finishExperiment(dataManager);
+                finishExperiment();
             }
-            if(tutorialManager.hasNext() && tutorialManager.isValid()) {
-                infoPane.setText(tutorialManager.getText());
-            } else if(!tutorialManager.isValid()) {
-                keyboard.finishPlayback(playbackManager);
-                finishTutorial();
-            }
-        } else if(runningPractice && !wordManager.isValid() && delayedStart == null) {
-            finishPractice();
-        } else if(runningExperiment && !wordManager.isValid() && delayedStart == null) {
-            keyboard.finishExperiment(dataManager);
-            finishExperiment();
+        } finally {
+            EXPERIMENT_LOCK.unlock();
         }
         
         if(isFading) {
@@ -503,9 +526,8 @@ public class ExperimentController extends GraphicsController {
             }
             if(key == '\b') {
                 if(0 < wordManager.getAnswer().length()) {
-                    String oldAnswer = wordManager.getAnswer();
                     wordManager.setAnswer(wordManager.getAnswer().substring(0, wordManager.getAnswer().length()-1));
-                    MyUtilities.JAVA_SWING_UTILITIES.calculateFontSize(oldAnswer, wordManager.getAnswer(), answerLabel, answerPanel);
+                    MyUtilities.JAVA_SWING_UTILITIES.calculateFontSize(wordManager.getAnswer(), answerLabel, answerPanel);
                 }
                 if(wordManager.isMatch()) {
                     currentColor = LIGHT_GREEN;
@@ -544,9 +566,8 @@ public class ExperimentController extends GraphicsController {
                     answerPanel.setBackground(Color.RED);
                 }
             } else {
-                String oldAnswer = wordManager.getAnswer();
                 wordManager.setAnswer(wordManager.getAnswer()+Character.toString(key));
-                MyUtilities.JAVA_SWING_UTILITIES.calculateFontSize(oldAnswer, wordManager.getAnswer(), answerLabel, answerPanel);
+                MyUtilities.JAVA_SWING_UTILITIES.calculateFontSize(wordManager.getAnswer(), answerLabel, answerPanel);
                 if(wordManager.isMatch()) {
                     currentColor = LIGHT_GREEN;
                     wordPanel.setBackground(currentColor);
@@ -576,21 +597,23 @@ public class ExperimentController extends GraphicsController {
     
     private class CountDownListener implements ActionListener {
         private int countDown = COUNTDOWN_TIME;
-        
-        public CountDownListener() {
-            System.out.println("Created Counter");
-        }
-        
         public void actionPerformed(ActionEvent e){
             countDown--;
             infoPane.setText("<center><b>" + countDown + "</b></center>");
             if(countDown == 0) {
-                delayedStart.stop();
-                if(runningPractice) {
-                    beginPractice();
-                } else if(runningExperiment) {
-                    beginExperiment();
-                    keyboard.beginExperiment(dataManager);
+                EXPERIMENT_LOCK.lock();
+                try {
+                    delayedStart.stop();
+                    if(runningPractice) {
+                        beginPractice();
+                    } else if(runningExperiment) {
+                        beginExperiment();
+                        keyboard.beginExperiment(dataManager);
+                    } else {
+                        System.err.println("Something went wrong with the counter.");
+                    }
+                } finally {
+                    EXPERIMENT_LOCK.unlock();
                 }
             }
         }

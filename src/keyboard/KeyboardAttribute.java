@@ -4,18 +4,13 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import utilities.Point;
-import java.io.IOException;
 
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-import utilities.MyUtilities;
-
 import com.leapmotion.leap.Vector;
 
 import enums.Attribute;
-import enums.FileExt;
-import enums.FilePath;
 
 public class KeyboardAttribute {
     private Attribute attribute;
@@ -25,13 +20,14 @@ public class KeyboardAttribute {
     
     public KeyboardAttribute(IKeyboard keyboard, Attribute attribute, Object defaultValue) {
         this.attribute = attribute;
-        try {
+        /*try {
             this.value = MyUtilities.FILE_IO_UTILITIES.readAttributeFromFile(FilePath.CONFIG.getPath(),
                     keyboard.getFileName() + FileExt.INI.getExt(), attribute.name(), defaultValue);
         } catch(IOException e) {
             System.err.println("Error occured while trying to read "  + attribute + " from file. Using default value.");
             this.value = defaultValue;
-        }
+        }*/
+        value = defaultValue;
         createAttributePanel();
     }
 
@@ -79,10 +75,9 @@ public class KeyboardAttribute {
         return null;
     }
     
-    // Special function used when we're calibrating the leap.
-    public void setVectorValue(Vector vector) {
-        if(vector != null) {
-            value = vector;
+    public void setValue(Object value) {
+        if(value != null) {
+            this.value = value;
             valueLabel.setText(value.toString());
         }
     }

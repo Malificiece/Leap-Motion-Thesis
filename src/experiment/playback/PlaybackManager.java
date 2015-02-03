@@ -22,6 +22,7 @@ public class PlaybackManager {
     private static final String TUTORIAL = FileName.TUTORIAL.getName();
     private static final long NANO_SECOND = 1000000000;
     private final boolean isTutorial;
+    private final String FILE_PATH;
 	private ArrayList<PlaybackObserver> observers = new ArrayList<PlaybackObserver>();
 	private boolean isRepeating = false;
 	private ArrayList<PlaybackData> playbackData = new ArrayList<PlaybackData>();
@@ -31,21 +32,13 @@ public class PlaybackManager {
 	private long elapsedTime = 0;
 	private long previousTime;
 	
-	// TODO:
-	// 1) Need to open and read file based on subject ID or 'tutorial'
-	// 2) Scan through contents and determine start time
-	// 3) Use a timer to know when to throw events
-	// 4) Use observer pattern to update keyboard contents
-	// 5) If repeat is enabled, loop playback until shutdown.
-	// 6) If repeat is disabled, play once
-	
 	public PlaybackManager(boolean repeat, String subjectID, IKeyboard keyboard) {
 	    isTutorial = TUTORIAL.equals(subjectID);
 		isRepeating = repeat;
-		String filePath = FilePath.DATA.getPath() + subjectID + "/";;
+		FILE_PATH = FilePath.DATA.getPath() + subjectID + "/";
 		String wildcardFileName = subjectID + "_" + keyboard.getFileName() + FileUtilities.WILDCARD + FileExt.DAT.getExt();
 		try {
-            ArrayList<String> fileData = MyUtilities.FILE_IO_UTILITIES.readListFromWildcardFile(filePath, wildcardFileName);
+            ArrayList<String> fileData = MyUtilities.FILE_IO_UTILITIES.readListFromWildcardFile(FILE_PATH, wildcardFileName);
             parseFileData(fileData);
         } catch (IOException e) {
             System.out.println("Failed to open up data file for playback.");
@@ -53,6 +46,10 @@ public class PlaybackManager {
         }
 		previousTime = System.nanoTime();
 		elapsedTime = startTime - NANO_SECOND;
+	}
+	
+	public String getFilePath() {
+	    return FILE_PATH;
 	}
 
     public void update() {

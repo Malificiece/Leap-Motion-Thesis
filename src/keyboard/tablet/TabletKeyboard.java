@@ -3,6 +3,7 @@ package keyboard.tablet;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -50,9 +51,15 @@ public class TabletKeyboard extends IKeyboard implements TabletPlaybackObserver 
     
     public TabletKeyboard() {
         super(KEYBOARD_ID, KEYBOARD_NAME, KEYBOARD_FILE_NAME);
-        System.out.println(KEYBOARD_NAME + " - Loading Settings from " + FilePath.CONFIG.getPath() + KEYBOARD_FILE_NAME + FileExt.INI.getExt());
         keyboardAttributes = new TabletAttributes(this);
         keyboardSettings = new TabletSettings(this);
+        System.out.println(KEYBOARD_NAME + " - Loading Settings from " + FilePath.CONFIG.getPath() + KEYBOARD_FILE_NAME + FileExt.INI.getExt());
+        try {
+            MyUtilities.FILE_IO_UTILITIES.readSettingsAndAttributesFromFile(FilePath.CONFIG.getPath(), KEYBOARD_FILE_NAME + FileExt.INI.getExt(), this);
+        } catch (IOException e) {
+            System.out.println("Error occured while reading settings from file. Using default values on unreached settings.");
+            e.printStackTrace();
+        }
         System.out.println("-------------------------------------------------------");
         keyboardRenderables = new TabletRenderables(this);
         keyboardSize = keyboardAttributes.getAttributeAsPoint(Attribute.KEYBOARD_SIZE);

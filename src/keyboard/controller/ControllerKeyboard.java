@@ -1,5 +1,6 @@
 package keyboard.controller;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -59,9 +60,15 @@ public class ControllerKeyboard extends IKeyboard implements ControllerPlaybackO
     
     public ControllerKeyboard() {
         super(KEYBOARD_ID, KEYBOARD_NAME, KEYBOARD_FILE_NAME);
-        System.out.println(KEYBOARD_NAME + " - Loading Settings from " + FilePath.CONFIG.getPath() + KEYBOARD_FILE_NAME + FileExt.INI.getExt());
         keyboardAttributes = new ControllerAttributes(this);
         keyboardSettings = new ControllerSettings(this);
+        System.out.println(KEYBOARD_NAME + " - Loading Settings from " + FilePath.CONFIG.getPath() + KEYBOARD_FILE_NAME + FileExt.INI.getExt());
+        try {
+            MyUtilities.FILE_IO_UTILITIES.readSettingsAndAttributesFromFile(FilePath.CONFIG.getPath(), KEYBOARD_FILE_NAME + FileExt.INI.getExt(), this);
+        } catch (IOException e) {
+            System.out.println("Error occured while reading settings from file. Using default values on unreached settings.");
+            e.printStackTrace();
+        }
         System.out.println("-------------------------------------------------------");
         keyboardRenderables = new ControllerRenderables(this);
         CAMERA_DISTANCE = keyboardAttributes.getAttributeAsFloat(Attribute.CAMERA_DISTANCE);

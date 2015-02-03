@@ -6,68 +6,50 @@ import java.awt.Font;
 import javax.swing.JComponent;
 
 public class SwingUtilities {
-    private static final int OFFSET = 38;
-    
+    private final int OFFSET = 38;
+
     public void calculateFontSize(String text, JComponent component, Container container) {
-        Font labelFont = component.getFont();
+        Font font = component.getFont();
         
         // Find out how the sizes of the old font.
-        int newStringWidth = component.getFontMetrics(labelFont).stringWidth(text);
+        int stringWidth = component.getFontMetrics(font).stringWidth(text);
         int componentWidth = container.getWidth() - OFFSET;
         
-        // Find out how much the font can grow in width.
-        double widthRatio = (double) componentWidth / (double) newStringWidth;
-
-        // Different font sizes to consider
-        int newFontSize = (int) ((labelFont.getSize() * widthRatio));
-        int componentHeight = container.getHeight() - OFFSET;
-        
-        if(newFontSize == 0) {
-            newFontSize = 1;
-        }
-
-        // Pick a new font size so it will not be larger than the height of label.
-        int fontSizeToUse = Math.min(newFontSize, componentHeight);
-
-        // Set the label's font size to the newly determined size.
-        component.setFont(new Font(labelFont.getName(), Font.PLAIN, fontSizeToUse));
-    }
+        if(stringWidth > 0) {
+            // Find out how much the font can grow in width.
+            double widthRatio = (double) componentWidth / (double) stringWidth;
     
-    public void calculateFontSize(String oldText, String newText, JComponent component, Container container) {
-        Font labelFont = component.getFont();
-        
-        // Find out how the sizes of the old font.
-        int oldStringWidth = component.getFontMetrics(labelFont).stringWidth(oldText);
-        int newStringWidth = component.getFontMetrics(labelFont).stringWidth(newText);
-        int componentWidth = container.getWidth() - OFFSET;
-        
-        // Find out how much the font can grow in width.
-        double newWidthRatio = (double) componentWidth / (double) newStringWidth;
-
-        // Different font sizes to consider
-        int oldFontSize = labelFont.getSize();
-        int newFontSize = (int) (labelFont.getSize() * newWidthRatio);
-        int componentHeight = container.getHeight() - OFFSET;
-        
-        if(newFontSize == 0) {
-            newFontSize = 1;
-        }
-
-        // Pick a new font size so it will not be larger than the height of label.
-        int chosenFontSize;
-        if(oldStringWidth < newStringWidth) {
-            chosenFontSize = Math.min(oldFontSize, newFontSize);
-        } else {
-            if(componentWidth > newStringWidth) {
-                chosenFontSize = newFontSize;
-            } else {
-                chosenFontSize = oldFontSize;
+            // Different font sizes to consider
+            int newFontSize = (int) ((font.getSize() * widthRatio));
+            Font tmpFont = new Font(font.getName(), Font.PLAIN, newFontSize);
+            stringWidth = component.getFontMetrics(tmpFont).stringWidth(text);
+            if(stringWidth < componentWidth) {
+                do {
+                    tmpFont = new Font(font.getName(), Font.PLAIN, ++newFontSize);
+                    stringWidth = component.getFontMetrics(tmpFont).stringWidth(text);
+                } while(stringWidth < componentWidth);
+                if(stringWidth > componentWidth) {
+                    newFontSize--;
+                }
+            } else if(stringWidth > componentWidth) {
+                do {
+                    tmpFont = new Font(font.getName(), Font.PLAIN, --newFontSize);
+                    stringWidth = component.getFontMetrics(tmpFont).stringWidth(text);
+                } while(stringWidth > componentWidth);
             }
+            
+            int componentHeight = container.getHeight() - OFFSET;
+            
+            if(newFontSize == 0) {
+                newFontSize = 1;
+            }
+    
+            // Pick a new font size so it will not be larger than the height of label.
+            int fontSizeToUse = Math.min(newFontSize, componentHeight);
+    
+            // Set the label's font size to the newly determined size.
+            component.setFont(new Font(font.getName(), Font.PLAIN, fontSizeToUse));
         }
-        int fontSizeToUse = Math.min(chosenFontSize, componentHeight);
-
-        // Set the label's font size to the newly determined size.
-        component.setFont(new Font(labelFont.getName(), Font.PLAIN, fontSizeToUse));
     }
     
     public String parseHTML(String htmlString) {

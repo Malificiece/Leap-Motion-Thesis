@@ -23,7 +23,8 @@ public class TutorialManager {
             + "<font size=+1>Press the <b>NEXT</b> button below to continue.</font>",
             "<font size=+1>Please, take a moment to observe the example on the left and feel free to ask questions if you have any.<br><br></font>"
             + "<font size=+1>Press the <b>DONE</b> button below to continue.</font>"};
-    private final ReentrantLock tutorialLock = new ReentrantLock();
+    // TODO: add specific instructions for each type of keyboard so that we can further tell them what to do.
+    private final ReentrantLock TUTORIAL_LOCK = new ReentrantLock();
     private int step = 0;
     private boolean hasNext = false;
     private JButton stepButton;
@@ -33,7 +34,7 @@ public class TutorialManager {
         stepButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                tutorialLock.lock();
+                TUTORIAL_LOCK.lock();
                 try {
                     step++;
                     hasNext = true;
@@ -45,38 +46,38 @@ public class TutorialManager {
                         rootPane.requestFocusInWindow();
                     }
                 } finally {
-                    tutorialLock.unlock();
+                    TUTORIAL_LOCK.unlock();
                 }
             }
         });
     }
     
     public boolean hasNext() {
-        tutorialLock.lock();
+        TUTORIAL_LOCK.lock();
         try {
             return hasNext;
         } finally {
             // Consume next event
             hasNext = false;
-            tutorialLock.unlock();
+            TUTORIAL_LOCK.unlock();
         }
     }
     
     public boolean isValid() {
-        tutorialLock.lock();
+        TUTORIAL_LOCK.lock();
         try {
             return step < INSTRUCTIONS.length;
         } finally {
-            tutorialLock.unlock();
+            TUTORIAL_LOCK.unlock();
         }
     }
 
     public String getText() {
-        tutorialLock.lock();
+        TUTORIAL_LOCK.lock();
         try {
             return INSTRUCTIONS[step];
         } finally {
-            tutorialLock.unlock();
+            TUTORIAL_LOCK.unlock();
         }
     }
 

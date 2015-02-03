@@ -11,6 +11,7 @@ import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Random;
 import java.util.TreeMap;
 
@@ -33,15 +34,6 @@ public class FileUtilities {
         Path path;
         //Create data folder if it doesn't already exist.
         createDirectory(FilePath.DATA.getPath());
-
-        // Create subject_ID_list.
-        path = FileSystems.getDefault().getPath(FilePath.DATA.getPath(), FileName.SUBJECT_ID_LIST.getName() + FileExt.FILE.getExt());
-        if(!Files.exists(path)) {
-            file = path.toFile();
-            try {
-                file.createNewFile();
-            } catch (IOException e) {e.printStackTrace();}
-        }
         
         //Create docs folder if it doesn't already exist.
         createDirectory(FilePath.DOCS.getPath());
@@ -222,9 +214,16 @@ public class FileUtilities {
         }
     }
     
+    // Check if directory exists. Don't worry about creation.
+    public boolean checkDirectoryExists(String filePath) {
+        //Create data folder if it doesn't already exist.
+        Path path = FileSystems.getDefault().getPath(filePath);
+        return Files.exists(path);
+    }
+    
     // SETTINGS READ AND WRITE
     public double readSettingFromFile(String filePath, String fileName, String settingName, double defaultValue) throws IOException {
-        // Store default value so we know what class the original is.
+        // Store default value so we know what the original is.
         Double value = defaultValue;
         
         // Attempt to open file, create it if it doesn't exist.
@@ -235,6 +234,20 @@ public class FileUtilities {
             return value;
         } else {
             return defaultValue;
+        }
+    }
+    
+    public void readSettingsFromFile(String filePath, String fileName, KeyboardSettings keyboardSettings) throws IOException {
+        // Attempt to open file, create it if it doesn't exist.
+        File file = createFile(filePath, fileName);
+        
+        // Go through each setting and attempt to read it from file.
+        for(KeyboardSetting keyboardSetting: keyboardSettings.getAllSettings()) {
+            // Store default value so we know what the original is.
+            Double value = keyboardSetting.getValue();
+            if((value = (Double) readValueFromFile(file, keyboardSetting.getType().name(), value)) != null) {
+                keyboardSetting.setValue(value);
+            }
         }
     }
     
@@ -287,6 +300,20 @@ public class FileUtilities {
         }
     }
     
+    public void readAttributesFromFile(String filePath, String fileName, KeyboardAttributes keyboardAttributes) throws IOException {
+        // Attempt to open file, create it if it doesn't exist.
+        File file = createFile(filePath, fileName);
+        
+        // Go through each attribute and attempt to read it from file.
+        for(KeyboardAttribute keyboardAttribute: keyboardAttributes.getAllAttributes()) {
+            // Store default value so we know what the original is.
+            Object value = keyboardAttribute.getValue();
+            if((value = readValueFromFile(file, keyboardAttribute.getType().name(), value)) != null) {
+                keyboardAttribute.setValue(value);
+            }
+        }
+    }
+    
     public void writeAttributeToFile(String filePath, String fileName, KeyboardAttribute keyboardAttribute) throws IOException {
         if(keyboardAttribute.isWriteable()) {
             // Attempt to open file, create it if it doesn't exist.
@@ -325,6 +352,29 @@ public class FileUtilities {
     }
     
     // BOTH ATTRIBUTES AND SETTINGS
+    public void readSettingsAndAttributesFromFile(String filePath, String fileName, IKeyboard keyboard) throws IOException {
+        // Attempt to open file, create it if it doesn't exist.
+        File file = createFile(filePath, fileName);
+        
+        // Go through each attribute and attempt to read it from file.
+        for(KeyboardAttribute keyboardAttribute: keyboard.getAttributes().getAllAttributes()) {
+            // Store default value so we know what the original is.
+            Object value = keyboardAttribute.getValue();
+            if((value = readValueFromFile(file, keyboardAttribute.getType().name(), value)) != null) {
+                keyboardAttribute.setValue(value);
+            }
+        }
+        
+        // Go through each setting and attempt to read it from file.
+        for(KeyboardSetting keyboardSetting: keyboard.getSettings().getAllSettings()) {
+            // Store default value so we know what the original is.
+            Double value = keyboardSetting.getValue();
+            if((value = (Double) readValueFromFile(file, keyboardSetting.getType().name(), value)) != null) {
+                keyboardSetting.setValue(value);
+            }
+        }
+    }
+    
     public void writeSettingsAndAttributesToFile(String filePath, String fileName, IKeyboard keyboard) throws IOException {
         // Attempt to open file, create it if it doesn't exist.
         File file = createFile(filePath, fileName);
@@ -369,6 +419,35 @@ public class FileUtilities {
         storeDataAsList(dataList, file);
         
         return dataList;
+    }
+    
+    public boolean checkWildcardFileExists(String filePath, String wildcardFileName) throws IOException {
+        // Check if base directory exists.
+        if(checkDirectoryExists(filePath)) {
+            // Attempt to open a file that matches.
+            File file = openWildcardFile(filePath, wildcardFileName);
+            if(file != null) {
+                // We found a file that matches wildcard name.
+                return true;
+            }
+        }
+        return false;
+    }
+    
+    public ArrayList<String> getListOfDirectories(String filePath) throws IOException {
+        // Attempt to open directory, create it if it doesn't exist.
+        File directory = createDirectory(filePath);
+        
+        // Filter directory to retrieve all sub-directories.
+        String[] subDirectories = directory.list(new FilenameFilter() {
+            @Override
+            public boolean accept(File dir, String name) {
+              return new File(dir, name).isDirectory();
+            }
+          });
+        
+        // Return the list of directories as names.
+        return new ArrayList<String>(Arrays.asList(subDirectories));
     }
 
     public ArrayList<String> reservoirSampling(int reservoirSize, int dictionarySize, String filePath, String fileName) throws IOException {

@@ -13,10 +13,9 @@ import enums.FileExt;
 import enums.FilePath;
 import experiment.data.DataManager;
 import experiment.playback.PlaybackManager;
-import ui.SaveSettingsObserver;
 import utilities.MyUtilities;
 
-public abstract class IKeyboard implements SaveSettingsObserver {
+public abstract class IKeyboard {
     private int keyboardID;
     private String keyboardName;
     private String filePath;
@@ -119,17 +118,27 @@ public abstract class IKeyboard implements SaveSettingsObserver {
         }
     }
     
-    public void saveSettingsEventObserved(IKeyboard keyboard) {
+    public void saveSettings() {
         // Save all settings and attributes to file (stored for next time program launched)
-        if(keyboardID == keyboard.getID()) {
-            System.out.println(keyboardName + " - Saving Settings to " + FilePath.CONFIG.getPath() + fileName + FileExt.INI.getExt());
-            try {
-                MyUtilities.FILE_IO_UTILITIES.writeSettingsAndAttributesToFile(FilePath.CONFIG.getPath(), fileName + FileExt.INI.getExt(), this);
-                System.out.println("Save Success");
-            } catch (IOException e) {
-                System.out.println("Save Failed");
-                e.printStackTrace();
-            }
+        System.out.println(keyboardName + " - Saving Settings to " + FilePath.CONFIG.getPath() + fileName + FileExt.INI.getExt());
+        try {
+            MyUtilities.FILE_IO_UTILITIES.writeSettingsAndAttributesToFile(FilePath.CONFIG.getPath(), fileName + FileExt.INI.getExt(), this);
+            System.out.println("Save Success");
+        } catch (IOException e) {
+            System.out.println("Save Failed");
+            e.printStackTrace();
+        }
+    }
+    
+    public void saveSettings(String filePath) {
+        // Save all settings and attributes to file (stored for next time program launched)
+        System.out.println(keyboardName + " - Saving Settings to " + filePath + fileName + FileExt.INI.getExt());
+        try {
+            MyUtilities.FILE_IO_UTILITIES.writeSettingsAndAttributesToFile(filePath, fileName + FileExt.INI.getExt(), this);
+            System.out.println("Save Success");
+        } catch (IOException e) {
+            System.out.println("Save Failed");
+            e.printStackTrace();
         }
     }
 }

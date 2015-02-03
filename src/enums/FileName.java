@@ -9,7 +9,6 @@ public enum FileName {
     KEYBOARD_IMAGE("_keyboard"),
     KEYBOARD_IMAGE_UPPER("_keyboard_upper"),
     DICTIONARY("English-US"),
-    SUBJECT_ID_LIST("subject_ID_list"),
     TUTORIAL("tutorial");
 
     private final String name;

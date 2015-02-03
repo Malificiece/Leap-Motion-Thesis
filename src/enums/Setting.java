@@ -23,7 +23,7 @@ public enum Setting {
         return minimumValue;
     }
     
-    public double getDef() {
+    public double getDefault() {
         return defaultValue;
     }
     

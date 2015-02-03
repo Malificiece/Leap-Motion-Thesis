@@ -24,12 +24,12 @@ public class LeapListener extends Listener /*implements SaveSettingsObserver*/ {
     }
     
     public void onInit(Controller controller) {
-        System.out.println("Initialized");
+        System.out.println("Leap - Initialized");
         notifyListenersInteractionBoxUpdate(controller.frame().interactionBox());
     }
 
     public void onConnect(Controller controller) {
-        System.out.println("Connected");
+        System.out.println("Leap - Connected");
         // Gestures do not work with tools.
         // controller.enableGesture(Gesture.Type.TYPE_SWIPE);
         // controller.enableGesture(Gesture.Type.TYPE_CIRCLE);
@@ -37,11 +37,11 @@ public class LeapListener extends Listener /*implements SaveSettingsObserver*/ {
 
     public void onDisconnect(Controller controller) {
         //Note: not dispatched when running in a debugger.
-        System.out.println("Disconnected");
+        System.out.println("Leap - Disconnected");
     }
 
     public void onExit(Controller controller) {
-        System.out.println("Exited");
+        System.out.println("Leap - Exited");
     }
 
     public void onFrame(Controller controller) {

@@ -1,11 +1,11 @@
 package ui;
 import java.awt.Dimension;
 import java.awt.EventQueue;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.util.ArrayList;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -32,7 +32,6 @@ import enums.TestType;
 
 
 public class CalibrationController extends GraphicsController {
-    private ArrayList<SaveSettingsObserver> observers = new ArrayList<SaveSettingsObserver>();
     private JFrame frame;
     private JPanel canvasPanel;
     private JLabel wordLabel;
@@ -73,8 +72,8 @@ public class CalibrationController extends GraphicsController {
         
         saveSettingsButton.addActionListener(new ActionListener() {
             @Override
-            public void actionPerformed(ActionEvent arg0) {
-                notifyListeners();
+            public void actionPerformed(ActionEvent e) {
+                keyboard.saveSettings();
                 frame.requestFocusInWindow();
             }
         });
@@ -145,7 +144,6 @@ public class CalibrationController extends GraphicsController {
     
     @Override
     public void keyboardKeyEventObserved(char key) {
-        String oldString = wordLabel.getText();
         if(key == '\b') {
             if(0 < wordLabel.getText().length()) {
                 wordLabel.setText(wordLabel.getText().substring(0, wordLabel.getText().length()-1));
@@ -155,7 +153,7 @@ public class CalibrationController extends GraphicsController {
         } else {
             wordLabel.setText(wordLabel.getText()+Character.toString(key));
         }
-        MyUtilities.JAVA_SWING_UTILITIES.calculateFontSize(oldString, wordLabel.getText(), wordLabel, wordPanel);
+        MyUtilities.JAVA_SWING_UTILITIES.calculateFontSize(wordLabel.getText(), wordLabel, wordPanel);
     }
     
     @Override
@@ -212,11 +210,6 @@ public class CalibrationController extends GraphicsController {
         removeKeyboardFromUI();
         frame.setVisible(false);
         canvas.disposeGLEventListener(this, true);
-        removeObserver(Keyboard.STANDARD.getKeyboard());
-        removeObserver(Keyboard.LEAP_SURFACE.getKeyboard());
-        removeObserver(Keyboard.LEAP_AIR.getKeyboard());
-        removeObserver(Keyboard.TABLET.getKeyboard());
-        removeObserver(Keyboard.CONTROLLER.getKeyboard());
         Keyboard.STANDARD.getKeyboard().removeObserver(this);
         Keyboard.LEAP_SURFACE.getKeyboard().removeObserver(this);
         Keyboard.LEAP_AIR.getKeyboard().removeObserver(this);
@@ -231,11 +224,6 @@ public class CalibrationController extends GraphicsController {
         frame.setVisible(true);
         frame.requestFocusInWindow();
         canvas.addGLEventListener(this);
-        registerObserver(Keyboard.STANDARD.getKeyboard());
-        registerObserver(Keyboard.LEAP_SURFACE.getKeyboard());
-        registerObserver(Keyboard.LEAP_AIR.getKeyboard());
-        registerObserver(Keyboard.TABLET.getKeyboard());
-        registerObserver(Keyboard.CONTROLLER.getKeyboard());
         Keyboard.STANDARD.getKeyboard().registerObserver(this);
         Keyboard.LEAP_SURFACE.getKeyboard().registerObserver(this);
         Keyboard.LEAP_AIR.getKeyboard().registerObserver(this);
@@ -298,23 +286,10 @@ public class CalibrationController extends GraphicsController {
         frame.revalidate();
         frame.repaint();
         frame.pack();
-    }
-    
-    public void registerObserver(SaveSettingsObserver observer) {
-        if(observers.contains(observer)) {
-            return;
-        }
-        observers.add(observer);
-    }
-    
-    public void removeObserver(SaveSettingsObserver observer) {
-        observers.remove(observer);
-    }
-
-    private void notifyListeners() {
-        for(SaveSettingsObserver observer : observers) {
-            observer.saveSettingsEventObserved(keyboard);
-        }
+        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+        Dimension windowSize = frame.getSize();
+        frame.setLocation((int)(screenSize.getWidth()/2 - windowSize.getWidth()/2),
+                          (int)(screenSize.getHeight()/2 - windowSize.getHeight()/2));
     }
     
     private boolean isLeapKeyboard() {

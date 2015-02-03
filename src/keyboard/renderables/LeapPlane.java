@@ -208,10 +208,11 @@ public class LeapPlane extends KeyboardRenderable {
     }
     
     public boolean isNormalizedTouching(float normalizedZ) {
-        float normalizedThreshold = (float) ((-TOUCH_THRESHOLD.getValue()) / distanceToCameraPlane);
+        float normalizedThreshold = (float) ((-TOUCH_THRESHOLD.getValue()) / (1 - MyUtilities.MATH_UTILITILES.findMidpoint(pointA, pointC).getZ()));
         if(normalizedThreshold > 1) {normalizedThreshold = 1;} else if(normalizedThreshold < 0) {normalizedThreshold = 0;}
         normalizedThreshold *= CAMERA_DISTANCE;
-        return normalizedZ < normalizedThreshold;
+        System.out.println("normalized Z: " + normalizedZ + " threshold: " + normalizedThreshold);
+        return normalizedZ <= normalizedThreshold;
     }
     
     public boolean isTouching() {
@@ -286,6 +287,8 @@ public class LeapPlane extends KeyboardRenderable {
         // Find D, a simple variable that holds our normal time's a point on the plane
         planeD = MyUtilities.MATH_UTILITILES.calcPlaneD(planeNormal, planeCenter);
         
+        System.out.println("normal: " + planeNormal + " D: " + planeD + " planeCenter: " + planeCenter);
+        
         // Precalculate side vectors needed for finding keyboard position.
         //BA = pointA.minus(pointB);
         //DA = pointA.minus(pointD);
@@ -323,7 +326,6 @@ public class LeapPlane extends KeyboardRenderable {
     
     private void calcDistToPlane(Vector point) {
         distanceToPlane = MyUtilities.MATH_UTILITILES.findDistanceToPlane(point, planeNormal, planeD);
-        //System.out.println(distanceToPlane);
     }
     
     private void applyPlaneNormalization(Vector point) {
@@ -442,7 +444,7 @@ public class LeapPlane extends KeyboardRenderable {
                     case LeapPlaneCalibrator.POINT_A:
                         // Get the midpoint and update it.
                         pointA = leapPlaneCalibrator.getMidPoint();
-                        POINT_A_ATTRIBUTE.setVectorValue(pointA);
+                        POINT_A_ATTRIBUTE.setValue(pointA);
                         
                         // Remove the tool after finding a point.
                         if(leapPlaneCalibrator.doneWithCurrentPoint() && leapPlaneCalibrator.isValid()) {
@@ -452,7 +454,7 @@ public class LeapPlane extends KeyboardRenderable {
                     case LeapPlaneCalibrator.POINT_B:
                         // Get the midpoint and update it.
                         pointB = leapPlaneCalibrator.getMidPoint();
-                        POINT_B_ATTRIBUTE.setVectorValue(pointB);
+                        POINT_B_ATTRIBUTE.setValue(pointB);
                         
                         // Remove the tool after finding a point.
                         if(leapPlaneCalibrator.doneWithCurrentPoint() && leapPlaneCalibrator.isValid()) {
@@ -462,7 +464,7 @@ public class LeapPlane extends KeyboardRenderable {
                     case LeapPlaneCalibrator.POINT_C:
                         // Get the midpoint and update it.
                         pointC = leapPlaneCalibrator.getMidPoint();
-                        POINT_C_ATTRIBUTE.setVectorValue(pointC);
+                        POINT_C_ATTRIBUTE.setValue(pointC);
 
                         // Remove the tool after finding a point.
                         if(leapPlaneCalibrator.doneWithCurrentPoint() && leapPlaneCalibrator.isValid()) {
