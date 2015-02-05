@@ -1,6 +1,8 @@
-/keyboard/
-/utilities/
-/ui/
-/experiment/
 /enums/
+/experiment/
+/keyboard/
 /leap/
+/main/
+/swipe/
+/ui/
+/utilities/

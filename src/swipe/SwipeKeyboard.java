@@ -42,6 +42,23 @@ public class SwipeKeyboard implements WordObserver {
     private boolean touchPress;
     private boolean touchDown;
     
+    // TODO:
+    // 1) Enter, Period, Comma, Space, Numbers:
+    //    	- Must only fire on release if it was the first thing pressed.
+    //		- If leave key and start swiping, then we start swiping instead
+    //		- Don't detect these at all while swiping regardless of angle or overlap
+    // 2) Shift:
+    //		- Must only fire on down press.
+    //		- If leave key, it is still counted as held down, we ignore swiping
+    //		- Don't detect shift at all while swiping regardless of angle or overlap
+    // 3) Backspace:
+    //		- Must start to fire on down press, it is the only repeating key while held down
+    //		- If leave key, it is still counted as held down, we ignore swiping
+    //		- Don't detect backspace at all while swiping regardless of angle or overlap
+    // 4) Letters:
+    //		- Can be detected on key press, angle, and release
+    //		- If we are swiping, then we ignore all other non letter keys, consider closest alpha keys to us on angle
+    
     public SwipeKeyboard(IKeyboard keyboard) {
         int keyWidth = keyboard.getAttributes().getAttributeAsPoint(Attribute.KEY_SIZE).x;
         MAX_EXPECTED_PRESS_RADIUS = (int) (keyWidth * 1.25f); // 80;
