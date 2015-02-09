@@ -70,6 +70,8 @@ public class SwipePoint extends KeyboardRenderable {
     public void applyPlaneRotationAndNormalizePoint(Vector axis, float angle) {
         if(axis.isValid()) {
             normalizedPoint = MyUtilities.MATH_UTILITILES.rotateVector(point, axis, angle);
+        } else {
+            normalizedPoint = point;
         }
         normalizedPoint = normalizePoint();
     }

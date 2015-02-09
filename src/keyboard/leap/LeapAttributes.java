@@ -47,5 +47,6 @@ public class LeapAttributes extends KeyboardAttributes {
         this.addAttribute(new KeyboardAttribute(keyboard, Attribute.LEAP_PLANE_POINT_A, Vector.zero()));
         this.addAttribute(new KeyboardAttribute(keyboard, Attribute.LEAP_PLANE_POINT_B, Vector.zero()));
         this.addAttribute(new KeyboardAttribute(keyboard, Attribute.LEAP_PLANE_POINT_C, Vector.zero()));
+        this.addAttribute(new KeyboardAttribute(keyboard, Attribute.LEAP_PLANE_POINT_D, Vector.zero()));
     }
 }

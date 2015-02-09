@@ -49,8 +49,8 @@ public class LeapPlane extends KeyboardRenderable {
     private final KeyboardAttribute POINT_A_ATTRIBUTE;
     private final KeyboardAttribute POINT_B_ATTRIBUTE;
     private final KeyboardAttribute POINT_C_ATTRIBUTE;
+    private final KeyboardAttribute POINT_D_ATTRIBUTE;
     private final String FILE_NAME;
-    private final boolean AIR_KEYBOARD;
     private ArrayList<CalibrationObserver> observers = new ArrayList<CalibrationObserver>();
     private InteractionBox iBox;
     private Vector pointA; // min
@@ -63,6 +63,7 @@ public class LeapPlane extends KeyboardRenderable {
     private Vector scaledPointD;
     private Vector planeNormal;
     private Vector planeCenter;
+    private Vector denormalizedPlaneCenter;
     private float distanceToCameraPlane;
     private float planeD;
     private float angleToCamera;
@@ -83,9 +84,8 @@ public class LeapPlane extends KeyboardRenderable {
     private JEditorPane explinationPane; // TODO: Use JTextPane and character attributes instead of html
     private boolean removeTool = false;
     
-    public LeapPlane(IKeyboard keyboard, boolean air) {
+    public LeapPlane(IKeyboard keyboard) {
         super(TYPE);
-        AIR_KEYBOARD = air;
         KEYBOARD_SIZE = keyboard.getAttributes().getAttributeAsPoint(Attribute.KEYBOARD_SIZE);
         BORDER_SIZE = keyboard.getAttributes().getAttributeAsInteger(Attribute.BORDER_SIZE);
         CAMERA_DISTANCE = keyboard.getAttributes().getAttributeAsFloat(Attribute.CAMERA_DISTANCE);
@@ -94,6 +94,7 @@ public class LeapPlane extends KeyboardRenderable {
         POINT_A_ATTRIBUTE = keyboard.getAttributes().getAttribute(Attribute.LEAP_PLANE_POINT_A);
         POINT_B_ATTRIBUTE = keyboard.getAttributes().getAttribute(Attribute.LEAP_PLANE_POINT_B);
         POINT_C_ATTRIBUTE = keyboard.getAttributes().getAttribute(Attribute.LEAP_PLANE_POINT_C);
+        POINT_D_ATTRIBUTE = keyboard.getAttributes().getAttribute(Attribute.LEAP_PLANE_POINT_D);
         getPlaneAttributes();
         if(!pointA.equals(Vector.zero()) && !pointB.equals(Vector.zero()) && !pointC.equals(Vector.zero())) {
             isCalibrated = true;
@@ -116,11 +117,12 @@ public class LeapPlane extends KeyboardRenderable {
         pointA = POINT_A_ATTRIBUTE.getValueAsVector();
         pointB = POINT_B_ATTRIBUTE.getValueAsVector();
         pointC = POINT_C_ATTRIBUTE.getValueAsVector();
+        pointD = POINT_D_ATTRIBUTE.getValueAsVector();
     }
     
     public void beginCalibration(JPanel textPanel) {      
         grantAccess(true);
-        leapPlaneCalibrator = new LeapPlaneCalibrator(AIR_KEYBOARD);
+        leapPlaneCalibrator = new LeapPlaneCalibrator();
         //explinationPane = new JEditorPane("text/html", "");
         //explinationPane.setEditable(false);
         this.textPanel = textPanel;
@@ -154,6 +156,7 @@ public class LeapPlane extends KeyboardRenderable {
             MyUtilities.FILE_IO_UTILITIES.writeAttributeToFile(FilePath.CONFIG.getPath(), FILE_NAME + FileExt.INI.getExt(), POINT_A_ATTRIBUTE);
             MyUtilities.FILE_IO_UTILITIES.writeAttributeToFile(FilePath.CONFIG.getPath(), FILE_NAME + FileExt.INI.getExt(), POINT_B_ATTRIBUTE);
             MyUtilities.FILE_IO_UTILITIES.writeAttributeToFile(FilePath.CONFIG.getPath(), FILE_NAME + FileExt.INI.getExt(), POINT_C_ATTRIBUTE);
+            MyUtilities.FILE_IO_UTILITIES.writeAttributeToFile(FilePath.CONFIG.getPath(), FILE_NAME + FileExt.INI.getExt(), POINT_D_ATTRIBUTE);
             System.out.println("Save Success");
         } catch (IOException e) {
             System.out.println("Save Failure. Try using the \"Save Settings\" button to save calibration to file.");
@@ -185,6 +188,13 @@ public class LeapPlane extends KeyboardRenderable {
                     explinationPane.setText(text);
                 }
                 break;
+            case LeapPlaneCalibrator.POINT_D:
+                text = "<div style=\"white-space: nowrap\"><font size=+1><b><font color=red>Place and hold</font></b> "
+                        + "the tool over the <b><font color=red>bottom-right or \"D\" corner</font></b> of the keyboard.</font></div>";
+                if(!MyUtilities.JAVA_SWING_UTILITIES.equalsIgnoreHTML(text, explinationPane.getText())) {
+                    explinationPane.setText(text);
+                }
+                break;
             default:
                 text = "<div style=\"white-space: nowrap\"><font size=+2><b><font color=red>Remove the tool</font></b> "
                         + "from the Leap Motinon Interaction Zone.</font></div>";
@@ -207,11 +217,18 @@ public class LeapPlane extends KeyboardRenderable {
         return distanceToPlane;
     }
     
+    public Vector getDenormalizedPlaceCenter() {
+        return denormalizedPlaneCenter;
+    }
+    
+    public float getTouchThreshold() {
+        return (float) TOUCH_THRESHOLD.getValue();
+    }
+    
     public boolean isNormalizedTouching(float normalizedZ) {
         float normalizedThreshold = (float) ((-TOUCH_THRESHOLD.getValue()) / (1 - MyUtilities.MATH_UTILITILES.findMidpoint(pointA, pointC).getZ()));
         if(normalizedThreshold > 1) {normalizedThreshold = 1;} else if(normalizedThreshold < 0) {normalizedThreshold = 0;}
         normalizedThreshold *= CAMERA_DISTANCE;
-        System.out.println("normalized Z: " + normalizedZ + " threshold: " + normalizedThreshold);
         return normalizedZ <= normalizedThreshold;
     }
     
@@ -230,11 +247,12 @@ public class LeapPlane extends KeyboardRenderable {
         // Get the original attributes for recalculation.
         getPlaneAttributes();
         
-        // Compute the 4th point of the plane for drawing.
-        // TODO: Detect D as another point instead of auto calculating it.
-        // This would allow us to take 4 points and use a transformation to create a more accurate plane
-        // Take a look at alvin's work on this.
-        pointD = pointA.minus(pointB).plus(pointC);
+        // Average the two planes we found to find a better fitting plane.
+        Vector calcD = pointA.minus(pointB).plus(pointC);
+        Vector calcB = pointC.minus(pointD).plus(pointA);
+        
+        pointB = MyUtilities.MATH_UTILITILES.findMidpoint(pointB, calcB);
+        pointD = MyUtilities.MATH_UTILITILES.findMidpoint(pointD, calcD);
         
         // Determine the vectors
         Vector AB = pointB.minus(pointA);
@@ -242,6 +260,7 @@ public class LeapPlane extends KeyboardRenderable {
         
         // Find the center of the plane
         planeCenter = MyUtilities.MATH_UTILITILES.findMidpoint(pointA, pointC);
+        denormalizedPlaneCenter = new Vector(planeCenter);
         
         // Determine the normal of the plane by finding the cross product
         planeNormal = AB.cross(AC);
@@ -286,8 +305,6 @@ public class LeapPlane extends KeyboardRenderable {
         
         // Find D, a simple variable that holds our normal time's a point on the plane
         planeD = MyUtilities.MATH_UTILITILES.calcPlaneD(planeNormal, planeCenter);
-        
-        System.out.println("normal: " + planeNormal + " D: " + planeD + " planeCenter: " + planeCenter);
         
         // Precalculate side vectors needed for finding keyboard position.
         //BA = pointA.minus(pointB);
@@ -359,7 +376,7 @@ public class LeapPlane extends KeyboardRenderable {
         // per cycle. Since finding the distance to a line is always positive, we have to find the distance to both
         // the top and bottom lines and the left and right lines to determine our position in world space.
         // The above method and this method return results that are similar but not the same.
-        
+
         // Find horizontal position.
         // Find distance to left and right sides. Use the right side to determine if we should negate the distance to the left side.
         float distAB = MyUtilities.MATH_UTILITILES.findDistanceToLine(point, pointA, pointB)/normalizedPlaneWidth;
@@ -369,7 +386,7 @@ public class LeapPlane extends KeyboardRenderable {
         } else {
             x = distAB;
         }
-        
+
         // Find vertical position.
         // Find distance to top and bottom sides. Use the top side to determine if we should negate the distance to the bottom side.
         float distAD = MyUtilities.MATH_UTILITILES.findDistanceToLine(point, pointA, pointD)/normalizedPlaneHeight;
@@ -379,7 +396,7 @@ public class LeapPlane extends KeyboardRenderable {
         } else {
             y = distAD;
         }
-        
+
         // Use planeCenter and point's Z's to determine %.
         z = (point.getZ() - planeCenter.getZ()) / distanceToCameraPlane;
         if(z > 1) {z = 1;} else if(z < 0) {z = 0;}
@@ -471,6 +488,16 @@ public class LeapPlane extends KeyboardRenderable {
                             removeTool = true;
                         }
                         break;
+                    case LeapPlaneCalibrator.POINT_D:
+                        // Get the midpoint and update it.
+                        pointD = leapPlaneCalibrator.getMidPoint();
+                        POINT_D_ATTRIBUTE.setValue(pointD);
+
+                        // Remove the tool after finding a point.
+                        if(leapPlaneCalibrator.doneWithCurrentPoint() && leapPlaneCalibrator.isValid()) {
+                            removeTool = true;
+                        }
+                        break;
                     default:
                         isCalibrated = true;
                         break;
@@ -491,7 +518,7 @@ public class LeapPlane extends KeyboardRenderable {
             drawCircleWithLetter(gl, scaledPointA, 'A', LeapPlaneCalibrator.POINT_A);
             drawCircleWithLetter(gl, scaledPointB, 'B', LeapPlaneCalibrator.POINT_B);
             drawCircleWithLetter(gl, scaledPointC, 'C', LeapPlaneCalibrator.POINT_C);
-            drawCircleWithLetter(gl, scaledPointD, 'D', -1);
+            drawCircleWithLetter(gl, scaledPointD, 'D', LeapPlaneCalibrator.POINT_D);
             gl.glPopMatrix();
         }
     }

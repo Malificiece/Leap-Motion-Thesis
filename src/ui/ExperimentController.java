@@ -58,10 +58,11 @@ public class ExperimentController extends GraphicsController {
     //		- 40+ words for standard keyboard if we were going to legitimately use it.
     //		- 40 words per session is good for touch/leap keyboard
     //		- 10-15 words per sessoin is good enough for controller (it is soooo slow, it doesn't need to be proven)
-    private final int PRACTICE_SIZE = 5;
     private final int EXPERIMENT_SIZE = 40;
+    private final int PRACTICE_SIZE = EXPERIMENT_SIZE;
     private final Color LIGHT_GREEN = new Color(204, 255, 204);
     private final int FADE_DURATION = 500;
+    private int practiceWordCount = 0;
     private Color currentColor = Color.WHITE;
     private long previousFadeTime;
     private long fadeTimeElapsed = 0;
@@ -180,10 +181,14 @@ public class ExperimentController extends GraphicsController {
             public void actionPerformed(ActionEvent e) {
                 EXPERIMENT_LOCK.lock();
                 try {
-                    runningPractice = true;
-                    wordManager.loadWords(PRACTICE_SIZE);
-                    disableUI();
-                    delayedStart();
+                    if(runningPractice) {
+                        finishPractice();
+                    } else {
+                        runningPractice = true;
+                        wordManager.loadWords(PRACTICE_SIZE);
+                        disableUI();
+                        delayedStart();
+                    }
                 } finally {
                     EXPERIMENT_LOCK.unlock();
                 }
@@ -254,6 +259,7 @@ public class ExperimentController extends GraphicsController {
             settingsPanel.add(ka.getAttribute(Attribute.LEAP_PLANE_POINT_A).getAttributePanel());
             settingsPanel.add(ka.getAttribute(Attribute.LEAP_PLANE_POINT_B).getAttributePanel());
             settingsPanel.add(ka.getAttribute(Attribute.LEAP_PLANE_POINT_C).getAttributePanel());
+            settingsPanel.add(ka.getAttribute(Attribute.LEAP_PLANE_POINT_D).getAttributePanel());
         }
     }
     
@@ -263,7 +269,7 @@ public class ExperimentController extends GraphicsController {
         enableUI();
         wordPanel.add(wordLabel);
         wordLabel.setVisible(true);
-        wordPanel.add(answerLabel);
+        answerPanel.add(answerLabel);
         answerLabel.setVisible(true);
         settingsPanel.removeAll();
         KeyboardAttributes ka = keyboard.getAttributes();
@@ -272,6 +278,7 @@ public class ExperimentController extends GraphicsController {
             settingsPanel.add(ka.getAttribute(Attribute.LEAP_PLANE_POINT_A).getAttributePanel());
             settingsPanel.add(ka.getAttribute(Attribute.LEAP_PLANE_POINT_B).getAttributePanel());
             settingsPanel.add(ka.getAttribute(Attribute.LEAP_PLANE_POINT_C).getAttributePanel());
+            settingsPanel.add(ka.getAttribute(Attribute.LEAP_PLANE_POINT_D).getAttributePanel());
         }
         
         for(KeyboardSetting ks: keyboard.getSettings().getAllSettings()) {
@@ -307,9 +314,11 @@ public class ExperimentController extends GraphicsController {
     
     private void beginPractice() {
         delayedStart = null;
-        enableUI();
-        splitPane.setRightComponent(null);
-        disableUI();
+        //enableUI();
+        //splitPane.setRightComponent(null);
+        //disableUI();
+        practiceButton.setEnabled(true);
+        practiceButton.setText("Finish Practice");
         wordManager.paintLetters(wordLabel, answerLabel);
         MyUtilities.JAVA_SWING_UTILITIES.calculateFontSize(wordManager.currentWord(), wordLabel, wordPanel);
         MyUtilities.JAVA_SWING_UTILITIES.calculateFontSize(wordManager.getAnswer(), answerLabel, answerPanel);
@@ -321,6 +330,7 @@ public class ExperimentController extends GraphicsController {
         ranPractice = true;
         wordManager.setDefault();
         enableUI();
+        practiceButton.setText("Practice");
     }
     
     private void beginExperiment() {
@@ -328,7 +338,7 @@ public class ExperimentController extends GraphicsController {
         String timeStarted = "_";
         timeStarted += LocalDate.now().format(DateTimeFormatter.BASIC_ISO_DATE);
         timeStarted += "_" + LocalTime.now().format(DateTimeFormatter.ofPattern("kkmm"));
-        dataManager = new DataManager(keyboard, subjectID, timeStarted);
+        dataManager = new DataManager(keyboard, subjectID, timeStarted, practiceWordCount);
         enableUI();
         splitPane.setRightComponent(null);
         disableUI();
@@ -392,15 +402,14 @@ public class ExperimentController extends GraphicsController {
         removeKeyboardFromUI();
         frame.setVisible(false);
         canvas.disposeGLEventListener(this, true);
-        Keyboard.STANDARD.getKeyboard().removeObserver(this);
-        Keyboard.LEAP_SURFACE.getKeyboard().removeObserver(this);
-        Keyboard.LEAP_AIR.getKeyboard().removeObserver(this);
-        Keyboard.TABLET.getKeyboard().removeObserver(this);
-        Keyboard.CONTROLLER.getKeyboard().removeObserver(this);
+        for(Keyboard tmpKeyboard: Keyboard.values()) {
+            tmpKeyboard.getKeyboard().removeObserver(this);
+        }
         ranTutorial = false;
         ranPractice = false;
         disableUI();
         enabled = false;
+        practiceWordCount = 0;
     }
     
     public void enable() {
@@ -408,11 +417,9 @@ public class ExperimentController extends GraphicsController {
         frame.setVisible(true);
         frame.requestFocusInWindow();
         canvas.addGLEventListener(this);
-        Keyboard.STANDARD.getKeyboard().registerObserver(this);
-        Keyboard.LEAP_SURFACE.getKeyboard().registerObserver(this);
-        Keyboard.LEAP_AIR.getKeyboard().registerObserver(this);
-        Keyboard.TABLET.getKeyboard().registerObserver(this);
-        Keyboard.CONTROLLER.getKeyboard().registerObserver(this);
+        for(Keyboard tmpKeyboard: Keyboard.values()) {
+            tmpKeyboard.getKeyboard().registerObserver(this);
+        }
         wordManager.setDefault();
         enableUI();
         enabled = true;
@@ -446,6 +453,7 @@ public class ExperimentController extends GraphicsController {
             settingsPanel.add(ka.getAttribute(Attribute.LEAP_PLANE_POINT_A).getAttributePanel());
             settingsPanel.add(ka.getAttribute(Attribute.LEAP_PLANE_POINT_B).getAttributePanel());
             settingsPanel.add(ka.getAttribute(Attribute.LEAP_PLANE_POINT_C).getAttributePanel());
+            settingsPanel.add(ka.getAttribute(Attribute.LEAP_PLANE_POINT_D).getAttributePanel());
         }
         
         for(KeyboardSetting ks: keyboard.getSettings().getAllSettings()) {
@@ -469,10 +477,10 @@ public class ExperimentController extends GraphicsController {
                           (int)(screenSize.getHeight()/2 - windowSize.getHeight()/2));
     }
     
-    public void update() {
+    public void update() {        
+        EXPERIMENT_LOCK.lock();
         keyboard.update();
         
-        EXPERIMENT_LOCK.lock();
         try {
             if(runningTutorial) {
                 if(tutorialManager.isValid() && wordManager.isDefault()) {
@@ -562,6 +570,9 @@ public class ExperimentController extends GraphicsController {
                     wordManager.nextWord();
                     wordManager.setAnswer("");
                     wordLabel.setText(wordManager.currentWord());
+                    if(runningPractice) {
+                        practiceWordCount++;
+                    }
                     if(runningExperiment && wordManager.isValid()) {
                         dataManager.startWord(wordManager.currentWord());
                     }
@@ -593,7 +604,7 @@ public class ExperimentController extends GraphicsController {
     }
     
     private boolean isLeapKeyboard() {
-        return keyboard.getID() == Keyboard.LEAP_SURFACE.getID() || keyboard.getID() == Keyboard.LEAP_AIR.getID();
+        return keyboard.getID() == Keyboard.LEAP_SURFACE.getID() || keyboard.getID() == Keyboard.LEAP_AIR.getID() || keyboard.getID() == Keyboard.LEAP_PINCH.getID();
     }
     
     private void delayedStart() {

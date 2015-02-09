@@ -25,10 +25,10 @@ import keyboard.renderables.VirtualKeyboard;
 import enums.Attribute;
 import enums.Direction;
 import enums.FileExt;
-import enums.FileName;
 import enums.FilePath;
 import enums.Gesture;
 import enums.Key;
+import enums.KeyboardType;
 import enums.Renderable;
 import experiment.data.ControllerDataObserver;
 import experiment.data.DataManager;
@@ -36,9 +36,6 @@ import experiment.playback.ControllerPlaybackObserver;
 import experiment.playback.PlaybackManager;
 
 public class ControllerKeyboard extends IKeyboard implements ControllerPlaybackObserver {
-    public static final int KEYBOARD_ID = 3;
-    private static final String KEYBOARD_NAME = "Controller Keyboard";
-    private static final String KEYBOARD_FILE_NAME = FileName.CONTROLLER.getName();
     private static final float AUTO_REPEAT_DELAY = (750 * 1f/3f) + 250; // Windows default
     private static final int AUTO_REPEAT_RATE = 1000 / 31; // Windows default
     private final float HORIZONTAL_GESTURE_LENGTH = 125f;
@@ -59,7 +56,7 @@ public class ControllerKeyboard extends IKeyboard implements ControllerPlaybackO
     private boolean shiftTwice = false;
     
     public ControllerKeyboard() {
-        super(KEYBOARD_ID, KEYBOARD_NAME, KEYBOARD_FILE_NAME);
+        super(KeyboardType.CONTROLLER);
         keyboardAttributes = new ControllerAttributes(this);
         keyboardSettings = new ControllerSettings(this);
         System.out.println(KEYBOARD_NAME + " - Loading Settings from " + FilePath.CONFIG.getPath() + KEYBOARD_FILE_NAME + FileExt.INI.getExt());

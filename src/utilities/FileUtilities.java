@@ -50,7 +50,7 @@ public class FileUtilities {
                 file.createNewFile();
             } catch (IOException e) {e.printStackTrace();}
         }
-        // Create leap_surface.ini
+        // Create leapSurface.ini
         path = FileSystems.getDefault().getPath(FilePath.CONFIG.getPath(), FileName.LEAP_SURFACE.getName() + FileExt.INI.getExt());
         if(!Files.exists(path)) {
             file = path.toFile();
@@ -58,8 +58,16 @@ public class FileUtilities {
                 file.createNewFile();
             } catch (IOException e) {e.printStackTrace();}
         }
-        // Create leap_air.ini
+        // Create leapAir.ini
         path = FileSystems.getDefault().getPath(FilePath.CONFIG.getPath(), FileName.LEAP_AIR.getName() + FileExt.INI.getExt());
+        if(!Files.exists(path)) {
+            file = path.toFile();
+            try {
+                file.createNewFile();
+            } catch (IOException e) {e.printStackTrace();}
+        }
+        // Create leapPinch.ini
+        path = FileSystems.getDefault().getPath(FilePath.CONFIG.getPath(), FileName.LEAP_PINCH.getName() + FileExt.INI.getExt());
         if(!Files.exists(path)) {
             file = path.toFile();
             try {

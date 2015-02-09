@@ -47,10 +47,14 @@ public class LeapListener extends Listener /*implements SaveSettingsObserver*/ {
     public void onFrame(Controller controller) {
         // Get the most recent frame and report some basic information
         Frame frame = controller.frame();
+
+        // Populate leapData with relevant hand data and gestures.
+        leapData.setHandData(frame.hands().frontmost());
         
+        // Override with tool if it's valid.
         // Populate leapData with relevant tool data and gestures.
         leapData.setToolData(frame.tools().frontmost());
-    
+
         notifyListenersDataUpdate();
     }
     

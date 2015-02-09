@@ -24,10 +24,10 @@ import com.leapmotion.leap.Vector;
 import utilities.MyUtilities;
 import enums.Attribute;
 import enums.FileExt;
-import enums.FileName;
 import enums.FilePath;
 import enums.Gesture;
 import enums.Direction;
+import enums.KeyboardType;
 import enums.Renderable;
 import enums.Key;
 import experiment.data.DataManager;
@@ -39,9 +39,6 @@ import keyboard.renderables.KeyboardGestures;
 import keyboard.renderables.VirtualKeyboard;
 
 public class StandardKeyboard extends IKeyboard implements PlaybackObserver {
-    public static final int KEYBOARD_ID = 0;
-    private static final String KEYBOARD_NAME = "Standard Keyboard";
-    private static final String KEYBOARD_FILE_NAME = FileName.STANDARD.getName();
     private final float HORIZONTAL_GESTURE_LENGTH = 125f;
     private final float VERTICAL_GESTURE_LENGTH;
     private final float HORIZONTAL_GESTURE_OFFSET = 25f;
@@ -57,7 +54,7 @@ public class StandardKeyboard extends IKeyboard implements PlaybackObserver {
     private ReentrantLock gestureLock;
     
     public StandardKeyboard() {
-        super(KEYBOARD_ID, KEYBOARD_NAME, KEYBOARD_FILE_NAME);
+        super(KeyboardType.STANDARD);
         keyboardAttributes = new StandardAttributes(this);
         keyboardSettings = new StandardSettings(this);
         System.out.println(KEYBOARD_NAME + " - Loading Settings from " + FilePath.CONFIG.getPath() + KEYBOARD_FILE_NAME + FileExt.INI.getExt());

@@ -14,7 +14,10 @@ public enum DataType {
     TIME_SPECIAL,
     POINT_POSITION,
     TOOL_DIRECTION,
-    DIRECTION_PRESSED;
+    DIRECTION_PRESSED,
+    GESTURE_TYPE,
+    GESTURE_STATE,
+    PRACTICE_WORD_COUNT;
     
     private static final DataType[] VALUES = values();
     private static final int SIZE = VALUES.length;

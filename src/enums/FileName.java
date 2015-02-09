@@ -4,6 +4,7 @@ public enum FileName {
     STANDARD("standard"),
     LEAP_SURFACE("leapSurface"),
     LEAP_AIR("leapAir"),
+    LEAP_PINCH("leapPinch"),
     CONTROLLER("controller"),
     TABLET("tablet"),
     KEYBOARD_IMAGE("_keyboard"),

@@ -11,15 +11,16 @@ import javax.swing.JPanel;
 
 import enums.FileExt;
 import enums.FilePath;
+import enums.KeyboardType;
 import experiment.data.DataManager;
 import experiment.playback.PlaybackManager;
 import utilities.MyUtilities;
 
 public abstract class IKeyboard {
-    private int keyboardID;
-    private String keyboardName;
-    private String filePath;
-    private String fileName;
+    protected final int KEYBOARD_ID;
+    protected final String KEYBOARD_NAME;
+    protected final String KEYBOARD_FILE_NAME;
+    protected final String KEYBOARD_FILE_PATH;
     private ArrayList<KeyboardObserver> observers = new ArrayList<KeyboardObserver>();
     protected Point keyboardSize;
     protected Point imageSize;
@@ -30,11 +31,11 @@ public abstract class IKeyboard {
     protected boolean isPlayback = false;
     protected PlaybackManager playbackManager;
     
-    public IKeyboard(int keyboardID, String keyboardName, String fileName) {
-        this.keyboardID = keyboardID;
-        this.keyboardName = keyboardName;
-        this.fileName = fileName;
-        this.filePath = fileName + "/";
+    public IKeyboard(KeyboardType keyboardType) {
+        KEYBOARD_ID = keyboardType.getID();
+        KEYBOARD_NAME = keyboardType.getName();
+        KEYBOARD_FILE_NAME = keyboardType.getFileName();
+        KEYBOARD_FILE_PATH = keyboardType.getFileName() + "/";
     }
     
     public abstract void render(GL2 gl);
@@ -55,19 +56,19 @@ public abstract class IKeyboard {
     public abstract void removeFromUI(JPanel panel, GLCanvas canvas);
     
     public int getID() {
-        return keyboardID;
+        return KEYBOARD_ID;
     }
     
     public String getName() {
-        return keyboardName;
+        return KEYBOARD_NAME;
     }
     
     public String getFilePath() {
-        return filePath;
+        return KEYBOARD_FILE_PATH;
     }
     
     public String getFileName() {
-        return fileName;
+        return KEYBOARD_FILE_NAME;
     }
     
     public int getHeight() {
@@ -120,9 +121,9 @@ public abstract class IKeyboard {
     
     public void saveSettings() {
         // Save all settings and attributes to file (stored for next time program launched)
-        System.out.println(keyboardName + " - Saving Settings to " + FilePath.CONFIG.getPath() + fileName + FileExt.INI.getExt());
+        System.out.println(KEYBOARD_NAME + " - Saving Settings to " + FilePath.CONFIG.getPath() + KEYBOARD_FILE_NAME + FileExt.INI.getExt());
         try {
-            MyUtilities.FILE_IO_UTILITIES.writeSettingsAndAttributesToFile(FilePath.CONFIG.getPath(), fileName + FileExt.INI.getExt(), this);
+            MyUtilities.FILE_IO_UTILITIES.writeSettingsAndAttributesToFile(FilePath.CONFIG.getPath(), KEYBOARD_FILE_NAME + FileExt.INI.getExt(), this);
             System.out.println("Save Success");
         } catch (IOException e) {
             System.out.println("Save Failed");
@@ -132,9 +133,9 @@ public abstract class IKeyboard {
     
     public void saveSettings(String filePath) {
         // Save all settings and attributes to file (stored for next time program launched)
-        System.out.println(keyboardName + " - Saving Settings to " + filePath + fileName + FileExt.INI.getExt());
+        System.out.println(KEYBOARD_NAME + " - Saving Settings to " + filePath + KEYBOARD_FILE_NAME + FileExt.INI.getExt());
         try {
-            MyUtilities.FILE_IO_UTILITIES.writeSettingsAndAttributesToFile(filePath, fileName + FileExt.INI.getExt(), this);
+            MyUtilities.FILE_IO_UTILITIES.writeSettingsAndAttributesToFile(filePath, KEYBOARD_FILE_NAME + FileExt.INI.getExt(), this);
             System.out.println("Save Success");
         } catch (IOException e) {
             System.out.println("Save Failed");

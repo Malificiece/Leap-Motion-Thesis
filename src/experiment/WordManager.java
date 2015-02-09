@@ -147,7 +147,7 @@ public class WordManager {
         } else {
             wordLabel.setText("<html><nobr>" + word + "</nobr></html>");
         }
-        answerLabel.setText("<html><nobr><font color=green>" + answer.substring(0, matchIndex + 1) + "</font><font color=red>" + answer.substring(matchIndex + 1) + "</font></nobr></html>");
+        answerLabel.setText("<html><nobr><pre style=\"font-family:Dialog;\"><font color=green>" + answer.substring(0, matchIndex + 1) + "</font><font color=red>" + answer.substring(matchIndex + 1) + "</font></pre></nobr></html>");
     }
     
     public static void registerObserver(WordObserver observer) {

@@ -180,6 +180,7 @@ public class CalibrationController extends GraphicsController {
             settingsPanel.add(ka.getAttribute(Attribute.LEAP_PLANE_POINT_A).getAttributePanel());
             settingsPanel.add(ka.getAttribute(Attribute.LEAP_PLANE_POINT_B).getAttributePanel());
             settingsPanel.add(ka.getAttribute(Attribute.LEAP_PLANE_POINT_C).getAttributePanel());
+            settingsPanel.add(ka.getAttribute(Attribute.LEAP_PLANE_POINT_D).getAttributePanel());
         }
     }
     
@@ -198,6 +199,7 @@ public class CalibrationController extends GraphicsController {
             settingsPanel.add(ka.getAttribute(Attribute.LEAP_PLANE_POINT_A).getAttributePanel());
             settingsPanel.add(ka.getAttribute(Attribute.LEAP_PLANE_POINT_B).getAttributePanel());
             settingsPanel.add(ka.getAttribute(Attribute.LEAP_PLANE_POINT_C).getAttributePanel());
+            settingsPanel.add(ka.getAttribute(Attribute.LEAP_PLANE_POINT_D).getAttributePanel());
         }
         
         for(KeyboardSetting ks: keyboard.getSettings().getAllSettings()) {
@@ -210,11 +212,9 @@ public class CalibrationController extends GraphicsController {
         removeKeyboardFromUI();
         frame.setVisible(false);
         canvas.disposeGLEventListener(this, true);
-        Keyboard.STANDARD.getKeyboard().removeObserver(this);
-        Keyboard.LEAP_SURFACE.getKeyboard().removeObserver(this);
-        Keyboard.LEAP_AIR.getKeyboard().removeObserver(this);
-        Keyboard.TABLET.getKeyboard().removeObserver(this);
-        Keyboard.CONTROLLER.getKeyboard().removeObserver(this);
+        for(Keyboard tmpKeyboard: Keyboard.values()) {
+            tmpKeyboard.getKeyboard().removeObserver(this);
+        }
         fpsTimer.cancel();
         enabled = false;
     }
@@ -224,11 +224,9 @@ public class CalibrationController extends GraphicsController {
         frame.setVisible(true);
         frame.requestFocusInWindow();
         canvas.addGLEventListener(this);
-        Keyboard.STANDARD.getKeyboard().registerObserver(this);
-        Keyboard.LEAP_SURFACE.getKeyboard().registerObserver(this);
-        Keyboard.LEAP_AIR.getKeyboard().registerObserver(this);
-        Keyboard.TABLET.getKeyboard().registerObserver(this);
-        Keyboard.CONTROLLER.getKeyboard().registerObserver(this);
+        for(Keyboard tmpKeyboard: Keyboard.values()) {
+            tmpKeyboard.getKeyboard().registerObserver(this);
+        }
         TimerTask updateFPS = new TimerTask() {
             @Override
             public void run() {
@@ -271,6 +269,7 @@ public class CalibrationController extends GraphicsController {
             settingsPanel.add(ka.getAttribute(Attribute.LEAP_PLANE_POINT_A).getAttributePanel());
             settingsPanel.add(ka.getAttribute(Attribute.LEAP_PLANE_POINT_B).getAttributePanel());
             settingsPanel.add(ka.getAttribute(Attribute.LEAP_PLANE_POINT_C).getAttributePanel());
+            settingsPanel.add(ka.getAttribute(Attribute.LEAP_PLANE_POINT_D).getAttributePanel());
         }
         
         for(KeyboardSetting ks: keyboard.getSettings().getAllSettings()) {
@@ -293,6 +292,6 @@ public class CalibrationController extends GraphicsController {
     }
     
     private boolean isLeapKeyboard() {
-        return keyboard.getID() == Keyboard.LEAP_SURFACE.getID() || keyboard.getID() == Keyboard.LEAP_AIR.getID();
+        return keyboard.getID() == Keyboard.LEAP_SURFACE.getID() || keyboard.getID() == Keyboard.LEAP_AIR.getID() || keyboard.getID() == Keyboard.LEAP_PINCH.getID();
     }
 }

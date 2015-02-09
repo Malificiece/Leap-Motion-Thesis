@@ -120,6 +120,15 @@ public enum Key {
         return 48 <= this.keyCode && this.keyCode <= 57;
     }
     
+    public boolean isSpecial() {
+        return this.equals(VK_ENTER) ||
+                this.equals(VK_PERIOD) ||
+                this.equals(VK_COMMA) ||
+                this.equals(VK_SHIFT) ||
+                this.equals(VK_BACK_SPACE) ||
+                this.equals(VK_SPACE);
+    }
+    
     public static Key getByValue(int keyValue) {
         for(int i = 0; i < SIZE; i++) {
             if(VALUES[i].getValue() == keyValue || VALUES[i].toUpper() == keyValue) return VALUES[i];

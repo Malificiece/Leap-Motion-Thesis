@@ -20,11 +20,12 @@ public class DataManager implements DataObserver {
     private ArrayList<String> dataList;
     private String word;
     
-    public DataManager(IKeyboard keyboard, String subjectID, String experimentTime) {
+    public DataManager(IKeyboard keyboard, String subjectID, String experimentTime, int practiceWordCount) {
         FILE_PATH = FilePath.DATA.getPath() + subjectID + "/";
         DATA_FILE_NAME = subjectID + "_" + keyboard.getFileName() + experimentTime + FileExt.DAT.getExt();
         dataList = new ArrayList<String>();
         System.out.println("Starting experiment for " + subjectID + " using " + keyboard.getName());
+        dataList.add(DataType.PRACTICE_WORD_COUNT.name() + ": " + practiceWordCount);
     }
     
     public void save(IKeyboard keyboard) {
@@ -89,9 +90,15 @@ public class DataManager implements DataObserver {
     }
 
     @Override
-    public void leapDataEventObserved(Vector leapPoint, Vector toolDirection) {
+    public void leapToolDataEventObserved(Vector leapPoint, Vector toolDirection) {
         dataList.add(DataType.TIME_SPECIAL.name() + ": " + System.nanoTime()
                 + "; " + DataType.POINT_POSITION.name() + ": " + leapPoint
                 + "; " + DataType.TOOL_DIRECTION.name() + ": " + toolDirection);
+    }
+
+    @Override
+    public void leapHandDataEventObserved(Vector leapPoint) {
+        dataList.add(DataType.TIME_SPECIAL.name() + ": " + System.nanoTime()
+                + "; " + DataType.POINT_POSITION.name() + ": " + leapPoint);
     }
 }

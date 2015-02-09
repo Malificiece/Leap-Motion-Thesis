@@ -15,5 +15,6 @@ public enum Attribute {
     CAMERA_DISTANCE,
     LEAP_PLANE_POINT_A,
     LEAP_PLANE_POINT_B,
-    LEAP_PLANE_POINT_C;
+    LEAP_PLANE_POINT_C,
+    LEAP_PLANE_POINT_D;
 }

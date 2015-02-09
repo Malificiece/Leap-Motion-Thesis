@@ -8,8 +8,9 @@ import keyboard.tablet.TabletKeyboard;
 
 public enum Keyboard {
     STANDARD(new StandardKeyboard()),
-    LEAP_SURFACE(new LeapKeyboard(false)),
-    LEAP_AIR(new LeapKeyboard(true)),
+    LEAP_SURFACE(new LeapKeyboard(KeyboardType.LEAP_SURFACE)),
+    LEAP_AIR(new LeapKeyboard(KeyboardType.LEAP_AIR)),
+    LEAP_PINCH(new LeapKeyboard(KeyboardType.LEAP_PINCH)),
     TABLET(new TabletKeyboard()),
     CONTROLLER(new ControllerKeyboard());
 

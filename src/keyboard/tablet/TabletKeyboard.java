@@ -23,9 +23,9 @@ import keyboard.renderables.SwipePoint;
 import keyboard.renderables.VirtualKeyboard;
 import enums.Attribute;
 import enums.FileExt;
-import enums.FileName;
 import enums.FilePath;
 import enums.Key;
+import enums.KeyboardType;
 import enums.Renderable;
 import experiment.WordManager;
 import experiment.data.DataManager;
@@ -34,9 +34,6 @@ import experiment.playback.PlaybackManager;
 import experiment.playback.TabletPlaybackObserver;
 
 public class TabletKeyboard extends IKeyboard implements TabletPlaybackObserver {
-    public static final int KEYBOARD_ID = 4;
-    private static final String KEYBOARD_NAME = "Tablet Keyboard";
-    private static final String KEYBOARD_FILE_NAME = FileName.TABLET.getName();
     private final float CAMERA_DISTANCE;
     private final ReentrantLock TABLET_LOCK = new ReentrantLock();
     private ArrayList<TabletDataObserver> observers = new ArrayList<TabletDataObserver>();
@@ -50,7 +47,7 @@ public class TabletKeyboard extends IKeyboard implements TabletPlaybackObserver 
     private boolean shiftTwice = false;
     
     public TabletKeyboard() {
-        super(KEYBOARD_ID, KEYBOARD_NAME, KEYBOARD_FILE_NAME);
+        super(KeyboardType.TABLET);
         keyboardAttributes = new TabletAttributes(this);
         keyboardSettings = new TabletSettings(this);
         System.out.println(KEYBOARD_NAME + " - Loading Settings from " + FilePath.CONFIG.getPath() + KEYBOARD_FILE_NAME + FileExt.INI.getExt());
