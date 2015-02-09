@@ -1,10 +1,14 @@
 package ui;
 
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+
+import javax.media.opengl.GLAutoDrawable;
 import javax.swing.ButtonGroup;
 import javax.swing.JFrame;
 import javax.swing.JRadioButton;
 
-public class ExitSurveyController {
+public class ExitSurveyController extends GraphicsController {
     //private final int HOURS_MIN = 0;
     //private final int HOURS_MAX = 24;
     //private final int HOURS_INIT = 12;
@@ -49,5 +53,49 @@ public class ExitSurveyController {
         male.setSelected(true);
         
         frame.setVisible(true);
+        
+        // by default, an AWT Frame doesn't do anything when you click
+        // the close button; this bit of code will terminate the program when
+        // the window is asked to close
+        frame.addWindowListener(new WindowAdapter() {
+            public void windowClosing(WindowEvent e) {
+                if(true /* TODO: BOOLEAN FOR CHECK FOR EVERYTHING BEING PROPERLY FILLED OUT*/) {
+                    disable();
+                }
+            }
+        });
+    }
+
+    @Override
+    public void enable() {
+        frame.setVisible(true);
+        frame.requestFocusInWindow();
+        enabled = true;
+    }
+
+    @Override
+    public void disable() {
+        frame.setVisible(false);
+        enabled = false;
+    }
+
+    @Override
+    public void update() {
+        // Do nothing.
+    }
+
+    @Override
+    public void render(GLAutoDrawable drawable) {
+        // Do nothing.
+    }
+    
+    @Override
+    public void keyboardKeyEventObserved(char key) {
+        // Do nothing.
+    }
+
+    @Override
+    public void keyboardCalibrationFinishedEventObserved() {
+        // Do nothing.
     }
 }

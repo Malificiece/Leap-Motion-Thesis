@@ -50,14 +50,6 @@ public class ExperimentController extends GraphicsController {
     private final ReentrantLock EXPERIMENT_LOCK = new ReentrantLock();
     private final int ONE_SECOND = 1000;
     private final int COUNTDOWN_TIME = 5;
-    // TODO:
-    // 1) PRACTICE_SIZE should just be infinite, and give them a done button once they feel comfortable. Then I can record the number of words they used to practice, as well
-    // As the distance data etc with familiarizing themselves with the keyboard.
-    // 2) Implement different tutorial description for each keyboard
-    // 3) Implement different EXPERIMENT_SIZE for each keyboard
-    //		- 40+ words for standard keyboard if we were going to legitimately use it.
-    //		- 40 words per session is good for touch/leap keyboard
-    //		- 10-15 words per sessoin is good enough for controller (it is soooo slow, it doesn't need to be proven)
     private final int EXPERIMENT_SIZE = 40;
     private final int PRACTICE_SIZE = EXPERIMENT_SIZE;
     private final Color LIGHT_GREEN = new Color(204, 255, 204);

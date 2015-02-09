@@ -23,7 +23,8 @@ public class TutorialManager {
             + "<font size=+1>Press the <b>NEXT</b> button below to continue.</font>",
             "<font size=+1>Please, take a moment to observe the example on the left and feel free to ask questions if you have any.<br><br></font>"
             + "<font size=+1>Press the <b>DONE</b> button below to continue.</font>"};
-    // TODO: add specific instructions for each type of keyboard so that we can further tell them what to do.
+    // TODO:
+    // Implement different tutorial description for each keyboard
     private final ReentrantLock TUTORIAL_LOCK = new ReentrantLock();
     private int step = 0;
     private boolean hasNext = false;

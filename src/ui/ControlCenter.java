@@ -41,9 +41,8 @@ public class ControlCenter {
     // Constants
     private final ExperimentController EXPERIMENT_CONTROLLER = new ExperimentController();
     private final CalibrationController CALIBRATION_CONTROLLER = new CalibrationController();
-    //private final ExitSurveyController EXIT_SURVEY_CONTROLLER = new ExitSurveyController();
-    private final  ReentrantLock EXPERIMENT_LOCK = new ReentrantLock();
-    private final ReentrantLock CALIBRATION_LOCK = new ReentrantLock();
+    private final ExitSurveyController EXIT_SURVEY_CONTROLLER = new ExitSurveyController();
+    private final  ReentrantLock CONTROL_LOCK = new ReentrantLock();
     
     // Not Constants
     private JFrame frame;
@@ -53,6 +52,7 @@ public class ControlCenter {
     private JButton editSubjectIDButton;
     private JButton calibrateButton;
     private JButton experimentButton;
+    private JButton exitSurveyButton;
     private boolean isLocked = false;
     
     @SuppressWarnings("unchecked")
@@ -66,8 +66,9 @@ public class ControlCenter {
         editSubjectIDButton = new JButton("Edit");
         calibrateButton = new JButton("Calibration");
         experimentButton = new JButton("Experiment");
+        exitSurveyButton = new JButton("Exit Survey");
         
-        JButton buttons[] = {calibrateButton, experimentButton, editSubjectIDButton};
+        JButton buttons[] = {calibrateButton, experimentButton, editSubjectIDButton, exitSurveyButton};
         
         // Window builder builds window using important fields here. It adds unimportant fields that we won't use for aesthetics only.
         WindowBuilder.buildControlWindow(frame, testTypeComboBox, subjectField, buttons);
@@ -147,12 +148,29 @@ public class ControlCenter {
             }
         });
         
-        // RUN EXPERIEMENT BUTTON CONTROL
+        // RUN EXIT SURVEY CONTROLLER
+        exitSurveyButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                CONTROL_LOCK.lock();
+                try {
+                    if(!isInProgress()) {
+                        EXIT_SURVEY_CONTROLLER.enable();
+                        System.out.println("Starting Exit Survey");
+                        lockUI();
+                    }
+                } finally {
+                    CONTROL_LOCK.unlock();
+                }
+            }
+        });
+        
+        // RUN EXPERIEMENT CONTORLLER
         experimentButton.addActionListener(new ActionListener() {
 
             @Override
-            public void actionPerformed(ActionEvent arg0) {
-                EXPERIMENT_LOCK.lock();
+            public void actionPerformed(ActionEvent e) {
+                CONTROL_LOCK.lock();
                 try {
                     if(!isInProgress()) {
                         EXPERIMENT_CONTROLLER.enable(subjectID, TestType.getByName((String) testTypeComboBox.getSelectedItem()));
@@ -160,18 +178,18 @@ public class ControlCenter {
                         lockUI();
                     }
                 } finally {
-                    EXPERIMENT_LOCK.unlock();
+                    CONTROL_LOCK.unlock();
                 }
             }
             
         });
         
-        // RUN CALIBRATION BUTTON CONTROL
+        // RUN CALIBRATION CONTROLLER
         calibrateButton.addActionListener(new ActionListener() {
 
             @Override
-            public void actionPerformed(ActionEvent arg0) {
-                CALIBRATION_LOCK.lock();
+            public void actionPerformed(ActionEvent e) {
+                CONTROL_LOCK.lock();
                 try {
                     if(!isInProgress()) {
                         CALIBRATION_CONTROLLER.enable();
@@ -179,7 +197,7 @@ public class ControlCenter {
                         lockUI();
                     }
                 } finally {
-                    CALIBRATION_LOCK.unlock();
+                    CONTROL_LOCK.unlock();
                 }
             }
             
@@ -191,6 +209,8 @@ public class ControlCenter {
             EXPERIMENT_CONTROLLER.update();
         } else if(calibInProgress()) {
             CALIBRATION_CONTROLLER.update();
+        } else if(exitInProgress()) {
+            //EXIT_SURVEY_CONTROLLER.update();
         } else if(isLocked) {
             unlockUI();
         }
@@ -201,31 +221,42 @@ public class ControlCenter {
             EXPERIMENT_CONTROLLER.display();
         } else if(calibInProgress()) {
             CALIBRATION_CONTROLLER.display();
+        } else if(exitInProgress()) {
+            //EXIT_SURVEY_CONTROLLER.display();
         }
     }
     
     public boolean isInProgress() {
-        if(calibInProgress() || expInProgress()) {
+        if(calibInProgress() || expInProgress() || exitInProgress()) {
             return true;
         }
         return false;
     }
     
     public boolean calibInProgress() {
-        CALIBRATION_LOCK.lock();
+        CONTROL_LOCK.lock();
         try {
             return CALIBRATION_CONTROLLER.isEnabled();
         } finally {
-            CALIBRATION_LOCK.unlock();
+            CONTROL_LOCK.unlock();
         }
     }
     
     public boolean expInProgress() {
-        EXPERIMENT_LOCK.lock();
+        CONTROL_LOCK.lock();
         try {
             return EXPERIMENT_CONTROLLER.isEnabled();
         } finally {
-            EXPERIMENT_LOCK.unlock();
+            CONTROL_LOCK.unlock();
+        }
+    }
+    
+    public boolean exitInProgress() {
+        CONTROL_LOCK.lock();
+        try {
+            return EXIT_SURVEY_CONTROLLER.isEnabled();
+        } finally {
+            CONTROL_LOCK.unlock();
         }
     }
     
@@ -233,6 +264,7 @@ public class ControlCenter {
         isLocked = true;
         calibrateButton.setEnabled(false);
         experimentButton.setEnabled(false);
+        exitSurveyButton.setEnabled(false);
         testTypeComboBox.setEnabled(false);
     }
     
@@ -240,6 +272,7 @@ public class ControlCenter {
         isLocked = false;
         calibrateButton.setEnabled(true);
         experimentButton.setEnabled(true);
+        exitSurveyButton.setEnabled(true);
         testTypeComboBox.setEnabled(true);
     }
     

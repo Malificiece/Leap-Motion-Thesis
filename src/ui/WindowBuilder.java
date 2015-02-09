@@ -27,7 +27,7 @@ public class WindowBuilder {
     public static void buildControlWindow(JFrame frame,
             JComboBox<String> testComboBox,
             JTextField subjectField,
-            JButton [] optionsButtons) { // calibrate, run, edit
+            JButton [] optionsButtons) { // calibrate, run, edit, exit
         
         JPanel background = new JPanel();
         background.setLayout(new BoxLayout(background, BoxLayout.Y_AXIS));
@@ -77,13 +77,20 @@ public class WindowBuilder {
         background.add(padding3);
         
         JPanel optionsPanel = new JPanel();
+        optionsPanel.setLayout(new BoxLayout(optionsPanel, BoxLayout.Y_AXIS));
         optionsPanel.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createTitledBorder("Options"), BorderFactory.createEmptyBorder(5, 10, 10, 10)));
         background.add(optionsPanel);
         
-        optionsPanel.add(optionsButtons[0]);
+        JPanel buttonGroup1 = new JPanel();
+        optionsPanel.add(buttonGroup1);
+        buttonGroup1.add(optionsButtons[0]);
         JPanel padding4 = new JPanel();
-        optionsPanel.add(padding4);
-        optionsPanel.add(optionsButtons[1]);
+        buttonGroup1.add(padding4);
+        buttonGroup1.add(optionsButtons[1]);
+        
+        JPanel buttonGroup2 = new JPanel();
+        optionsPanel.add(buttonGroup2);
+        buttonGroup2.add(optionsButtons[3]);
         
         // Arrange the components inside the window
         frame.pack();
