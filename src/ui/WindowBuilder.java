@@ -9,17 +9,26 @@ import java.awt.Toolkit;
 
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
+import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JEditorPane;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
+import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import javax.swing.SpringLayout;
+import javax.swing.SwingConstants;
 import javax.swing.UIManager;
+import javax.swing.text.MutableAttributeSet;
+import javax.swing.text.SimpleAttributeSet;
+import javax.swing.text.StyleConstants;
 
+import utilities.MyUtilities;
 import enums.*;
 
 public class WindowBuilder {
@@ -42,23 +51,17 @@ public class WindowBuilder {
         
         JLabel subjectLabel = new JLabel("Subject ID:");
         subjectPanel.add(subjectLabel);
-        JPanel padding0 = new JPanel();
-        padding0.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 10));
-        subjectPanel.add(padding0);
+        subjectPanel.add(MyUtilities.SWING_UTILITIES.createPadding(10, SwingConstants.HORIZONTAL));
         subjectPanel.add(subjectField);
         subjectField.setEditable(false);
         subjectField.setHighlighter(null);
         subjectField.setHorizontalAlignment(JTextField.CENTER);
         
-        JPanel padding1 = new JPanel();
-        padding1.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 10));
-        subjectPanel.add(padding1);
+        subjectPanel.add(MyUtilities.SWING_UTILITIES.createPadding(10, SwingConstants.HORIZONTAL));
         subjectPanel.add(optionsButtons[2]);
         
         // Build layout for Test Select area
-        JPanel padding2 = new JPanel();
-        padding2.setBorder(BorderFactory.createEmptyBorder(0, 0, 10, 0));
-        background.add(padding2);
+        background.add(MyUtilities.SWING_UTILITIES.createPadding(10, SwingConstants.VERTICAL));
         
         JPanel testPanel = new JPanel();
         testPanel.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createTitledBorder("Test Selection"), BorderFactory.createEmptyBorder(5, 10, 10, 10)));
@@ -72,9 +75,7 @@ public class WindowBuilder {
         testPanel.add(testComboBox);
         
         // Build layout for calibration and run buttons
-        JPanel padding3 = new JPanel();
-        padding3.setBorder(BorderFactory.createEmptyBorder(0, 0, 10, 0));
-        background.add(padding3);
+        background.add(MyUtilities.SWING_UTILITIES.createPadding(10, SwingConstants.VERTICAL));
         
         JPanel optionsPanel = new JPanel();
         optionsPanel.setLayout(new BoxLayout(optionsPanel, BoxLayout.Y_AXIS));
@@ -84,8 +85,8 @@ public class WindowBuilder {
         JPanel buttonGroup1 = new JPanel();
         optionsPanel.add(buttonGroup1);
         buttonGroup1.add(optionsButtons[0]);
-        JPanel padding4 = new JPanel();
-        buttonGroup1.add(padding4);
+        JPanel padding = new JPanel();
+        buttonGroup1.add(padding);
         buttonGroup1.add(optionsButtons[1]);
         
         JPanel buttonGroup2 = new JPanel();
@@ -102,76 +103,276 @@ public class WindowBuilder {
                           (int)(screenSize.getHeight()/2 - windowSize.getHeight()/2));
     }
     
-    public static void buildExitSurveyWindow(JFrame frame) {
-        /*// Build layout for Subject information area
-        JPanel subjectPanel = new JPanel();
-        subjectPanel.setLayout(new BoxLayout(subjectPanel, BoxLayout.Y_AXIS));
-        subjectPanel.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createTitledBorder("Subject Information"), BorderFactory.createEmptyBorder(5, 10, 10, 10)));
-        background.add(subjectPanel);
+    public static void buildExitSurveyWindow(JFrame frame,
+            JTextField[] subjectTextFields, // id, age, major
+            JTextField[] historyTextFields, // physical, gesture, touch, swipe
+            JTextField[] ratingTextFields, // controller, tablet, surface, air, pinch
+            ButtonGroup[] subjectButtonGroups, // gender, own computer, hours, handedness, touch hand
+            ButtonGroup[] historyButtonGroups, // physical, gesture, touch, swipe
+            ButtonGroup[] discomfortButtonGroups, // controller, tablet, surface, air, pinch
+            ButtonGroup[] fatigueButtonGroups, // controller, tablet, surface, air, pinch
+            ButtonGroup[] difficutlyButtonGroups) { // controller, tablet, surface, air, pinch
+
+        JPanel background = new JPanel(new GridLayout(0,1));
+        background.setPreferredSize(new Dimension(800, 600));
+        frame.add(background);
         
-        // Details: firstname, lastname, age, gender 
-        JPanel firstNamePanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        JPanel lastNamePanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        JPanel agePanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        JPanel sexPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        JPanel handednessPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        JPanel contentPanel = new JPanel();
+        contentPanel.setLayout(new BoxLayout(contentPanel, BoxLayout.Y_AXIS));
+        contentPanel.setBorder(BorderFactory.createEmptyBorder(10, 25, 10, 25));
         
-        subjectPanel.add(firstNamePanel);
-        subjectPanel.add(lastNamePanel);
-        subjectPanel.add(agePanel);
-        subjectPanel.add(sexPanel);
-        subjectPanel.add(handednessPanel);
+        // Add subject information section.
+        JPanel subjectInfoPanel = new JPanel(new GridLayout(1,3));
+        subjectInfoPanel.setLayout(new BoxLayout(subjectInfoPanel, BoxLayout.X_AXIS));
+        subjectInfoPanel.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createTitledBorder("Subject Information"), BorderFactory.createEmptyBorder(5, 10, 10, 10)));
+        contentPanel.add(subjectInfoPanel);
         
-        JLabel firstNameLabel = new JLabel("First Name:     ");
-        JLabel lastNameLabel = new JLabel("Last Name:     ");
-        JLabel ageLabel = new JLabel("Age:                  ");
-        JLabel sexLabel = new JLabel("Sex:                 ");
-        JLabel handednessLabel = new JLabel("Handedness: ");
+        // Subject info left side
+        JPanel leftSubjectInfoPanel = new JPanel(new SpringLayout());
+        subjectInfoPanel.add(leftSubjectInfoPanel);
         
-        firstNamePanel.add(firstNameLabel);
-        lastNamePanel.add(lastNameLabel);
-        agePanel.add(ageLabel);
-        sexPanel.add(sexLabel);
-        handednessPanel.add(handednessLabel);
+        JLabel subjectIDLabel = new JLabel("Subject ID:", JLabel.LEADING);        
+        leftSubjectInfoPanel.add(subjectIDLabel);
+        subjectTextFields[0].setHorizontalAlignment(JTextField.CENTER);
+        leftSubjectInfoPanel.add(subjectTextFields[0]);
         
-        firstNamePanel.add(subjectTextFields[0]);
-        lastNamePanel.add(subjectTextFields[1]);
-        agePanel.add(subjectTextFields[2]);
-        sexPanel.add(subjectRadioButtons[0]);
-        sexPanel.add(subjectRadioButtons[1]);
-        handednessPanel.add(subjectRadioButtons[2]);
-        handednessPanel.add(subjectRadioButtons[3]);
+        JLabel genderLabel = new JLabel("Gender:", JLabel.LEADING);
+        JPanel genderGroupPanel = new JPanel();
+        JRadioButton maleRadioButton = new JRadioButton(ExitSurveyOptions.MALE_GENDER.getDescription());
+        JRadioButton femaleRadioButton = new JRadioButton(ExitSurveyOptions.FEMALE_GENDER.getDescription());
+        JRadioButton otherRadioButton = new JRadioButton(ExitSurveyOptions.OTHER_GENDER.getDescription());
+        genderGroupPanel.add(maleRadioButton);
+        genderGroupPanel.add(femaleRadioButton);
+        genderGroupPanel.add(otherRadioButton);
+        leftSubjectInfoPanel.add(genderLabel);
+        leftSubjectInfoPanel.add(genderGroupPanel);
+        subjectButtonGroups[0].add(maleRadioButton);
+        subjectButtonGroups[0].add(femaleRadioButton);
+        subjectButtonGroups[0].add(otherRadioButton);
         
-        JPanel padding0 = new JPanel();
-        padding0.setBorder(BorderFactory.createEmptyBorder(0, 0, 10, 0));
-        subjectPanel.add(padding0);
+        MyUtilities.SPRING_UTILITIES.makeCompactGrid(leftSubjectInfoPanel,
+                2, 2,        //rows, cols
+                6, 6,        //initX, initY
+                6, 6);       //xPad, yPad
         
-        // Hours per day slider
-        JPanel sliderBackground = new JPanel();
-        sliderBackground.setLayout(new BoxLayout(sliderBackground, BoxLayout.Y_AXIS));
-        sliderBackground.setBorder(BorderFactory.createEtchedBorder());
-        subjectPanel.add(sliderBackground);
+        // Add some padding in between
+        subjectInfoPanel.add(MyUtilities.SWING_UTILITIES.createPadding(225, SwingConstants.HORIZONTAL));
         
-        JPanel hoursOnComputerPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        JLabel hoursOnComputerLabel = new JLabel("How many hours per day do you typically use a computer?");
-        hoursOnComputerPanel.add(hoursOnComputerLabel);
-        sliderBackground.add(hoursOnComputerPanel);
+        // Subject info right side
+        JPanel rightSubjectInfoPanel = new JPanel(new SpringLayout());
+        subjectInfoPanel.add(rightSubjectInfoPanel);
         
-        JPanel padding1 = new JPanel();
-        padding1.setBorder(BorderFactory.createEmptyBorder(0, 0, 5, 0));
-        sliderBackground.add(padding1);
+        JLabel ageLabel = new JLabel("Age:", JLabel.TRAILING);        
+        rightSubjectInfoPanel.add(ageLabel);
+        subjectTextFields[1].setHorizontalAlignment(JTextField.CENTER);
+        rightSubjectInfoPanel.add(subjectTextFields[1]);
         
-        JPanel sliderPanel = new JPanel(new FlowLayout());
-        sliderPanel.setSize(20, 40);
+        JLabel majorLabel = new JLabel("Major:", JLabel.TRAILING);        
+        rightSubjectInfoPanel.add(majorLabel);
+        subjectTextFields[2].setHorizontalAlignment(JTextField.CENTER);
+        rightSubjectInfoPanel.add(subjectTextFields[2]);
         
-        //Turn on labels at major tick marks.
-        hoursSlider.setMajorTickSpacing(6);
-        hoursSlider.setMinorTickSpacing(1);
-        hoursSlider.setPaintTicks(true);
-        hoursSlider.setPaintLabels(true);
-        sliderPanel.add(hoursSlider);
+        MyUtilities.SPRING_UTILITIES.makeCompactGrid(rightSubjectInfoPanel,
+                2, 2,        //rows, cols
+                6, 6,        //initX, initY
+                6, 6);       //xPad, yPad
         
-        sliderBackground.add(sliderPanel);*/
+        // Question 1 - Do you own personal computer?
+        contentPanel.add(MyUtilities.SWING_UTILITIES.createPadding(25, SwingConstants.VERTICAL));
+        JTextArea ownComputerQuestion = new JTextArea("1. Do you own a personal computer (eg: Desktop, Lapton, Netbook, Tablet, etc)?");
+        ownComputerQuestion.setEditable(false);
+        ownComputerQuestion.setHighlighter(null);
+        ownComputerQuestion.setBackground(UIManager.getColor("Panel.background"));
+        ownComputerQuestion.setFont(UIManager.getFont("Label.font"));
+        ownComputerQuestion.setLineWrap(true);
+        ownComputerQuestion.setWrapStyleWord(true);
+        contentPanel.add(ownComputerQuestion);
+        
+        JPanel hasComputerGroup = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        JRadioButton yesComputerRadioButton = new JRadioButton(ExitSurveyOptions.YES.getDescription());
+        JRadioButton noComputerRadioButton = new JRadioButton(ExitSurveyOptions.NO.getDescription());
+        hasComputerGroup.add(yesComputerRadioButton);
+        hasComputerGroup.add(noComputerRadioButton);
+        contentPanel.add(hasComputerGroup);
+        subjectButtonGroups[1].add(yesComputerRadioButton);
+        subjectButtonGroups[1].add(noComputerRadioButton);
+        
+        // Question 2 - How many hours a week do you use a computer?
+        contentPanel.add(MyUtilities.SWING_UTILITIES.createPadding(25, SwingConstants.VERTICAL));
+        JTextArea hoursPerWeekQuestion = new JTextArea("2. How much time do you spend on a computer each week?");
+        hoursPerWeekQuestion.setEditable(false);
+        hoursPerWeekQuestion.setHighlighter(null);
+        hoursPerWeekQuestion.setBackground(UIManager.getColor("Panel.background"));
+        hoursPerWeekQuestion.setFont(UIManager.getFont("Label.font"));
+        hoursPerWeekQuestion.setLineWrap(true);
+        hoursPerWeekQuestion.setWrapStyleWord(true);
+        contentPanel.add(hoursPerWeekQuestion);
+        
+        JPanel hoursGroup0 = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        JPanel hoursGroup1 = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        JPanel hoursGroup2 = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        JPanel hoursGroup3 = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        JRadioButton hoursRadioButton0 = new JRadioButton(ExitSurveyOptions.HOURS_0.getDescription() + " hours");
+        JRadioButton hoursRadioButton1 = new JRadioButton(ExitSurveyOptions.HOURS_1.getDescription() + " hours");
+        JRadioButton hoursRadioButton2 = new JRadioButton(ExitSurveyOptions.HOURS_2.getDescription() + " hours");
+        JRadioButton hoursRadioButton3 = new JRadioButton(ExitSurveyOptions.HOURS_3.getDescription() + " hours");
+        JRadioButton hoursRadioButton4 = new JRadioButton(ExitSurveyOptions.HOURS_4.getDescription() + " hours");
+        JRadioButton hoursRadioButton5 = new JRadioButton(ExitSurveyOptions.HOURS_5.getDescription() + " hours");
+        JRadioButton hoursRadioButton6 = new JRadioButton(ExitSurveyOptions.HOURS_6.getDescription() + " hours");
+        JRadioButton hoursRadioButton7 = new JRadioButton(ExitSurveyOptions.HOURS_7.getDescription() + " hours");
+        hoursGroup0.add(hoursRadioButton0);
+        hoursGroup1.add(hoursRadioButton1);
+        hoursGroup2.add(hoursRadioButton2);
+        hoursGroup3.add(hoursRadioButton3);
+        int hoursSize0 = hoursRadioButton0.getFontMetrics(hoursRadioButton0.getFont()).stringWidth(hoursRadioButton0.getText());
+        int hoursSize1 = hoursRadioButton1.getFontMetrics(hoursRadioButton1.getFont()).stringWidth(hoursRadioButton1.getText());
+        int hoursSize2 = hoursRadioButton2.getFontMetrics(hoursRadioButton2.getFont()).stringWidth(hoursRadioButton2.getText());
+        int hoursSize3 = hoursRadioButton3.getFontMetrics(hoursRadioButton3.getFont()).stringWidth(hoursRadioButton3.getText());
+        int gapDifference0 = hoursSize3 - hoursSize0;
+        int gapDifference1 = hoursSize3 - hoursSize1;
+        int gapDifference2 = hoursSize3 - hoursSize2;
+        hoursGroup0.add(MyUtilities.SWING_UTILITIES.createPadding(75 + gapDifference0, SwingConstants.HORIZONTAL));
+        hoursGroup1.add(MyUtilities.SWING_UTILITIES.createPadding(75 + gapDifference1, SwingConstants.HORIZONTAL));
+        hoursGroup2.add(MyUtilities.SWING_UTILITIES.createPadding(75 + gapDifference2, SwingConstants.HORIZONTAL));
+        hoursGroup3.add(MyUtilities.SWING_UTILITIES.createPadding(75, SwingConstants.HORIZONTAL));
+        hoursGroup0.add(hoursRadioButton4);
+        hoursGroup1.add(hoursRadioButton5);
+        hoursGroup2.add(hoursRadioButton6);
+        hoursGroup3.add(hoursRadioButton7);
+        contentPanel.add(hoursGroup0);
+        contentPanel.add(hoursGroup1);
+        contentPanel.add(hoursGroup2);
+        contentPanel.add(hoursGroup3);
+        subjectButtonGroups[2].add(hoursRadioButton0);
+        subjectButtonGroups[2].add(hoursRadioButton1);
+        subjectButtonGroups[2].add(hoursRadioButton2);
+        subjectButtonGroups[2].add(hoursRadioButton3);
+        subjectButtonGroups[2].add(hoursRadioButton4);
+        subjectButtonGroups[2].add(hoursRadioButton5);
+        subjectButtonGroups[2].add(hoursRadioButton6);
+        subjectButtonGroups[2].add(hoursRadioButton7);
+        
+        // Question 3 - Do you have gesture device experience?
+        contentPanel.add(MyUtilities.SWING_UTILITIES.createPadding(25, SwingConstants.VERTICAL));
+        JTextArea gestureExperienceQuestion = new JTextArea("3. Have you used gestural controllers before (eg: Xbox Kinect, Leap Motion, etc) or any other gesture devices?\n\n"
+                + "If yes, please indicate the type of device.");
+        gestureExperienceQuestion.setEditable(false);
+        gestureExperienceQuestion.setHighlighter(null);
+        gestureExperienceQuestion.setBackground(UIManager.getColor("Panel.background"));
+        gestureExperienceQuestion.setFont(UIManager.getFont("Label.font"));
+        gestureExperienceQuestion.setLineWrap(true);
+        gestureExperienceQuestion.setWrapStyleWord(true);
+        contentPanel.add(gestureExperienceQuestion);
+        
+        JPanel gestureExperienceYesGroup = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        JRadioButton yesGestureExperienceRadioButton = new JRadioButton(ExitSurveyOptions.YES.getDescription());
+        JLabel gestureExperienceYesLabel = new JLabel("(please list devices):");
+        historyTextFields[1].setEditable(false);
+        gestureExperienceYesGroup.add(yesGestureExperienceRadioButton);
+        gestureExperienceYesGroup.add(gestureExperienceYesLabel);
+        gestureExperienceYesGroup.add(historyTextFields[1]);
+        JPanel gestureExperienceNoGroup = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        JRadioButton noGestureExperienceRadioButton = new JRadioButton(ExitSurveyOptions.NO.getDescription());
+        gestureExperienceNoGroup.add(noGestureExperienceRadioButton);
+        contentPanel.add(gestureExperienceYesGroup);
+        contentPanel.add(gestureExperienceNoGroup);
+        historyButtonGroups[1].add(yesGestureExperienceRadioButton);
+        historyButtonGroups[1].add(noGestureExperienceRadioButton);
+        
+        // Question 4 - Do you have touch screen device experience?
+        contentPanel.add(MyUtilities.SWING_UTILITIES.createPadding(25, SwingConstants.VERTICAL));
+        JTextArea touchExperienceQuestion = new JTextArea("4. Have you used touch devices before (eg: iPad, Surface, Smartphone, Laptop, etc)?\n\n"
+                + "If yes, please indicate the type of device.");
+        touchExperienceQuestion.setEditable(false);
+        touchExperienceQuestion.setHighlighter(null);
+        touchExperienceQuestion.setBackground(UIManager.getColor("Panel.background"));
+        touchExperienceQuestion.setFont(UIManager.getFont("Label.font"));
+        touchExperienceQuestion.setLineWrap(true);
+        touchExperienceQuestion.setWrapStyleWord(true);
+        contentPanel.add(touchExperienceQuestion);
+        
+        JPanel touchExperienceYesGroup = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        JRadioButton yesTouchExperienceRadioButton = new JRadioButton(ExitSurveyOptions.YES.getDescription());
+        JLabel touchExperienceYesLabel = new JLabel("(please list devices):");
+        historyTextFields[2].setEditable(false);
+        touchExperienceYesGroup.add(yesTouchExperienceRadioButton);
+        touchExperienceYesGroup.add(touchExperienceYesLabel);
+        touchExperienceYesGroup.add(historyTextFields[2]);
+        JPanel touchExperienceNoGroup = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        JRadioButton noTouchExperienceRadioButton = new JRadioButton(ExitSurveyOptions.NO.getDescription());
+        touchExperienceNoGroup.add(noTouchExperienceRadioButton);
+        contentPanel.add(touchExperienceYesGroup);
+        contentPanel.add(touchExperienceNoGroup);
+        historyButtonGroups[2].add(yesTouchExperienceRadioButton);
+        historyButtonGroups[2].add(noTouchExperienceRadioButton);
+        
+        // Question 5 - Do you have swipe keyboard experience?
+        contentPanel.add(MyUtilities.SWING_UTILITIES.createPadding(25, SwingConstants.VERTICAL));
+        JTextArea swipeExperienceQuestion = new JTextArea("5. Have you used a swipe-based keyboard before on any device (eg: Android, Surface, etc)?\n\n"
+                + "If yes, please indicate the type of device.");
+        swipeExperienceQuestion.setEditable(false);
+        swipeExperienceQuestion.setHighlighter(null);
+        swipeExperienceQuestion.setBackground(UIManager.getColor("Panel.background"));
+        swipeExperienceQuestion.setFont(UIManager.getFont("Label.font"));
+        swipeExperienceQuestion.setLineWrap(true);
+        swipeExperienceQuestion.setWrapStyleWord(true);
+        contentPanel.add(swipeExperienceQuestion);
+        
+        JPanel swipeExperienceYesGroup = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        JRadioButton yesSwipeExperienceRadioButton = new JRadioButton(ExitSurveyOptions.YES.getDescription());
+        JLabel swipeExperienceYesLabel = new JLabel("(please list devices):");
+        historyTextFields[3].setEditable(false);
+        swipeExperienceYesGroup.add(yesSwipeExperienceRadioButton);
+        swipeExperienceYesGroup.add(swipeExperienceYesLabel);
+        swipeExperienceYesGroup.add(historyTextFields[3]);
+        JPanel swipeExperienceNoGroup = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        JRadioButton noSwipeExperienceRadioButton = new JRadioButton(ExitSurveyOptions.NO.getDescription());
+        swipeExperienceNoGroup.add(noSwipeExperienceRadioButton);
+        contentPanel.add(swipeExperienceYesGroup);
+        contentPanel.add(swipeExperienceNoGroup);
+        historyButtonGroups[3].add(yesSwipeExperienceRadioButton);
+        historyButtonGroups[3].add(noSwipeExperienceRadioButton);
+        
+        // Question 6 - Do you have any physical impairments?
+        contentPanel.add(MyUtilities.SWING_UTILITIES.createPadding(25, SwingConstants.VERTICAL));
+        JTextArea impairExperienceQuestion = new JTextArea("5. Do you haev any physical impairment that makes it difficult to use a computer?\n\n"
+                + "If yes, please indicate the impairment.");
+        impairExperienceQuestion.setEditable(false);
+        impairExperienceQuestion.setHighlighter(null);
+        impairExperienceQuestion.setBackground(UIManager.getColor("Panel.background"));
+        impairExperienceQuestion.setFont(UIManager.getFont("Label.font"));
+        impairExperienceQuestion.setLineWrap(true);
+        impairExperienceQuestion.setWrapStyleWord(true);
+        contentPanel.add(impairExperienceQuestion);
+        
+        JPanel impairExperienceYesGroup = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        JRadioButton yesImpairExperienceRadioButton = new JRadioButton(ExitSurveyOptions.YES.getDescription());
+        JLabel impairExperienceYesLabel = new JLabel("(please list impairment):");
+        historyTextFields[0].setEditable(false);
+        impairExperienceYesGroup.add(yesImpairExperienceRadioButton);
+        impairExperienceYesGroup.add(impairExperienceYesLabel);
+        impairExperienceYesGroup.add(historyTextFields[0]);
+        JPanel impairExperienceNoGroup = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        JRadioButton noImpairExperienceRadioButton = new JRadioButton(ExitSurveyOptions.NO.getDescription());
+        impairExperienceNoGroup.add(noImpairExperienceRadioButton);
+        contentPanel.add(impairExperienceYesGroup);
+        contentPanel.add(impairExperienceNoGroup);
+        historyButtonGroups[0].add(yesImpairExperienceRadioButton);
+        historyButtonGroups[0].add(noImpairExperienceRadioButton);
+        
+        // Add the entire content panel to a scroll pane.
+        JScrollPane contentScrollBar = new JScrollPane(contentPanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        contentScrollBar.getVerticalScrollBar().setUnitIncrement(16);
+        background.add(contentScrollBar);
+        
+        // Arrange the components inside the window
+        frame.pack();
+        frame.setResizable(false);
+        
+        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+        Dimension windowSize = frame.getSize();
+        frame.setLocation((int)(screenSize.getWidth()/2 - windowSize.getWidth()/2),
+                          (int)(screenSize.getHeight()/2 - windowSize.getHeight()/2));
     }
     
     public static void buildExperimentWindow(JFrame frame,

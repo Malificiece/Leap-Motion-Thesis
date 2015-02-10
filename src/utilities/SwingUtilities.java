@@ -3,7 +3,10 @@ package utilities;
 import java.awt.Container;
 import java.awt.Font;
 
+import javax.swing.BorderFactory;
 import javax.swing.JComponent;
+import javax.swing.JPanel;
+import javax.swing.SwingConstants;
 
 public class SwingUtilities {
     private final int OFFSET = 38;
@@ -58,5 +61,16 @@ public class SwingUtilities {
     
     public boolean equalsIgnoreHTML(String htmlString0, String htmlString1) {
         return parseHTML(htmlString0).equals(parseHTML(htmlString1));
+    }
+    
+    public JPanel createPadding(int size, int direction) {
+        assert(direction == SwingConstants.HORIZONTAL || direction == SwingConstants.VERTICAL);
+        JPanel padding = new JPanel();
+        if(direction == SwingConstants.HORIZONTAL) {
+            padding.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, size));
+        } else if(direction == SwingConstants.VERTICAL) {
+            padding.setBorder(BorderFactory.createEmptyBorder(0, 0, size, 0));
+        }
+        return padding;
     }
 }

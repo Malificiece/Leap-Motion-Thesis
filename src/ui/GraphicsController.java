@@ -56,7 +56,8 @@ public abstract class GraphicsController implements GLEventListener, KeyboardObs
 
     @Override
     public void dispose(GLAutoDrawable drawable) {
-        // TODO Auto-generated method stub
+        // TODO Determine if there is anything we need to do here.
+        System.out.println("I'm being disposed -- GL");
     }
 
     @Override

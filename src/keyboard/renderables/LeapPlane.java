@@ -81,7 +81,7 @@ public class LeapPlane extends KeyboardRenderable {
     //private Vector intersectionPoint = Vector.zero();
     private float x, y, z = -1;
     private JPanel textPanel;
-    private JEditorPane explinationPane; // TODO: Use JTextPane and character attributes instead of html
+    private JEditorPane explinationPane;
     private boolean removeTool = false;
     
     public LeapPlane(IKeyboard keyboard) {
@@ -170,35 +170,35 @@ public class LeapPlane extends KeyboardRenderable {
             case LeapPlaneCalibrator.POINT_A:
                 text = "<div style=\"white-space: nowrap\"><font size=+1><b><font color=red>Place and hold</font></b> "
                         + "the tool over the <b><font color=red>bottom-left or \"A\" corner</font></b> of the keyboard.</font></div>";
-                if(!MyUtilities.JAVA_SWING_UTILITIES.equalsIgnoreHTML(text, explinationPane.getText())) {
+                if(!MyUtilities.SWING_UTILITIES.equalsIgnoreHTML(text, explinationPane.getText())) {
                     explinationPane.setText(text);
                 }
                 break;
             case LeapPlaneCalibrator.POINT_B:
                 text = "<div style=\"white-space: nowrap\"><font size=+1><b><font color=red>Place and hold</font></b> "
                         + "the tool over the <b><font color=red>top-left or \"B\" corner</font></b> of the keyboard.</font></div>";
-                if(!MyUtilities.JAVA_SWING_UTILITIES.equalsIgnoreHTML(text, explinationPane.getText())) {
+                if(!MyUtilities.SWING_UTILITIES.equalsIgnoreHTML(text, explinationPane.getText())) {
                     explinationPane.setText(text);
                 }
                 break;
             case LeapPlaneCalibrator.POINT_C:
                 text = "<div style=\"white-space: nowrap\"><font size=+1><b><font color=red>Place and hold</font></b> "
                         + "the tool over the <b><font color=red>top-right or \"C\" corner</font></b> of the keyboard.</font></div>";
-                if(!MyUtilities.JAVA_SWING_UTILITIES.equalsIgnoreHTML(text, explinationPane.getText())) {
+                if(!MyUtilities.SWING_UTILITIES.equalsIgnoreHTML(text, explinationPane.getText())) {
                     explinationPane.setText(text);
                 }
                 break;
             case LeapPlaneCalibrator.POINT_D:
                 text = "<div style=\"white-space: nowrap\"><font size=+1><b><font color=red>Place and hold</font></b> "
                         + "the tool over the <b><font color=red>bottom-right or \"D\" corner</font></b> of the keyboard.</font></div>";
-                if(!MyUtilities.JAVA_SWING_UTILITIES.equalsIgnoreHTML(text, explinationPane.getText())) {
+                if(!MyUtilities.SWING_UTILITIES.equalsIgnoreHTML(text, explinationPane.getText())) {
                     explinationPane.setText(text);
                 }
                 break;
             default:
                 text = "<div style=\"white-space: nowrap\"><font size=+2><b><font color=red>Remove the tool</font></b> "
                         + "from the Leap Motinon Interaction Zone.</font></div>";
-                if(!MyUtilities.JAVA_SWING_UTILITIES.equalsIgnoreHTML(text, explinationPane.getText())) {
+                if(!MyUtilities.SWING_UTILITIES.equalsIgnoreHTML(text, explinationPane.getText())) {
                     explinationPane.setText(text);
                 }
                 break;

@@ -288,8 +288,8 @@ public class ExperimentController extends GraphicsController {
         wordManager.loadTutorialWords();
         disableUI();
         wordManager.paintLetters(wordLabel, answerLabel);
-        MyUtilities.JAVA_SWING_UTILITIES.calculateFontSize(wordManager.currentWord(), wordLabel, wordPanel);
-        MyUtilities.JAVA_SWING_UTILITIES.calculateFontSize(wordManager.getAnswer(), answerLabel, answerPanel);
+        MyUtilities.SWING_UTILITIES.calculateFontSize(wordManager.currentWord(), wordLabel, wordPanel);
+        MyUtilities.SWING_UTILITIES.calculateFontSize(wordManager.getAnswer(), answerLabel, answerPanel);
     }
     
     private void finishTutorial() {
@@ -312,8 +312,8 @@ public class ExperimentController extends GraphicsController {
         practiceButton.setEnabled(true);
         practiceButton.setText("Finish Practice");
         wordManager.paintLetters(wordLabel, answerLabel);
-        MyUtilities.JAVA_SWING_UTILITIES.calculateFontSize(wordManager.currentWord(), wordLabel, wordPanel);
-        MyUtilities.JAVA_SWING_UTILITIES.calculateFontSize(wordManager.getAnswer(), answerLabel, answerPanel);
+        MyUtilities.SWING_UTILITIES.calculateFontSize(wordManager.currentWord(), wordLabel, wordPanel);
+        MyUtilities.SWING_UTILITIES.calculateFontSize(wordManager.getAnswer(), answerLabel, answerPanel);
     }
     
     private void finishPractice() {
@@ -337,8 +337,8 @@ public class ExperimentController extends GraphicsController {
         dataManager.startRecording();
         wordManager.paintLetters(wordLabel, answerLabel);
         dataManager.startWord(wordManager.currentWord());
-        MyUtilities.JAVA_SWING_UTILITIES.calculateFontSize(wordManager.currentWord(), wordLabel, wordPanel);
-        MyUtilities.JAVA_SWING_UTILITIES.calculateFontSize(wordManager.getAnswer(), answerLabel, answerPanel);
+        MyUtilities.SWING_UTILITIES.calculateFontSize(wordManager.currentWord(), wordLabel, wordPanel);
+        MyUtilities.SWING_UTILITIES.calculateFontSize(wordManager.getAnswer(), answerLabel, answerPanel);
     }
     
     private void finishExperiment() {
@@ -370,8 +370,8 @@ public class ExperimentController extends GraphicsController {
     }
     
     public void enableUI() {
-        MyUtilities.JAVA_SWING_UTILITIES.calculateFontSize(wordManager.currentWord(), wordLabel, wordPanel);
-        MyUtilities.JAVA_SWING_UTILITIES.calculateFontSize(wordManager.getAnswer(), answerLabel, answerPanel);
+        MyUtilities.SWING_UTILITIES.calculateFontSize(wordManager.currentWord(), wordLabel, wordPanel);
+        MyUtilities.SWING_UTILITIES.calculateFontSize(wordManager.getAnswer(), answerLabel, answerPanel);
         wordManager.paintLetters(wordLabel, answerLabel);
         currentColor = Color.WHITE;
         wordPanel.setBackground(currentColor);
@@ -478,8 +478,8 @@ public class ExperimentController extends GraphicsController {
                 if(tutorialManager.isValid() && wordManager.isDefault()) {
                     wordManager.loadTutorialWords();
                     wordManager.paintLetters(wordLabel, answerLabel);
-                    MyUtilities.JAVA_SWING_UTILITIES.calculateFontSize(wordManager.currentWord(), wordLabel, wordPanel);
-                    MyUtilities.JAVA_SWING_UTILITIES.calculateFontSize(wordManager.getAnswer(), answerLabel, answerPanel);
+                    MyUtilities.SWING_UTILITIES.calculateFontSize(wordManager.currentWord(), wordLabel, wordPanel);
+                    MyUtilities.SWING_UTILITIES.calculateFontSize(wordManager.getAnswer(), answerLabel, answerPanel);
                 }
                 if(tutorialManager.hasNext() && tutorialManager.isValid()) {
                     infoPane.setText(tutorialManager.getText());
@@ -535,7 +535,7 @@ public class ExperimentController extends GraphicsController {
             if(key == '\b') {
                 if(0 < wordManager.getAnswer().length()) {
                     wordManager.setAnswer(wordManager.getAnswer().substring(0, wordManager.getAnswer().length()-1));
-                    MyUtilities.JAVA_SWING_UTILITIES.calculateFontSize(wordManager.getAnswer(), answerLabel, answerPanel);
+                    MyUtilities.SWING_UTILITIES.calculateFontSize(wordManager.getAnswer(), answerLabel, answerPanel);
                 }
                 if(wordManager.isMatch()) {
                     currentColor = LIGHT_GREEN;
@@ -569,8 +569,8 @@ public class ExperimentController extends GraphicsController {
                         dataManager.startWord(wordManager.currentWord());
                     }
                     if(wordManager.isValid()) {
-                        MyUtilities.JAVA_SWING_UTILITIES.calculateFontSize(wordManager.currentWord(), wordLabel, wordPanel);
-                        MyUtilities.JAVA_SWING_UTILITIES.calculateFontSize(wordManager.getAnswer(), answerLabel, answerPanel);
+                        MyUtilities.SWING_UTILITIES.calculateFontSize(wordManager.currentWord(), wordLabel, wordPanel);
+                        MyUtilities.SWING_UTILITIES.calculateFontSize(wordManager.getAnswer(), answerLabel, answerPanel);
                     }
                 } else {
                     wordPanel.setBackground(Color.RED);
@@ -578,7 +578,7 @@ public class ExperimentController extends GraphicsController {
                 }
             } else {
                 wordManager.setAnswer(wordManager.getAnswer()+Character.toString(key));
-                MyUtilities.JAVA_SWING_UTILITIES.calculateFontSize(wordManager.getAnswer(), answerLabel, answerPanel);
+                MyUtilities.SWING_UTILITIES.calculateFontSize(wordManager.getAnswer(), answerLabel, answerPanel);
                 if(wordManager.isMatch()) {
                     currentColor = LIGHT_GREEN;
                     wordPanel.setBackground(currentColor);

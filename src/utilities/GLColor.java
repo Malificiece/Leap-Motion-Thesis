@@ -8,7 +8,6 @@ public class GLColor {
     private static final int SIZE = 4;
     private static final int ALPHA = 3;
     private final float[] COLOR = new float[SIZE];
-    // TODO: Add emission for selected keys
     
     public GLColor(Color color) {
         float[] c = color.getColor();

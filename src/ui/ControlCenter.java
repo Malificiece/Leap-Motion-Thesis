@@ -155,7 +155,7 @@ public class ControlCenter {
                 CONTROL_LOCK.lock();
                 try {
                     if(!isInProgress()) {
-                        EXIT_SURVEY_CONTROLLER.enable();
+                        EXIT_SURVEY_CONTROLLER.enable(subjectID);
                         System.out.println("Starting Exit Survey");
                         lockUI();
                     }

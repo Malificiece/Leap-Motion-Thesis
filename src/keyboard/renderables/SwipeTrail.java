@@ -242,7 +242,6 @@ public class SwipeTrail extends KeyboardRenderable {
                 if(angle < (onPath ? MIN_PRESSED_ANGLE_ON_PATH : MIN_PRESSED_ANGLE_OFF_PATH)) {
                     pressedPoints.add(getLast(interpolatedPoints));
                     isPressed = true;
-                    //System.out.println("SWIPE_TRAIL: detected angle press"); // TODO: REMOVE ME
                 }
             }
             interpolatedPoints.add(point);
