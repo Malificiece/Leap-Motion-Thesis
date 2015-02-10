@@ -40,7 +40,7 @@ public enum ExitSurveyDataType {
     CONTROLLER_KEYBOARD_PREFERENCE_RATING,
     LEAP_SURFACE_KEYBOARD_PREFERENCE_RATING,
     LEAP_AIR_KEYBOARD_PREFERENCE_RATING,
-    LEAP_PINCH_KEYBOARD_PREFERENCE_RATING,;
+    LEAP_PINCH_KEYBOARD_PREFERENCE_RATING;
     
     private static final ExitSurveyDataType[] VALUES = values();
     private static final int SIZE = VALUES.length;

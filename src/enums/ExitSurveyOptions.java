@@ -39,7 +39,7 @@ public enum ExitSurveyOptions {
     
     public static ExitSurveyOptions getByDescription(String description) {
         for(int i = 0; i < SIZE; i++) {
-            if(VALUES[i].getDescription().equalsIgnoreCase(description)) return VALUES[i];
+            if(VALUES[i].getDescription().contains(description)) return VALUES[i];
         }
         return null;
     }

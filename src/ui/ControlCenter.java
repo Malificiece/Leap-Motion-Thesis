@@ -41,8 +41,8 @@ public class ControlCenter {
     // Constants
     private final ExperimentController EXPERIMENT_CONTROLLER = new ExperimentController();
     private final CalibrationController CALIBRATION_CONTROLLER = new CalibrationController();
-    private final ExitSurveyController EXIT_SURVEY_CONTROLLER = new ExitSurveyController();
     private final  ReentrantLock CONTROL_LOCK = new ReentrantLock();
+    private ExitSurveyController exitSurveyController;
     
     // Not Constants
     private JFrame frame;
@@ -80,14 +80,29 @@ public class ControlCenter {
         // the window is asked to close
         frame.addWindowListener(new WindowAdapter() {
             public void windowClosing(WindowEvent e) {
-                if(!expInProgress()) {
+                if(!expInProgress() && !exitInProgress()) {
                     frame.dispose();
                     System.exit(0);
-                } else {
+                } else if(expInProgress()){
                     Object[] options = {"Yes", "Cancel"};
                     int selection =
                             JOptionPane.showOptionDialog(frame,
                             "An experiment is currently running. If you close now, data will be lost.\nClose anyway?",
+                            "Warning!",
+                            JOptionPane.YES_NO_OPTION,
+                            JOptionPane.WARNING_MESSAGE,
+                            null,
+                            options,
+                            options[0]);
+                    if(selection == JOptionPane.YES_OPTION) {
+                        frame.dispose();
+                        System.exit(0);
+                    }
+                } else if(exitInProgress()){
+                    Object[] options = {"Yes", "Cancel"};
+                    int selection =
+                            JOptionPane.showOptionDialog(frame,
+                            "An exit survey is currently being filled out. If you close now, data will be lost.\nClose anyway?",
                             "Warning!",
                             JOptionPane.YES_NO_OPTION,
                             JOptionPane.WARNING_MESSAGE,
@@ -155,7 +170,8 @@ public class ControlCenter {
                 CONTROL_LOCK.lock();
                 try {
                     if(!isInProgress()) {
-                        EXIT_SURVEY_CONTROLLER.enable(subjectID);
+                    	exitSurveyController = new ExitSurveyController();
+                    	exitSurveyController.enable(subjectID);
                         System.out.println("Starting Exit Survey");
                         lockUI();
                     }
@@ -254,7 +270,14 @@ public class ControlCenter {
     public boolean exitInProgress() {
         CONTROL_LOCK.lock();
         try {
-            return EXIT_SURVEY_CONTROLLER.isEnabled();
+        	if(exitSurveyController != null) {
+        		if(exitSurveyController.isEnabled()) {
+        			return true;
+        		} else {
+        			exitSurveyController = null;
+        		}
+        	}
+            return false;
         } finally {
             CONTROL_LOCK.unlock();
         }
@@ -265,6 +288,7 @@ public class ControlCenter {
         calibrateButton.setEnabled(false);
         experimentButton.setEnabled(false);
         exitSurveyButton.setEnabled(false);
+        editSubjectIDButton.setEnabled(false);
         testTypeComboBox.setEnabled(false);
     }
     
@@ -273,6 +297,7 @@ public class ControlCenter {
         calibrateButton.setEnabled(true);
         experimentButton.setEnabled(true);
         exitSurveyButton.setEnabled(true);
+        editSubjectIDButton.setEnabled(true);
         testTypeComboBox.setEnabled(true);
     }
     

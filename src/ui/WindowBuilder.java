@@ -3,6 +3,7 @@ package ui;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.Font;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.Toolkit;
@@ -24,9 +25,6 @@ import javax.swing.JTextField;
 import javax.swing.SpringLayout;
 import javax.swing.SwingConstants;
 import javax.swing.UIManager;
-import javax.swing.text.MutableAttributeSet;
-import javax.swing.text.SimpleAttributeSet;
-import javax.swing.text.StyleConstants;
 
 import utilities.MyUtilities;
 import enums.*;
@@ -106,26 +104,23 @@ public class WindowBuilder {
     public static void buildExitSurveyWindow(JFrame frame,
             JTextField[] subjectTextFields, // id, age, major
             JTextField[] historyTextFields, // physical, gesture, touch, swipe
-            JTextField[] ratingTextFields, // controller, tablet, surface, air, pinch
+            JTextField[] rankingTextFields, // controller, tablet, surface, air, pinch
             ButtonGroup[] subjectButtonGroups, // gender, own computer, hours, handedness, touch hand
             ButtonGroup[] historyButtonGroups, // physical, gesture, touch, swipe
             ButtonGroup[] discomfortButtonGroups, // controller, tablet, surface, air, pinch
             ButtonGroup[] fatigueButtonGroups, // controller, tablet, surface, air, pinch
-            ButtonGroup[] difficutlyButtonGroups) { // controller, tablet, surface, air, pinch
-
-        JPanel background = new JPanel(new GridLayout(0,1));
-        background.setPreferredSize(new Dimension(800, 600));
-        frame.add(background);
-        
-        JPanel contentPanel = new JPanel();
-        contentPanel.setLayout(new BoxLayout(contentPanel, BoxLayout.Y_AXIS));
-        contentPanel.setBorder(BorderFactory.createEmptyBorder(10, 25, 10, 25));
+            ButtonGroup[] difficultyButtonGroups, // controller, tablet, surface, air, pinch
+            JButton saveButton) {
+    	
+    	JPanel background = new JPanel();
+    	background.setLayout(new BoxLayout(background, BoxLayout.Y_AXIS));
+    	frame.add(background);
         
         // Add subject information section.
         JPanel subjectInfoPanel = new JPanel(new GridLayout(1,3));
         subjectInfoPanel.setLayout(new BoxLayout(subjectInfoPanel, BoxLayout.X_AXIS));
         subjectInfoPanel.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createTitledBorder("Subject Information"), BorderFactory.createEmptyBorder(5, 10, 10, 10)));
-        contentPanel.add(subjectInfoPanel);
+        background.add(subjectInfoPanel);
         
         // Subject info left side
         JPanel leftSubjectInfoPanel = new JPanel(new SpringLayout());
@@ -156,7 +151,7 @@ public class WindowBuilder {
                 6, 6);       //xPad, yPad
         
         // Add some padding in between
-        subjectInfoPanel.add(MyUtilities.SWING_UTILITIES.createPadding(225, SwingConstants.HORIZONTAL));
+        subjectInfoPanel.add(MyUtilities.SWING_UTILITIES.createPadding(150, SwingConstants.HORIZONTAL));
         
         // Subject info right side
         JPanel rightSubjectInfoPanel = new JPanel(new SpringLayout());
@@ -176,6 +171,16 @@ public class WindowBuilder {
                 2, 2,        //rows, cols
                 6, 6,        //initX, initY
                 6, 6);       //xPad, yPad
+        
+        
+        // Create the content pane and scroll pane
+        JPanel scrollPanel = new JPanel(new GridLayout(0,1));
+        scrollPanel.setPreferredSize(new Dimension(675, 600));
+        background.add(scrollPanel);
+        
+        JPanel contentPanel = new JPanel();
+        contentPanel.setLayout(new BoxLayout(contentPanel, BoxLayout.Y_AXIS));
+        contentPanel.setBorder(BorderFactory.createEmptyBorder(10, 25, 10, 25));
         
         // Question 1 - Do you own personal computer?
         contentPanel.add(MyUtilities.SWING_UTILITIES.createPadding(25, SwingConstants.VERTICAL));
@@ -268,6 +273,7 @@ public class WindowBuilder {
         JRadioButton yesGestureExperienceRadioButton = new JRadioButton(ExitSurveyOptions.YES.getDescription());
         JLabel gestureExperienceYesLabel = new JLabel("(please list devices):");
         historyTextFields[1].setEditable(false);
+        historyTextFields[1].setHorizontalAlignment(JTextField.CENTER);
         gestureExperienceYesGroup.add(yesGestureExperienceRadioButton);
         gestureExperienceYesGroup.add(gestureExperienceYesLabel);
         gestureExperienceYesGroup.add(historyTextFields[1]);
@@ -295,6 +301,7 @@ public class WindowBuilder {
         JRadioButton yesTouchExperienceRadioButton = new JRadioButton(ExitSurveyOptions.YES.getDescription());
         JLabel touchExperienceYesLabel = new JLabel("(please list devices):");
         historyTextFields[2].setEditable(false);
+        historyTextFields[2].setHorizontalAlignment(JTextField.CENTER);
         touchExperienceYesGroup.add(yesTouchExperienceRadioButton);
         touchExperienceYesGroup.add(touchExperienceYesLabel);
         touchExperienceYesGroup.add(historyTextFields[2]);
@@ -322,6 +329,7 @@ public class WindowBuilder {
         JRadioButton yesSwipeExperienceRadioButton = new JRadioButton(ExitSurveyOptions.YES.getDescription());
         JLabel swipeExperienceYesLabel = new JLabel("(please list devices):");
         historyTextFields[3].setEditable(false);
+        historyTextFields[3].setHorizontalAlignment(JTextField.CENTER);
         swipeExperienceYesGroup.add(yesSwipeExperienceRadioButton);
         swipeExperienceYesGroup.add(swipeExperienceYesLabel);
         swipeExperienceYesGroup.add(historyTextFields[3]);
@@ -335,7 +343,7 @@ public class WindowBuilder {
         
         // Question 6 - Do you have any physical impairments?
         contentPanel.add(MyUtilities.SWING_UTILITIES.createPadding(25, SwingConstants.VERTICAL));
-        JTextArea impairExperienceQuestion = new JTextArea("5. Do you haev any physical impairment that makes it difficult to use a computer?\n\n"
+        JTextArea impairExperienceQuestion = new JTextArea("6. Do you haev any physical impairment that makes it difficult to use a computer?\n\n"
                 + "If yes, please indicate the impairment.");
         impairExperienceQuestion.setEditable(false);
         impairExperienceQuestion.setHighlighter(null);
@@ -349,6 +357,7 @@ public class WindowBuilder {
         JRadioButton yesImpairExperienceRadioButton = new JRadioButton(ExitSurveyOptions.YES.getDescription());
         JLabel impairExperienceYesLabel = new JLabel("(please list impairment):");
         historyTextFields[0].setEditable(false);
+        historyTextFields[0].setHorizontalAlignment(JTextField.CENTER);
         impairExperienceYesGroup.add(yesImpairExperienceRadioButton);
         impairExperienceYesGroup.add(impairExperienceYesLabel);
         impairExperienceYesGroup.add(historyTextFields[0]);
@@ -360,10 +369,198 @@ public class WindowBuilder {
         historyButtonGroups[0].add(yesImpairExperienceRadioButton);
         historyButtonGroups[0].add(noImpairExperienceRadioButton);
         
+        // Question 7 - Which is your dominant hand?
+        contentPanel.add(MyUtilities.SWING_UTILITIES.createPadding(25, SwingConstants.VERTICAL));
+        JTextArea handednessQuestion = new JTextArea("7. Which is your dominant hand?");
+        handednessQuestion.setEditable(false);
+        handednessQuestion.setHighlighter(null);
+        handednessQuestion.setBackground(UIManager.getColor("Panel.background"));
+        handednessQuestion.setFont(UIManager.getFont("Label.font"));
+        handednessQuestion.setLineWrap(true);
+        handednessQuestion.setWrapStyleWord(true);
+        contentPanel.add(handednessQuestion);
+        
+        JPanel handednessGroup = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        JRadioButton rightHandRadioButton = new JRadioButton(ExitSurveyOptions.RIGHT_HAND.getDescription() + " hand");
+        JRadioButton leftHandRadioButton = new JRadioButton(ExitSurveyOptions.LEFT_HAND.getDescription() + " hand");
+        JRadioButton ambidextriousRadioButton = new JRadioButton(ExitSurveyOptions.AMBIDEXTROUS.getDescription());
+        handednessGroup.add(rightHandRadioButton);
+        handednessGroup.add(leftHandRadioButton);
+        handednessGroup.add(ambidextriousRadioButton);
+        contentPanel.add(handednessGroup);
+        subjectButtonGroups[3].add(rightHandRadioButton);
+        subjectButtonGroups[3].add(leftHandRadioButton);
+        subjectButtonGroups[3].add(ambidextriousRadioButton);
+        
+        // Question 8 - Which hand do you normally use to control touch screen devices?
+        contentPanel.add(MyUtilities.SWING_UTILITIES.createPadding(25, SwingConstants.VERTICAL));
+        JTextArea touchHandQuestion = new JTextArea("8. Which hand do you normally use to control touch screen devices?");
+        touchHandQuestion.setEditable(false);
+        touchHandQuestion.setHighlighter(null);
+        touchHandQuestion.setBackground(UIManager.getColor("Panel.background"));
+        touchHandQuestion.setFont(UIManager.getFont("Label.font"));
+        touchHandQuestion.setLineWrap(true);
+        touchHandQuestion.setWrapStyleWord(true);
+        contentPanel.add(touchHandQuestion);
+        
+        JPanel touchHandGroup = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        JRadioButton touchRightHandRadioButton = new JRadioButton(ExitSurveyOptions.RIGHT_HAND.getDescription() + " hand");
+        JRadioButton touchLeftHandRadioButton = new JRadioButton(ExitSurveyOptions.LEFT_HAND.getDescription() + " hand");
+        JRadioButton touchBothRadioButton = new JRadioButton(ExitSurveyOptions.BOTH_HANDS.getDescription() + " hands");
+        touchHandGroup.add(touchRightHandRadioButton);
+        touchHandGroup.add(touchLeftHandRadioButton);
+        touchHandGroup.add(touchBothRadioButton);
+        contentPanel.add(touchHandGroup);
+        subjectButtonGroups[4].add(touchRightHandRadioButton);
+        subjectButtonGroups[4].add(touchLeftHandRadioButton);
+        subjectButtonGroups[4].add(touchBothRadioButton);
+        
+        // Questions - Discomfort, Fatigue, Difficulty
+        contentPanel.add(MyUtilities.SWING_UTILITIES.createPadding(25, SwingConstants.VERTICAL));
+        JTextArea deviceSurveySection = new JTextArea("Please indicate if you agree or disagree with the following statements.\n");
+        deviceSurveySection.setFont(new Font(deviceSurveySection.getFont().getName(), Font.BOLD, deviceSurveySection.getFont().getSize()+2));
+        deviceSurveySection.setEditable(false);
+        deviceSurveySection.setHighlighter(null);
+        deviceSurveySection.setBackground(UIManager.getColor("Panel.background"));
+        deviceSurveySection.setFont(UIManager.getFont("Label.font"));
+        deviceSurveySection.setLineWrap(true);
+        deviceSurveySection.setWrapStyleWord(true);
+        contentPanel.add(deviceSurveySection);
+        
+        int questionIndex = 0;
+        for(KeyboardType keyboardType: KeyboardType.values()) {
+        	if(keyboardType != KeyboardType.STANDARD) {
+        		// Discomfort Question
+                JTextArea discomfortQuestion = new JTextArea(++questionIndex + ". I experienced discomfort today while using the " + keyboardType.getName() + ".");
+                discomfortQuestion.setEditable(false);
+                discomfortQuestion.setHighlighter(null);
+                discomfortQuestion.setBackground(UIManager.getColor("Panel.background"));
+                discomfortQuestion.setFont(UIManager.getFont("Label.font"));
+                discomfortQuestion.setLineWrap(true);
+                discomfortQuestion.setWrapStyleWord(true);
+                contentPanel.add(discomfortQuestion);
+                
+                JPanel discomfortGroup = new JPanel(new FlowLayout(FlowLayout.LEFT));
+                JRadioButton discomfortRadioButton0 = new JRadioButton(ExitSurveyOptions.STRONGLY_AGREE.getDescription());
+                JRadioButton discomfortRadioButton1 = new JRadioButton(ExitSurveyOptions.AGREE.getDescription());
+                JRadioButton discomfortRadioButton2 = new JRadioButton(ExitSurveyOptions.NEUTRAL.getDescription());
+                JRadioButton discomfortRadioButton3 = new JRadioButton(ExitSurveyOptions.DISAGREE.getDescription());
+                JRadioButton discomfortRadioButton4 = new JRadioButton(ExitSurveyOptions.STRONGLY_DISAGREE.getDescription());
+                discomfortGroup.add(discomfortRadioButton0);
+                discomfortGroup.add(discomfortRadioButton1);
+                discomfortGroup.add(discomfortRadioButton2);
+                discomfortGroup.add(discomfortRadioButton3);
+                discomfortGroup.add(discomfortRadioButton4);
+                contentPanel.add(discomfortGroup);
+                discomfortButtonGroups[keyboardType.getID() - 1].add(discomfortRadioButton0);
+                discomfortButtonGroups[keyboardType.getID() - 1].add(discomfortRadioButton1);
+                discomfortButtonGroups[keyboardType.getID() - 1].add(discomfortRadioButton2);
+                discomfortButtonGroups[keyboardType.getID() - 1].add(discomfortRadioButton3);
+                discomfortButtonGroups[keyboardType.getID() - 1].add(discomfortRadioButton4);
+                
+                // Fatigue Question
+                JTextArea fatigueQuestion = new JTextArea(++questionIndex + ". I experienced fatigue today while using the " + keyboardType.getName() + ".");
+                fatigueQuestion.setEditable(false);
+                fatigueQuestion.setHighlighter(null);
+                fatigueQuestion.setBackground(UIManager.getColor("Panel.background"));
+                fatigueQuestion.setFont(UIManager.getFont("Label.font"));
+                fatigueQuestion.setLineWrap(true);
+                fatigueQuestion.setWrapStyleWord(true);
+                contentPanel.add(fatigueQuestion);
+                
+                JPanel fatigueGroup = new JPanel(new FlowLayout(FlowLayout.LEFT));
+                JRadioButton fatigueRadioButton0 = new JRadioButton(ExitSurveyOptions.STRONGLY_AGREE.getDescription());
+                JRadioButton fatigueRadioButton1 = new JRadioButton(ExitSurveyOptions.AGREE.getDescription());
+                JRadioButton fatigueRadioButton2 = new JRadioButton(ExitSurveyOptions.NEUTRAL.getDescription());
+                JRadioButton fatigueRadioButton3 = new JRadioButton(ExitSurveyOptions.DISAGREE.getDescription());
+                JRadioButton fatigueRadioButton4 = new JRadioButton(ExitSurveyOptions.STRONGLY_DISAGREE.getDescription());
+                fatigueGroup.add(fatigueRadioButton0);
+                fatigueGroup.add(fatigueRadioButton1);
+                fatigueGroup.add(fatigueRadioButton2);
+                fatigueGroup.add(fatigueRadioButton3);
+                fatigueGroup.add(fatigueRadioButton4);
+                contentPanel.add(fatigueGroup);
+                fatigueButtonGroups[keyboardType.getID() - 1].add(fatigueRadioButton0);
+                fatigueButtonGroups[keyboardType.getID() - 1].add(fatigueRadioButton1);
+                fatigueButtonGroups[keyboardType.getID() - 1].add(fatigueRadioButton2);
+                fatigueButtonGroups[keyboardType.getID() - 1].add(fatigueRadioButton3);
+                fatigueButtonGroups[keyboardType.getID() - 1].add(fatigueRadioButton4);
+                
+                // Difficulty Question
+                JTextArea difficultyQuestion = new JTextArea(++questionIndex + ". I experienced difficulty today when using the " + keyboardType.getName() + ".");
+                difficultyQuestion.setEditable(false);
+                difficultyQuestion.setHighlighter(null);
+                difficultyQuestion.setBackground(UIManager.getColor("Panel.background"));
+                difficultyQuestion.setFont(UIManager.getFont("Label.font"));
+                difficultyQuestion.setLineWrap(true);
+                difficultyQuestion.setWrapStyleWord(true);
+                contentPanel.add(difficultyQuestion);
+                
+                JPanel difficultyGroup = new JPanel(new FlowLayout(FlowLayout.LEFT));
+                JRadioButton difficultyRadioButton0 = new JRadioButton(ExitSurveyOptions.STRONGLY_AGREE.getDescription());
+                JRadioButton difficultyRadioButton1 = new JRadioButton(ExitSurveyOptions.AGREE.getDescription());
+                JRadioButton difficultyRadioButton2 = new JRadioButton(ExitSurveyOptions.NEUTRAL.getDescription());
+                JRadioButton difficultyRadioButton3 = new JRadioButton(ExitSurveyOptions.DISAGREE.getDescription());
+                JRadioButton difficultyRadioButton4 = new JRadioButton(ExitSurveyOptions.STRONGLY_DISAGREE.getDescription());
+                difficultyGroup.add(difficultyRadioButton0);
+                difficultyGroup.add(difficultyRadioButton1);
+                difficultyGroup.add(difficultyRadioButton2);
+                difficultyGroup.add(difficultyRadioButton3);
+                difficultyGroup.add(difficultyRadioButton4);
+                contentPanel.add(difficultyGroup);
+                difficultyButtonGroups[keyboardType.getID() - 1].add(difficultyRadioButton0);
+                difficultyButtonGroups[keyboardType.getID() - 1].add(difficultyRadioButton1);
+                difficultyButtonGroups[keyboardType.getID() - 1].add(difficultyRadioButton2);
+                difficultyButtonGroups[keyboardType.getID() - 1].add(difficultyRadioButton3);
+                difficultyButtonGroups[keyboardType.getID() - 1].add(difficultyRadioButton4);
+
+                contentPanel.add(MyUtilities.SWING_UTILITIES.createPadding(25, SwingConstants.VERTICAL));
+        	}
+        }
+        
+        
+        // Final question - Rank the keyboards from best to worst
+        JTextArea rankingQuestion = new JTextArea(++questionIndex + ". Please rank the keyboards from most preferred (1), to lease preferred (5).");
+        rankingQuestion.setEditable(false);
+        rankingQuestion.setHighlighter(null);
+        rankingQuestion.setBackground(UIManager.getColor("Panel.background"));
+        rankingQuestion.setFont(UIManager.getFont("Label.font"));
+        rankingQuestion.setLineWrap(true);
+        rankingQuestion.setWrapStyleWord(true);
+        contentPanel.add(rankingQuestion);
+        
+        // Subject info left side
+        JPanel rankingPanel = new JPanel(new SpringLayout());
+        contentPanel.add(rankingPanel);
+        
+        for(KeyboardType keyboardType: KeyboardType.values()) {
+        	if(keyboardType != KeyboardType.STANDARD) {
+        		JLabel rankingLabel = new JLabel(keyboardType.getName() + ":");
+        		rankingTextFields[keyboardType.getID() - 1].setHorizontalAlignment(JTextField.CENTER);
+        		rankingPanel.add(rankingLabel);
+        		rankingPanel.add(rankingTextFields[keyboardType.getID() - 1]);
+        		rankingPanel.add(MyUtilities.SWING_UTILITIES.createPadding(500, SwingConstants.HORIZONTAL));
+        	}
+        }
+        
+        MyUtilities.SPRING_UTILITIES.makeCompactGrid(rankingPanel,
+                5, 3,        //rows, cols
+                6, 6,        //initX, initY
+                6, 6);       //xPad, yPad
+        
         // Add the entire content panel to a scroll pane.
         JScrollPane contentScrollBar = new JScrollPane(contentPanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         contentScrollBar.getVerticalScrollBar().setUnitIncrement(16);
-        background.add(contentScrollBar);
+        scrollPanel.add(contentScrollBar);
+        
+        // Add save button
+        saveButton.setHorizontalAlignment(JButton.RIGHT);
+        background.add(MyUtilities.SWING_UTILITIES.createPadding(5, SwingConstants.VERTICAL));
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        buttonPanel.add(saveButton);
+        buttonPanel.add(MyUtilities.SWING_UTILITIES.createPadding(5, SwingConstants.HORIZONTAL));
+        background.add(buttonPanel);
+        background.add(MyUtilities.SWING_UTILITIES.createPadding(5, SwingConstants.VERTICAL));
         
         // Arrange the components inside the window
         frame.pack();
