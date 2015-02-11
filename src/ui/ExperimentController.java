@@ -50,7 +50,7 @@ public class ExperimentController extends GraphicsController {
     private final ReentrantLock EXPERIMENT_LOCK = new ReentrantLock();
     private final int ONE_SECOND = 1000;
     private final int COUNTDOWN_TIME = 5;
-    private final int EXPERIMENT_SIZE = 40;
+    private final int EXPERIMENT_SIZE = 20;
     private final int PRACTICE_SIZE = EXPERIMENT_SIZE;
     private final Color LIGHT_GREEN = new Color(204, 255, 204);
     private final int FADE_DURATION = 500;
