@@ -78,7 +78,6 @@ public class ExperimentController extends GraphicsController {
     private boolean runningTutorial = false;
     private boolean runningPractice = false;
     private boolean runningExperiment = false;
-    private boolean ranTutorial = false;
     private boolean ranPractice = false;
     private String subjectID;
     private WordManager wordManager = new WordManager();
@@ -297,7 +296,6 @@ public class ExperimentController extends GraphicsController {
         infoPanel.remove(tutorialManager.getComponent());
         tutorialManager = null;
         playbackManager = null;
-        ranTutorial = true;
         answerLabel.setText("");
         wordManager.setAnswer("");
         wordManager.setDefault();
@@ -378,9 +376,7 @@ public class ExperimentController extends GraphicsController {
         answerPanel.setBackground(currentColor);
         calibrateButton.setEnabled(true);
         tutorialButton.setEnabled(true);
-        if(ranTutorial) {
-            practiceButton.setEnabled(true);
-        }
+        practiceButton.setEnabled(true);
         if(ranPractice) {
             experimentButton.setEnabled(true);
         }
@@ -397,7 +393,6 @@ public class ExperimentController extends GraphicsController {
         for(Keyboard tmpKeyboard: Keyboard.values()) {
             tmpKeyboard.getKeyboard().removeObserver(this);
         }
-        ranTutorial = false;
         ranPractice = false;
         disableUI();
         enabled = false;
@@ -533,7 +528,7 @@ public class ExperimentController extends GraphicsController {
                 dataManager.keyPressedEvent(key, wordManager.currentLetter());
             }
             if(key == '\b') {
-                if(0 < wordManager.getAnswer().length()) {
+                if(0 < wordManager.getAnswer().length() && wordManager.currentIndex() < wordManager.getAnswer().length()) {
                     wordManager.setAnswer(wordManager.getAnswer().substring(0, wordManager.getAnswer().length()-1));
                     MyUtilities.SWING_UTILITIES.calculateFontSize(wordManager.getAnswer(), answerLabel, answerPanel);
                 }

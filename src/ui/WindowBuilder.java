@@ -520,7 +520,7 @@ public class WindowBuilder {
         
         
         // Final question - Rank the keyboards from best to worst
-        JTextArea rankingQuestion = new JTextArea(++questionIndex + ". Please rank the keyboards from most preferred (1), to lease preferred (5).");
+        JTextArea rankingQuestion = new JTextArea(++questionIndex + ". Please rank the keyboards from most preferred (1), to least preferred (5).");
         rankingQuestion.setEditable(false);
         rankingQuestion.setHighlighter(null);
         rankingQuestion.setBackground(UIManager.getColor("Panel.background"));

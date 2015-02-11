@@ -14,7 +14,7 @@ import enums.Key;
 import utilities.MyUtilities;
 
 public class WordManager {
-    private static final String DEFAULT_WORD = "test"; // ced, frazzled, test, calumnies, atherosclerosis --- check that A doesn't trigger when hit enter.....
+    private static final String DEFAULT_WORD = "test"; // enunciating, ced, frazzled, test, calumnies, atherosclerosis --- check that A doesn't trigger when hit enter.....
     private static ArrayList<WordObserver> OBSERVERS = new ArrayList<WordObserver>();
     private final int DICTIONARY_SIZE = 118619;
     private boolean isDefault = false;
@@ -44,6 +44,10 @@ public class WordManager {
     
     public String getAnswer() {
         return answer;
+    }
+    
+    public int currentIndex() {
+    	return currentLetter;
     }
     
     public char currentLetter() {

@@ -62,7 +62,7 @@ public class SwipeKeyboard implements WordObserver {
     
     public SwipeKeyboard(IKeyboard keyboard) {
         int keyWidth = keyboard.getAttributes().getAttributeAsPoint(Attribute.KEY_SIZE).x;
-        MAX_EXPECTED_PRESS_RADIUS = (int) (keyWidth * 1.25f); // 80;
+        MAX_EXPECTED_PRESS_RADIUS = (int) (keyWidth * 1.20f); // 64; --- was 1.25 -- 80
         MAX_CLOSE_EXPECTED_PRESS_RADIUS = (int) (keyWidth * 0.75f); // 48;
         virtualKeyboard = (VirtualKeyboard) keyboard.getRenderables().getRenderable(Renderable.VIRTUAL_KEYBOARD);
         MAX_CLOSE_KEY_DISTANCE = MyUtilities.MATH_UTILITILES.findDistanceToPoint(
@@ -151,7 +151,8 @@ public class SwipeKeyboard implements WordObserver {
                     isPressed = true;
                     isDown = true;
                     if(!touchPress) {
-                        swipeTrail.setPressedPoint(virtualKey.getCenter());
+                        //swipeTrail.setPressedPoint(virtualKey.getCenter());
+                    	swipeTrail.setPressedPoint(swipePoint.getNormalizedPoint());
                     }
                     isSwiping = true;
                     //System.out.println("pressed: touching IS expected key " + virtualKey.getKey());

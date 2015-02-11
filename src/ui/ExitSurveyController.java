@@ -24,7 +24,6 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import utilities.MyUtilities;
-import enums.DataType;
 import enums.ExitSurveyDataType;
 import enums.ExitSurveyOptions;
 import enums.FileExt;
@@ -211,6 +210,20 @@ public class ExitSurveyController extends GraphicsController {
             public void windowClosing(WindowEvent e) {
             	if(isFilledOut() && isSurveySaved) {
             		disable();
+            	} else {
+                    Object[] options = {"Yes", "Cancel"};
+                    int selection =
+                            JOptionPane.showOptionDialog(frame,
+                            "An exit survey is currently being filled out and has not been saved. If you close now, the survey will be lost.\nClose anyway?",
+                            "Warning!",
+                            JOptionPane.YES_NO_OPTION,
+                            JOptionPane.WARNING_MESSAGE,
+                            null,
+                            options,
+                            options[0]);
+                    if(selection == JOptionPane.YES_OPTION) {
+                        disable();
+                    }
             	}
             }
         });
@@ -276,7 +289,7 @@ public class ExitSurveyController extends GraphicsController {
         String filePath = FilePath.DATA.getPath() + subjectIDTextField.getText() + "/";
         String fileName = subjectIDTextField.getText() + "_" + "exitSurvey" + time + FileExt.FILE.getExt();
     	try {
-			MyUtilities.FILE_IO_UTILITIES.writeListToFile(exitSurveyData, filePath, fileName, true);
+			MyUtilities.FILE_IO_UTILITIES.writeListToFile(exitSurveyData, filePath, fileName, false);
 			isSurveySaved = true;
 		} catch (IOException e) {
 			System.out.println("An error occured while trying to save the survey.");

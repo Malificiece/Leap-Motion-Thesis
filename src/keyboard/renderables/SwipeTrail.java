@@ -1,6 +1,7 @@
 package keyboard.renderables;
 
-import static javax.media.opengl.GL.GL_LINES;
+import static javax.media.opengl.GL.*;
+//import static javax.media.opengl.GL2.*;
 
 import java.util.ArrayList;
 
@@ -271,7 +272,7 @@ public class SwipeTrail extends KeyboardRenderable {
     }
     
     public void setPressedPoint(Vector point) {
-        pressedPoints.add(point);
+        pressedPoints.add(new Vector(point));
         isPressed = false;
     }
     
