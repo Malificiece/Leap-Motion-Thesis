@@ -343,7 +343,7 @@ public class WindowBuilder {
         
         // Question 6 - Do you have any physical impairments?
         contentPanel.add(MyUtilities.SWING_UTILITIES.createPadding(25, SwingConstants.VERTICAL));
-        JTextArea impairExperienceQuestion = new JTextArea("6. Do you haev any physical impairment that makes it difficult to use a computer?\n\n"
+        JTextArea impairExperienceQuestion = new JTextArea("6. Do you have any physical impairment that makes it difficult to use a computer?\n\n"
                 + "If yes, please indicate the impairment.");
         impairExperienceQuestion.setEditable(false);
         impairExperienceQuestion.setHighlighter(null);
@@ -392,9 +392,9 @@ public class WindowBuilder {
         subjectButtonGroups[3].add(leftHandRadioButton);
         subjectButtonGroups[3].add(ambidextriousRadioButton);
         
-        // Question 8 - Which hand do you normally use to control touch screen devices?
+        // Question 8 - Which hand did you use in today's experiments?
         contentPanel.add(MyUtilities.SWING_UTILITIES.createPadding(25, SwingConstants.VERTICAL));
-        JTextArea touchHandQuestion = new JTextArea("8. Which hand do you normally use to control touch screen devices?");
+        JTextArea touchHandQuestion = new JTextArea("8. Which hand did you use in today's experiments?");
         touchHandQuestion.setEditable(false);
         touchHandQuestion.setHighlighter(null);
         touchHandQuestion.setBackground(UIManager.getColor("Panel.background"));
