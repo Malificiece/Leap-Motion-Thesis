@@ -3,6 +3,8 @@ TODO:
 	But for each word added, we need to make sure there is one word in every other dictionary
 	that is extremely similar in distance traveled and gesture used to draw the word. We need
 	a very similar dictionary for each input method even though the words all different.
+1.5) Make sure that the values in the fields of the exit survey are checked when typed. Meaning
+	Age must be a number and the 1-5 section must be unique 1-5.
 2) Remove Enter, Shift, Spaces, Period, Comma, and Number keys from being able to be pressed.
 3) Consider a new location for the backspace key so that it is easily accessible while at the
 	same time limiting false positives for key presses. We want it to be used easily while not

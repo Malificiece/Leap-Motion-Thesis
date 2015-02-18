@@ -28,6 +28,7 @@ import javax.swing.UIManager;
 import javax.swing.WindowConstants;
 import javax.swing.text.DefaultHighlighter;
 
+import dictionary.DictionaryBuilder;
 import keyboard.IKeyboard;
 import utilities.FileUtilities;
 import utilities.MyUtilities;
@@ -43,6 +44,7 @@ public class ControlCenter {
     private final CalibrationController CALIBRATION_CONTROLLER = new CalibrationController();
     private final  ReentrantLock CONTROL_LOCK = new ReentrantLock();
     private ExitSurveyController exitSurveyController;
+    private DictionaryBuilder dictionaryBuilder;
     
     // Not Constants
     private JFrame frame;
@@ -53,6 +55,7 @@ public class ControlCenter {
     private JButton calibrateButton;
     private JButton experimentButton;
     private JButton exitSurveyButton;
+    private JButton createDictionariesButton;
     private boolean isLocked = false;
     
     @SuppressWarnings("unchecked")
@@ -67,8 +70,9 @@ public class ControlCenter {
         calibrateButton = new JButton("Calibration");
         experimentButton = new JButton("Experiment");
         exitSurveyButton = new JButton("Exit Survey");
+        createDictionariesButton = new JButton("Create Dictionaries");
         
-        JButton buttons[] = {calibrateButton, experimentButton, editSubjectIDButton, exitSurveyButton};
+        JButton buttons[] = {calibrateButton, experimentButton, editSubjectIDButton, exitSurveyButton, createDictionariesButton};
         
         // Window builder builds window using important fields here. It adds unimportant fields that we won't use for aesthetics only.
         WindowBuilder.buildControlWindow(frame, testTypeComboBox, subjectField, buttons);
@@ -80,10 +84,10 @@ public class ControlCenter {
         // the window is asked to close
         frame.addWindowListener(new WindowAdapter() {
             public void windowClosing(WindowEvent e) {
-                if(!expInProgress() && !exitInProgress()) {
+                if(!experimentInProgress() && !exitSurveyInProgress() && !dictionaryBuildInProgress()) {
                     frame.dispose();
                     System.exit(0);
-                } else if(expInProgress()){
+                } else if(experimentInProgress()){
                     Object[] options = {"Yes", "Cancel"};
                     int selection =
                             JOptionPane.showOptionDialog(frame,
@@ -98,7 +102,7 @@ public class ControlCenter {
                         frame.dispose();
                         System.exit(0);
                     }
-                } else if(exitInProgress()){
+                } else if(exitSurveyInProgress()) {
                     Object[] options = {"Yes", "Cancel"};
                     int selection =
                             JOptionPane.showOptionDialog(frame,
@@ -113,6 +117,12 @@ public class ControlCenter {
                         frame.dispose();
                         System.exit(0);
                     }
+                } else if(dictionaryBuildInProgress()) {
+                    JOptionPane.showMessageDialog(frame,
+                            "You must wait until the dictionary is built to exit.",
+                            "Error!",
+                            JOptionPane.ERROR_MESSAGE,
+                            null);
                 }
             }
         });
@@ -121,44 +131,68 @@ public class ControlCenter {
         editSubjectIDButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                if(editSubjectIDButton.getText().equals("Edit")) {
-                    subjectField.setEditable(true);
-                    subjectField.setHighlighter(new DefaultHighlighter());
-                    subjectField.requestFocusInWindow();
-                    editSubjectIDButton.setText("Save");
-                } else if(!checkForUniqueSubjectID(subjectField.getText())) {
-                    Object[] options = {"Save", "Randomize", "Cancel"};
-                    int selection =
-                            JOptionPane.showOptionDialog(frame,
-                            "A duplicate subjectID was selected.\nContinue anyway?",
-                            "Warning!",
-                            JOptionPane.YES_NO_CANCEL_OPTION,
-                            JOptionPane.WARNING_MESSAGE,
-                            null,
-                            options,
-                            options[0]);
-                    if(selection == JOptionPane.YES_OPTION) {
-                        subjectField.setEditable(false);
-                        subjectField.setHighlighter(null);
-                        editSubjectIDButton.setText("Edit");
-                        subjectID = subjectField.getText();
-                    } else if(selection == JOptionPane.NO_OPTION) {
-                        subjectField.setEditable(false);
-                        subjectField.setHighlighter(null);
-                        editSubjectIDButton.setText("Edit");
-                        subjectID = generateSubjectID();
-                        subjectField.setText(subjectID);
-                    } else {
-                        subjectField.setEditable(false);
-                        subjectField.setHighlighter(null);
-                        editSubjectIDButton.setText("Edit");
-                        subjectField.setText(subjectID);
+                CONTROL_LOCK.lock();
+                try {
+                    if(!isInProgress()) {
+                        if(editSubjectIDButton.getText().equals("Edit")) {
+                            subjectField.setEditable(true);
+                            subjectField.setHighlighter(new DefaultHighlighter());
+                            subjectField.requestFocusInWindow();
+                            editSubjectIDButton.setText("Save");
+                        } else if(!checkForUniqueSubjectID(subjectField.getText())) {
+                            Object[] options = {"Save", "Randomize", "Cancel"};
+                            int selection =
+                                    JOptionPane.showOptionDialog(frame,
+                                    "A duplicate subjectID was selected.\nContinue anyway?",
+                                    "Warning!",
+                                    JOptionPane.YES_NO_CANCEL_OPTION,
+                                    JOptionPane.WARNING_MESSAGE,
+                                    null,
+                                    options,
+                                    options[0]);
+                            if(selection == JOptionPane.YES_OPTION) {
+                                subjectField.setEditable(false);
+                                subjectField.setHighlighter(null);
+                                editSubjectIDButton.setText("Edit");
+                                subjectID = subjectField.getText();
+                            } else if(selection == JOptionPane.NO_OPTION) {
+                                subjectField.setEditable(false);
+                                subjectField.setHighlighter(null);
+                                editSubjectIDButton.setText("Edit");
+                                subjectID = generateSubjectID();
+                                subjectField.setText(subjectID);
+                            } else {
+                                subjectField.setEditable(false);
+                                subjectField.setHighlighter(null);
+                                editSubjectIDButton.setText("Edit");
+                                subjectField.setText(subjectID);
+                            }
+                        } else {
+                            subjectField.setEditable(false);
+                            subjectField.setHighlighter(null);
+                            editSubjectIDButton.setText("Edit");
+                            subjectID = subjectField.getText();
+                        }
                     }
-                } else {
-                    subjectField.setEditable(false);
-                    subjectField.setHighlighter(null);
-                    editSubjectIDButton.setText("Edit");
-                    subjectID = subjectField.getText();
+                } finally {
+                    CONTROL_LOCK.unlock();
+                }
+            }
+        });
+        
+        // RUN THE DICTIONARY RECOGNIZER / BUILDER
+        createDictionariesButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent arg0) {
+                CONTROL_LOCK.lock();
+                try {
+                    if(!isInProgress()) {
+                        dictionaryBuilder = new DictionaryBuilder();
+                        System.out.println("Building dicitonaries...");
+                        lockUI();
+                    }
+                } finally {
+                    CONTROL_LOCK.unlock();
                 }
             }
         });
@@ -221,84 +255,100 @@ public class ControlCenter {
     }
     
     public void update() {
-        if(expInProgress()) {
-            EXPERIMENT_CONTROLLER.update();
-        } else if(calibInProgress()) {
-            CALIBRATION_CONTROLLER.update();
-        } else if(exitInProgress()) {
-            //EXIT_SURVEY_CONTROLLER.update();
-        } else if(isLocked) {
-            unlockUI();
+        CONTROL_LOCK.lock();
+        try {
+            if(experimentInProgress()) {
+                EXPERIMENT_CONTROLLER.update();
+            } else if(calibrationInProgress()) {
+                CALIBRATION_CONTROLLER.update();
+            } else if(exitSurveyInProgress()) {
+                // Do nothing
+            } else if(dictionaryBuildInProgress()) {
+                dictionaryBuilder.update();
+            } else if(isLocked) {
+                unlockUI();
+            }
+        } finally {
+            CONTROL_LOCK.unlock();
         }
     }
     
     public void render() {
-        if(expInProgress()) {
-            EXPERIMENT_CONTROLLER.display();
-        } else if(calibInProgress()) {
-            CALIBRATION_CONTROLLER.display();
-        } else if(exitInProgress()) {
-            //EXIT_SURVEY_CONTROLLER.display();
+        CONTROL_LOCK.lock();
+        try {
+            if(experimentInProgress()) {
+                EXPERIMENT_CONTROLLER.display();
+            } else if(calibrationInProgress()) {
+                CALIBRATION_CONTROLLER.display();
+            } else if(exitSurveyInProgress()) {
+                // Do nothing
+            } else if(dictionaryBuildInProgress()) {
+                // Do nothing
+            }
+        } finally {
+            CONTROL_LOCK.unlock();
         }
     }
     
     public boolean isInProgress() {
-        if(calibInProgress() || expInProgress() || exitInProgress()) {
+        if(calibrationInProgress() || experimentInProgress() || exitSurveyInProgress() || dictionaryBuildInProgress()) {
             return true;
         }
         return false;
     }
     
-    public boolean calibInProgress() {
-        CONTROL_LOCK.lock();
-        try {
-            return CALIBRATION_CONTROLLER.isEnabled();
-        } finally {
-            CONTROL_LOCK.unlock();
-        }
+    public boolean calibrationInProgress() {
+        return CALIBRATION_CONTROLLER.isEnabled();
     }
     
-    public boolean expInProgress() {
-        CONTROL_LOCK.lock();
-        try {
-            return EXPERIMENT_CONTROLLER.isEnabled();
-        } finally {
-            CONTROL_LOCK.unlock();
-        }
+    public boolean experimentInProgress() {
+        return EXPERIMENT_CONTROLLER.isEnabled();
     }
     
-    public boolean exitInProgress() {
-        CONTROL_LOCK.lock();
-        try {
-        	if(exitSurveyController != null) {
-        		if(exitSurveyController.isEnabled()) {
-        			return true;
-        		} else {
-        			exitSurveyController = null;
-        		}
-        	}
-            return false;
-        } finally {
-            CONTROL_LOCK.unlock();
+    public boolean exitSurveyInProgress() {
+    	if(exitSurveyController != null) {
+    		if(exitSurveyController.isEnabled()) {
+    			return true;
+    		} else {
+    			exitSurveyController = null;
+    		}
+    	}
+        return false;
+    }
+    
+    public boolean dictionaryBuildInProgress() {
+        if(dictionaryBuilder != null) {
+            if(dictionaryBuilder.isEnabled()) {
+                return true;
+            } else {
+                dictionaryBuilder = null;
+            }
         }
+        return false;
     }
     
     private void lockUI() {
         isLocked = true;
+        System.out.println("locked");
         calibrateButton.setEnabled(false);
         experimentButton.setEnabled(false);
         exitSurveyButton.setEnabled(false);
         editSubjectIDButton.setEnabled(false);
+        createDictionariesButton.setEnabled(false);
         testTypeComboBox.setEnabled(false);
+        //frame.setVisible(false);
     }
     
     private void unlockUI() {
         isLocked = false;
+        System.out.println("unlocked");
         calibrateButton.setEnabled(true);
         experimentButton.setEnabled(true);
         exitSurveyButton.setEnabled(true);
         editSubjectIDButton.setEnabled(true);
+        createDictionariesButton.setEnabled(true);
         testTypeComboBox.setEnabled(true);
+        //frame.setVisible(true);
     }
     
     private String generateSubjectID() {

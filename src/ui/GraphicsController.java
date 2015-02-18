@@ -26,7 +26,7 @@ public abstract class GraphicsController implements GLEventListener, KeyboardObs
 	protected IKeyboard keyboard;
 	public static GLU glu;
 	public static GLUT glut;
-	protected boolean enabled = false;
+	protected boolean isEnabled = false;
 	
 	public static void init() {
 	    GLProfile.initSingleton();
@@ -40,7 +40,7 @@ public abstract class GraphicsController implements GLEventListener, KeyboardObs
 	public abstract void render(GLAutoDrawable drawable);
 	
 	public boolean isEnabled() {
-	    return enabled;
+	    return isEnabled;
 	}
 	
 	public void display() {

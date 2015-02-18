@@ -328,14 +328,14 @@ public class ExitSurveyController extends GraphicsController {
     @Override
     public void disable() {
         frame.setVisible(false);
-        enabled = false;
+        isEnabled = false;
     }
     
     @Override
     public void enable() {
         frame.setVisible(true);
         frame.requestFocusInWindow();
-        enabled = true;
+        isEnabled = true;
     }
     
     public void enable(String subjectID) {

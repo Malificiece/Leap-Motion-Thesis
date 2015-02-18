@@ -395,7 +395,7 @@ public class ExperimentController extends GraphicsController {
         }
         ranPractice = false;
         disableUI();
-        enabled = false;
+        isEnabled = false;
         practiceWordCount = 0;
     }
     
@@ -409,7 +409,7 @@ public class ExperimentController extends GraphicsController {
         }
         wordManager.setDefault();
         enableUI();
-        enabled = true;
+        isEnabled = true;
     }
     
     public void enable(String subjectID, TestType testType) {

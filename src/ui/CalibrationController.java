@@ -216,7 +216,7 @@ public class CalibrationController extends GraphicsController {
             tmpKeyboard.getKeyboard().removeObserver(this);
         }
         fpsTimer.cancel();
-        enabled = false;
+        isEnabled = false;
     }
     
     public void enable() {
@@ -238,7 +238,7 @@ public class CalibrationController extends GraphicsController {
         };
         fpsTimer = new Timer();
         fpsTimer.scheduleAtFixedRate(updateFPS, 1000, 1000);
-        enabled = true;
+        isEnabled = true;
     }
     
     public void update() {
