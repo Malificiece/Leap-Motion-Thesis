@@ -20,7 +20,7 @@ import enums.Key;
 
 public class PlaybackManager {
     private static final String TUTORIAL = FileName.TUTORIAL.getName();
-    private static final long NANO_SECOND = 1000000000;
+    private static final long SECOND_AS_NANO = 1000000000;
     private final boolean isTutorial;
     private final String FILE_PATH;
 	private ArrayList<PlaybackObserver> observers = new ArrayList<PlaybackObserver>();
@@ -45,7 +45,7 @@ public class PlaybackManager {
             e.printStackTrace();
         }
 		previousTime = System.nanoTime();
-		elapsedTime = startTime - NANO_SECOND;
+		elapsedTime = startTime - SECOND_AS_NANO;
 	}
 	
 	public String getFilePath() {
@@ -88,7 +88,7 @@ public class PlaybackManager {
 		if(isRepeating && playbackIndex == playbackData.size() && elapsedTime > finishTime) {
 		    // Reset playback and give a 1 second delay before next start.
 		    playbackIndex = 0;
-		    elapsedTime = startTime - NANO_SECOND;
+		    elapsedTime = startTime - SECOND_AS_NANO;
 		    previousTime = System.nanoTime();
 		    notifyListenersResetEvent();
 		}

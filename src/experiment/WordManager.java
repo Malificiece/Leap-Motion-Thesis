@@ -16,7 +16,6 @@ import utilities.MyUtilities;
 public class WordManager {
     private static final String DEFAULT_WORD = "test"; // enunciating, ced, frazzled, test, calumnies, atherosclerosis --- check that A doesn't trigger when hit enter.....
     private static ArrayList<WordObserver> OBSERVERS = new ArrayList<WordObserver>();
-    private final int DICTIONARY_SIZE = 118619;
     private boolean isDefault = false;
     private Queue<String> wordList = new LinkedList<String>();
     private int currentLetter = 0;
@@ -103,7 +102,7 @@ public class WordManager {
         wordList.clear();
         try {
             isDefault = false;
-            wordList.addAll(MyUtilities.FILE_IO_UTILITIES.readListFromFile(FilePath.DOCS.getPath(), FileName.TUTORIAL.getName() + FileExt.DICTIONARY.getExt()));
+            wordList.addAll(MyUtilities.FILE_IO_UTILITIES.readListFromFile(FilePath.DICTIONARY.getPath(), FileName.TUTORIAL.getName() + FileExt.DICTIONARY.getExt()));
             currentLetter = 0;
             if(isValid()) {
                 notifyListenersWordSet();
@@ -115,12 +114,14 @@ public class WordManager {
         }
     }
 
+    // TODO: Change this to loading using the given keyboard, to load a static library for each unique input
+    // We probably actually need two loads. One that uses a reservoir to when practicing (avoiding the words in any library)
+    // And also a load to load the static library for the experiment.
     public void loadWords(int reservoirSize) {
         wordList.clear();
         try {
             isDefault = false;
-            wordList.addAll(MyUtilities.FILE_IO_UTILITIES.reservoirSampling(reservoirSize, DICTIONARY_SIZE,
-                    FilePath.DOCS.getPath(), FileName.DICTIONARY.getName() + FileExt.DICTIONARY.getExt()));
+            wordList.addAll(MyUtilities.FILE_IO_UTILITIES.reservoirSampling(reservoirSize, FilePath.DICTIONARY.getPath(), FileName.DICTIONARY.getName() + FileExt.DICTIONARY.getExt()));
             currentLetter = 0;
             if(isValid()) {
                 notifyListenersWordSet();

@@ -206,7 +206,6 @@ public class ControlCenter {
                     if(!isInProgress()) {
                     	exitSurveyController = new ExitSurveyController();
                     	exitSurveyController.enable(subjectID);
-                        System.out.println("Starting Exit Survey");
                         lockUI();
                     }
                 } finally {
@@ -224,7 +223,6 @@ public class ControlCenter {
                 try {
                     if(!isInProgress()) {
                         EXPERIMENT_CONTROLLER.enable(subjectID, TestType.getByName((String) testTypeComboBox.getSelectedItem()));
-                        System.out.println("Starting Experiment");
                         lockUI();
                     }
                 } finally {
@@ -243,7 +241,6 @@ public class ControlCenter {
                 try {
                     if(!isInProgress()) {
                         CALIBRATION_CONTROLLER.enable();
-                        System.out.println("Starting Calibration");
                         lockUI();
                     }
                 } finally {
@@ -321,6 +318,7 @@ public class ControlCenter {
             if(dictionaryBuilder.isEnabled()) {
                 return true;
             } else {
+                System.out.println("Dictionaries built.");
                 dictionaryBuilder = null;
             }
         }
@@ -329,7 +327,6 @@ public class ControlCenter {
     
     private void lockUI() {
         isLocked = true;
-        System.out.println("locked");
         calibrateButton.setEnabled(false);
         experimentButton.setEnabled(false);
         exitSurveyButton.setEnabled(false);
@@ -341,7 +338,6 @@ public class ControlCenter {
     
     private void unlockUI() {
         isLocked = false;
-        System.out.println("unlocked");
         calibrateButton.setEnabled(true);
         experimentButton.setEnabled(true);
         exitSurveyButton.setEnabled(true);

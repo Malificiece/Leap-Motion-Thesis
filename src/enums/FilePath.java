@@ -4,7 +4,7 @@ public enum FilePath {
     ASSETS("./assets/"),
     CONFIG("./config/"),
     DATA("./data/"),
-    DOCS("./docs/");
+    DICTIONARY("./dictionary/");
     //STANDARD("standard/"),
     //LEAP("leap/"),
     //TABLET("tablet/"),

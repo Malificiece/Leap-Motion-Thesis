@@ -395,26 +395,26 @@ public class WindowBuilder {
         
         // Question 8 - Which hand did you use in today's experiments?
         contentPanel.add(MyUtilities.SWING_UTILITIES.createPadding(25, SwingConstants.VERTICAL));
-        JTextArea touchHandQuestion = new JTextArea("8. Which hand did you use in today's experiments?");
-        touchHandQuestion.setEditable(false);
-        touchHandQuestion.setHighlighter(null);
-        touchHandQuestion.setBackground(UIManager.getColor("Panel.background"));
-        touchHandQuestion.setFont(UIManager.getFont("Label.font"));
-        touchHandQuestion.setLineWrap(true);
-        touchHandQuestion.setWrapStyleWord(true);
-        contentPanel.add(touchHandQuestion);
+        JTextArea experimentHandQuestion = new JTextArea("8. Which hand did you use in today's experiments?");
+        experimentHandQuestion.setEditable(false);
+        experimentHandQuestion.setHighlighter(null);
+        experimentHandQuestion.setBackground(UIManager.getColor("Panel.background"));
+        experimentHandQuestion.setFont(UIManager.getFont("Label.font"));
+        experimentHandQuestion.setLineWrap(true);
+        experimentHandQuestion.setWrapStyleWord(true);
+        contentPanel.add(experimentHandQuestion);
         
-        JPanel touchHandGroup = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        JRadioButton touchRightHandRadioButton = new JRadioButton(ExitSurveyOptions.RIGHT_HAND.getDescription() + " hand");
-        JRadioButton touchLeftHandRadioButton = new JRadioButton(ExitSurveyOptions.LEFT_HAND.getDescription() + " hand");
-        JRadioButton touchBothRadioButton = new JRadioButton(ExitSurveyOptions.BOTH_HANDS.getDescription() + " hands");
-        touchHandGroup.add(touchRightHandRadioButton);
-        touchHandGroup.add(touchLeftHandRadioButton);
-        touchHandGroup.add(touchBothRadioButton);
-        contentPanel.add(touchHandGroup);
-        subjectButtonGroups[4].add(touchRightHandRadioButton);
-        subjectButtonGroups[4].add(touchLeftHandRadioButton);
-        subjectButtonGroups[4].add(touchBothRadioButton);
+        JPanel experimentHandGroup = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        JRadioButton experimentRightHandRadioButton = new JRadioButton(ExitSurveyOptions.RIGHT_HAND.getDescription() + " hand");
+        JRadioButton experimentLeftHandRadioButton = new JRadioButton(ExitSurveyOptions.LEFT_HAND.getDescription() + " hand");
+        JRadioButton experimentBothRadioButton = new JRadioButton(ExitSurveyOptions.BOTH_HANDS.getDescription() + " hands");
+        experimentHandGroup.add(experimentRightHandRadioButton);
+        experimentHandGroup.add(experimentLeftHandRadioButton);
+        experimentHandGroup.add(experimentBothRadioButton);
+        contentPanel.add(experimentHandGroup);
+        subjectButtonGroups[4].add(experimentRightHandRadioButton);
+        subjectButtonGroups[4].add(experimentLeftHandRadioButton);
+        subjectButtonGroups[4].add(experimentBothRadioButton);
         
         // Questions - Discomfort, Fatigue, Difficulty
         contentPanel.add(MyUtilities.SWING_UTILITIES.createPadding(25, SwingConstants.VERTICAL));

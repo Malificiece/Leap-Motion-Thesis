@@ -35,8 +35,8 @@ public class FileUtilities {
         //Create data folder if it doesn't already exist.
         createDirectory(FilePath.DATA.getPath());
         
-        //Create docs folder if it doesn't already exist.
-        createDirectory(FilePath.DOCS.getPath());
+        //Create dictionary folder if it doesn't already exist.
+        createDirectory(FilePath.DICTIONARY.getPath());
         
         // Create config/settings path/files if they don't exist.
         // Create config folder.
@@ -458,7 +458,7 @@ public class FileUtilities {
         return new ArrayList<String>(Arrays.asList(subDirectories));
     }
 
-    public ArrayList<String> reservoirSampling(int reservoirSize, int dictionarySize, String filePath, String fileName) throws IOException {
+    public ArrayList<String> reservoirSampling(int reservoirSize, String filePath, String fileName) throws IOException {
         // Attempt to open file, create it if it doesn't exist.
         File file = createFile(filePath, fileName);
         
@@ -471,7 +471,7 @@ public class FileUtilities {
         }
         Random random = new Random();
         // Replace elements with gradually decreasing probability.
-        for(int i = reservoirSize; i < dictionarySize && (line = bufferedReader.readLine()) != null; i++) {
+        for(int i = reservoirSize; (line = bufferedReader.readLine()) != null; i++) {
             int j = random.nextInt(i + 1);
             if(j < reservoirSize) {
                 reservoir.set(j, line);

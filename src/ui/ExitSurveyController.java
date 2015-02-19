@@ -46,7 +46,7 @@ public class ExitSurveyController extends GraphicsController {
     private ButtonGroup swipeDeviceExperienceButtonGroup;
     private JTextField swipeDeviceExperienceTextField;
     private ButtonGroup handednessButtonGroup;
-    private ButtonGroup preferedTouchHandButtonGroup;
+    private ButtonGroup preferedExperimentHandButtonGroup;
     private ButtonGroup controllerDiscomfortButtonGroup;
     private ButtonGroup controllerFatigueButtonGroup;
     private ButtonGroup controllerDifficultyButtonGroup;
@@ -88,7 +88,7 @@ public class ExitSurveyController extends GraphicsController {
         swipeDeviceExperienceButtonGroup = new ButtonGroup();
         swipeDeviceExperienceTextField = new JTextField(39);
         handednessButtonGroup = new ButtonGroup();
-        preferedTouchHandButtonGroup = new ButtonGroup();
+        preferedExperimentHandButtonGroup = new ButtonGroup();
         controllerDiscomfortButtonGroup = new ButtonGroup();
         controllerFatigueButtonGroup = new ButtonGroup();
         controllerDifficultyButtonGroup = new ButtonGroup();
@@ -114,7 +114,7 @@ public class ExitSurveyController extends GraphicsController {
         JTextField subjectTextFields[] = {subjectIDTextField, ageTextField, majorTextField};
         JTextField historyTextFields[] = {physicalImpairmentTextField, gestureDeviceExperienceTextField, touchDeviceExperienceTextField, swipeDeviceExperienceTextField};
         JTextField rankingTextFields[] = {controllerRankingTextField, tabletRankingTextField, leapSurfaceRankingTextField, leapAirRankingTextField, leapPinchRankingTextField};
-        ButtonGroup subjectButtonGroups[] = {genderButtonGroup, hasComputerButtonGroup, computerHoursPerWeekButtonGroup, handednessButtonGroup, preferedTouchHandButtonGroup};
+        ButtonGroup subjectButtonGroups[] = {genderButtonGroup, hasComputerButtonGroup, computerHoursPerWeekButtonGroup, handednessButtonGroup, preferedExperimentHandButtonGroup};
         ButtonGroup historyButtonGroups[] = {physicalImpairmentButtonGroup, gestureDeviceExperienceButtonGroup, touchDeviceExperienceButtonGroup, swipeDeviceExperienceButtonGroup};
         ButtonGroup discomfortButtonGroups[] = {controllerDiscomfortButtonGroup, tabletDiscomfortButtonGroup, leapSurfaceDiscomfortButtonGroup, leapAirDiscomfortButtonGroup, leapPinchDiscomfortButtonGroup};
         ButtonGroup fatigueButtonGroups[] = {controllerFatigueButtonGroup, tabletFatigueButtonGroup, leapSurfaceFatigueButtonGroup, leapAirFatigueButtonGroup, leapPinchFatigueButtonGroup};
@@ -256,7 +256,7 @@ public class ExitSurveyController extends GraphicsController {
     		exitSurveyData.add(ExitSurveyDataType.PHYSICAL_INPAIRMENT_DESCRIPTION.name() + ": " + physicalImpairmentTextField.getText());
     	}
     	exitSurveyData.add(ExitSurveyDataType.HANDEDNESS.name() + ": " + getSelectedButtonText(handednessButtonGroup));
-    	exitSurveyData.add(ExitSurveyDataType.PREFERED_HANDEDNESS_FOR_TOUCH_SCREENS.name() + ": " + getSelectedButtonText(preferedTouchHandButtonGroup));
+    	exitSurveyData.add(ExitSurveyDataType.PREFERED_HANDEDNESS_FOR_EXPERIMENT.name() + ": " + getSelectedButtonText(preferedExperimentHandButtonGroup));
     	
     	// Survey section
     	exitSurveyData.add(ExitSurveyDataType.CONTROLLER_KEYBOARD_DISCOMFORT_LEVEL.name() + ": " + getSelectedButtonText(controllerDiscomfortButtonGroup));
@@ -276,11 +276,11 @@ public class ExitSurveyController extends GraphicsController {
     	exitSurveyData.add(ExitSurveyDataType.LEAP_PINCH_KEYBOARD_DIFFICULTY_LEVEL.name() + ": " + getSelectedButtonText(leapPinchDifficultyButtonGroup));
     	
     	// Rank section
-    	exitSurveyData.add(ExitSurveyDataType.CONTROLLER_KEYBOARD_PREFERENCE_RATING.name() + ": " + controllerRankingTextField.getText());
-    	exitSurveyData.add(ExitSurveyDataType.TABLET_KEYBOARD_PREFERENCE_RATING.name() + ": " + tabletRankingTextField.getText());
-    	exitSurveyData.add(ExitSurveyDataType.LEAP_SURFACE_KEYBOARD_PREFERENCE_RATING.name() + ": " + leapSurfaceRankingTextField.getText());
-    	exitSurveyData.add(ExitSurveyDataType.LEAP_AIR_KEYBOARD_PREFERENCE_RATING.name() + ": " + leapAirRankingTextField.getText());
-    	exitSurveyData.add(ExitSurveyDataType.LEAP_PINCH_KEYBOARD_PREFERENCE_RATING.name() + ": " + leapPinchRankingTextField.getText());
+    	exitSurveyData.add(ExitSurveyDataType.CONTROLLER_KEYBOARD_PREFERENCE_RANKING.name() + ": " + controllerRankingTextField.getText());
+    	exitSurveyData.add(ExitSurveyDataType.TABLET_KEYBOARD_PREFERENCE_RANKING.name() + ": " + tabletRankingTextField.getText());
+    	exitSurveyData.add(ExitSurveyDataType.LEAP_SURFACE_KEYBOARD_PREFERENCE_RANKING.name() + ": " + leapSurfaceRankingTextField.getText());
+    	exitSurveyData.add(ExitSurveyDataType.LEAP_AIR_KEYBOARD_PREFERENCE_RANKING.name() + ": " + leapAirRankingTextField.getText());
+    	exitSurveyData.add(ExitSurveyDataType.LEAP_PINCH_KEYBOARD_PREFERENCE_RANKING.name() + ": " + leapPinchRankingTextField.getText());
     	
     	// Write to file.
         String time = "_";
@@ -302,7 +302,7 @@ public class ExitSurveyController extends GraphicsController {
         JTextField textFields[] = {subjectIDTextField, ageTextField, majorTextField,
         		physicalImpairmentTextField, gestureDeviceExperienceTextField, touchDeviceExperienceTextField, swipeDeviceExperienceTextField,
         		controllerRankingTextField, tabletRankingTextField, leapSurfaceRankingTextField, leapAirRankingTextField, leapPinchRankingTextField};
-        ButtonGroup buttonGroups[] = {genderButtonGroup, hasComputerButtonGroup, computerHoursPerWeekButtonGroup, handednessButtonGroup, preferedTouchHandButtonGroup,
+        ButtonGroup buttonGroups[] = {genderButtonGroup, hasComputerButtonGroup, computerHoursPerWeekButtonGroup, handednessButtonGroup, preferedExperimentHandButtonGroup,
         		physicalImpairmentButtonGroup, gestureDeviceExperienceButtonGroup, touchDeviceExperienceButtonGroup, swipeDeviceExperienceButtonGroup,
         		controllerDiscomfortButtonGroup, tabletDiscomfortButtonGroup, leapSurfaceDiscomfortButtonGroup, leapAirDiscomfortButtonGroup, leapPinchDiscomfortButtonGroup,
         		controllerFatigueButtonGroup, tabletFatigueButtonGroup, leapSurfaceFatigueButtonGroup, leapAirFatigueButtonGroup, leapPinchFatigueButtonGroup,

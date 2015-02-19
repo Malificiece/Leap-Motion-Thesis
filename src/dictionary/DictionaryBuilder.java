@@ -1,9 +1,18 @@
 package dictionary;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.Queue;
+
+import enums.FileExt;
+import enums.FileName;
+import enums.FilePath;
+import utilities.MyUtilities;
+
 public class DictionaryBuilder {
 	// TODO:
-	// 1) Use a modifier to enable and disable this class.
-	// 2) Decide if we want the enable/disable option or a button to perform this class's actions.
 	// 3) Scan through the library and find like gestures
 	//		- Look for distance between keys
 	//		- Number of like keys / number of keys
@@ -18,19 +27,52 @@ public class DictionaryBuilder {
     // verticies = word length
     // let's only compare words of the same number of verticies?
     // this will more evenly distribute the size of the words.
-    
-	private boolean isEnabled = false;
+    private final int NUMBER_OF_DICTIONARIES = 10;
+    private final int MIN_LETTER_LENGTH = 3;
+    private final int MAX_LETTER_LENGTH = 6;
+    private final int NUMBER_OF_TOP_SIMILAR_WORDS = 50;
+    private Queue<String> dictionary = new LinkedList<String>();
+	private boolean isEnabled;
 
     public DictionaryBuilder() {
 		isEnabled = true;
 	}
     
     public void update() {
-        // now that it is built, do all the work here and then disable when finished
+        try {
+            dictionary.addAll(MyUtilities.FILE_IO_UTILITIES.readListFromFile(FilePath.DICTIONARY.getPath(), FileName.DICTIONARY.getName() + FileExt.DICTIONARY.getExt()));
+            
+            // Find the dissimilarity values for all words within the letter length range.
+            for(int letterLength = MIN_LETTER_LENGTH; letterLength <= MAX_LETTER_LENGTH; letterLength++) {
+                // Go through and and grab all the words of the current letter length.
+                ArrayList<String> dictionaryPart = new ArrayList<String>();
+                while(dictionary.peek().length() == letterLength && dictionary.size() > 0) {
+                    dictionaryPart.add(dictionary.remove());
+                }
+                
+                System.out.println(dictionary.size());
+                System.out.println(dictionaryPart.size());
+                
+                // First we need to go through and find all the similarity values
+                // remove each word as we go
+                // store the top 50 words with the lowest dissimilarity scores
+                /*for(int i = 0; i < 10; i++) {
+                    for(int j = 0; j < 10; j++) {
+                        
+                    }
+                }*/
+            }
+            
+        } catch (IOException e) {
+            System.out.println("There was an error in building the dictionaries.");
+            e.printStackTrace();
+        }
         isEnabled = false;
     }
 
     public boolean isEnabled() {
         return isEnabled ;
     }
+    
+    //private class WordAnalyzer
 }
