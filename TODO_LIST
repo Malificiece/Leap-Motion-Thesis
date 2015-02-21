@@ -1,8 +1,6 @@
 TODO:
-1) Create a word dictionary for each different input method. The words should all be different
-	But for each word added, we need to make sure there is one word in every other dictionary
-	that is extremely similar in distance traveled and gesture used to draw the word. We need
-	a very similar dictionary for each input method even though the words all different.
+1) Change experiments to use the new static dictionaries. Have practice still use reservoir
+	sampling and filter swear words plus filter current dictionary words.
 1.5) Make sure that the values in the fields of the exit survey are checked when typed. Meaning
 	Age must be a number and the 1-5 section must be unique 1-5.
 2) Remove Enter, Shift, Spaces, Period, Comma, and Number keys from being able to be pressed.

@@ -46,12 +46,12 @@ public class ExperimentController extends GraphicsController {
             + "<font><b>TUTORIAL:</b><br>A brief example to familiarize yourself with the keyboard.<br><br></font>"
             + "<font><b>PRACTICE:</b><br>A small sample of what you should expect from the experiment.<br><br></font>"
             + "<font><b>EXPERIMENT:</b><br>The actual experiment with recorded data.</font>";
+    public static final int EXPERIMENT_SIZE = 10;
+    private final int PRACTICE_SIZE = EXPERIMENT_SIZE;
     private final String TUTORIAL = FileName.TUTORIAL.getName();
     private final ReentrantLock EXPERIMENT_LOCK = new ReentrantLock();
     private final int ONE_SECOND = 1000;
     private final int COUNTDOWN_TIME = 5;
-    private final int EXPERIMENT_SIZE = 10;
-    private final int PRACTICE_SIZE = EXPERIMENT_SIZE;
     private final Color LIGHT_GREEN = new Color(204, 255, 204);
     private final int FADE_DURATION = 500;
     private int practiceWordCount = 0;
@@ -176,7 +176,7 @@ public class ExperimentController extends GraphicsController {
                         finishPractice();
                     } else {
                         runningPractice = true;
-                        wordManager.loadWords(PRACTICE_SIZE);
+                        //wordManager.loadWords(PRACTICE_SIZE);
                         disableUI();
                         delayedStart();
                     }
@@ -196,7 +196,7 @@ public class ExperimentController extends GraphicsController {
                     if(TUTORIAL.equals(subjectID)) {
                         wordManager.loadTutorialWords();
                     } else {
-                        wordManager.loadWords(EXPERIMENT_SIZE);
+                        //wordManager.loadWords(EXPERIMENT_SIZE);
                     }
                     disableUI();
                     delayedStart();

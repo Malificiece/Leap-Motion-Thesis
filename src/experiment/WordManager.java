@@ -113,15 +113,28 @@ public class WordManager {
             e.printStackTrace();
         }
     }
-
-    // TODO: Change this to loading using the given keyboard, to load a static library for each unique input
-    // We probably actually need two loads. One that uses a reservoir to when practicing (avoiding the words in any library)
-    // And also a load to load the static library for the experiment.
-    public void loadWords(int reservoirSize) {
+    
+    public void loadPracticeWords(int reservoirSize) {
         wordList.clear();
         try {
             isDefault = false;
             wordList.addAll(MyUtilities.FILE_IO_UTILITIES.reservoirSampling(reservoirSize, FilePath.DICTIONARY.getPath(), FileName.DICTIONARY.getName() + FileExt.DICTIONARY.getExt()));
+            currentLetter = 0;
+            if(isValid()) {
+                notifyListenersWordSet();
+            }
+        } catch (IOException e) {
+            setDefault();
+            System.out.println("An error occured while trying to load the words.");
+            e.printStackTrace();
+        }
+    }
+
+    public void loadExperimentWords(String fileName) {
+        wordList.clear();
+        try {
+            isDefault = false;
+            wordList.addAll(MyUtilities.FILE_IO_UTILITIES.readListFromFile(FilePath.DICTIONARY.getPath(), fileName + FileExt.DICTIONARY.getExt()));
             currentLetter = 0;
             if(isValid()) {
                 notifyListenersWordSet();
