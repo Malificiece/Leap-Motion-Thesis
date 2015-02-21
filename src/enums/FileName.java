@@ -10,6 +10,7 @@ public enum FileName {
     KEYBOARD_IMAGE("_keyboard"),
     KEYBOARD_IMAGE_UPPER("_keyboard_upper"),
     DICTIONARY("English-US"),
+    DICTIONARY_FILTER("Terms-to-Block"),
     TUTORIAL("tutorial");
 
     private final String name;

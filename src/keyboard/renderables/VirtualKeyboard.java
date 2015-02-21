@@ -3,6 +3,7 @@ package keyboard.renderables;
 import utilities.MyUtilities;
 import utilities.Point;
 
+import java.util.ArrayList;
 import java.util.TreeMap;
 
 import javax.media.opengl.GL2;
@@ -67,6 +68,12 @@ public class VirtualKeyboard extends KeyboardRenderable {
             }
         }
         
+    }
+    
+    public ArrayList<VirtualKey> getVirtualKeys() {
+        ArrayList<VirtualKey> virtualKeys = new ArrayList<VirtualKey>();
+        virtualKeys.addAll(keys.values());
+        return virtualKeys;
     }
     
     public VirtualKey getVirtualKey(Key key) {
