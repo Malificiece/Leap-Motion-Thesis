@@ -25,6 +25,6 @@ public enum DecimalPrecision {
     }
     
     public double round(double value) {
-        return Math.round((double) value / precision) * precision;
+        return Math.round(value / precision) * precision;
     }
 }

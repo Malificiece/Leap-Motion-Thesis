@@ -418,6 +418,14 @@ public class FileUtilities {
         return dataList;
     }
     
+    public ArrayList<String> readListFromFile(File file) throws IOException {
+        // Read in all stored data from file into an array.
+        ArrayList<String> dataList = new ArrayList<String>();
+        storeDataAsList(dataList, file);
+        
+        return dataList;
+    }
+    
     public ArrayList<String> readListFromWildcardFile(String filePath, String wildcardFileName) throws IOException {
         // Attempt to open the wildcard file. Create directory if it doesn't exist
         File file = openWildcardFile(filePath, wildcardFileName);
@@ -440,6 +448,18 @@ public class FileUtilities {
             }
         }
         return false;
+    }
+    
+    public File [] getListOfWildCardFileMatches(String filePath, String wildcardFileName) throws IOException {
+        // Attempt to open directory, create it if it doesn't exist
+        File directory = createDirectory(filePath);
+        return directory.listFiles(new FilenameFilter() {
+            @Override
+            public boolean accept(File dir, String name) {
+                String[] parts = wildcardFileName.split("\\" + WILDCARD);
+                return name.contains(parts[0]) && name.endsWith(FileExt.DICTIONARY.getExt());
+            }
+        });
     }
     
     public ArrayList<String> getListOfDirectories(String filePath) throws IOException {

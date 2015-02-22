@@ -1,5 +1,6 @@
 package experiment;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -11,6 +12,8 @@ import enums.FileExt;
 import enums.FileName;
 import enums.FilePath;
 import enums.Key;
+import enums.KeyboardType;
+import utilities.FileUtilities;
 import utilities.MyUtilities;
 
 public class WordManager {
@@ -119,6 +122,20 @@ public class WordManager {
         try {
             isDefault = false;
             wordList.addAll(MyUtilities.FILE_IO_UTILITIES.reservoirSampling(reservoirSize, FilePath.DICTIONARY.getPath(), FileName.DICTIONARY.getName() + FileExt.DICTIONARY.getExt()));
+            
+            // Filter swear words
+            wordList.removeAll(MyUtilities.FILE_IO_UTILITIES.readListFromFile(FilePath.DICTIONARY.getPath(), FileName.DICTIONARY_FILTER.getName() + FileExt.DICTIONARY.getExt()));
+            
+            // Filter used words
+            for(KeyboardType keyboardType: KeyboardType.values()) {
+                wordList.removeAll(MyUtilities.FILE_IO_UTILITIES.readListFromFile(FilePath.DICTIONARY.getPath(), keyboardType.getFileName() + FileExt.DICTIONARY.getExt()));
+            }
+            
+            // Filter standby words
+            for(File file: MyUtilities.FILE_IO_UTILITIES.getListOfWildCardFileMatches(FilePath.DICTIONARY.getPath(),
+                    FileName.TEMPORARY.getName() + FileUtilities.WILDCARD + FileExt.DICTIONARY.getExt())) {
+                wordList.removeAll(MyUtilities.FILE_IO_UTILITIES.readListFromFile(file));
+            }
             currentLetter = 0;
             if(isValid()) {
                 notifyListenersWordSet();

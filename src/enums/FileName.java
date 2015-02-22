@@ -11,6 +11,7 @@ public enum FileName {
     KEYBOARD_IMAGE_UPPER("_keyboard_upper"),
     DICTIONARY("English-US"),
     DICTIONARY_FILTER("Terms-to-Block"),
+    TEMPORARY("temporary_"),
     TUTORIAL("tutorial");
 
     private final String name;

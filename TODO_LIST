@@ -1,8 +1,7 @@
 TODO:
-1) Change experiments to use the new static dictionaries. Have practice still use reservoir
-	sampling and filter swear words plus filter current dictionary words.
-1.5) Make sure that the values in the fields of the exit survey are checked when typed. Meaning
+1) Make sure that the values in the fields of the exit survey are checked when typed. Meaning
 	Age must be a number and the 1-5 section must be unique 1-5.
+1.5) Remove all of the UPPER calls since we're removing shift?
 2) Remove Enter, Shift, Spaces, Period, Comma, and Number keys from being able to be pressed.
 3) Consider a new location for the backspace key so that it is easily accessible while at the
 	same time limiting false positives for key presses. We want it to be used easily while not

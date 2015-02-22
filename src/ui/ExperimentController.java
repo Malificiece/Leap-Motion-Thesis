@@ -176,7 +176,7 @@ public class ExperimentController extends GraphicsController {
                         finishPractice();
                     } else {
                         runningPractice = true;
-                        //wordManager.loadWords(PRACTICE_SIZE);
+                        wordManager.loadPracticeWords(PRACTICE_SIZE);
                         disableUI();
                         delayedStart();
                     }
@@ -196,7 +196,7 @@ public class ExperimentController extends GraphicsController {
                     if(TUTORIAL.equals(subjectID)) {
                         wordManager.loadTutorialWords();
                     } else {
-                        //wordManager.loadWords(EXPERIMENT_SIZE);
+                        wordManager.loadExperimentWords(keyboard.getFileName());
                     }
                     disableUI();
                     delayedStart();

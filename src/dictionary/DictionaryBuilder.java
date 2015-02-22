@@ -15,6 +15,7 @@ import enums.FileName;
 import enums.FilePath;
 import enums.Key;
 import enums.Keyboard;
+import enums.KeyboardType;
 import enums.Renderable;
 import ui.ExperimentController;
 import utilities.MyUtilities;
@@ -35,14 +36,17 @@ public class DictionaryBuilder {
     // let's only compare words of the same number of verticies?
     // this will more evenly distribute the size of the words.
     private final int NUMBER_OF_DICTIONARIES = 10;
-    private final int NUMBER_OF_TOP_MATCHES = 50;
-    private final int MIN_WORD_LENGTH = 2;
-    private final int MAX_WORD_LENGTH = 4;
+    private final int NUMBER_OF_TOP_MATCHES = 100;
+    private final int MIN_WORD_LENGTH = 3;
+    private final int MAX_WORD_LENGTH = 6;
+    @SuppressWarnings("unused")
     private final float NUMBER_OF_SETS_TO_USE_IN_DICTIONARY = ((int) (ExperimentController.EXPERIMENT_SIZE / ((MAX_WORD_LENGTH - MIN_WORD_LENGTH) + 1))) == 0 ? 1 :
         ((int) (ExperimentController.EXPERIMENT_SIZE / ((MAX_WORD_LENGTH - MIN_WORD_LENGTH) + 1)));
-    private final float NUMBER_OF_WORDS_TO_CONTAINER_RATIO = (float) ((ExperimentController.EXPERIMENT_SIZE / (double) ((MAX_WORD_LENGTH - MIN_WORD_LENGTH) + 1))
-            - NUMBER_OF_SETS_TO_USE_IN_DICTIONARY) < 0 ? 0 : (float) ((ExperimentController.EXPERIMENT_SIZE / (double) ((MAX_WORD_LENGTH - MIN_WORD_LENGTH) + 1))
-            - NUMBER_OF_SETS_TO_USE_IN_DICTIONARY);
+    @SuppressWarnings("unused")
+    private final float NUMBER_OF_WORDS_TO_CONTAINER_RATIO = (float) ((float) ((ExperimentController.EXPERIMENT_SIZE / (double) ((MAX_WORD_LENGTH - MIN_WORD_LENGTH) + 1))
+            - NUMBER_OF_SETS_TO_USE_IN_DICTIONARY) < 0 ? 1 :
+            DecimalPrecision.FIVE.round(1 - (float) ((ExperimentController.EXPERIMENT_SIZE / (double) ((MAX_WORD_LENGTH - MIN_WORD_LENGTH) + 1))
+            - NUMBER_OF_SETS_TO_USE_IN_DICTIONARY)));
     private final float MAX_DIFFERENCE_BETWEEN_LETTERS;
     private final float MIN_DISTANCE_BETWEEN_LETTERS;
     private Queue<String> dictionary = new LinkedList<String>();
@@ -53,30 +57,7 @@ public class DictionaryBuilder {
         try {
             dictionary.addAll(MyUtilities.FILE_IO_UTILITIES.readListFromFile(FilePath.DICTIONARY.getPath(), FileName.DICTIONARY.getName() + FileExt.DICTIONARY.getExt()));
             dictionary.removeAll(MyUtilities.FILE_IO_UTILITIES.readListFromFile(FilePath.DICTIONARY.getPath(), FileName.DICTIONARY_FILTER.getName() + FileExt.DICTIONARY.getExt()));
-            System.out.println(NUMBER_OF_SETS_TO_USE_IN_DICTIONARY);
-            System.out.println(NUMBER_OF_WORDS_TO_CONTAINER_RATIO);
-            System.out.println(1/3f);
-            System.out.println(2/3f);
-            System.out.println((1f - 2f/3f));
-            System.out.println((1/3f + 2f/3f));
-            System.out.println((1 - 1/2f) == NUMBER_OF_WORDS_TO_CONTAINER_RATIO);
-            System.out.println(1/3f);
-            System.out.println(DecimalPrecision.FIVE.round(1/3f));
-            System.out.println(1 - (2/3f));
-            System.out.println(DecimalPrecision.FIVE.round(1 - (2/3f)));
-            System.out.println((1/3f) == (1 - (2/3f)));
-            System.out.println(DecimalPrecision.FIVE.round(1/3f) == DecimalPrecision.FIVE.round(1 - (2/3f)));
-            
-            int min = 0;
-            for(int i = 0; i < 15; i++) {
-                float NUMBER_OF_SETS_TO_USE_IN_DICTIONARY = ((int) (ExperimentController.EXPERIMENT_SIZE / ((i - min) + 1))) == 0 ? 1 :
-                    ((int) (ExperimentController.EXPERIMENT_SIZE / ((i - min) + 1)));
-                float NUMBER_OF_WORDS_TO_CONTAINER_RATIO = (float) ((float) ((ExperimentController.EXPERIMENT_SIZE / (double) ((i - min) + 1))
-                        - NUMBER_OF_SETS_TO_USE_IN_DICTIONARY) < 0 ? 0 : DecimalPrecision.FIVE.round((float) ((ExperimentController.EXPERIMENT_SIZE / (double) ((i - min) + 1))
-                        - NUMBER_OF_SETS_TO_USE_IN_DICTIONARY)));
-                System.out.println(NUMBER_OF_SETS_TO_USE_IN_DICTIONARY + " " + NUMBER_OF_WORDS_TO_CONTAINER_RATIO);
-            }
-    		isEnabled = false;
+    		isEnabled = true;
         } catch (IOException e) {
             System.out.println("Unable to read the default dictionary.");
             e.printStackTrace();
@@ -180,7 +161,9 @@ public class DictionaryBuilder {
                     System.out.println();
     
                     // Go through the top matches and find the specified number of sets of each word length.
-                    while((matchesToSave.size() - matchStartIndex) < Math.round((wordLength / NUMBER_OF_SETS_TO_USE_IN_DICTIONARY))) {
+                    while((matchesToSave.size() - matchStartIndex) < (DecimalPrecision.FIVE.round(((wordLength - MIN_WORD_LENGTH) + 1) /
+                            (double) ((MAX_WORD_LENGTH - MIN_WORD_LENGTH) + 1)) > NUMBER_OF_WORDS_TO_CONTAINER_RATIO
+                            ? NUMBER_OF_SETS_TO_USE_IN_DICTIONARY + 1 : NUMBER_OF_SETS_TO_USE_IN_DICTIONARY)) {
                         for(WordDissimilarityData wdd: topMatches) {
                             boolean isUnique = true;
                             notUnique:
@@ -243,7 +226,7 @@ public class DictionaryBuilder {
                 
                 System.out.println(dictionaryWordSelection);
                 
-                /*if(dictionaryIndex < KeyboardType.values().length) {
+                if(dictionaryIndex < KeyboardType.values().length) {
                     try {
                         MyUtilities.FILE_IO_UTILITIES.writeListToFile(dictionaryWordSelection, FilePath.DICTIONARY.getPath(),
                                 KeyboardType.values()[dictionaryIndex].getFileName() + FileExt.DICTIONARY.getExt(), false);
@@ -252,7 +235,7 @@ public class DictionaryBuilder {
                         e.printStackTrace();
                     }
                 } else {
-                    String fileName = "temporary_" + (dictionaryIndex - KeyboardType.values().length);
+                    String fileName = FileName.TEMPORARY.getName() + (dictionaryIndex - KeyboardType.values().length);
                     try {
                         MyUtilities.FILE_IO_UTILITIES.writeListToFile(dictionaryWordSelection, FilePath.DICTIONARY.getPath(),
                                 fileName + FileExt.DICTIONARY.getExt(), false);
@@ -260,7 +243,7 @@ public class DictionaryBuilder {
                         System.out.println("One of the dictionaries encountered an error while saving. Please rebuild dictionaries.");
                         e.printStackTrace();
                     }
-                }*/
+                }
             }
             wordsToSave = null;
             dictionary = null;
