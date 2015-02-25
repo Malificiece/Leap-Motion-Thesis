@@ -6,6 +6,8 @@ public enum Key {
     VK_NULL('\0', '\0', "VK_NULL", -1, false),
     VK_BLANK_0('\0', '\0', "VK_BLANK", -1, false),
     VK_BLANK_1('\0', '\0', "VK_BLANK", -1, false),
+    VK_BLANK_2('\0', '\0', "VK_BLANK", -1, false),
+    VK_BLANK_3('\0', '\0', "VK_BLANK", -1, false),
     VK_A('a', 'A', "VK_A", KeyEvent.VK_A, true),
     VK_B('b', 'B', "VK_B", KeyEvent.VK_B, true),
     VK_C('c', 'C', "VK_C", KeyEvent.VK_C, true),
@@ -101,7 +103,7 @@ public enum Key {
     }
     
     public boolean isBlank() {
-        return keyValue == '\0';
+        return keyName.equals(VK_BLANK_0.getName());
     }
     
     public boolean isArrow() {

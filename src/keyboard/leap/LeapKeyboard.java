@@ -123,7 +123,7 @@ public class LeapKeyboard extends IKeyboard implements LeapObserver, Calibration
         LEAP_LOCK.lock();
         try {
             if(leapData != null) {
-                if(KEYBOARD_TYPE.equals(KeyboardType.LEAP_PINCH)) {
+                if(KEYBOARD_TYPE.equals(KeyboardType.LEAP_PINCH) && isCalibrated) {
                     leapData.populateHandData(leapPoint);
                     leapHand = leapData.getHandData();
                     Vector point = leapPoint.getPoint();
@@ -177,7 +177,7 @@ public class LeapKeyboard extends IKeyboard implements LeapObserver, Calibration
             swipeKeyboard.update(isTouching);
         } else {
             // Allow leap plane to take over the updates of specific objects that require the plane
-            leapPlane.update(leapPoint, leapTool, Gesture.ENABLED ? keyboardGestures : null, swipeTrail);
+            leapPlane.update(leapPoint, leapTool, Gesture.ENABLED ? keyboardGestures : null, swipeTrail, KEYBOARD_TYPE);
             
             //System.out.println(leapPoint.getPoint() + " norm: " + leapPoint.getNormalizedPoint());
             
@@ -233,6 +233,12 @@ public class LeapKeyboard extends IKeyboard implements LeapObserver, Calibration
                 virtualKeyboard.pressed(Key.VK_SHIFT);
             }
         //}
+        
+        // Since we removed the Enter key, we simulate it on releasing our touch.
+        if(swipeKeyboard.isTouchReleased()) {
+            keyPressed = Key.VK_ENTER.getValue();
+            notifyListenersKeyEvent();
+        }
     }
     
     @Override
@@ -375,6 +381,7 @@ public class LeapKeyboard extends IKeyboard implements LeapObserver, Calibration
 
     @Override
     public void beginCalibration(JPanel textPanel) {
+        isCalibrated = false;
         leapPoint.blockAccess(true);
         leapTool.blockAccess(true);
         if(Gesture.ENABLED) {

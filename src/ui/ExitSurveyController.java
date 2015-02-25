@@ -22,12 +22,16 @@ import javax.swing.JTextField;
 import javax.swing.WindowConstants;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.PlainDocument;
+import javax.swing.text.AttributeSet;
 
 import utilities.MyUtilities;
 import enums.ExitSurveyDataType;
 import enums.ExitSurveyOptions;
 import enums.FileExt;
 import enums.FilePath;
+import enums.Key;
 
 public class ExitSurveyController extends GraphicsController {
     private JFrame frame;
@@ -125,6 +129,13 @@ public class ExitSurveyController extends GraphicsController {
                 subjectTextFields, historyTextFields, rankingTextFields,
                 subjectButtonGroups, historyButtonGroups, discomfortButtonGroups, fatigueButtonGroups, difficultyButtonGroups,
                 saveButton);
+        
+        ageTextField.setDocument(new NumberOnlyDocument());
+        controllerRankingTextField.setDocument(new UniqueRankingDocument(controllerRankingTextField));
+        tabletRankingTextField.setDocument(new UniqueRankingDocument(tabletRankingTextField));
+        leapSurfaceRankingTextField.setDocument(new UniqueRankingDocument(leapSurfaceRankingTextField));
+        leapAirRankingTextField.setDocument(new UniqueRankingDocument(leapAirRankingTextField));
+        leapPinchRankingTextField.setDocument(new UniqueRankingDocument(leapPinchRankingTextField));
         
         JRadioButton physicalImpairmentRadioButton = getRadioButtonToListenTo(physicalImpairmentButtonGroup);
         if(physicalImpairmentRadioButton != null) {
@@ -386,5 +397,54 @@ public class ExitSurveyController extends GraphicsController {
     @Override
     public void keyboardCalibrationFinishedEventObserved() {
         // Do nothing.
+    }
+    
+    @SuppressWarnings("serial")
+    private class NumberOnlyDocument extends PlainDocument {
+        @Override
+        public void insertString(int offset, String str, AttributeSet a)
+                throws BadLocationException {
+            Key key = Key.getByValue(str.charAt(str.length() - 1));
+            if(key != null && key.isNumeric()) {
+                super.insertString(offset, str, a);
+            }
+        }
+    }
+    
+    @SuppressWarnings("serial")
+    private class UniqueRankingDocument extends PlainDocument {
+        private static final char MAX_RANKING = '5';
+        private static final char MIN_RANKING = '1';
+        private final JTextField RANKING_FIELDS[] = {controllerRankingTextField,
+                tabletRankingTextField,
+                leapSurfaceRankingTextField,
+                leapAirRankingTextField,
+                leapPinchRankingTextField};
+        private final JTextField RANKING_FIELD;
+        
+        public UniqueRankingDocument(JTextField rankingField) {
+            super();
+            RANKING_FIELD = rankingField;
+        }
+        
+        @Override
+        public void insertString(int offset, String str, AttributeSet a)
+                throws BadLocationException {
+            Key key = Key.getByValue(str.charAt(str.length() - 1));
+            if(key != null && key.isNumeric() && MIN_RANKING <= key.getValue() && key.getValue() <= MAX_RANKING) {
+                boolean unique = true;
+                for(JTextField jtf: RANKING_FIELDS) {
+                    if(!RANKING_FIELD.equals(jtf) && jtf.getText().length() > 0 && jtf.getText().charAt(0) == key.getValue()) {
+                        unique = false;
+                    }
+                }
+                if(unique) {
+                    if(RANKING_FIELD.getText().length() > 0) {
+                        RANKING_FIELD.setText("");
+                    }
+                    super.insertString(0, str, a);
+                }
+            }
+        }
     }
 }

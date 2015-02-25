@@ -532,7 +532,7 @@ public class ExperimentController extends GraphicsController {
                     wordManager.setAnswer(wordManager.getAnswer().substring(0, wordManager.getAnswer().length()-1));
                     MyUtilities.SWING_UTILITIES.calculateFontSize(wordManager.getAnswer(), answerLabel, answerPanel);
                 }
-                if(wordManager.isMatch()) {
+                if(wordManager.isMatch(true)) {
                     currentColor = LIGHT_GREEN;
                     wordPanel.setBackground(currentColor);
                     answerPanel.setBackground(currentColor);
@@ -548,7 +548,7 @@ public class ExperimentController extends GraphicsController {
                 previousFadeTime = System.currentTimeMillis();
                 fadeTimeElapsed = 0;
                 isFading = true;
-                if(wordManager.isMatch()) {
+                if(wordManager.isMatch(false)) {
                     wordPanel.setBackground(Color.GREEN);
                     answerPanel.setBackground(Color.GREEN);
                     if(runningExperiment) {
@@ -574,7 +574,7 @@ public class ExperimentController extends GraphicsController {
             } else {
                 wordManager.setAnswer(wordManager.getAnswer()+Character.toString(key));
                 MyUtilities.SWING_UTILITIES.calculateFontSize(wordManager.getAnswer(), answerLabel, answerPanel);
-                if(wordManager.isMatch()) {
+                if(wordManager.isMatch(true)) {
                     currentColor = LIGHT_GREEN;
                     wordPanel.setBackground(currentColor);
                     answerPanel.setBackground(currentColor);

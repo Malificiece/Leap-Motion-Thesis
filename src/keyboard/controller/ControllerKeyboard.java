@@ -1,5 +1,7 @@
 package keyboard.controller;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.concurrent.locks.ReentrantLock;
@@ -9,6 +11,7 @@ import utilities.Point;
 import javax.media.opengl.GL2;
 import javax.media.opengl.awt.GLCanvas;
 import javax.swing.JPanel;
+import javax.swing.Timer;
 
 import com.leapmotion.leap.Vector;
 
@@ -30,12 +33,14 @@ import enums.Gesture;
 import enums.Key;
 import enums.KeyboardType;
 import enums.Renderable;
+import experiment.WordManager;
+import experiment.WordObserver;
 import experiment.data.ControllerDataObserver;
 import experiment.data.DataManager;
 import experiment.playback.ControllerPlaybackObserver;
 import experiment.playback.PlaybackManager;
 
-public class ControllerKeyboard extends IKeyboard implements ControllerPlaybackObserver {
+public class ControllerKeyboard extends IKeyboard implements ControllerPlaybackObserver, WordObserver {
     private static final float AUTO_REPEAT_DELAY = (750 * 1f/3f) + 250; // Windows default
     private static final int AUTO_REPEAT_RATE = 1000 / 31; // Windows default
     private final float HORIZONTAL_GESTURE_LENGTH = 125f;
@@ -54,6 +59,7 @@ public class ControllerKeyboard extends IKeyboard implements ControllerPlaybackO
     private Key [][] keyLayout;
     private boolean shiftOnce = false;
     private boolean shiftTwice = false;
+    private Timer detectedMatchTimer;
     
     public ControllerKeyboard() {
         super(KeyboardType.CONTROLLER);
@@ -83,6 +89,15 @@ public class ControllerKeyboard extends IKeyboard implements ControllerPlaybackO
         selectedKey = new Point(0, 0);
         // default selected is q
         selectKey(Key.VK_Q);
+        
+        detectedMatchTimer = new Timer(AUTO_REPEAT_RATE, new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                detectedMatchTimer.stop();
+                keyPressed = Key.VK_ENTER.getValue();
+                notifyListenersKeyEvent();
+            }
+        });
     }
     
     @Override
@@ -124,6 +139,7 @@ public class ControllerKeyboard extends IKeyboard implements ControllerPlaybackO
         if(Button.A.isDown() && !key.isBlank()) {
             virtualKeyboard.pressed(key);
             if(Button.A.isPressed()) {
+                detectedMatchTimer.stop();
                 if(key != Key.VK_SHIFT) {
                     if(shiftOnce) {
                         keyPressed = key.toUpper();
@@ -152,9 +168,11 @@ public class ControllerKeyboard extends IKeyboard implements ControllerPlaybackO
             virtualKeyboard.selected(key);
         }
         
-        if(Button.B.isDown()) {
+        // REMOVE Y FROM HERE IF WE EVER CHANGE BACK
+        if(/*Button.B.isDown()*/ Button.Y.isDown()) {
             virtualKeyboard.pressed(Key.VK_BACK_SPACE);
-            if(Button.B.isPressed()) {
+            if(/*Button.B.isPressed()*/ Button.Y.isPressed()) {
+                detectedMatchTimer.stop();
                 if(shiftOnce) {
                     keyPressed = Key.VK_BACK_SPACE.toUpper();
                     shiftOnce = shiftTwice;
@@ -170,7 +188,7 @@ public class ControllerKeyboard extends IKeyboard implements ControllerPlaybackO
             virtualKeyboard.deselected(Key.VK_BACK_SPACE);
         }
         
-        if(Button.X.isDown()) {
+        /*if(Button.X.isDown()) {
             if(Button.X.isPressed()) {
                 if(!shiftOnce && !shiftTwice) {
                     shiftOnce = true;
@@ -218,7 +236,7 @@ public class ControllerKeyboard extends IKeyboard implements ControllerPlaybackO
             }
         } else if(key != Key.VK_ENTER) {
             virtualKeyboard.deselected(Key.VK_ENTER);
-        }
+        }*/
         
         // Left Stick, moves keyboard (maybe add gestures)
         moveSelectedKey(Axis.getClosestDirectionLeftStick());
@@ -241,12 +259,12 @@ public class ControllerKeyboard extends IKeyboard implements ControllerPlaybackO
     
     @Override
     public void addToUI(JPanel panel, GLCanvas canvas) {
-        // Do nothing
+        WordManager.registerObserver(this);
     }
 
     @Override
     public void removeFromUI(JPanel panel, GLCanvas canvas) {
-        // Do nothing
+        WordManager.removeObserver(this);
     }
     
     public void registerObserver(ControllerDataObserver observer) {
@@ -390,6 +408,22 @@ public class ControllerKeyboard extends IKeyboard implements ControllerPlaybackO
         return isCalibrated;
     }
     
+    @Override
+    public void wordSetEventObserved(String word) {
+        // Do nothing
+    }
+
+    @Override
+    public void currentLetterIndexChangedEventObservered(int letterIndex, Key key) {
+        // Do nothing
+    }
+
+    @Override
+    public void matchEventObserved() {
+        // Start timer for matched event
+        detectedMatchTimer.start();
+    }
+    
     public KeyboardGesture createSwipeGesture(Direction direction) {
         if(Gesture.ENABLED) {
             KeyboardGesture gesture = null;
@@ -448,6 +482,9 @@ public class ControllerKeyboard extends IKeyboard implements ControllerPlaybackO
         Key previousKey;
         do {
             previousKey = getSelectedKey();
+            if(previousKey == Key.VK_BACK_SPACE && (direction == Direction.LEFT || direction == Direction.RIGHT)) { // REMOVE ME IF WE EVER CHANGE THINGS BACK
+                break;
+            }
             int row = (rowDelta + selectedKey.x) % KEY_LAYOUT_SIZE.x;
             int col = (colDelta + selectedKey.y) % KEY_LAYOUT_SIZE.y;
             if(row < 0) { row += KEY_LAYOUT_SIZE.x; }
@@ -486,8 +523,18 @@ public class ControllerKeyboard extends IKeyboard implements ControllerPlaybackO
             Key [] tmpRow = new Key[KEY_LAYOUT_SIZE.y];
             if(row == KEY_LAYOUT_SIZE.x - 1) {
                 // Pad fifth row with shift, enter, backspace, and space key buffers.
-                int col = 0;
-                // 2 Shift keys.
+                int col = 2; // 0;
+                { // REMOVE THIS SECTION IF WE EVER ADD SPECIAL KEYS BACK
+                    tmpRow[0] = Key.VK_NULL;
+                    tmpRow[1] = Key.VK_NULL;
+                    while(col < KEY_LAYOUT_SIZE.y - 2) {
+                        tmpRow[col] = keyRows[row][0];
+                        col++;
+                    }
+                    tmpRow[tmpRow.length-2] = Key.VK_NULL;
+                    tmpRow[tmpRow.length-1] = Key.VK_NULL;
+                }
+                /*// 2 Shift keys.
                 int size = 2;
                 while(col < size) {
                     tmpRow[col] = keyRows[row][0];
@@ -510,14 +557,18 @@ public class ControllerKeyboard extends IKeyboard implements ControllerPlaybackO
                 while(col < size) {
                     tmpRow[col] = keyRows[row][3];
                     col++;
-                }
+                }*/
             } else if(row == KEY_LAYOUT_SIZE.x - 2) {
                 // Pad fourth row with shift and enter key buffers.
-                tmpRow[0] = Key.VK_SHIFT;
-                tmpRow[1] = Key.VK_SHIFT;
+                //tmpRow[0] = Key.VK_SHIFT;
+                //tmpRow[1] = Key.VK_SHIFT;
+                tmpRow[0] = Key.VK_NULL;
+                tmpRow[1] = Key.VK_NULL;
                 System.arraycopy(keyRows[row], 0, tmpRow, 2, keyRows[row].length);
-                tmpRow[tmpRow.length-2] = Key.VK_ENTER;
-                tmpRow[tmpRow.length-1] = Key.VK_ENTER;
+                //tmpRow[tmpRow.length-2] = Key.VK_ENTER;
+                //tmpRow[tmpRow.length-1] = Key.VK_ENTER;
+                tmpRow[tmpRow.length-2] = Key.VK_NULL;
+                tmpRow[tmpRow.length-1] = Key.VK_NULL;
             } else {
                 // Pad row with null key buffers.
                 tmpRow[0] = Key.VK_NULL;

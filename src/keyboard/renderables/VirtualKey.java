@@ -81,24 +81,34 @@ public class VirtualKey {
     }
     
     public void selected() {
-        keyState = KeyState.HOVER;
+        if(keyState != KeyState.PRESSED) {
+            keyState = KeyState.HOVER;
+        }
     }
     
     public void deselected() {
-        keyState = KeyState.NONE;
+        if(keyState != KeyState.PRESSED) {
+            keyState = KeyState.NONE;
+        }
     }
     
     // Hovering is only called by the surface/leap interaction so we need to include the padding between keys.
     public boolean isHovering(Vector point) {
         if(max.getX() + paddingSize.x < point.getX() || max.getY() + paddingSize.y < point.getY()) {
-            keyState = KeyState.NONE;
+            if(keyState != KeyState.PRESSED) {
+                keyState = KeyState.NONE;
+            }
             return false;
         }
         if(min.getX() - paddingSize.x > point.getX() || min.getY() - paddingSize.y > point.getY()) {
-            keyState = KeyState.NONE;
+            if(keyState != KeyState.PRESSED) {
+                keyState = KeyState.NONE;
+            }
             return false;
         }
-        keyState = KeyState.HOVER;
+        if(keyState != KeyState.PRESSED) {
+            keyState = KeyState.HOVER;
+        }
         return true;
     }
     

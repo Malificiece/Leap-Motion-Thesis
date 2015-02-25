@@ -134,6 +134,12 @@ public class TabletKeyboard extends IKeyboard implements TabletPlaybackObserver 
         } else if(shiftOnce) {
             virtualKeyboard.pressed(Key.VK_SHIFT);
         }
+        
+        // Since we removed the Enter key, we simulate it on releasing our touch.
+        if(swipeKeyboard.isTouchReleased()) {
+            keyPressed = Key.VK_ENTER.getValue();
+            notifyListenersKeyEvent();
+        }
     }
     
     @Override

@@ -39,7 +39,7 @@ public class LeapData {
     
     public void populateHandData(SwipePoint leapPoint) {
         if(leapPoint != null) {
-            leapPoint.setPoint(handData.palmPosition());
+            leapPoint.setPoint(handData.stabilizedPalmPosition());
         }
     }
     

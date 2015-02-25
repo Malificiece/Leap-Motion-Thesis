@@ -94,8 +94,11 @@ public class WordManager {
         }
     }
     
-    public boolean isMatch() {
+    public boolean isMatch(boolean notify) {
         if(!wordList.isEmpty() && currentWord().equals(answer)) {
+            if(notify) {
+                notifyListenersMatchObserved();
+            }
             return true;
         }
         return false;
@@ -205,6 +208,12 @@ public class WordManager {
     protected void notifyListenersLetterIndexChanged() {
         for(WordObserver observer : OBSERVERS) {
             observer.currentLetterIndexChangedEventObservered(currentLetter, currentLetterAsKey());
+        }
+    }
+    
+    protected void notifyListenersMatchObserved() {
+        for(WordObserver observer : OBSERVERS) {
+            observer.matchEventObserved();
         }
     }
 }

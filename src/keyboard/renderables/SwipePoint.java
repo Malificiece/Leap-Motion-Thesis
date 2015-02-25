@@ -26,6 +26,7 @@ public class SwipePoint extends KeyboardRenderable {
     private static final int NUM_VERTICIES = 32;
     private static final float DELTA_ANGLE = (float) (2.0f * Math.PI / NUM_VERTICIES);
     private static final float RADIUS = 10f;
+    private final float MINIMUM_OPACITY = 0.5f;
     private final Point KEYBOARD_SIZE;
     private final int BORDER_SIZE;
     private final float CAMERA_DISTANCE;
@@ -88,7 +89,7 @@ public class SwipePoint extends KeyboardRenderable {
             gl.glPushMatrix();
             gl.glNormal3f(0, 0, 1);
             drawDottedLine(gl);
-            gl.glTranslatef(normalizedPoint.getX(), normalizedPoint.getY(), normalizedPoint.getZ());
+            gl.glTranslatef(normalizedPoint.getX(), normalizedPoint.getY(), 0);
             drawPoint(gl);
             gl.glPopMatrix();
         }
@@ -110,7 +111,12 @@ public class SwipePoint extends KeyboardRenderable {
     }
     
     private void drawPoint(GL2 gl) {
-        COLOR.setAlpha((CAMERA_DISTANCE-normalizedPoint.getZ())/CAMERA_DISTANCE);
+        float alpha = (CAMERA_DISTANCE-normalizedPoint.getZ())/CAMERA_DISTANCE;
+        if(alpha < MINIMUM_OPACITY) {
+            COLOR.setAlpha(MINIMUM_OPACITY);
+        } else {
+            COLOR.setAlpha(alpha);
+        }
         COLOR.glColor(gl);
         gl.glBegin(GL_TRIANGLE_FAN);
         // Draw the vertex at the center of the circle

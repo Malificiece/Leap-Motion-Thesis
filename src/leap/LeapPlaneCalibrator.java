@@ -10,13 +10,14 @@ public class LeapPlaneCalibrator {
     // A - bottom left
     // B - top left
     public static final int POINT_C = 0;
-    public static final int POINT_A = 1;
-    public static final int POINT_B = 2;
+    public static final int POINT_A = 2;
+    public static final int POINT_B = 1;
     public static final int POINT_D = 3;
     public static final int POINT_INVALID = 4;
     public static final int POINT_FIRST = POINT_C;
-    private final int CLUSTER_SIZE = 1000;
-    private final int START_SEARCH = 500;
+    private final int CALCULATE_MIDPOINT = 250;
+    private final int CLUSTER_SIZE = 1000 + CALCULATE_MIDPOINT;
+    private final int START_SEARCH = 500 + CALCULATE_MIDPOINT;
     private final float EPSILON = 0.00015f;
     private final float DELTA_EPSILON = 0.0001f;
     private float epsilon;
@@ -35,17 +36,21 @@ public class LeapPlaneCalibrator {
     
     public void addPoint(Vector point) {
         if(!doneWithCurrentPoint) {
-            cluster[clusterIndex % CLUSTER_SIZE] = point;
-            clusterIndex++;
-            startSearch = startSearch < START_SEARCH ? ++startSearch : startSearch;
-            previousMidpoint = new Vector(midpoint);
-            if(MyUtilities.MATH_UTILITILES.findMidpoint(midpoint, cluster)) {
-                if(startSearch == START_SEARCH && MyUtilities.MATH_UTILITILES.findDistanceToPoint(previousMidpoint, midpoint) < epsilon) {
-                    doneWithCurrentPoint = true;
-                } else if(startSearch == START_SEARCH) {
-                    // reduce epsilon here
-                    epsilon += DELTA_EPSILON;
+            startSearch = startSearch < CLUSTER_SIZE ? ++startSearch : startSearch;
+            if(startSearch >= CALCULATE_MIDPOINT) {
+                cluster[clusterIndex % CLUSTER_SIZE] = point;
+                clusterIndex++;
+                previousMidpoint = new Vector(midpoint);
+                if(MyUtilities.MATH_UTILITILES.findMidpoint(midpoint, cluster)) {
+                    if(startSearch >= START_SEARCH && MyUtilities.MATH_UTILITILES.findDistanceToPoint(previousMidpoint, midpoint) < epsilon) {
+                        doneWithCurrentPoint = true;
+                    } else if(startSearch == CLUSTER_SIZE) {
+                        // reduce epsilon here
+                        epsilon += DELTA_EPSILON;
+                    }
                 }
+            } else {
+                midpoint = point;
             }
         }
     }

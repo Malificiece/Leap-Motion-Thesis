@@ -1,38 +1,28 @@
 TODO:
-1) Make sure that the values in the fields of the exit survey are checked when typed. Meaning
-	Age must be a number and the 1-5 section must be unique 1-5.
-1.5) Remove all of the UPPER calls since we're removing shift?
-2) Remove Enter, Shift, Spaces, Period, Comma, and Number keys from being able to be pressed.
-3) Consider a new location for the backspace key so that it is easily accessible while at the
+1) Consider a new location for the backspace key so that it is easily accessible while at the
 	same time limiting false positives for key presses. We want it to be used easily while not
 	affecting swipe. So just move it away and then treat it like we did before.
-4) Treat backspace like before, don't lock it while through the touch plane.
-5) Recreate the keyboards and images to supplement the removal of all the keys and the change
+2) Treat backspace like before, don't lock it while through the touch plane.
+3) Recreate the keyboards and images to supplement the removal of all the keys and the change
 	in location of the backspace.
-6) Resize the viewable area of the keyboards on the screen by increasing the border and potentially
+4) Resize the viewable area of the keyboards on the screen by increasing the border and potentially
 	capping the camera (z) distance so that we can always be aware of where we are in relation
 	to the keyboard.
-7) Don't allow swipe to determine key presses when way off the keyboard. (This was happening
-	when Darren was off the screen but was still getting key presses).
-8) Make sure to use the stabilized palm position for the pinch keyboard and when we implement
-	The hand.
-9) Modify the pinch threshold to further stabilize it and try to account for an actual pinch.
+5) Modify the pinch threshold to further stabilize it and try to account for an actual pinch.
 	Consider using the fingers and measuring the distances to also determine a pinch gesture.
 	Lastly let's consider changing the angle of the leap to have a better view of the fingers.
-10) Enable calibration of the pinch keyboard leap plane.
-11) Fix the calibration order to be intuitive. A, B, C, D or C, B, A, D
-12) Implement a hand alternative for both the surface and air keyboards on the leap.
-13) Solve the problem of entering/leaving the touch plane (we move along a sphere) so when
+6) Implement a hand alternative for both the surface and air keyboards on the leap.
+7) Solve the problem of entering/leaving the touch plane (we move along a sphere) so when
 	moving away from the touch plane, you often hit the key above what you're leaving on.
 	This can probably be solved by aligning the touch plane normal to the direction that the
 	tool is pointing.
-14) Consider a moving touch plane that aligns to the normal of the tool as well as the movements of the tool.
+8) Consider a moving touch plane that aligns to the normal of the tool as well as the movements of the tool.
 	This will be similar to the leap's already implemented moving touch plane. This will also allow us to
 	test it as an alternative. This could be compared to the AR static keyboard.
-15) Allow the user to move an already pre-calibrated plane using the tool as the center/normal.
-16) Implement the data parser to convert from playback format to Matlab format.
-17) Implement AR to help with feed back for air based keyboards
-18) Consider further stabilizing the leap point based on delta velocity and delta position.
-19) Add another UI/button to the control center. We want a data viewer that
+9) Allow the user to move an already pre-calibrated plane using the tool as the center/normal.
+10) Implement the data parser to convert from playback format to Matlab format.
+11) Implement AR to help with feed back for air based keyboards
+12) Consider further stabilizing the leap point based on delta velocity and delta position.
+13) Add another UI/button to the control center. We want a data viewer that
    will allow me to select anything that has been previously recorded and
    view the playback.

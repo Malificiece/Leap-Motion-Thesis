@@ -126,6 +126,21 @@ public class VirtualKeyboard extends KeyboardRenderable {
         return false;
     }
     
+    public VirtualKey getNearestAlphaKey(Vector point, int maxDistance) {
+        VirtualKey vKey = null;
+        float minDistance = Float.MAX_VALUE;
+        for(VirtualKey virtualKey: keys.values()) {
+            if(virtualKey.getKey().isAlpha()) {
+                float distance = MyUtilities.MATH_UTILITILES.findDistanceToPoint(point, virtualKey.getCenter());
+                if(distance < minDistance && distance <= maxDistance) {
+                    minDistance = distance;
+                    vKey = virtualKey;
+                }
+            }
+        }
+        return vKey;
+    }
+    
     public VirtualKey getNearestAlphaKey(Vector point) {
         VirtualKey vKey = null;
         float minDistance = Float.MAX_VALUE;

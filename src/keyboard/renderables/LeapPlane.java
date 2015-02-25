@@ -24,6 +24,7 @@ import enums.Color;
 import enums.FileExt;
 import enums.FilePath;
 import enums.Gesture;
+import enums.KeyboardType;
 import enums.Renderable;
 import enums.Setting;
 import keyboard.CalibrationObserver;
@@ -407,7 +408,7 @@ public class LeapPlane extends KeyboardRenderable {
         point.setZ(z);
     }
     
-    public void update(SwipePoint leapPoint, LeapTool leapTool, KeyboardGestures keyboardGestures, SwipeTrail swipeTrail) {
+    public void update(SwipePoint leapPoint, LeapTool leapTool, KeyboardGestures keyboardGestures, SwipeTrail swipeTrail, KeyboardType keyboardType) {
         if(isCalibrating && isCalibrated) { // means we just finished
             finishCalibration();
         }
@@ -447,10 +448,15 @@ public class LeapPlane extends KeyboardRenderable {
                     removeTool = false;
                 } else {
                     // Populate text area with correct message.
-                    setCalibrationText(LeapPlaneCalibrator.POINT_INVALID);
+                    //setCalibrationText(LeapPlaneCalibrator.POINT_INVALID);
+                    setCalibrationText(leapPlaneCalibrator.calibratingPoint());
+                    removeTool = false;
                 }
             } else if(leapTool.isValid()) {
                 // While calibrating, add each new point to the plane calibrator object.
+                if(keyboardType.equals(KeyboardType.LEAP_PINCH)) {
+                    leapPoint.getPoint().setZ(0);
+                }
                 leapPlaneCalibrator.addPoint(leapPoint.getPoint());
                 
                 // Calibration order:

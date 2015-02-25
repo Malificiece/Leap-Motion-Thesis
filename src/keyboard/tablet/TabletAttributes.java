@@ -15,18 +15,18 @@ public class TabletAttributes extends KeyboardAttributes {
     private static final Point KEY_SIZE = new Point(64, 64);
     private static final Point SPACE_KEY_SIZE = new Point(286, 64);
     private static final Point BACK_SPACE_KEY_SIZE = new Point(101, 64);
-    private static final Point ENTER_KEY_SIZE = new Point(143, 64);
+    private static final Point ENTER_KEY_SIZE = new Point(0, 0); //new Point(143, 64);
     private static final Point SHIFT_KEY_SIZE = new Point(101, 64);
     private static final int FIRST_ROW_OFFSET = 0;
     private static final int SECOND_ROW_OFFSET = 0;
     private static final int THIRD_ROW_OFFSET = 37;
-    private static final int FOURTH_ROW_OFFSET = 0;
-    private static final int FIFTH_ROW_OFFSET = 143;
-    private static final Key [] FIRST_ROW = {Key.VK_1, Key.VK_2, Key.VK_3, Key.VK_4, Key.VK_5, Key.VK_6, Key.VK_7, Key.VK_8, Key.VK_9, Key.VK_0};
+    private static final int FOURTH_ROW_OFFSET = 0 + SHIFT_KEY_SIZE.x + GAP_SIZE.x; // REMOVE ME IF WE ADD BACK.
+    private static final int FIFTH_ROW_OFFSET = 10000; //143;
+    private static final Key [] FIRST_ROW = {/*Key.VK_1, Key.VK_2, Key.VK_3, Key.VK_4, Key.VK_5, Key.VK_6, Key.VK_7, Key.VK_8, Key.VK_9, Key.VK_0*/};
     private static final Key [] SECOND_ROW = {Key.VK_Q, Key.VK_W, Key.VK_E, Key.VK_R, Key.VK_T, Key.VK_Y, Key.VK_U, Key.VK_I, Key.VK_O, Key.VK_P};
     private static final Key [] THIRD_ROW = {Key.VK_A, Key.VK_S, Key.VK_D, Key.VK_F, Key.VK_G, Key.VK_H, Key.VK_J, Key.VK_K, Key.VK_L};
-    private static final Key [] FOURTH_ROW = {Key.VK_SHIFT, Key.VK_Z, Key.VK_X, Key.VK_C, Key.VK_V, Key.VK_B, Key.VK_N, Key.VK_M, Key.VK_BACK_SPACE};
-    private static final Key [] FIFTH_ROW = {Key.VK_COMMA, Key.VK_SPACE, Key.VK_PERIOD, Key.VK_ENTER};
+    private static final Key [] FOURTH_ROW = {/*Key.VK_SHIFT,*/ Key.VK_Z, Key.VK_X, Key.VK_C, Key.VK_V, Key.VK_B, Key.VK_N, Key.VK_M, Key.VK_BACK_SPACE};
+    private static final Key [] FIFTH_ROW = {/*Key.VK_COMMA, Key.VK_SPACE, Key.VK_PERIOD,*/ Key.VK_ENTER};
     
     TabletAttributes(TabletKeyboard keyboard) {
         this.addAttribute(new KeyboardAttribute(keyboard, Attribute.KEYBOARD_SIZE, KEYBOARD_SIZE));

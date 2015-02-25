@@ -3,6 +3,7 @@ package keyboard.standard;
 import utilities.Point;
 
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
@@ -18,6 +19,7 @@ import javax.swing.InputMap;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.KeyStroke;
+import javax.swing.Timer;
 
 import com.leapmotion.leap.Vector;
 
@@ -30,6 +32,8 @@ import enums.Direction;
 import enums.KeyboardType;
 import enums.Renderable;
 import enums.Key;
+import experiment.WordManager;
+import experiment.WordObserver;
 import experiment.data.DataManager;
 import experiment.playback.PlaybackManager;
 import experiment.playback.PlaybackObserver;
@@ -38,7 +42,8 @@ import keyboard.KeyboardGesture;
 import keyboard.renderables.KeyboardGestures;
 import keyboard.renderables.VirtualKeyboard;
 
-public class StandardKeyboard extends IKeyboard implements PlaybackObserver {
+public class StandardKeyboard extends IKeyboard implements PlaybackObserver, WordObserver {
+    private static final int AUTO_REPEAT_RATE = 1000 / 31; // Windows default
     private final float HORIZONTAL_GESTURE_LENGTH = 125f;
     private final float VERTICAL_GESTURE_LENGTH;
     private final float HORIZONTAL_GESTURE_OFFSET = 25f;
@@ -52,6 +57,7 @@ public class StandardKeyboard extends IKeyboard implements PlaybackObserver {
     private boolean shiftDown = false;
     private boolean isCalibrated = false;
     private ReentrantLock gestureLock;
+    private Timer detectedMatchTimer;
     
     public StandardKeyboard() {
         super(KeyboardType.STANDARD);
@@ -79,6 +85,15 @@ public class StandardKeyboard extends IKeyboard implements PlaybackObserver {
         }
         VERTICAL_GESTURE_LENGTH = HORIZONTAL_GESTURE_LENGTH * (imageSize.y/(float)imageSize.x);
         VERTICAL_GESTURE_OFFSET = HORIZONTAL_GESTURE_OFFSET * (imageSize.y/(float)imageSize.x);
+        
+        detectedMatchTimer = new Timer(AUTO_REPEAT_RATE, new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                detectedMatchTimer.stop();
+                keyPressed = Key.VK_ENTER.getValue();
+                notifyListenersKeyEvent();
+            }
+        });
     }
     
     @Override
@@ -114,6 +129,7 @@ public class StandardKeyboard extends IKeyboard implements PlaybackObserver {
     
     @Override
     public void addToUI(JPanel panel, GLCanvas canvas) {
+        WordManager.registerObserver(this);
         panel.add(keyBindings);
         if(Gesture.ENABLED) {
             canvas.addMouseListener(mouseGesture);
@@ -123,6 +139,7 @@ public class StandardKeyboard extends IKeyboard implements PlaybackObserver {
 
     @Override
     public void removeFromUI(JPanel panel, GLCanvas canvas) {
+        WordManager.removeObserver(this);
         panel.remove(keyBindings);
         if(Gesture.ENABLED) {
             canvas.removeMouseListener(mouseGesture);
@@ -203,6 +220,22 @@ public class StandardKeyboard extends IKeyboard implements PlaybackObserver {
         return isCalibrated;
     }
     
+    @Override
+    public void wordSetEventObserved(String word) {
+        // Do nothing
+    }
+
+    @Override
+    public void currentLetterIndexChangedEventObservered(int letterIndex, Key key) {
+        // Do nothing
+    }
+
+    @Override
+    public void matchEventObserved() {
+        // Start timer for matched event
+        detectedMatchTimer.start();
+    }
+    
     public KeyboardGesture createSwipeGesture(Direction direction) {
         if(Gesture.ENABLED) {
             KeyboardGesture gesture = null;
@@ -250,7 +283,7 @@ public class StandardKeyboard extends IKeyboard implements PlaybackObserver {
             InputMap inputMap = getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
             
             for(Key key: Key.values()) {
-                if(key.isPrintable() || (key.isArrow() && Gesture.ENABLED)) {
+                if((key.isPrintable() || (key.isArrow() && Gesture.ENABLED)) && /* Removing Special keys */ (!key.isSpecial() || key == Key.VK_BACK_SPACE)) {
                     // Add normal keys to input map
                     inputMap.put(KeyStroke.getKeyStroke(key.getCode(), 0), key.getName());
                     
@@ -278,6 +311,7 @@ public class StandardKeyboard extends IKeyboard implements PlaybackObserver {
             @Override
             public void actionPerformed(ActionEvent e) {
                 if(!isPlayingBack()) {
+                    detectedMatchTimer.stop();
                     keyPressed = e.getActionCommand().charAt(0);
                     Key key = null;
                     if((key = Key.getByCode(keyPressed)) == null) {
