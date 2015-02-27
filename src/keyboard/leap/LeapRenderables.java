@@ -20,8 +20,8 @@ public class LeapRenderables extends KeyboardRenderables {
     LeapRenderables(LeapKeyboard keyboard) {
         // order here determines render order
         this.addRenderable(new LeapPlane(keyboard));
-        this.addRenderable(new KeyboardImage(keyboard.getFileName() + FileName.KEYBOARD_IMAGE.getName() + FileExt.PNG.getExt()));
-        this.addRenderable(new KeyboardImage(keyboard.getFileName() + FileName.KEYBOARD_IMAGE_UPPER.getName() + FileExt.PNG.getExt()));
+        this.addRenderable(new KeyboardImage(FileName.SWIPE.getName() + FileName.KEYBOARD_IMAGE.getName() + FileExt.PNG.getExt()));
+        this.addRenderable(new KeyboardImage(FileName.SWIPE.getName() + FileName.KEYBOARD_IMAGE_UPPER.getName() + FileExt.PNG.getExt()));
         this.swapToLowerCaseKeyboard();
         this.addRenderable(new VirtualKeyboard(keyboard.getAttributes()));
         if(Gesture.ENABLED) {

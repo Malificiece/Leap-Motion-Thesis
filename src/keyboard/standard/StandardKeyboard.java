@@ -73,7 +73,7 @@ public class StandardKeyboard extends IKeyboard implements PlaybackObserver, Wor
         System.out.println("-------------------------------------------------------");
         keyboardRenderables = new StandardRenderables(this);
         keyboardSize = keyboardAttributes.getAttributeAsPoint(Attribute.KEYBOARD_SIZE);
-        int borderSize = keyboardAttributes.getAttributeAsInteger(Attribute.BORDER_SIZE) * 2;
+        float borderSize = keyboardAttributes.getAttributeAsFloat(Attribute.BORDER_SIZE) * 2;
         imageSize = new Point(keyboardSize.x + borderSize, keyboardSize.y + borderSize);
         CAMERA_DISTANCE = keyboardAttributes.getAttributeAsFloat(Attribute.CAMERA_DISTANCE);
         virtualKeyboard = (VirtualKeyboard) keyboardRenderables.getRenderable(Renderable.VIRTUAL_KEYBOARD);
@@ -288,19 +288,19 @@ public class StandardKeyboard extends IKeyboard implements PlaybackObserver, Wor
                     inputMap.put(KeyStroke.getKeyStroke(key.getCode(), 0), key.getName());
                     
                     // Add shifted keys to input map
-                    inputMap.put(KeyStroke.getKeyStroke(key.getCode(), KeyEvent.SHIFT_DOWN_MASK, false), key.getName() + Key.VK_SHIFT.getName());
+                    //inputMap.put(KeyStroke.getKeyStroke(key.getCode(), KeyEvent.SHIFT_DOWN_MASK, false), key.getName() + Key.VK_SHIFT.getName());
                     
                     // Add normal keys to action map
                     actionMap.put(key.getName(), new KeyAction(key.getValue()));
                     
                     // Add shifted keys to action map
-                    actionMap.put(key.getName() + Key.VK_SHIFT.getName(), new KeyAction(key.toUpper()));
+                    //actionMap.put(key.getName() + Key.VK_SHIFT.getName(), new KeyAction(key.toUpper()));
                 }
             }
-            inputMap.put(KeyStroke.getKeyStroke(Key.VK_SHIFT.getCode(), KeyEvent.SHIFT_DOWN_MASK, false), Key.VK_SHIFT.getName());
+            /*inputMap.put(KeyStroke.getKeyStroke(Key.VK_SHIFT.getCode(), KeyEvent.SHIFT_DOWN_MASK, false), Key.VK_SHIFT.getName());
             actionMap.put(Key.VK_SHIFT.getName(), new KeyAction(Key.VK_SHIFT.toUpper()));
             inputMap.put(KeyStroke.getKeyStroke(Key.VK_SHIFT.getCode(), 0, true), Key.VK_SHIFT_RELEASED.getName());
-            actionMap.put(Key.VK_SHIFT_RELEASED.getName(), new KeyAction(Key.VK_SHIFT_RELEASED.getValue()));
+            actionMap.put(Key.VK_SHIFT_RELEASED.getName(), new KeyAction(Key.VK_SHIFT_RELEASED.getValue()));*/
         }
         
         private class KeyAction extends AbstractAction {

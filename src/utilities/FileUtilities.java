@@ -114,7 +114,7 @@ public class FileUtilities {
                     value = tmpVector;
                 } else if(value instanceof Point) {
                     Point tmpPoint = new Point(0, 0);
-                    tmpPoint.setLocation(Integer.valueOf(words[1].substring(1, words[1].length()-1)), Integer.valueOf(words[2].substring(0, words[2].length()-1)));
+                    tmpPoint.setLocation(Float.valueOf(words[1].substring(1, words[1].length()-1)), Float.valueOf(words[2].substring(0, words[2].length()-1)));
                     value = tmpPoint;
                 }
                 System.out.println(dataName + ": " + value);

@@ -60,7 +60,7 @@ public class TabletKeyboard extends IKeyboard implements TabletPlaybackObserver 
         System.out.println("-------------------------------------------------------");
         keyboardRenderables = new TabletRenderables(this);
         keyboardSize = keyboardAttributes.getAttributeAsPoint(Attribute.KEYBOARD_SIZE);
-        int borderSize = keyboardAttributes.getAttributeAsInteger(Attribute.BORDER_SIZE) * 2;
+        float borderSize = keyboardAttributes.getAttributeAsFloat(Attribute.BORDER_SIZE) * 2;
         imageSize = new Point(keyboardSize.x + borderSize, keyboardSize.y + borderSize);
         CAMERA_DISTANCE = keyboardAttributes.getAttributeAsFloat(Attribute.CAMERA_DISTANCE);
         virtualKeyboard = (VirtualKeyboard) keyboardRenderables.getRenderable(Renderable.VIRTUAL_KEYBOARD);

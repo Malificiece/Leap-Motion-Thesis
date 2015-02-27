@@ -3,6 +3,7 @@ package experiment;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.Queue;
 
@@ -154,7 +155,11 @@ public class WordManager {
         wordList.clear();
         try {
             isDefault = false;
-            wordList.addAll(MyUtilities.FILE_IO_UTILITIES.readListFromFile(FilePath.DICTIONARY.getPath(), fileName + FileExt.DICTIONARY.getExt()));
+            ArrayList<String> randomizedWords = new ArrayList<String>();
+            randomizedWords.addAll(MyUtilities.FILE_IO_UTILITIES.readListFromFile(FilePath.DICTIONARY.getPath(), fileName + FileExt.DICTIONARY.getExt()));
+            // Considered the Fisher-Yates shuffle but it's not as good as this shuffle.
+            Collections.shuffle(randomizedWords);
+            wordList.addAll(randomizedWords);
             currentLetter = 0;
             if(isValid()) {
                 notifyListenersWordSet();

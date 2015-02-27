@@ -5,6 +5,7 @@ import keyboard.renderables.LeapTool;
 
 import com.leapmotion.leap.Hand;
 import com.leapmotion.leap.Tool;
+import com.leapmotion.leap.Vector;
 
 
 public class LeapData {
@@ -39,7 +40,11 @@ public class LeapData {
     
     public void populateHandData(SwipePoint leapPoint) {
         if(leapPoint != null) {
-            leapPoint.setPoint(handData.stabilizedPalmPosition());
+            if(handData.isValid()) {
+                leapPoint.setPoint(handData.stabilizedPalmPosition());
+            } else {
+                leapPoint.setPoint(Vector.zero());
+            }
         }
     }
     
@@ -51,7 +56,11 @@ public class LeapData {
     
     private void populatePointData(SwipePoint leapPoint) {
         if(leapPoint != null) {
-            leapPoint.setPoint(toolData.stabilizedTipPosition());
+            if(toolData.isValid()) {
+                leapPoint.setPoint(toolData.stabilizedTipPosition());
+            } else {
+                leapPoint.setPoint(Vector.zero());
+            }
         }
     }
 }

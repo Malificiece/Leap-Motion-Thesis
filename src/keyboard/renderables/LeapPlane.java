@@ -16,6 +16,7 @@ import ui.GraphicsController;
 import utilities.MyUtilities;
 import static com.jogamp.opengl.util.gl2.GLUT.*;
 
+import com.leapmotion.leap.Hand;
 import com.leapmotion.leap.InteractionBox;
 import com.leapmotion.leap.Vector;
 
@@ -45,7 +46,7 @@ public class LeapPlane extends KeyboardRenderable {
     private static final float RADIUS = 10f;
     private final KeyboardSetting TOUCH_THRESHOLD; // -0.10f; normalized // -10.0f; not normalized for defaults
     private final Point KEYBOARD_SIZE;
-    private final int BORDER_SIZE;
+    private final float BORDER_SIZE;
     private final float CAMERA_DISTANCE;
     private final KeyboardAttribute POINT_A_ATTRIBUTE;
     private final KeyboardAttribute POINT_B_ATTRIBUTE;
@@ -88,7 +89,7 @@ public class LeapPlane extends KeyboardRenderable {
     public LeapPlane(IKeyboard keyboard) {
         super(TYPE);
         KEYBOARD_SIZE = keyboard.getAttributes().getAttributeAsPoint(Attribute.KEYBOARD_SIZE);
-        BORDER_SIZE = keyboard.getAttributes().getAttributeAsInteger(Attribute.BORDER_SIZE);
+        BORDER_SIZE = keyboard.getAttributes().getAttributeAsFloat(Attribute.BORDER_SIZE);
         CAMERA_DISTANCE = keyboard.getAttributes().getAttributeAsFloat(Attribute.CAMERA_DISTANCE);
         TOUCH_THRESHOLD = keyboard.getSettings().getSetting(Setting.TOUCH_THRESHOLD);
         FILE_NAME = keyboard.getFileName();
@@ -289,11 +290,11 @@ public class LeapPlane extends KeyboardRenderable {
         
         // Normalize points in the leap box.
         if(iBox != null) {
-            pointA = iBox.normalizePoint(pointA);
-            pointB = iBox.normalizePoint(pointB);
-            pointC = iBox.normalizePoint(pointC);
-            pointD = iBox.normalizePoint(pointD);
-            planeCenter = iBox.normalizePoint(planeCenter);
+            pointA = iBox.normalizePoint(pointA, false);
+            pointB = iBox.normalizePoint(pointB, false);
+            pointC = iBox.normalizePoint(pointC, false);
+            pointD = iBox.normalizePoint(pointD, false);
+            planeCenter = iBox.normalizePoint(planeCenter, false);
         }
         
         // Recalculate normalized plane
@@ -314,7 +315,7 @@ public class LeapPlane extends KeyboardRenderable {
         // Calculate the width and height of the normalized plane we created.
         normalizedPlaneWidth = MyUtilities.MATH_UTILITILES.findDistanceToPoint(pointB, pointC);
         normalizedPlaneHeight = MyUtilities.MATH_UTILITILES.findDistanceToPoint(pointB, pointA);
-        //distanceToCameraPlane = Math.abs((iBox.normalizePoint(iBox.center()).getZ() - 0.5f) - planeCenter.getZ());
+        //distanceToCameraPlane = Math.abs((iBox.normalizePoint(iBox.center(), false).getZ() - 0.5f) - planeCenter.getZ());
         distanceToCameraPlane = 1 - planeCenter.getZ();
         
         // Scale the plane to 3D space.
@@ -382,7 +383,7 @@ public class LeapPlane extends KeyboardRenderable {
         // Find distance to left and right sides. Use the right side to determine if we should negate the distance to the left side.
         float distAB = MyUtilities.MATH_UTILITILES.findDistanceToLine(point, pointA, pointB)/normalizedPlaneWidth;
         float distDC = MyUtilities.MATH_UTILITILES.findDistanceToLine(point, pointD, pointC);
-        if (distDC > normalizedPlaneWidth) {
+        if (distDC > normalizedPlaneWidth && distAB < distDC) {
             x = -distAB;
         } else {
             x = distAB;
@@ -392,7 +393,7 @@ public class LeapPlane extends KeyboardRenderable {
         // Find distance to top and bottom sides. Use the top side to determine if we should negate the distance to the bottom side.
         float distAD = MyUtilities.MATH_UTILITILES.findDistanceToLine(point, pointA, pointD)/normalizedPlaneHeight;
         float distBC = MyUtilities.MATH_UTILITILES.findDistanceToLine(point, pointB, pointC);
-        if (distBC > normalizedPlaneHeight) {
+        if (distBC > normalizedPlaneHeight && distAD < distBC) {
             y = -distAD;
         } else {
             y = distAD;
@@ -408,16 +409,20 @@ public class LeapPlane extends KeyboardRenderable {
         point.setZ(z);
     }
     
-    public void update(SwipePoint leapPoint, LeapTool leapTool, KeyboardGestures keyboardGestures, SwipeTrail swipeTrail, KeyboardType keyboardType) {
+    public void update(SwipePoint leapPoint, LeapTool leapTool, KeyboardGestures keyboardGestures, SwipeTrail swipeTrail, KeyboardType keyboardType, Hand leapHand) {
         if(isCalibrating && isCalibrated) { // means we just finished
             finishCalibration();
         }
         if(isCalibrated) {
             // Find point distance, normalize it, and position it.
-            leapPoint.applyPlaneRotationAndNormalizePoint(axisToCamera, angleToCamera);
-            calcDistToPlane(leapPoint.getNormalizedPoint());
-            applyPlaneNormalization(leapPoint.getNormalizedPoint());
-            leapPoint.scaleTo3DSpace();
+            if(leapTool.isValid() || leapHand.isValid()) {
+                leapPoint.applyPlaneRotationAndNormalizePoint(axisToCamera, angleToCamera);
+                calcDistToPlane(leapPoint.getNormalizedPoint());
+                applyPlaneNormalization(leapPoint.getNormalizedPoint());
+                leapPoint.scaleTo3DSpace();
+            } else {
+                leapPoint.setNormalizedPoint(Vector.zero());
+            }
             
             // Set tool point, scale it, rotate and position it.
             leapTool.update(leapPoint.getNormalizedPoint());
@@ -434,7 +439,7 @@ public class LeapPlane extends KeyboardRenderable {
             }
             
             // Set add to trail and set location.
-            if(isTouching() /*&& this.isValid()*/) {
+            if(isTouching() && (leapTool.isValid() || leapHand.isValid())) {
                 swipeTrail.update(leapPoint.getNormalizedPoint());
             } else {
                 swipeTrail.update();

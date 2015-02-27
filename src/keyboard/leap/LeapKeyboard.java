@@ -48,6 +48,7 @@ public class LeapKeyboard extends IKeyboard implements LeapObserver, Calibration
     private final KeyboardType KEYBOARD_TYPE;
     private final ReentrantLock LEAP_LOCK = new ReentrantLock();
     private final float CAMERA_DISTANCE;
+    private final int PINCH_AIR_HEIGHT = 100;
     private ArrayList<LeapDataObserver> observers = new ArrayList<LeapDataObserver>();
     private SwipePoint leapPoint;
     private SwipeTrail swipeTrail;
@@ -79,7 +80,7 @@ public class LeapKeyboard extends IKeyboard implements LeapObserver, Calibration
         System.out.println("-------------------------------------------------------");
         keyboardRenderables = new LeapRenderables(this);
         keyboardSize = keyboardAttributes.getAttributeAsPoint(Attribute.KEYBOARD_SIZE);
-        int borderSize = keyboardAttributes.getAttributeAsInteger(Attribute.BORDER_SIZE) * 2;
+        float borderSize = keyboardAttributes.getAttributeAsFloat(Attribute.BORDER_SIZE) * 2;
         imageSize = new Point(keyboardSize.x + borderSize, keyboardSize.y + borderSize);
         CAMERA_DISTANCE = keyboardAttributes.getAttributeAsFloat(Attribute.CAMERA_DISTANCE);
         virtualKeyboard = (VirtualKeyboard) keyboardRenderables.getRenderable(Renderable.VIRTUAL_KEYBOARD);
@@ -131,7 +132,7 @@ public class LeapKeyboard extends IKeyboard implements LeapObserver, Calibration
                         point.setZ(leapPlane.getDenormalizedPlaceCenter().getZ());
                         leapPoint.setPoint(point);
                     } else {
-                        point.setZ(leapPlane.getDenormalizedPlaceCenter().getZ() + 20f);
+                        point.setZ(leapPlane.getDenormalizedPlaceCenter().getZ() + PINCH_AIR_HEIGHT);
                         leapPoint.setPoint(point);
                     }
                 } else {
@@ -177,14 +178,18 @@ public class LeapKeyboard extends IKeyboard implements LeapObserver, Calibration
             swipeKeyboard.update(isTouching);
         } else {
             // Allow leap plane to take over the updates of specific objects that require the plane
-            leapPlane.update(leapPoint, leapTool, Gesture.ENABLED ? keyboardGestures : null, swipeTrail, KEYBOARD_TYPE);
+            leapPlane.update(leapPoint, leapTool, Gesture.ENABLED ? keyboardGestures : null, swipeTrail, KEYBOARD_TYPE, leapHand);
             
             //System.out.println(leapPoint.getPoint() + " norm: " + leapPoint.getNormalizedPoint());
             
             // Update gestures after plane, we need both normalized and non normalized points.
             if(Gesture.ENABLED) leapGestures.update();
             
-            if(leapTool.isValid() || leapHand.isValid()) swipeKeyboard.update(leapPlane.isTouching());
+            if(leapTool.isValid() || leapHand.isValid()) {
+                swipeKeyboard.update(leapPlane.isTouching());
+            } else {
+                virtualKeyboard.clearAll();
+            }
         }
         
         //if(leapTool.isValid()) {
@@ -200,7 +205,7 @@ public class LeapKeyboard extends IKeyboard implements LeapObserver, Calibration
                 point.setZ(0);
                 leapPoint.setNormalizedPoint(point);
             }
-            
+
             Key key;
             if((key = swipeKeyboard.isPressed()) != Key.VK_NULL) {
                 if(key != Key.VK_SHIFT) {

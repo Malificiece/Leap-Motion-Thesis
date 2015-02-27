@@ -16,6 +16,7 @@ import static javax.media.opengl.GL.*;  // GL constants
 //import static javax.media.opengl.GL2.*; // GL2 constants
 
 public class KeyboardImage extends KeyboardRenderable {
+    public final static float SCALE = 1.0f;
     private final static String UPPER = "upper";
     private static final String ASSETS_PATH = FilePath.ASSETS.getPath();
     private static final String DEFAULT_FILE_NAME = FileName.STANDARD.getName() + FileName.KEYBOARD_IMAGE.getName();
@@ -93,7 +94,7 @@ public class KeyboardImage extends KeyboardRenderable {
     
             // Draw image as bytes.
             gl.glRasterPos2i(0, 0); // moves in object space
-            gl.glPixelZoom( 1.0f, 1.0f ); // x-factor, y-factor
+            gl.glPixelZoom(SCALE, SCALE); // x-factor, y-factor
             gl.glDrawPixels(imageWidth, imageHeight, GL_RGBA, GL_UNSIGNED_BYTE, image);
             gl.glPopMatrix();
         }

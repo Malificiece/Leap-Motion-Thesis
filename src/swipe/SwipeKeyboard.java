@@ -18,9 +18,9 @@ public class SwipeKeyboard implements WordObserver {
     private static final float AUTO_REPEAT_DELAY = (750 * 1f/3f) + 250; // Windows default
     private static final int AUTO_REPEAT_RATE = 1000 / 31; // Windows default
     private final float MAX_CLOSE_KEY_DISTANCE;
-    private final int MAX_EXPECTED_PRESS_RADIUS;
-    private final int MAX_CLOSE_EXPECTED_PRESS_RADIUS;
-    private final int MAX_DISTANCE_OFF_KEYBOARD;
+    private final float MAX_EXPECTED_PRESS_RADIUS;
+    private final float MAX_CLOSE_EXPECTED_PRESS_RADIUS;
+    private final float MAX_DISTANCE_OFF_KEYBOARD;
     private final SwipePoint swipePoint;
     private final SwipeTrail swipeTrail;
     private final VirtualKeyboard virtualKeyboard;
@@ -63,10 +63,10 @@ public class SwipeKeyboard implements WordObserver {
     //		- If we are swiping, then we ignore all other non letter keys, consider closest alpha keys to us on angle
     
     public SwipeKeyboard(IKeyboard keyboard) {
-        int keyWidth = keyboard.getAttributes().getAttributeAsPoint(Attribute.KEY_SIZE).x;
-        MAX_EXPECTED_PRESS_RADIUS = (int) (keyWidth * 1.20f); // 64; --- was 1.25 -- 80
-        MAX_DISTANCE_OFF_KEYBOARD = MAX_EXPECTED_PRESS_RADIUS * 2;
-        MAX_CLOSE_EXPECTED_PRESS_RADIUS = (int) (keyWidth * 0.75f); // 48;
+        float keyWidth = keyboard.getAttributes().getAttributeAsPoint(Attribute.KEY_SIZE).x;
+        MAX_EXPECTED_PRESS_RADIUS = keyWidth * 1.20f; // 64; --- was 1.25 -- 80
+        MAX_DISTANCE_OFF_KEYBOARD = keyWidth * 1.5f;
+        MAX_CLOSE_EXPECTED_PRESS_RADIUS = keyWidth * 0.75f; // 48;
         virtualKeyboard = (VirtualKeyboard) keyboard.getRenderables().getRenderable(Renderable.VIRTUAL_KEYBOARD);
         MAX_CLOSE_KEY_DISTANCE = MyUtilities.MATH_UTILITILES.findDistanceToPoint(
                 virtualKeyboard.getVirtualKey(Key.VK_G).getCenter(),
@@ -79,7 +79,11 @@ public class SwipeKeyboard implements WordObserver {
     }
 
     public void update(boolean isTouching) {
-        if(isTouching && virtualKeyboard.getNearestAlphaKey(swipePoint.getNormalizedPoint(), MAX_DISTANCE_OFF_KEYBOARD) != null) {
+        VirtualKey nearestAnyKey = null;
+        if(isTouching) {
+            nearestAnyKey = virtualKeyboard.getNearestKeyNoEnter(swipePoint.getNormalizedPoint(), MAX_DISTANCE_OFF_KEYBOARD);
+        }
+        if(nearestAnyKey != null) {
             if(!touchPress && !touchDown) {
                 touchPress = true;
                 touchDown = true;
@@ -104,7 +108,7 @@ public class SwipeKeyboard implements WordObserver {
                 firstKey = virtualKey;
             }
             //System.out.println("hovering: " + virtualKey.getKey());
-            if(isBackSpaceDown || (virtualKey.getKey() == Key.VK_BACK_SPACE && !isSwiping && !isShiftDown)) {
+            if(/*isBackSpaceDown || */(virtualKey.getKey() == Key.VK_BACK_SPACE /*&& !isSwiping*/ && !isShiftDown)) {
                 virtualKey = virtualKeyboard.getVirtualKey(Key.VK_BACK_SPACE);
                 if(!isPressed && !isBackSpaceDown) {
                     isPressed = true;
@@ -183,7 +187,7 @@ public class SwipeKeyboard implements WordObserver {
             virtualKey.pressed();
         } else if(touchDown) {
             if(isBackSpaceDown) {
-                virtualKey = virtualKeyboard.getVirtualKey(Key.VK_BACK_SPACE);
+                /*virtualKey = virtualKeyboard.getVirtualKey(Key.VK_BACK_SPACE);
                 long now = System.currentTimeMillis();
                 elapsedRepeatTime += now - previousRepeatTime;
                 previousRepeatTime = now;
@@ -196,7 +200,9 @@ public class SwipeKeyboard implements WordObserver {
                     isPressed = true;
                     elapsedRepeatTime = 0;
                 }
-                virtualKey.pressed();
+                virtualKey.pressed();*/
+                isBackSpaceDown = false;
+                isBackSpaceRepeating = false;
             } else if(isShiftDown) {
                 virtualKey = virtualKeyboard.getVirtualKey(Key.VK_SHIFT);
                 virtualKey.pressed();
@@ -301,14 +307,17 @@ public class SwipeKeyboard implements WordObserver {
                     isDown = false;
                     //System.out.println("For some reason ending up here");
                 }
-            } else if(isSpecialDown) {
+            }
+            if(isSpecialDown) {
                 isPressed = true;
                 isSpecialDown = false;
-            } else if(isBackSpaceDown) {
+            }
+            if(isBackSpaceDown) {
                 isPressed = false;
                 isBackSpaceDown = false;
                 isBackSpaceRepeating = false;
-            } else if(isShiftDown) {
+            }
+            if(isShiftDown) {
                 isPressed = false;
                 isShiftDown = false;
             }

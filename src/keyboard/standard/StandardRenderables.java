@@ -17,7 +17,7 @@ public class StandardRenderables extends KeyboardRenderables {
 
     StandardRenderables(StandardKeyboard keyboard) {
         // order here determines render order
-        this.addRenderable(new KeyboardImage( keyboard.getFileName() + FileName.KEYBOARD_IMAGE_UPPER.getName() + FileExt.PNG.getExt()));
+        this.addRenderable(new KeyboardImage(keyboard.getFileName() + FileName.KEYBOARD_IMAGE_UPPER.getName() + FileExt.PNG.getExt()));
         this.addRenderable(new VirtualKeyboard(keyboard.getAttributes()));
         if(Gesture.ENABLED) {
             this.addRenderable(new KeyboardGestures(keyboard.getAttributes()));

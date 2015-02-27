@@ -42,11 +42,11 @@ public class SwipeTrail extends KeyboardRenderable {
     
     // Variables used in determining if our movements constitute a press event
     // TODO: Convert these to settings we can save/modify with the program.
-    private final int MIN_INTERPOLATED_DISTANCE;
-    private final int MIN_PRESSED_DISTANCE;
+    private final float MIN_INTERPOLATED_DISTANCE;
+    private final float MIN_PRESSED_DISTANCE;
     private final float MIN_PRESSED_ANGLE_OFF_PATH = 165 * MathUtilities.DEGREES_TO_RADS;
     private final float MIN_PRESSED_ANGLE_ON_PATH = 90 * MathUtilities.DEGREES_TO_RADS; // 115 good, but still hit false positives, 90 almost gets rid of false positives
-    private final int MIN_EXPECTED_PATH_DISTANCE;
+    private final float MIN_EXPECTED_PATH_DISTANCE;
     private Vector expectedPathSource = Vector.zero();
     private Vector expectedPathDestination = Vector.zero();
     private float pathDistance = 0;
@@ -58,10 +58,10 @@ public class SwipeTrail extends KeyboardRenderable {
 
     public SwipeTrail(KeyboardAttributes keyboardAttributes) {
         super(TYPE);
-        int keyWidth = keyboardAttributes.getAttributeAsPoint(Attribute.KEY_SIZE).x;
-        MIN_INTERPOLATED_DISTANCE = (int) (keyWidth * 0.25f); // 16
-        MIN_PRESSED_DISTANCE = (int) (keyWidth * 0.75f); // 48
-        MIN_EXPECTED_PATH_DISTANCE = (int) (keyWidth * 0.8125f); // 52
+        float keyWidth = keyboardAttributes.getAttributeAsPoint(Attribute.KEY_SIZE).x;
+        MIN_INTERPOLATED_DISTANCE = keyWidth * 0.25f; // 16
+        MIN_PRESSED_DISTANCE = keyWidth * 0.75f; // 48
+        MIN_EXPECTED_PATH_DISTANCE = keyWidth * 0.8125f; // 52
         line = new Vector[LINE_SIZE];
     }
     

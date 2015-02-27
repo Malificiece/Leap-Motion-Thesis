@@ -28,7 +28,7 @@ public class SwipePoint extends KeyboardRenderable {
     private static final float RADIUS = 10f;
     private final float MINIMUM_OPACITY = 0.5f;
     private final Point KEYBOARD_SIZE;
-    private final int BORDER_SIZE;
+    private final float BORDER_SIZE;
     private final float CAMERA_DISTANCE;
     private Vector point = new Vector();
     private Vector normalizedPoint = Vector.zero();
@@ -37,7 +37,7 @@ public class SwipePoint extends KeyboardRenderable {
     public SwipePoint(KeyboardAttributes keyboardAttributes) {
         super(TYPE);
         KEYBOARD_SIZE = keyboardAttributes.getAttributeAsPoint(Attribute.KEYBOARD_SIZE);
-        BORDER_SIZE = keyboardAttributes.getAttributeAsInteger(Attribute.BORDER_SIZE);
+        BORDER_SIZE = keyboardAttributes.getAttributeAsFloat(Attribute.BORDER_SIZE);
         CAMERA_DISTANCE = keyboardAttributes.getAttributeAsFloat(Attribute.CAMERA_DISTANCE);
     }
     
@@ -63,7 +63,7 @@ public class SwipePoint extends KeyboardRenderable {
     
     private Vector normalizePoint() {
         if(iBox != null) {
-            return iBox.normalizePoint(normalizedPoint);
+            return iBox.normalizePoint(normalizedPoint, false);
         }
         return normalizedPoint;
     }

@@ -95,4 +95,8 @@ public class MathUtilities {
     public float findDimensionalAlignment(int height, int borderSize) {
         return (float) (((height + (borderSize * 2f)) / (Math.tan(DEGREES_TO_RADS*GraphicsUtilities.FOVY/2f))/2f)); // Purposefully leaving out negative
     }
+    
+    public float findDimensionalAlignment(float height, float borderSize) {
+        return (float) (((height + (borderSize * 2f)) / (Math.tan(DEGREES_TO_RADS*GraphicsUtilities.FOVY/2f))/2f)); // Purposefully leaving out negative
+    }
 }

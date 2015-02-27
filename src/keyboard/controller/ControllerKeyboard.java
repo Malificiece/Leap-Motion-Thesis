@@ -48,7 +48,7 @@ public class ControllerKeyboard extends IKeyboard implements ControllerPlaybackO
     private final float HORIZONTAL_GESTURE_OFFSET = 25f;
     private final float VERTICAL_GESTURE_OFFSET;
     private final float CAMERA_DISTANCE;
-    private final Point KEY_LAYOUT_SIZE = new Point(5, 14);
+    private final Point KEY_LAYOUT_SIZE = new Point(4, 10); // new Point(5, 14);
     private final ReentrantLock CONTROLLER_LOCK = new ReentrantLock();
     private ArrayList<ControllerDataObserver> observers = new ArrayList<ControllerDataObserver>();
     private boolean isCalibrated = false;
@@ -76,7 +76,7 @@ public class ControllerKeyboard extends IKeyboard implements ControllerPlaybackO
         keyboardRenderables = new ControllerRenderables(this);
         CAMERA_DISTANCE = keyboardAttributes.getAttributeAsFloat(Attribute.CAMERA_DISTANCE);
         keyboardSize = keyboardAttributes.getAttributeAsPoint(Attribute.KEYBOARD_SIZE);
-        int borderSize = keyboardAttributes.getAttributeAsInteger(Attribute.BORDER_SIZE) * 2;
+        float borderSize = keyboardAttributes.getAttributeAsFloat(Attribute.BORDER_SIZE) * 2;
         imageSize = new Point(keyboardSize.x + borderSize, keyboardSize.y + borderSize);
         VERTICAL_GESTURE_LENGTH = HORIZONTAL_GESTURE_LENGTH * (imageSize.y/(float)imageSize.x);
         VERTICAL_GESTURE_OFFSET = HORIZONTAL_GESTURE_OFFSET * (imageSize.y/(float)imageSize.x);
@@ -485,20 +485,19 @@ public class ControllerKeyboard extends IKeyboard implements ControllerPlaybackO
             if(previousKey == Key.VK_BACK_SPACE && (direction == Direction.LEFT || direction == Direction.RIGHT)) { // REMOVE ME IF WE EVER CHANGE THINGS BACK
                 break;
             }
-            int row = (rowDelta + selectedKey.x) % KEY_LAYOUT_SIZE.x;
-            int col = (colDelta + selectedKey.y) % KEY_LAYOUT_SIZE.y;
+            int row = (int) ((rowDelta + selectedKey.x) % KEY_LAYOUT_SIZE.x);
+            int col = (int) ((colDelta + selectedKey.y) % KEY_LAYOUT_SIZE.y);
             if(row < 0) { row += KEY_LAYOUT_SIZE.x; }
             if (col < 0) { col += KEY_LAYOUT_SIZE.y; }
             selectedKey.x = row;
             selectedKey.y = col;
         } while(previousKey == getSelectedKey() || getSelectedKey() == Key.VK_NULL);
         
-        
         virtualKeyboard.selected(getSelectedKey());
     }
     
     private Key getSelectedKey() {
-        return keyLayout[selectedKey.x][selectedKey.y];
+        return keyLayout[(int) selectedKey.x][(int) selectedKey.y];
     }
     
     private Point selectKey(Key key) {
@@ -518,23 +517,33 @@ public class ControllerKeyboard extends IKeyboard implements ControllerPlaybackO
     }
     
     private Key[][] getKeyLayout(Key [][] keyRows) {
+        Key [][] tmpKeyLayout = new Key[(int) KEY_LAYOUT_SIZE.x][(int) KEY_LAYOUT_SIZE.y];
+        for(int row = 0; row < KEY_LAYOUT_SIZE.x; row++) {
+            Key [] tmpRow = new Key[(int) KEY_LAYOUT_SIZE.y];
+            if(row == KEY_LAYOUT_SIZE.x - 1) {
+                // Pad Last row with backspace buffers and a null buffer.
+                { // THIS SECTION IS BECAUSE WE GOT RID OF ALL SPECIAL KEYS EXCEPT BACKSPACE
+                    for(int col = 0; col < KEY_LAYOUT_SIZE.y; col++) {
+                        tmpRow[col] = keyRows[row][0];
+                    }
+                }
+            } else {
+                // Pad row with null key buffers.
+                System.arraycopy(keyRows[row], 0, tmpRow, 0, keyRows[row].length);
+            }
+            tmpKeyLayout[row] = tmpRow;
+        }
+        return tmpKeyLayout;
+    }
+    
+    /*private Key[][] getKeyLayout(Key [][] keyRows) {
         Key [][] tmpKeyLayout = new Key[KEY_LAYOUT_SIZE.x][KEY_LAYOUT_SIZE.y];
         for(int row = 0; row < KEY_LAYOUT_SIZE.x; row++) {
             Key [] tmpRow = new Key[KEY_LAYOUT_SIZE.y];
             if(row == KEY_LAYOUT_SIZE.x - 1) {
                 // Pad fifth row with shift, enter, backspace, and space key buffers.
-                int col = 2; // 0;
-                { // REMOVE THIS SECTION IF WE EVER ADD SPECIAL KEYS BACK
-                    tmpRow[0] = Key.VK_NULL;
-                    tmpRow[1] = Key.VK_NULL;
-                    while(col < KEY_LAYOUT_SIZE.y - 2) {
-                        tmpRow[col] = keyRows[row][0];
-                        col++;
-                    }
-                    tmpRow[tmpRow.length-2] = Key.VK_NULL;
-                    tmpRow[tmpRow.length-1] = Key.VK_NULL;
-                }
-                /*// 2 Shift keys.
+                int col = 0;
+                // 2 Shift keys.
                 int size = 2;
                 while(col < size) {
                     tmpRow[col] = keyRows[row][0];
@@ -557,18 +566,14 @@ public class ControllerKeyboard extends IKeyboard implements ControllerPlaybackO
                 while(col < size) {
                     tmpRow[col] = keyRows[row][3];
                     col++;
-                }*/
+                }
             } else if(row == KEY_LAYOUT_SIZE.x - 2) {
                 // Pad fourth row with shift and enter key buffers.
-                //tmpRow[0] = Key.VK_SHIFT;
-                //tmpRow[1] = Key.VK_SHIFT;
-                tmpRow[0] = Key.VK_NULL;
-                tmpRow[1] = Key.VK_NULL;
+                tmpRow[0] = Key.VK_SHIFT;
+                tmpRow[1] = Key.VK_SHIFT;
                 System.arraycopy(keyRows[row], 0, tmpRow, 2, keyRows[row].length);
-                //tmpRow[tmpRow.length-2] = Key.VK_ENTER;
-                //tmpRow[tmpRow.length-1] = Key.VK_ENTER;
-                tmpRow[tmpRow.length-2] = Key.VK_NULL;
-                tmpRow[tmpRow.length-1] = Key.VK_NULL;
+                tmpRow[tmpRow.length-2] = Key.VK_ENTER;
+                tmpRow[tmpRow.length-1] = Key.VK_ENTER;
             } else {
                 // Pad row with null key buffers.
                 tmpRow[0] = Key.VK_NULL;
@@ -580,7 +585,7 @@ public class ControllerKeyboard extends IKeyboard implements ControllerPlaybackO
             tmpKeyLayout[row] = tmpRow;
         }
         return tmpKeyLayout;
-    }
+    }*/
     
     private static enum Button {
         A(Component.Identifier.Button._0),

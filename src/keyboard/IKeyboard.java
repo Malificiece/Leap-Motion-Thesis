@@ -71,19 +71,19 @@ public abstract class IKeyboard {
         return KEYBOARD_FILE_NAME;
     }
     
-    public int getHeight() {
+    public float getHeight() {
         return keyboardSize.y;
     }
-    public int getWidth() {
+    public float getWidth() {
         return keyboardSize.x;
     }
     
     public int getImageHeight() {
-        return imageSize.y;
+        return (int) imageSize.y;
     }
     
     public int getImageWidth() {
-        return imageSize.x;
+        return (int) imageSize.x;
     }
     
     public KeyboardSettings getSettings() {

@@ -53,6 +53,7 @@ public class ExperimentController extends GraphicsController {
     private final int ONE_SECOND = 1000;
     private final int COUNTDOWN_TIME = 5;
     private final Color LIGHT_GREEN = new Color(204, 255, 204);
+    private final Color LIGHT_RED = new Color(255, 204, 204);
     private final int FADE_DURATION = 500;
     private int practiceWordCount = 0;
     private Color currentColor = Color.WHITE;
@@ -568,8 +569,8 @@ public class ExperimentController extends GraphicsController {
                         MyUtilities.SWING_UTILITIES.calculateFontSize(wordManager.getAnswer(), answerLabel, answerPanel);
                     }
                 } else {
-                    wordPanel.setBackground(Color.RED);
-                    answerPanel.setBackground(Color.RED);
+                    wordPanel.setBackground(LIGHT_RED);
+                    answerPanel.setBackground(LIGHT_RED);
                 }
             } else {
                 wordManager.setAnswer(wordManager.getAnswer()+Character.toString(key));

@@ -7,6 +7,7 @@ public enum FileName {
     LEAP_PINCH("leapPinch"),
     CONTROLLER("controller"),
     TABLET("tablet"),
+    SWIPE("swipe"),
     KEYBOARD_IMAGE("_keyboard"),
     KEYBOARD_IMAGE_UPPER("_keyboard_upper"),
     DICTIONARY("English-US"),

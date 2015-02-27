@@ -37,12 +37,12 @@ public class VirtualKey {
             color.setAlpha(alpha);
         }
     };
-    private static final int LIGHT_UP_TIME = 100;
+    private static final int LIGHT_UP_TIME = 75;
     private Vector max;
     private Vector min; // also equivalent to location (not center)
     private Vector center;
-    private int width;
-    private int height;
+    private float width;
+    private float height;
     private Point paddingSize;
     private Key key;
     private Timer lightUpKeyTimer;
@@ -133,13 +133,13 @@ public class VirtualKey {
     private void drawRectangle(GL2 gl) {
         // Draw the key.
         gl.glBegin(GL_TRIANGLES);
-        gl.glVertex3i(0, 0, 0);
-        gl.glVertex3i(width, 0, 0);
-        gl.glVertex3i(0, height, 0);
+        gl.glVertex3f(0, 0, 0);
+        gl.glVertex3f(width, 0, 0);
+        gl.glVertex3f(0, height, 0);
         
-        gl.glVertex3i(width, height, 0);
-        gl.glVertex3i(width, 0, 0);
-        gl.glVertex3i(0, height, 0);
+        gl.glVertex3f(width, height, 0);
+        gl.glVertex3f(width, 0, 0);
+        gl.glVertex3f(0, height, 0);
         gl.glEnd();
         
         if(keyState != KeyState.NONE) {
@@ -152,10 +152,10 @@ public class VirtualKey {
         keyState.glColor(gl);
         gl.glLineWidth(3);
         gl.glBegin(GL_LINE_LOOP);
-        gl.glVertex3i(0, 0, 0);
-        gl.glVertex3i(0, height, 0);
-        gl.glVertex3i(width, height, 0);
-        gl.glVertex3i(width, 0, 0);
+        gl.glVertex3f(0, 0, 0);
+        gl.glVertex3f(0, height, 0);
+        gl.glVertex3f(width, height, 0);
+        gl.glVertex3f(width, 0, 0);
         gl.glEnd();
     }
 }

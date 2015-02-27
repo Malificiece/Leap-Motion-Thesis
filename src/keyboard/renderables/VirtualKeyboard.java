@@ -30,31 +30,33 @@ public class VirtualKeyboard extends KeyboardRenderable {
     
     private void createKeys(KeyboardAttributes keyboardAttributes) {
         Point keyboardSize = keyboardAttributes.getAttributeAsPoint(Attribute.KEYBOARD_SIZE);
-        Integer borderSize = keyboardAttributes.getAttributeAsInteger(Attribute.BORDER_SIZE);
+        Float borderSize = keyboardAttributes.getAttributeAsFloat(Attribute.BORDER_SIZE);
         Point gapSize = keyboardAttributes.getAttributeAsPoint(Attribute.GAP_SIZE);
         Point keySize = keyboardAttributes.getAttributeAsPoint(Attribute.KEY_SIZE);
-        Point spaceKeySize = keyboardAttributes.getAttributeAsPoint(Attribute.SPACE_KEY_SIZE);
+        //Point spaceKeySize = keyboardAttributes.getAttributeAsPoint(Attribute.SPACE_KEY_SIZE);
         Point backSpaceKeySize = keyboardAttributes.getAttributeAsPoint(Attribute.BACK_SPACE_KEY_SIZE);
-        Point shiftKeySize = keyboardAttributes.getAttributeAsPoint(Attribute.SHIFT_KEY_SIZE);
+        //Point shiftKeySize = keyboardAttributes.getAttributeAsPoint(Attribute.SHIFT_KEY_SIZE);
         Point enterKeySize = keyboardAttributes.getAttributeAsPoint(Attribute.ENTER_KEY_SIZE);
         //int numKeys = (int) keyboardAttributes.getValueByName(AttributeName.NUMBER_OF_KEYS);
-        Integer[] rowOffsets = (Integer[]) keyboardAttributes.getAttributeValue(Attribute.ROW_OFFSETS);
+        Float[] rowOffsets = (Float[]) keyboardAttributes.getAttributeValue(Attribute.ROW_OFFSETS);
         Key[][] keyRows = (Key[][]) keyboardAttributes.getAttributeValue(Attribute.KEY_ROWS);
         
-        for(int rowIndex = 0, x = 0, y = keyboardSize.y + gapSize.y + borderSize; rowIndex < keyRows.length; rowIndex++) {
+        float x = 0;
+        float y = keyboardSize.y + gapSize.y + borderSize;
+        for(int rowIndex = 0/*, x = 0, y = keyboardSize.y + gapSize.y + borderSize*/; rowIndex < keyRows.length; rowIndex++) {
             x = rowOffsets[rowIndex] + borderSize;
             y -= (keySize.y + gapSize.y);
             for(int colIndex = 0; colIndex < keyRows[rowIndex].length; colIndex++) {
                 Key key = keyRows[rowIndex][colIndex];
                 if(key == Key.VK_SPACE) {
-                    keys.put(key, new VirtualKey(x, y, spaceKeySize, gapSize, key));
-                    x += spaceKeySize.x + gapSize.x;
+                    /*keys.put(key, new VirtualKey(x, y, spaceKeySize, gapSize, key));
+                    x += spaceKeySize.x + gapSize.x;*/
                 } else if (key == Key.VK_BACK_SPACE) {
                     keys.put(key, new VirtualKey(x, y, backSpaceKeySize, gapSize, key));
                     x += backSpaceKeySize.x + gapSize.x;
                 } else if (key == Key.VK_SHIFT_LEFT || key == Key.VK_SHIFT_RIGHT || key == Key.VK_SHIFT) {
-                    keys.put(key, new VirtualKey(x, y, shiftKeySize, gapSize, key));
-                    x += shiftKeySize.x + gapSize.x;
+                    /*keys.put(key, new VirtualKey(x, y, shiftKeySize, gapSize, key));
+                    x += shiftKeySize.x + gapSize.x;*/
                 } else if (key == Key.VK_ENTER) {
                     keys.put(key, new VirtualKey(x, y, enterKeySize, gapSize, key));
                     x += enterKeySize.x + gapSize.x;
@@ -127,6 +129,36 @@ public class VirtualKeyboard extends KeyboardRenderable {
     }
     
     public VirtualKey getNearestAlphaKey(Vector point, int maxDistance) {
+        VirtualKey vKey = null;
+        float minDistance = Float.MAX_VALUE;
+        for(VirtualKey virtualKey: keys.values()) {
+            if(virtualKey.getKey().isAlpha()) {
+                float distance = MyUtilities.MATH_UTILITILES.findDistanceToPoint(point, virtualKey.getCenter());
+                if(distance < minDistance && distance <= maxDistance) {
+                    minDistance = distance;
+                    vKey = virtualKey;
+                }
+            }
+        }
+        return vKey;
+    }
+    
+    public VirtualKey getNearestKeyNoEnter(Vector point, float maxDistance) {
+        VirtualKey vKey = null;
+        float minDistance = Float.MAX_VALUE;
+        for(VirtualKey virtualKey: keys.values()) {
+            if(virtualKey.getKey() != Key.VK_ENTER) {
+                float distance = MyUtilities.MATH_UTILITILES.findDistanceToPoint(point, virtualKey.getCenter());
+                if(distance < minDistance && distance <= maxDistance) {
+                    minDistance = distance;
+                    vKey = virtualKey;
+                }
+            }
+        }
+        return vKey;
+    }
+    
+    public VirtualKey getNearestAlphaKey(Vector point, float maxDistance) {
         VirtualKey vKey = null;
         float minDistance = Float.MAX_VALUE;
         for(VirtualKey virtualKey: keys.values()) {
