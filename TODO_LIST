@@ -1,4 +1,5 @@
 TODO:
+-1) FILL OUT IRB INFORMATION AND SUBMIT IT SOON!!!! YOU NEED TO DO THIS BEFORE THE NEXT DEADLINE. FINISH THIS BEFORE MARCH 6th
 0) Resave tutorial files and add tutorial INFO!
 1) Modify the pinch threshold to further stabilize it and try to account for an actual pinch.
 	Consider using the fingers and measuring the distances to also determine a pinch gesture.
