@@ -8,9 +8,7 @@ public enum DataType {
     TIME_PRESSED,
     WORD_VALUE,
     KEY_PRESSED,
-    KEY_PRESSED_UPPER,
     KEY_EXPECTED,
-    KEY_EXPECTED_UPPER,
     TIME_SPECIAL,
     POINT_POSITION,
     TOOL_DIRECTION,
@@ -19,12 +17,9 @@ public enum DataType {
     GESTURE_STATE,
     PRACTICE_WORD_COUNT;
     
-    private static final DataType[] VALUES = values();
-    private static final int SIZE = VALUES.length;
-    
     public static DataType getByName(String typeName) {
-        for(int i = 0; i < SIZE; i++) {
-            if(VALUES[i].name().equalsIgnoreCase(typeName)) return VALUES[i];
+        for(DataType dataType: values()) {
+            if(dataType.name().equalsIgnoreCase(typeName)) return dataType;
         }
         return null;
     }

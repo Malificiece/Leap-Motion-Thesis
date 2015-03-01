@@ -11,9 +11,6 @@ public enum Direction {
     
     private final Vector direction;
     
-    private static final Direction[] VALUES = values();
-    private static final int SIZE = VALUES.length;
-    
     private Direction(Vector direction) {
         this.direction = direction;
     }
@@ -23,8 +20,8 @@ public enum Direction {
     }
     
     public static Direction getByName(String directionName) {
-        for(int i = 0; i < SIZE; i++) {
-            if(VALUES[i].name().equalsIgnoreCase(directionName)) return VALUES[i];
+        for(Direction direction: values()) {
+            if(direction.name().equalsIgnoreCase(directionName)) return direction;
         }
         return null;
     }

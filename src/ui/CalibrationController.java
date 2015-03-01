@@ -28,8 +28,7 @@ import keyboard.KeyboardSetting;
 import utilities.MyUtilities;
 import enums.Attribute;
 import enums.Keyboard;
-import enums.TestType;
-
+import enums.KeyboardType;
 
 public class CalibrationController extends GraphicsController {
     private JFrame frame;
@@ -62,8 +61,8 @@ public class CalibrationController extends GraphicsController {
         settingsPanel = new JPanel();
         renderOptionsPanel = new JPanel();
         
-        JPanel panels[] = {wordPanel, settingsPanel, renderOptionsPanel};
-        JButton buttons[] = {calibrateButton, saveSettingsButton};      
+        JPanel[] panels = {wordPanel, settingsPanel, renderOptionsPanel};
+        JButton[] buttons = {calibrateButton, saveSettingsButton};      
 
         // Window builder builds window using important fields here. It adds unimportant fields that we use for aesthetics only.
         WindowBuilder.buildCalibrationWindow(frame, canvasPanel, wordLabel, keyboardTypeComboBox, buttons, panels);
@@ -114,13 +113,13 @@ public class CalibrationController extends GraphicsController {
         keyboardTypeComboBox.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                TestType testType = TestType.getByName((String) keyboardTypeComboBox.getSelectedItem());
-                if(keyboard.getID() != testType.getKeyboardID()) {
+                KeyboardType keyboardType = KeyboardType.getByName((String) keyboardTypeComboBox.getSelectedItem());
+                if(keyboard.getID() != keyboardType.getID()) {
                     // Remove all settings, attributes, and renderables from the previous keyboard.
                     removeKeyboardFromUI();
                     
                     // Add all settings, attributes, and renderables from the new keyboard.
-                    keyboard = Keyboard.getByID(testType.getKeyboardID()).getKeyboard();
+                    keyboard = Keyboard.getByID(keyboardType.getID()).getKeyboard();
                     addKeyboardToUI();
                 }
                 frame.requestFocusInWindow();
@@ -292,6 +291,6 @@ public class CalibrationController extends GraphicsController {
     }
     
     private boolean isLeapKeyboard() {
-        return keyboard.getID() == Keyboard.LEAP_SURFACE.getID() || keyboard.getID() == Keyboard.LEAP_AIR.getID() || keyboard.getID() == Keyboard.LEAP_PINCH.getID();
+        return KeyboardType.getByID(keyboard.getID()).isLeap();
     }
 }

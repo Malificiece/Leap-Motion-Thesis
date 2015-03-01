@@ -9,17 +9,17 @@ import keyboard.tablet.TabletKeyboard;
 public enum Keyboard {
     STANDARD(new StandardKeyboard()),
     LEAP_SURFACE(new LeapKeyboard(KeyboardType.LEAP_SURFACE)),
-    LEAP_AIR(new LeapKeyboard(KeyboardType.LEAP_AIR)),
-    LEAP_PINCH(new LeapKeyboard(KeyboardType.LEAP_PINCH)),
+    LEAP_AIR_STATIC(new LeapKeyboard(KeyboardType.LEAP_AIR_STATIC)),
+    LEAP_AIR_PINCH(new LeapKeyboard(KeyboardType.LEAP_AIR_PINCH)),
+    //LEAP_AIR_DYNAMIC(new LeapKeyboard(KeyboardType.LEAP_AIR_DYNAMIC)),
+    //LEAP_AIR_BIMODAL(new LeapKeyboard(KeyboardType.LEAP_AIR_BIMODAL)),
+    //LEAP_AIR_AUGMENTED(new LeapKeyboard(KeyboardType.LEAP_AIR_AUGMENTED)),
     TABLET(new TabletKeyboard()),
     CONTROLLER(new ControllerKeyboard());
 
     private final int keyboardID;
     private final String keyboardName;
     private final IKeyboard keyboard;
-    
-    private static final Keyboard[] VALUES = values();
-    private static final int SIZE = VALUES.length;
     
     private Keyboard(IKeyboard keyboard) {
         this.keyboardID = keyboard.getID();
@@ -40,15 +40,15 @@ public enum Keyboard {
     }
     
     public static Keyboard getByID(int keyboardID) {
-        for(int i = 0; i < SIZE; i++) {
-            if(VALUES[i].getID() == keyboardID) return VALUES[i];
+        for(Keyboard keyboard: values()) {
+            if(keyboard.getID() == keyboardID) return keyboard;
         }
         return null;
     }
     
     public static Keyboard getByName(String keyboardName) {
-        for(int i = 0; i < SIZE; i++) {
-            if(VALUES[i].getName().equalsIgnoreCase(keyboardName)) return VALUES[i];
+        for(Keyboard keyboard: values()) {
+            if(keyboard.getName().equalsIgnoreCase(keyboardName)) return keyboard;
         }
         return null;
     }

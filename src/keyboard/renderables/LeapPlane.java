@@ -459,7 +459,7 @@ public class LeapPlane extends KeyboardRenderable {
                 }
             } else if(leapTool.isValid()) {
                 // While calibrating, add each new point to the plane calibrator object.
-                if(keyboardType.equals(KeyboardType.LEAP_PINCH)) {
+                if(keyboardType.equals(KeyboardType.LEAP_AIR_PINCH)) {
                     leapPoint.getPoint().setZ(0);
                 }
                 leapPlaneCalibrator.addPoint(leapPoint.getPoint());

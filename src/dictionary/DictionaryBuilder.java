@@ -91,7 +91,7 @@ public class DictionaryBuilder {
                 // Now we must calculate all of the dissimilarity values. We can do this with n log(n) time and
                 // never make any double comparisons. For n log(n) we need to keep a 2D matrix with the words of
                 // the dictionary part lining each side.
-                float [][] dissimilarityMatrix = new float[dictionaryPart.size()][dictionaryPart.size()];
+                float[][] dissimilarityMatrix = new float[dictionaryPart.size()][dictionaryPart.size()];
                 for(int wordIndex = 0; wordIndex < dictionaryPart.size(); wordIndex++) {
                     for(int compareIndex = wordIndex; compareIndex < dictionaryPart.size(); compareIndex++) {
                         if(wordIndex == compareIndex) {

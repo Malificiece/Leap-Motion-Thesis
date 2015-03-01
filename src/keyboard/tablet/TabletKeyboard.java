@@ -200,11 +200,6 @@ public class TabletKeyboard extends IKeyboard implements TabletPlaybackObserver 
         keyPressed = key.getValue();
         notifyListenersKeyEvent();
 	}
-	
-    @Override
-    public void upperEventObserved(boolean upper) {
-        // Ignoring SHIFT for now
-    }
 
 	@Override
 	public void touchEventObserved(Vector touchPoint) {

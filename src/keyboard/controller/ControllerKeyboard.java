@@ -56,7 +56,7 @@ public class ControllerKeyboard extends IKeyboard implements ControllerPlaybackO
     private KeyboardGestures keyboardGestures;
     private GamePad gamePad;
     private Point selectedKey;
-    private Key [][] keyLayout;
+    private Key[][] keyLayout;
     private boolean shiftOnce = false;
     private boolean shiftTwice = false;
     private Timer detectedMatchTimer;
@@ -334,11 +334,6 @@ public class ControllerKeyboard extends IKeyboard implements ControllerPlaybackO
 	            break;
 	    }
 	}
-	
-	@Override
-    public void upperEventObserved(boolean upper) {
-        // Ignoring SHIFT for now
-    }
 
 	@Override
 	public void directionEventObserved(Direction direction) {
@@ -420,8 +415,10 @@ public class ControllerKeyboard extends IKeyboard implements ControllerPlaybackO
 
     @Override
     public void matchEventObserved() {
-        // Start timer for matched event
-        detectedMatchTimer.start();
+        if(!isPlayingBack()) {
+            // Start timer for matched event
+            detectedMatchTimer.start();
+        }
     }
     
     public KeyboardGesture createSwipeGesture(Direction direction) {
@@ -516,10 +513,10 @@ public class ControllerKeyboard extends IKeyboard implements ControllerPlaybackO
         return selectedKey;
     }
     
-    private Key[][] getKeyLayout(Key [][] keyRows) {
-        Key [][] tmpKeyLayout = new Key[(int) KEY_LAYOUT_SIZE.x][(int) KEY_LAYOUT_SIZE.y];
+    private Key[][] getKeyLayout(Key[][] keyRows) {
+        Key[][] tmpKeyLayout = new Key[(int) KEY_LAYOUT_SIZE.x][(int) KEY_LAYOUT_SIZE.y];
         for(int row = 0; row < KEY_LAYOUT_SIZE.x; row++) {
-            Key [] tmpRow = new Key[(int) KEY_LAYOUT_SIZE.y];
+            Key[] tmpRow = new Key[(int) KEY_LAYOUT_SIZE.y];
             if(row == KEY_LAYOUT_SIZE.x - 1) {
                 // Pad Last row with backspace buffers and a null buffer.
                 { // THIS SECTION IS BECAUSE WE GOT RID OF ALL SPECIAL KEYS EXCEPT BACKSPACE
@@ -536,10 +533,10 @@ public class ControllerKeyboard extends IKeyboard implements ControllerPlaybackO
         return tmpKeyLayout;
     }
     
-    /*private Key[][] getKeyLayout(Key [][] keyRows) {
-        Key [][] tmpKeyLayout = new Key[KEY_LAYOUT_SIZE.x][KEY_LAYOUT_SIZE.y];
+    /*private Key[][] getKeyLayout(Key[][] keyRows) {
+        Key[][] tmpKeyLayout = new Key[KEY_LAYOUT_SIZE.x][KEY_LAYOUT_SIZE.y];
         for(int row = 0; row < KEY_LAYOUT_SIZE.x; row++) {
-            Key [] tmpRow = new Key[KEY_LAYOUT_SIZE.y];
+            Key[] tmpRow = new Key[KEY_LAYOUT_SIZE.y];
             if(row == KEY_LAYOUT_SIZE.x - 1) {
                 // Pad fifth row with shift, enter, backspace, and space key buffers.
                 int col = 0;

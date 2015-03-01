@@ -18,8 +18,8 @@ import java.util.TreeMap;
 import com.leapmotion.leap.Vector;
 
 import enums.FileExt;
-import enums.FileName;
 import enums.FilePath;
+import enums.KeyboardType;
 import keyboard.IKeyboard;
 import keyboard.KeyboardAttribute;
 import keyboard.KeyboardAttributes;
@@ -41,54 +41,16 @@ public class FileUtilities {
         // Create config/settings path/files if they don't exist.
         // Create config folder.
         createDirectory(FilePath.CONFIG.getPath());
-
-        // Create standard.ini
-        path = FileSystems.getDefault().getPath(FilePath.CONFIG.getPath(), FileName.STANDARD.getName() + FileExt.INI.getExt());
-        if(!Files.exists(path)) {
-            file = path.toFile();
-            try {
-                file.createNewFile();
-            } catch (IOException e) {e.printStackTrace();}
-        }
-        // Create leapSurface.ini
-        path = FileSystems.getDefault().getPath(FilePath.CONFIG.getPath(), FileName.LEAP_SURFACE.getName() + FileExt.INI.getExt());
-        if(!Files.exists(path)) {
-            file = path.toFile();
-            try {
-                file.createNewFile();
-            } catch (IOException e) {e.printStackTrace();}
-        }
-        // Create leapAir.ini
-        path = FileSystems.getDefault().getPath(FilePath.CONFIG.getPath(), FileName.LEAP_AIR.getName() + FileExt.INI.getExt());
-        if(!Files.exists(path)) {
-            file = path.toFile();
-            try {
-                file.createNewFile();
-            } catch (IOException e) {e.printStackTrace();}
-        }
-        // Create leapPinch.ini
-        path = FileSystems.getDefault().getPath(FilePath.CONFIG.getPath(), FileName.LEAP_PINCH.getName() + FileExt.INI.getExt());
-        if(!Files.exists(path)) {
-            file = path.toFile();
-            try {
-                file.createNewFile();
-            } catch (IOException e) {e.printStackTrace();}
-        }
-        // Create controller.ini
-        path = FileSystems.getDefault().getPath(FilePath.CONFIG.getPath(), FileName.CONTROLLER.getName() + FileExt.INI.getExt());
-        if(!Files.exists(path)) {
-            file = path.toFile();
-            try {
-                file.createNewFile();
-            } catch (IOException e) {e.printStackTrace();}
-        }
-        // Create tablet.ini
-        path = FileSystems.getDefault().getPath(FilePath.CONFIG.getPath(), FileName.TABLET.getName() + FileExt.INI.getExt());
-        if(!Files.exists(path)) {
-            file = path.toFile();
-            try {
-                file.createNewFile();
-            } catch (IOException e) {e.printStackTrace();}
+        
+        // Create .ini's
+        for(KeyboardType keyboardType: KeyboardType.values()) {
+            path = FileSystems.getDefault().getPath(FilePath.CONFIG.getPath(), keyboardType.getFileName() + FileExt.INI.getExt());
+            if(!Files.exists(path)) {
+                file = path.toFile();
+                try {
+                    file.createNewFile();
+                } catch (IOException e) {e.printStackTrace();}
+            }
         }
     }
     
@@ -450,7 +412,7 @@ public class FileUtilities {
         return false;
     }
     
-    public File [] getListOfWildCardFileMatches(String filePath, String wildcardFileName) throws IOException {
+    public File[] getListOfWildCardFileMatches(String filePath, String wildcardFileName) throws IOException {
         // Attempt to open directory, create it if it doesn't exist
         File directory = createDirectory(filePath);
         return directory.listFiles(new FilenameFilter() {

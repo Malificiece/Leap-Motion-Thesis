@@ -105,7 +105,7 @@ public class LeapKeyboard extends IKeyboard implements LeapObserver, Calibration
             leapGestures = new LeapGestures();
         }
         swipeKeyboard = new SwipeKeyboard(this);
-        if(KEYBOARD_TYPE.equals(KeyboardType.LEAP_PINCH)) {
+        if(KEYBOARD_TYPE.equals(KeyboardType.LEAP_AIR_PINCH)) {
             leapTool.blockAccess(true);
         }
     }
@@ -124,7 +124,7 @@ public class LeapKeyboard extends IKeyboard implements LeapObserver, Calibration
         LEAP_LOCK.lock();
         try {
             if(leapData != null) {
-                if(KEYBOARD_TYPE.equals(KeyboardType.LEAP_PINCH) && isCalibrated) {
+                if(KEYBOARD_TYPE.equals(KeyboardType.LEAP_AIR_PINCH) && isCalibrated) {
                     leapData.populateHandData(leapPoint);
                     leapHand = leapData.getHandData();
                     Vector point = leapPoint.getPoint();
@@ -144,7 +144,7 @@ public class LeapKeyboard extends IKeyboard implements LeapObserver, Calibration
         }
 
         if(isPlayingBack()) {
-            if(KEYBOARD_TYPE.equals(KeyboardType.LEAP_PINCH)) {
+            if(KEYBOARD_TYPE.equals(KeyboardType.LEAP_AIR_PINCH)) {
                 Vector point = leapPoint.getNormalizedPoint();
                 point.setZ(lastPinchZ);
                 leapPoint.setNormalizedPoint(point);
@@ -199,7 +199,7 @@ public class LeapKeyboard extends IKeyboard implements LeapObserver, Calibration
                 notifyListenersLeapEvent(leapPoint.getNormalizedPoint());
             }
             
-            if(KEYBOARD_TYPE.equals(KeyboardType.LEAP_PINCH)) {
+            if(KEYBOARD_TYPE.equals(KeyboardType.LEAP_AIR_PINCH)) {
                 Vector point = leapPoint.getNormalizedPoint();
                 lastPinchZ = point.getZ();
                 point.setZ(0);
@@ -325,11 +325,6 @@ public class LeapKeyboard extends IKeyboard implements LeapObserver, Calibration
         keyPressed = key.getValue();
         notifyListenersKeyEvent();
 	}
-	
-    @Override
-    public void upperEventObserved(boolean upper) {
-        // Ignoring SHIFT for now
-    }
 
 	@Override
 	public void positionEventObserved(Vector pointPosition) {
@@ -400,7 +395,7 @@ public class LeapKeyboard extends IKeyboard implements LeapObserver, Calibration
     @Override
     protected void finishCalibration() {
         leapPoint.grantAccess(true);
-        if(!KEYBOARD_TYPE.equals(KeyboardType.LEAP_PINCH)) {
+        if(!KEYBOARD_TYPE.equals(KeyboardType.LEAP_AIR_PINCH)) {
             leapTool.grantAccess(true);
         }
         if(Gesture.ENABLED) {

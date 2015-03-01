@@ -176,11 +176,6 @@ public class StandardKeyboard extends IKeyboard implements PlaybackObserver, Wor
 	    notifyListenersKeyEvent();
 	    virtualKeyboard.pressed(key);
 	}
-	
-	@Override
-    public void upperEventObserved(boolean upper) {
-        // Ignoring SHIFT for now
-    }
     
     @Override
     public void finishPlayback(PlaybackManager playbackManager) {
@@ -232,8 +227,10 @@ public class StandardKeyboard extends IKeyboard implements PlaybackObserver, Wor
 
     @Override
     public void matchEventObserved() {
-        // Start timer for matched event
-        detectedMatchTimer.start();
+        if(!isPlayingBack()) {
+            // Start timer for matched event
+            detectedMatchTimer.start();
+        }
     }
     
     public KeyboardGesture createSwipeGesture(Direction direction) {

@@ -2,6 +2,8 @@ package ui;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.IOException;
@@ -18,6 +20,7 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JRadioButton;
+import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.WindowConstants;
 import javax.swing.event.ChangeEvent;
@@ -32,8 +35,13 @@ import enums.ExitSurveyOptions;
 import enums.FileExt;
 import enums.FilePath;
 import enums.Key;
+import enums.KeyboardType;
 
 public class ExitSurveyController extends GraphicsController {
+    // Static text fields and button groups
+    private final int MIN_RANKING = 1;
+    private int maxRanking = 0;
+    private int questionIndex = 0;
     private JFrame frame;
     private JTextField subjectIDTextField;
     private JTextField majorTextField;
@@ -51,26 +59,16 @@ public class ExitSurveyController extends GraphicsController {
     private JTextField swipeDeviceExperienceTextField;
     private ButtonGroup handednessButtonGroup;
     private ButtonGroup preferedExperimentHandButtonGroup;
-    private ButtonGroup controllerDiscomfortButtonGroup;
-    private ButtonGroup controllerFatigueButtonGroup;
-    private ButtonGroup controllerDifficultyButtonGroup;
-    private ButtonGroup tabletDiscomfortButtonGroup;
-    private ButtonGroup tabletFatigueButtonGroup;
-    private ButtonGroup tabletDifficultyButtonGroup;
-    private ButtonGroup leapSurfaceDiscomfortButtonGroup;
-    private ButtonGroup leapSurfaceFatigueButtonGroup;
-    private ButtonGroup leapSurfaceDifficultyButtonGroup;
-    private ButtonGroup leapAirDiscomfortButtonGroup;
-    private ButtonGroup leapAirFatigueButtonGroup;
-    private ButtonGroup leapAirDifficultyButtonGroup;
-    private ButtonGroup leapPinchDiscomfortButtonGroup;
-    private ButtonGroup leapPinchFatigueButtonGroup;
-    private ButtonGroup leapPinchDifficultyButtonGroup;
-    private JTextField controllerRankingTextField;
-    private JTextField tabletRankingTextField;
-    private JTextField leapSurfaceRankingTextField;
-    private JTextField leapAirRankingTextField;
-    private JTextField leapPinchRankingTextField;
+    
+    // Dynamic text fields and button groups
+    private ArrayList<ButtonGroup> discomfortButtonGroups = new ArrayList<ButtonGroup>();
+    private ArrayList<ButtonGroup> fatigueButtonGroups = new ArrayList<ButtonGroup>();
+    private ArrayList<ButtonGroup> difficultyButtonGroups = new ArrayList<ButtonGroup>();
+    private ArrayList<JTextField> rankingTextFields = new ArrayList<JTextField>();
+    private ArrayList<ButtonGroup> usedButtonGroups = new ArrayList<ButtonGroup>();
+    
+    // Other
+    JTextArea rankingQuestion;
     private JButton saveButton;
     private boolean isSurveySaved = false;
     
@@ -93,51 +91,102 @@ public class ExitSurveyController extends GraphicsController {
         swipeDeviceExperienceTextField = new JTextField(39);
         handednessButtonGroup = new ButtonGroup();
         preferedExperimentHandButtonGroup = new ButtonGroup();
-        controllerDiscomfortButtonGroup = new ButtonGroup();
-        controllerFatigueButtonGroup = new ButtonGroup();
-        controllerDifficultyButtonGroup = new ButtonGroup();
-        tabletDiscomfortButtonGroup = new ButtonGroup();
-        tabletFatigueButtonGroup = new ButtonGroup();
-        tabletDifficultyButtonGroup = new ButtonGroup();
-        leapSurfaceDiscomfortButtonGroup = new ButtonGroup();
-        leapSurfaceFatigueButtonGroup = new ButtonGroup();
-        leapSurfaceDifficultyButtonGroup = new ButtonGroup();
-        leapAirDiscomfortButtonGroup = new ButtonGroup();
-        leapAirFatigueButtonGroup = new ButtonGroup();
-        leapAirDifficultyButtonGroup = new ButtonGroup();
-        leapPinchDiscomfortButtonGroup = new ButtonGroup();
-        leapPinchFatigueButtonGroup = new ButtonGroup();
-        leapPinchDifficultyButtonGroup = new ButtonGroup();
-        controllerRankingTextField = new JTextField(3);
-        tabletRankingTextField = new JTextField(3);
-        leapSurfaceRankingTextField = new JTextField(3);
-        leapAirRankingTextField = new JTextField(3);
-        leapPinchRankingTextField = new JTextField(3);
+        rankingQuestion = new JTextArea();
         saveButton = new JButton("Save Survey");
         
-        JTextField subjectTextFields[] = {subjectIDTextField, ageTextField, majorTextField};
-        JTextField historyTextFields[] = {physicalImpairmentTextField, gestureDeviceExperienceTextField, touchDeviceExperienceTextField, swipeDeviceExperienceTextField};
-        JTextField rankingTextFields[] = {controllerRankingTextField, tabletRankingTextField, leapSurfaceRankingTextField, leapAirRankingTextField, leapPinchRankingTextField};
-        ButtonGroup subjectButtonGroups[] = {genderButtonGroup, hasComputerButtonGroup, computerHoursPerWeekButtonGroup, handednessButtonGroup, preferedExperimentHandButtonGroup};
-        ButtonGroup historyButtonGroups[] = {physicalImpairmentButtonGroup, gestureDeviceExperienceButtonGroup, touchDeviceExperienceButtonGroup, swipeDeviceExperienceButtonGroup};
-        ButtonGroup discomfortButtonGroups[] = {controllerDiscomfortButtonGroup, tabletDiscomfortButtonGroup, leapSurfaceDiscomfortButtonGroup, leapAirDiscomfortButtonGroup, leapPinchDiscomfortButtonGroup};
-        ButtonGroup fatigueButtonGroups[] = {controllerFatigueButtonGroup, tabletFatigueButtonGroup, leapSurfaceFatigueButtonGroup, leapAirFatigueButtonGroup, leapPinchFatigueButtonGroup};
-        ButtonGroup difficultyButtonGroups[] = {controllerDifficultyButtonGroup, tabletDifficultyButtonGroup, leapSurfaceDifficultyButtonGroup, leapAirDifficultyButtonGroup, leapPinchDifficultyButtonGroup};
+        JTextField[] subjectTextFields = {subjectIDTextField, ageTextField, majorTextField};
+        JTextField[] historyTextFields = {physicalImpairmentTextField, gestureDeviceExperienceTextField, touchDeviceExperienceTextField, swipeDeviceExperienceTextField};
+        ButtonGroup[] subjectButtonGroups = {genderButtonGroup, hasComputerButtonGroup, computerHoursPerWeekButtonGroup, handednessButtonGroup, preferedExperimentHandButtonGroup};
+        ButtonGroup[] historyButtonGroups = {physicalImpairmentButtonGroup, gestureDeviceExperienceButtonGroup, touchDeviceExperienceButtonGroup, swipeDeviceExperienceButtonGroup};
+        
+        for(KeyboardType keyboardType: KeyboardType.values()) {
+            if(keyboardType != KeyboardType.STANDARD) {
+                usedButtonGroups.add(new ButtonGroup());
+                rankingTextFields.add(new JTextField(3));
+                discomfortButtonGroups.add(new ButtonGroup());
+                fatigueButtonGroups.add(new ButtonGroup());
+                difficultyButtonGroups.add(new ButtonGroup());
+            }
+        }
         
         // Window builder builds window using important fields here. It adds unimportant fields that we won't use for aesthetics only.
-        WindowBuilder.buildExitSurveyWindow(frame,
+        questionIndex = WindowBuilder.buildExitSurveyWindow(frame,
                 subjectTextFields, historyTextFields, rankingTextFields,
                 subjectButtonGroups, historyButtonGroups, discomfortButtonGroups, fatigueButtonGroups, difficultyButtonGroups,
+                usedButtonGroups, maxRanking, rankingQuestion,
                 saveButton);
         
-        ageTextField.setDocument(new NumberOnlyDocument());
-        controllerRankingTextField.setDocument(new UniqueRankingDocument(controllerRankingTextField));
-        tabletRankingTextField.setDocument(new UniqueRankingDocument(tabletRankingTextField));
-        leapSurfaceRankingTextField.setDocument(new UniqueRankingDocument(leapSurfaceRankingTextField));
-        leapAirRankingTextField.setDocument(new UniqueRankingDocument(leapAirRankingTextField));
-        leapPinchRankingTextField.setDocument(new UniqueRankingDocument(leapPinchRankingTextField));
+        ageTextField.setDocument(new NumericOnlyDocument());
+        for(JTextField rankingTextField: rankingTextFields) {
+            rankingTextField.setDocument(new UniqueRankingDocument(rankingTextField));
+        }
         
-        JRadioButton physicalImpairmentRadioButton = getRadioButtonToListenTo(physicalImpairmentButtonGroup);
+        for(int i = 0; i < usedButtonGroups.size(); i++) {
+            final int index = i;
+            JRadioButton usedRadioButton = getYesRadioButton(usedButtonGroups.get(i));
+            if(usedRadioButton != null) {
+                usedRadioButton.addItemListener(new ItemListener() {
+                    @Override
+                    public void itemStateChanged(ItemEvent e) {
+                        if(usedRadioButton.isSelected()) {
+                            // enable everything
+                            for (Enumeration<AbstractButton> buttons = discomfortButtonGroups.get(index).getElements(); buttons.hasMoreElements();) {
+                                AbstractButton button = buttons.nextElement();
+                                button.setEnabled(true);
+                            }
+                            for (Enumeration<AbstractButton> buttons = fatigueButtonGroups.get(index).getElements(); buttons.hasMoreElements();) {
+                                AbstractButton button = buttons.nextElement();
+                                button.setEnabled(true);
+                            }
+                            for (Enumeration<AbstractButton> buttons = difficultyButtonGroups.get(index).getElements(); buttons.hasMoreElements();) {
+                                AbstractButton button = buttons.nextElement();
+                                button.setEnabled(true);
+                            }
+                            rankingTextFields.get(index).setEditable(true);
+                            maxRanking++;
+                            rankingQuestion.setText(questionIndex + ". Please rank the keyboards from most preferred (1), to least preferred ("+ maxRanking + ").");
+                        } else {
+                            // disable everything
+                            discomfortButtonGroups.get(index).clearSelection();
+                            fatigueButtonGroups.get(index).clearSelection();
+                            difficultyButtonGroups.get(index).clearSelection();
+                            for (Enumeration<AbstractButton> buttons = discomfortButtonGroups.get(index).getElements(); buttons.hasMoreElements();) {
+                                AbstractButton button = buttons.nextElement();
+                                button.setEnabled(false);
+                            }
+                            for (Enumeration<AbstractButton> buttons = fatigueButtonGroups.get(index).getElements(); buttons.hasMoreElements();) {
+                                AbstractButton button = buttons.nextElement();
+                                button.setEnabled(false);
+                            }
+                            for (Enumeration<AbstractButton> buttons = difficultyButtonGroups.get(index).getElements(); buttons.hasMoreElements();) {
+                                AbstractButton button = buttons.nextElement();
+                                button.setEnabled(false);
+                            }
+                            if(!rankingTextFields.get(index).getText().isEmpty()) {
+                                int rank = Integer.parseInt(rankingTextFields.get(index).getText());
+                                rankingTextFields.get(index).setText("");
+                                for(JTextField rankingTextField: rankingTextFields) {
+                                    if(!rankingTextField.getText().isEmpty()) {
+                                        int otherRank = Integer.parseInt(rankingTextField.getText());
+                                        if(otherRank > rank) {
+                                            rankingTextField.setText("");
+                                        }
+                                    }
+                                }
+                                
+                            } else {
+                                rankingTextFields.get(index).setText("");
+                            }
+                            rankingTextFields.get(index).setEditable(false);
+                            maxRanking--;
+                            rankingQuestion.setText(questionIndex + ". Please rank the keyboards from most preferred (1), to least preferred ("+ maxRanking + ").");
+                        }
+                    }
+                });
+            }
+        }
+        
+        JRadioButton physicalImpairmentRadioButton = getYesRadioButton(physicalImpairmentButtonGroup);
         if(physicalImpairmentRadioButton != null) {
         	physicalImpairmentRadioButton.addChangeListener(new ChangeListener() {
 				@Override
@@ -152,7 +201,7 @@ public class ExitSurveyController extends GraphicsController {
         	});
         }
         
-        JRadioButton gestureDeviceExperienceRadioButton = getRadioButtonToListenTo(gestureDeviceExperienceButtonGroup);
+        JRadioButton gestureDeviceExperienceRadioButton = getYesRadioButton(gestureDeviceExperienceButtonGroup);
         if(gestureDeviceExperienceRadioButton != null) {
         	gestureDeviceExperienceRadioButton.addChangeListener(new ChangeListener() {
 				@Override
@@ -167,7 +216,7 @@ public class ExitSurveyController extends GraphicsController {
         	});
         }
         
-        JRadioButton touchDeviceExperienceRadioButton = getRadioButtonToListenTo(touchDeviceExperienceButtonGroup);
+        JRadioButton touchDeviceExperienceRadioButton = getYesRadioButton(touchDeviceExperienceButtonGroup);
         if(touchDeviceExperienceRadioButton != null) {
         	touchDeviceExperienceRadioButton.addChangeListener(new ChangeListener() {
 				@Override
@@ -182,7 +231,7 @@ public class ExitSurveyController extends GraphicsController {
         	});
         }
         
-        JRadioButton swipeDeviceExperienceRadioButton = getRadioButtonToListenTo(swipeDeviceExperienceButtonGroup);
+        JRadioButton swipeDeviceExperienceRadioButton = getYesRadioButton(swipeDeviceExperienceButtonGroup);
         if(swipeDeviceExperienceRadioButton != null) {
         	swipeDeviceExperienceRadioButton.addChangeListener(new ChangeListener() {
 				@Override
@@ -270,28 +319,52 @@ public class ExitSurveyController extends GraphicsController {
     	exitSurveyData.add(ExitSurveyDataType.PREFERED_HANDEDNESS_FOR_EXPERIMENT.name() + ": " + getSelectedButtonText(preferedExperimentHandButtonGroup));
     	
     	// Survey section
-    	exitSurveyData.add(ExitSurveyDataType.CONTROLLER_KEYBOARD_DISCOMFORT_LEVEL.name() + ": " + getSelectedButtonText(controllerDiscomfortButtonGroup));
-    	exitSurveyData.add(ExitSurveyDataType.CONTROLLER_KEYBOARD_FATIGUE_LEVEL.name() + ": " + getSelectedButtonText(controllerFatigueButtonGroup));
-    	exitSurveyData.add(ExitSurveyDataType.CONTROLLER_KEYBOARD_DIFFICULTY_LEVEL.name() + ": " + getSelectedButtonText(controllerDifficultyButtonGroup));
-    	exitSurveyData.add(ExitSurveyDataType.TABLET_KEYBOARD_DISCOMFORT_LEVEL.name() + ": " + getSelectedButtonText(tabletDiscomfortButtonGroup));
-    	exitSurveyData.add(ExitSurveyDataType.TABLET_KEYBOARD_FATIGUE_LEVEL.name() + ": " + getSelectedButtonText(tabletFatigueButtonGroup));
-    	exitSurveyData.add(ExitSurveyDataType.TABLET_KEYBOARD_DIFFICULTY_LEVEL.name() + ": " + getSelectedButtonText(tabletDifficultyButtonGroup));
-    	exitSurveyData.add(ExitSurveyDataType.LEAP_SURFACE_KEYBOARD_DISCOMFORT_LEVEL.name() + ": " + getSelectedButtonText(leapSurfaceDiscomfortButtonGroup));
-    	exitSurveyData.add(ExitSurveyDataType.LEAP_SURFACE_KEYBOARD_FATIGUE_LEVEL.name() + ": " + getSelectedButtonText(leapSurfaceFatigueButtonGroup));
-    	exitSurveyData.add(ExitSurveyDataType.LEAP_SURFACE_KEYBOARD_DIFFICULTY_LEVEL.name() + ": " + getSelectedButtonText(leapSurfaceDifficultyButtonGroup));
-    	exitSurveyData.add(ExitSurveyDataType.LEAP_AIR_KEYBOARD_DISCOMFORT_LEVEL.name() + ": " + getSelectedButtonText(leapAirDiscomfortButtonGroup));
-    	exitSurveyData.add(ExitSurveyDataType.LEAP_AIR_KEYBOARD_FATIGUE_LEVEL.name() + ": " + getSelectedButtonText(leapAirFatigueButtonGroup));
-    	exitSurveyData.add(ExitSurveyDataType.LEAP_AIR_KEYBOARD_DIFFICULTY_LEVEL.name() + ": " + getSelectedButtonText(leapAirDifficultyButtonGroup));
-    	exitSurveyData.add(ExitSurveyDataType.LEAP_PINCH_KEYBOARD_DISCOMFORT_LEVEL.name() + ": " + getSelectedButtonText(leapPinchDiscomfortButtonGroup));
-    	exitSurveyData.add(ExitSurveyDataType.LEAP_PINCH_KEYBOARD_FATIGUE_LEVEL.name() + ": " + getSelectedButtonText(leapPinchFatigueButtonGroup));
-    	exitSurveyData.add(ExitSurveyDataType.LEAP_PINCH_KEYBOARD_DIFFICULTY_LEVEL.name() + ": " + getSelectedButtonText(leapPinchDifficultyButtonGroup));
+        for(KeyboardType keyboardType: KeyboardType.values()) {
+            if(keyboardType != KeyboardType.STANDARD) {
+                JRadioButton radioButton = getYesRadioButton(usedButtonGroups.get(keyboardType.getID() - 1));
+                if(radioButton.isSelected()) {
+                    // discomfort
+                    exitSurveyData.add(keyboardType.getFileName() + ExitSurveyDataType._DISCOMFORT_LEVEL.name() + ": "
+                            + getSelectedButtonText(discomfortButtonGroups.get(keyboardType.getID() - 1)));
+                    
+                    // fatigue
+                    exitSurveyData.add(keyboardType.getFileName() + ExitSurveyDataType._FATIGUE_LEVEL.name() + ": "
+                            + getSelectedButtonText(fatigueButtonGroups.get(keyboardType.getID() - 1)));
+                    
+                    // difficulty
+                    exitSurveyData.add(keyboardType.getFileName() + ExitSurveyDataType._DIFFICULTY_LEVEL.name() + ": "
+                            + getSelectedButtonText(difficultyButtonGroups.get(keyboardType.getID() - 1)));
+                } else {
+                    // discomfort
+                    exitSurveyData.add(keyboardType.getFileName() + ExitSurveyDataType._DISCOMFORT_LEVEL.name() + ": "
+                            + ExitSurveyOptions.DID_NOT_USE.getDescription());
+                    
+                    // fatigue
+                    exitSurveyData.add(keyboardType.getFileName() + ExitSurveyDataType._FATIGUE_LEVEL.name() + ": "
+                            + ExitSurveyOptions.DID_NOT_USE.getDescription());
+                    
+                    // difficulty
+                    exitSurveyData.add(keyboardType.getFileName() + ExitSurveyDataType._DIFFICULTY_LEVEL.name() + ": "
+                            + ExitSurveyOptions.DID_NOT_USE.getDescription());
+                }
+            }
+        }
     	
     	// Rank section
-    	exitSurveyData.add(ExitSurveyDataType.CONTROLLER_KEYBOARD_PREFERENCE_RANKING.name() + ": " + controllerRankingTextField.getText());
-    	exitSurveyData.add(ExitSurveyDataType.TABLET_KEYBOARD_PREFERENCE_RANKING.name() + ": " + tabletRankingTextField.getText());
-    	exitSurveyData.add(ExitSurveyDataType.LEAP_SURFACE_KEYBOARD_PREFERENCE_RANKING.name() + ": " + leapSurfaceRankingTextField.getText());
-    	exitSurveyData.add(ExitSurveyDataType.LEAP_AIR_KEYBOARD_PREFERENCE_RANKING.name() + ": " + leapAirRankingTextField.getText());
-    	exitSurveyData.add(ExitSurveyDataType.LEAP_PINCH_KEYBOARD_PREFERENCE_RANKING.name() + ": " + leapPinchRankingTextField.getText());
+        for(KeyboardType keyboardType: KeyboardType.values()) {
+            if(keyboardType != KeyboardType.STANDARD) {
+                JRadioButton radioButton = getYesRadioButton(usedButtonGroups.get(keyboardType.getID() - 1));
+                if(radioButton.isSelected()) {
+                    // ranking
+                    exitSurveyData.add(keyboardType.getFileName() + ExitSurveyDataType._PREFERENCE_RANKING.name() + ": "
+                            + rankingTextFields.get(keyboardType.getID() - 1).getText());
+                } else {
+                    // ranking
+                    exitSurveyData.add(keyboardType.getFileName() + ExitSurveyDataType._PREFERENCE_RANKING.name() + ": "
+                            + ExitSurveyOptions.DID_NOT_USE.getDescription());
+                }
+            }
+        }
     	
     	// Write to file.
         String time = "_";
@@ -310,14 +383,18 @@ public class ExitSurveyController extends GraphicsController {
     }
     
     public boolean isFilledOut() {
-        JTextField textFields[] = {subjectIDTextField, ageTextField, majorTextField,
-        		physicalImpairmentTextField, gestureDeviceExperienceTextField, touchDeviceExperienceTextField, swipeDeviceExperienceTextField,
-        		controllerRankingTextField, tabletRankingTextField, leapSurfaceRankingTextField, leapAirRankingTextField, leapPinchRankingTextField};
-        ButtonGroup buttonGroups[] = {genderButtonGroup, hasComputerButtonGroup, computerHoursPerWeekButtonGroup, handednessButtonGroup, preferedExperimentHandButtonGroup,
-        		physicalImpairmentButtonGroup, gestureDeviceExperienceButtonGroup, touchDeviceExperienceButtonGroup, swipeDeviceExperienceButtonGroup,
-        		controllerDiscomfortButtonGroup, tabletDiscomfortButtonGroup, leapSurfaceDiscomfortButtonGroup, leapAirDiscomfortButtonGroup, leapPinchDiscomfortButtonGroup,
-        		controllerFatigueButtonGroup, tabletFatigueButtonGroup, leapSurfaceFatigueButtonGroup, leapAirFatigueButtonGroup, leapPinchFatigueButtonGroup,
-        		controllerDifficultyButtonGroup, tabletDifficultyButtonGroup, leapSurfaceDifficultyButtonGroup, leapAirDifficultyButtonGroup, leapPinchDifficultyButtonGroup};
+        ArrayList<JTextField> textFields = new ArrayList<JTextField>();
+        textFields.add(subjectIDTextField);
+        textFields.add(subjectIDTextField);
+        textFields.add(majorTextField);
+        textFields.add(physicalImpairmentTextField);
+        textFields.add(gestureDeviceExperienceTextField);
+        textFields.add(touchDeviceExperienceTextField);
+        textFields.add(swipeDeviceExperienceTextField);
+        textFields.addAll(rankingTextFields);
+        
+        ButtonGroup[] buttonGroups = {genderButtonGroup, hasComputerButtonGroup, computerHoursPerWeekButtonGroup, handednessButtonGroup, preferedExperimentHandButtonGroup,
+        		physicalImpairmentButtonGroup, gestureDeviceExperienceButtonGroup, touchDeviceExperienceButtonGroup, swipeDeviceExperienceButtonGroup};
         
         // Check text fields
         for(JTextField textField: textFields) {
@@ -331,6 +408,22 @@ public class ExitSurveyController extends GraphicsController {
         	if(getSelectedButtonText(buttonGroup) == null) {
         		return false;
         	}
+        }
+        
+        // Check special button groups
+        for(int i = 0; i < usedButtonGroups.size(); i++) {
+            if(getSelectedButtonText(usedButtonGroups.get(i)) == null) {
+                return false;
+            } else {
+                JRadioButton radioButton = getYesRadioButton(usedButtonGroups.get(i));
+                if(radioButton.isSelected()) {
+                    if(getSelectedButtonText(discomfortButtonGroups.get(i)) == null ||
+                            getSelectedButtonText(fatigueButtonGroups.get(i)) == null ||
+                            getSelectedButtonText(difficultyButtonGroups.get(i)) == null) {
+                        return false;
+                    }
+                }
+            }
         }
         
     	return true;
@@ -358,7 +451,7 @@ public class ExitSurveyController extends GraphicsController {
         enable();
     }
     
-    public JRadioButton getRadioButtonToListenTo(ButtonGroup group) {
+    public JRadioButton getYesRadioButton(ButtonGroup group) {
         for (Enumeration<AbstractButton> e = group.getElements(); e.hasMoreElements();) {
         	JRadioButton radioButton = (JRadioButton) e.nextElement();
         	ExitSurveyOptions option = ExitSurveyOptions.getByDescription(radioButton.getText());
@@ -400,7 +493,7 @@ public class ExitSurveyController extends GraphicsController {
     }
     
     @SuppressWarnings("serial")
-    private class NumberOnlyDocument extends PlainDocument {
+    private class NumericOnlyDocument extends PlainDocument {
         @Override
         public void insertString(int offset, String str, AttributeSet a)
                 throws BadLocationException {
@@ -413,13 +506,6 @@ public class ExitSurveyController extends GraphicsController {
     
     @SuppressWarnings("serial")
     private class UniqueRankingDocument extends PlainDocument {
-        private static final char MAX_RANKING = '5';
-        private static final char MIN_RANKING = '1';
-        private final JTextField RANKING_FIELDS[] = {controllerRankingTextField,
-                tabletRankingTextField,
-                leapSurfaceRankingTextField,
-                leapAirRankingTextField,
-                leapPinchRankingTextField};
         private final JTextField RANKING_FIELD;
         
         public UniqueRankingDocument(JTextField rankingField) {
@@ -431,9 +517,10 @@ public class ExitSurveyController extends GraphicsController {
         public void insertString(int offset, String str, AttributeSet a)
                 throws BadLocationException {
             Key key = Key.getByValue(str.charAt(str.length() - 1));
-            if(key != null && key.isNumeric() && MIN_RANKING <= key.getValue() && key.getValue() <= MAX_RANKING) {
+            if(key != null && key.isNumeric() &&
+                    MIN_RANKING <= Character.getNumericValue(key.getValue()) && Character.getNumericValue(key.getValue()) <= maxRanking) {
                 boolean unique = true;
-                for(JTextField jtf: RANKING_FIELDS) {
+                for(JTextField jtf: rankingTextFields) {
                     if(!RANKING_FIELD.equals(jtf) && jtf.getText().length() > 0 && jtf.getText().charAt(0) == key.getValue()) {
                         unique = false;
                     }

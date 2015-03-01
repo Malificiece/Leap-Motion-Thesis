@@ -35,7 +35,7 @@ import keyboard.KeyboardSetting;
 import enums.Attribute;
 import enums.FileName;
 import enums.Keyboard;
-import enums.TestType;
+import enums.KeyboardType;
 import experiment.TutorialManager;
 import experiment.WordManager;
 import experiment.data.DataManager;
@@ -413,12 +413,12 @@ public class ExperimentController extends GraphicsController {
         isEnabled = true;
     }
     
-    public void enable(String subjectID, TestType testType) {
+    public void enable(String subjectID, KeyboardType keyboardType) {
         if(frame != null) {
-            frame.setTitle("Experiment - Subject ID: " + subjectID + " Test: " + testType.getName());
+            frame.setTitle("Experiment - Subject ID: " + subjectID + " Test: " + keyboardType.getName());
         }
         this.subjectID = subjectID;
-        keyboard = Keyboard.getByID(testType.getKeyboardID()).getKeyboard();
+        keyboard = Keyboard.getByID(keyboardType.getID()).getKeyboard();
         enable();
     }
     
@@ -592,7 +592,7 @@ public class ExperimentController extends GraphicsController {
     }
     
     private boolean isLeapKeyboard() {
-        return keyboard.getID() == Keyboard.LEAP_SURFACE.getID() || keyboard.getID() == Keyboard.LEAP_AIR.getID() || keyboard.getID() == Keyboard.LEAP_PINCH.getID();
+        return KeyboardType.getByID(keyboard.getID()).isLeap();
     }
     
     private void delayedStart() {

@@ -72,9 +72,9 @@ public class DataManager implements DataObserver {
         Key cKey = Key.getByValue(currentKey);
         dataList.add(DataType.TIME_PRESSED.name() + ": " + System.nanoTime()
                 + "; " + DataType.KEY_PRESSED.name() + ": " + pKey.getName()
-                + "; " + DataType.KEY_EXPECTED.name() + ": " + cKey.getName()
-                + "; " + DataType.KEY_PRESSED_UPPER.name() + ": " + pKey.isUpper(pressedKey)
-                + "; " + DataType.KEY_EXPECTED_UPPER.name() + ": " + cKey.isUpper(currentKey));
+                + "; " + DataType.KEY_EXPECTED.name() + ": " + cKey.getName());
+                //+ "; " + DataType.KEY_PRESSED_UPPER.name() + ": " + pKey.isUpper(pressedKey)
+                //+ "; " + DataType.KEY_EXPECTED_UPPER.name() + ": " + cKey.isUpper(currentKey));
     }
 
     @Override

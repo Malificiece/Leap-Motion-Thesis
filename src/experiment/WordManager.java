@@ -95,9 +95,9 @@ public class WordManager {
         }
     }
     
-    public boolean isMatch(boolean notify) {
+    public boolean isMatch(boolean notifyObservers) {
         if(!wordList.isEmpty() && currentWord().equals(answer)) {
-            if(notify) {
+            if(notifyObservers) {
                 notifyListenersMatchObserved();
             }
             return true;

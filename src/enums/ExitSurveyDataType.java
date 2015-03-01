@@ -17,38 +17,18 @@ public enum ExitSurveyDataType {
     PHYSICAL_INPAIRMENT_DESCRIPTION,
     HANDEDNESS,
     PREFERED_HANDEDNESS_FOR_EXPERIMENT,
-    STANDARD_KEYBOARD_DISCOMFORT_LEVEL,
-    TABLET_KEYBOARD_DISCOMFORT_LEVEL,
-    CONTROLLER_KEYBOARD_DISCOMFORT_LEVEL,
-    LEAP_SURFACE_KEYBOARD_DISCOMFORT_LEVEL,
-    LEAP_AIR_KEYBOARD_DISCOMFORT_LEVEL,
-    LEAP_PINCH_KEYBOARD_DISCOMFORT_LEVEL,
-    STANDARD_KEYBOARD_FATIGUE_LEVEL,
-    TABLET_KEYBOARD_FATIGUE_LEVEL,
-    CONTROLLER_KEYBOARD_FATIGUE_LEVEL,
-    LEAP_SURFACE_KEYBOARD_FATIGUE_LEVEL,
-    LEAP_AIR_KEYBOARD_FATIGUE_LEVEL,
-    LEAP_PINCH_KEYBOARD_FATIGUE_LEVEL,
-    STANDARD_KEYBOARD_DIFFICULTY_LEVEL,
-    TABLET_KEYBOARD_DIFFICULTY_LEVEL,
-    CONTROLLER_KEYBOARD_DIFFICULTY_LEVEL,
-    LEAP_SURFACE_KEYBOARD_DIFFICULTY_LEVEL,
-    LEAP_AIR_KEYBOARD_DIFFICULTY_LEVEL,
-    LEAP_PINCH_KEYBOARD_DIFFICULTY_LEVEL,
-    STANDARD_KEYBOARD_PREFERENCE_RANKING,
-    TABLET_KEYBOARD_PREFERENCE_RANKING,
-    CONTROLLER_KEYBOARD_PREFERENCE_RANKING,
-    LEAP_SURFACE_KEYBOARD_PREFERENCE_RANKING,
-    LEAP_AIR_KEYBOARD_PREFERENCE_RANKING,
-    LEAP_PINCH_KEYBOARD_PREFERENCE_RANKING;
+    _DISCOMFORT_LEVEL,
+    _FATIGUE_LEVEL,
+    _DIFFICULTY_LEVEL,
+    _PREFERENCE_RANKING;
     
-    private static final ExitSurveyDataType[] VALUES = values();
-    private static final int SIZE = VALUES.length;
-    
-    public static ExitSurveyDataType getByName(String typeName) {
-        for(int i = 0; i < SIZE; i++) {
-            if(VALUES[i].name().equalsIgnoreCase(typeName)) return VALUES[i];
+    /*public static ExitSurveyDataType getByName(String typeName) {
+        for(ExitSurveyDataType esdt: values()) {
+            if(esdt.name().equalsIgnoreCase(typeName)) return esdt;
+        }
+        for(ExitSurveyDataType esdt: values()) {
+            if(esdt.name().contains(typeName)) return esdt;
         }
         return null;
-    }
+    }*/
 }

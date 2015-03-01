@@ -26,20 +26,23 @@ import javax.swing.JTextField;
 import javax.swing.ListCellRenderer;
 import javax.swing.UIManager;
 import javax.swing.WindowConstants;
+import javax.swing.text.AttributeSet;
+import javax.swing.text.BadLocationException;
 import javax.swing.text.DefaultHighlighter;
+import javax.swing.text.PlainDocument;
 
 import dictionary.DictionaryBuilder;
-import keyboard.IKeyboard;
 import utilities.FileUtilities;
 import utilities.MyUtilities;
 import enums.FileExt;
 import enums.FilePath;
-import enums.Keyboard;
-import enums.TestType;
+import enums.Key;
+import enums.KeyboardType;
 import leap.LeapListener;
 
 public class ControlCenter {
     // Constants
+    private final int SUBJECT_ID_SIZE = 8;
     private final ExperimentController EXPERIMENT_CONTROLLER = new ExperimentController();
     private final CalibrationController CALIBRATION_CONTROLLER = new CalibrationController();
     private final  ReentrantLock CONTROL_LOCK = new ReentrantLock();
@@ -72,11 +75,13 @@ public class ControlCenter {
         exitSurveyButton = new JButton("Exit Survey");
         createDictionariesButton = new JButton("Create Dictionaries");
         
-        JButton buttons[] = {calibrateButton, experimentButton, editSubjectIDButton, exitSurveyButton, createDictionariesButton};
+        JButton[] buttons = {calibrateButton, experimentButton, editSubjectIDButton, exitSurveyButton, createDictionariesButton};
         
         // Window builder builds window using important fields here. It adds unimportant fields that we won't use for aesthetics only.
         WindowBuilder.buildControlWindow(frame, testTypeComboBox, subjectField, buttons);
         testTypeComboBox.setRenderer(new ComboBoxRenderer(testTypeComboBox));
+        subjectField.setDocument(new AlphaNumericOnlyDocument());
+        subjectField.setText(subjectID);
         frame.setVisible(true);
         
         // by default, an AWT Frame doesn't do anything when you click
@@ -127,6 +132,13 @@ public class ControlCenter {
             }
         });
         
+        subjectField.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent arg0) {
+                editSubjectIDButton.doClick();
+            }
+        });
+        
         // Edit the subject ID if we want to redo a test or add to an old test.
         editSubjectIDButton.addActionListener(new ActionListener() {
             @Override
@@ -135,10 +147,18 @@ public class ControlCenter {
                 try {
                     if(!isInProgress()) {
                         if(editSubjectIDButton.getText().equals("Edit")) {
+                            subjectField.setFocusable(true);
                             subjectField.setEditable(true);
                             subjectField.setHighlighter(new DefaultHighlighter());
                             subjectField.requestFocusInWindow();
+                            subjectField.selectAll();
                             editSubjectIDButton.setText("Save");
+                        } else if(subjectField.getText().length() != SUBJECT_ID_SIZE) {
+                            JOptionPane.showMessageDialog(frame,
+                                    "The subject ID must be 8 character long.",
+                                    "Error!",
+                                    JOptionPane.ERROR_MESSAGE,
+                                    null);
                         } else if(!checkForUniqueSubjectID(subjectField.getText())) {
                             Object[] options = {"Save", "Randomize", "Cancel"};
                             int selection =
@@ -155,23 +175,28 @@ public class ControlCenter {
                                 subjectField.setHighlighter(null);
                                 editSubjectIDButton.setText("Edit");
                                 subjectID = subjectField.getText();
+                                ((ComboBoxRenderer) testTypeComboBox.getRenderer()).updateSubjectID(testTypeComboBox, subjectID);
                             } else if(selection == JOptionPane.NO_OPTION) {
                                 subjectField.setEditable(false);
                                 subjectField.setHighlighter(null);
                                 editSubjectIDButton.setText("Edit");
                                 subjectID = generateSubjectID();
                                 subjectField.setText(subjectID);
+                                ((ComboBoxRenderer) testTypeComboBox.getRenderer()).updateSubjectID(testTypeComboBox, subjectID);
                             } else {
                                 subjectField.setEditable(false);
                                 subjectField.setHighlighter(null);
                                 editSubjectIDButton.setText("Edit");
                                 subjectField.setText(subjectID);
                             }
+                            subjectField.setFocusable(false);
                         } else {
                             subjectField.setEditable(false);
                             subjectField.setHighlighter(null);
                             editSubjectIDButton.setText("Edit");
                             subjectID = subjectField.getText();
+                            ((ComboBoxRenderer) testTypeComboBox.getRenderer()).updateSubjectID(testTypeComboBox, subjectID);
+                            subjectField.setFocusable(false);
                         }
                     }
                 } finally {
@@ -222,7 +247,7 @@ public class ControlCenter {
                 CONTROL_LOCK.lock();
                 try {
                     if(!isInProgress()) {
-                        EXPERIMENT_CONTROLLER.enable(subjectID, TestType.getByName((String) testTypeComboBox.getSelectedItem()));
+                        EXPERIMENT_CONTROLLER.enable(subjectID, KeyboardType.getByName((String) testTypeComboBox.getSelectedItem()));
                         lockUI();
                     }
                 } finally {
@@ -337,6 +362,7 @@ public class ControlCenter {
     }
     
     private void unlockUI() {
+        ((ComboBoxRenderer) testTypeComboBox.getRenderer()).updateSubjectID(testTypeComboBox, subjectID);
         isLocked = false;
         calibrateButton.setEnabled(true);
         experimentButton.setEnabled(true);
@@ -381,41 +407,69 @@ public class ControlCenter {
         }
     }
     
+    @SuppressWarnings("serial")
+    private class AlphaNumericOnlyDocument extends PlainDocument {
+        @Override
+        public void insertString(int offset, String str, AttributeSet a)
+                throws BadLocationException {
+            Key key = Key.getByValue(str.charAt(str.length() - 1));
+            if(key != null && key.isAlphaNumeric() && getLength() < SUBJECT_ID_SIZE) {
+                super.insertString(offset, str, a);
+            }
+        }
+    }
+    
     @SuppressWarnings({ "rawtypes", "serial" })
     private class ComboBoxRenderer extends JPanel implements ListCellRenderer {
         private final Color LIGHT_GREEN = new Color(204, 255, 204);
         private final Color HTML_TEXT_GREEN = new Color(0, 128, 0);
+        private JPanel textPanel;
+        private JLabel text;
+        private ArrayList<Boolean> dataExists = new ArrayList<Boolean>();
+        private ArrayList<String> fileNames = new ArrayList<String>();
 
-        JPanel textPanel;
-        JLabel text;
-
-        public ComboBoxRenderer(JComboBox<String> combo) {
+        public ComboBoxRenderer(JComboBox<String> comboBox) {
             textPanel = new JPanel();
             textPanel.add(this);
             text = new JLabel();
             text.setOpaque(true);
-            text.setFont(combo.getFont());
+            text.setFont(comboBox.getFont());
             textPanel.add(text);
+            for(int i = 0; i < comboBox.getItemCount(); i++) {
+                dataExists.add(false); // By default we have a unique sujbect ID.
+                fileNames.add(KeyboardType.getByName(comboBox.getItemAt(i).toString()).getFileName());
+            }
+        }
+        
+        public void updateSubjectID(JComboBox<String> comboBox, String subjectID) {
+            String filePath = FilePath.DATA.getPath() + subjectID + "/";
+            for(int i = 0; i < comboBox.getItemCount(); i++) {
+                String wildcardFileName = subjectID + "_" + fileNames.get(i) + FileUtilities.WILDCARD + FileExt.DAT.getExt();
+                boolean fileExists;
+                try {
+                    fileExists = MyUtilities.FILE_IO_UTILITIES.checkWildcardFileExists(filePath, wildcardFileName);
+                } catch (IOException e) {
+                    fileExists = false;
+                    System.out.println("Error occured while trying to check if wildcard file exists. File: " + filePath + wildcardFileName);
+                    e.printStackTrace();
+                }
+                dataExists.set(i, fileExists);
+            }
+        }
+        
+        public boolean dataExists(int index) {
+            if(0 <= index && index < dataExists.size()) {
+                return dataExists.get(index);
+            }
+            return false;
         }
 
         @Override
         public Component getListCellRendererComponent(JList list, Object value,
                 int index, boolean isSelected, boolean cellHasFocus) {
-            String filePath = FilePath.DATA.getPath() + subjectID + "/";
-            IKeyboard keyboard = Keyboard.getByID(TestType.getByName(value.toString()).getKeyboardID()).getKeyboard();
-            String wildcardFileName = subjectID + "_" + keyboard.getFileName() + FileUtilities.WILDCARD + FileExt.DAT.getExt();
-            boolean fileExists;
-            try {
-                fileExists = MyUtilities.FILE_IO_UTILITIES.checkWildcardFileExists(filePath, wildcardFileName);
-            } catch (IOException e) {
-                fileExists = false;
-                System.out.println("Error occured while trying to check if wildcard file exists. File: " + filePath + wildcardFileName);
-                e.printStackTrace();
-            }
-
             if (isSelected) {
                 setBackground(list.getSelectionBackground());
-            } else if(fileExists) {
+            } else if(dataExists(index)) {
                 setBackground(LIGHT_GREEN);
             } else {
                 setBackground(Color.WHITE);
@@ -423,8 +477,7 @@ public class ControlCenter {
             text.setBackground(getBackground());
 
             text.setText(value.toString());
-
-            if(fileExists) {
+            if(dataExists(index)) {
                 text.setForeground(HTML_TEXT_GREEN);
             } else {
                 text.setForeground(UIManager.getColor("Label.foreground"));

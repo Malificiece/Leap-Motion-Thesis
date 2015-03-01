@@ -22,12 +22,10 @@ public enum ExitSurveyOptions {
     AGREE("agree"),
     NEUTRAL("neutral"),
     DISAGREE("disagree"),
-    STRONGLY_DISAGREE("strongly disagree");
+    STRONGLY_DISAGREE("strongly disagree"),
+    DID_NOT_USE("DID NOT USE");
     
     private final String description;
-    
-    private static final ExitSurveyOptions[] VALUES = values();
-    private static final int SIZE = VALUES.length;
     
     private ExitSurveyOptions(String description) {
         this.description = description;
@@ -38,8 +36,8 @@ public enum ExitSurveyOptions {
     }
     
     public static ExitSurveyOptions getByDescription(String description) {
-        for(int i = 0; i < SIZE; i++) {
-            if(VALUES[i].getDescription().contains(description)) return VALUES[i];
+        for(ExitSurveyOptions eso: values()) {
+            if(eso.getDescription().contains(description)) return eso;
         }
         return null;
     }

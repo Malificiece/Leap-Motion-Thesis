@@ -64,9 +64,6 @@ public enum Key {
     private final int keyCode;
     private final boolean isPrintable;
     
-    private static final Key[] VALUES = values();
-    private static final int SIZE = VALUES.length;
-    
     private Key(char keyValue, char keyUpperCase, String keyName, int keyCode, boolean isPrintable) {
         this.keyValue = keyValue;
         this.keyUpperCase = keyUpperCase;
@@ -132,29 +129,29 @@ public enum Key {
     }
     
     public static Key getByValue(int keyValue) {
-        for(int i = 0; i < SIZE; i++) {
-            if(VALUES[i].getValue() == keyValue || VALUES[i].toUpper() == keyValue) return VALUES[i];
+        for(Key key: values()) {
+            if(key.getValue() == keyValue || key.toUpper() == keyValue) return key;
         }
         return null;
     }
     
     public static Key getByName(String keyName) {
-        for(int i = 0; i < SIZE; i++) {
-            if(VALUES[i].getName().equalsIgnoreCase(keyName)) return VALUES[i];
+        for(Key key: values()) {
+            if(key.getName().equalsIgnoreCase(keyName)) return key;
         }
         return null;
     }
     
     public static Key getByCode(int keyCode) {
-        for(int i = 0; i < SIZE; i++) {
-            if(VALUES[i].getCode() == keyCode) return VALUES[i];
+        for(Key key: values()) {
+            if(key.getCode() == keyCode) return key;
         }
         return null;
     }
     
     public static Key getByIndex(int index) {
-        if(0 <= index && index < SIZE) {
-            return VALUES[index];
+        if(0 <= index && index < values().length) {
+            return values()[index];
         }
         return null;
     }
