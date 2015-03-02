@@ -8,7 +8,8 @@ TODO:
 7) Solve the problem of entering/leaving the touch plane (we move along a sphere) so when
 	moving away from the touch plane, you often hit the key above what you're leaving on.
 	This can probably be solved by aligning the touch plane normal to the direction that the
-	tool is pointing.
+	tool is pointing. Or by determining a certain velocity threshold that only moves us along
+	the Z axis. So if z is greater than x or y then we move on z only perhaps?
 8) Add another UI/button to the control center. We want a data viewer that
    will allow me to select anything that has been previously recorded and
    view the playback.
