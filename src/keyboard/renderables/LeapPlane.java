@@ -45,6 +45,7 @@ public class LeapPlane extends KeyboardRenderable {
     private static final float DELTA_ANGLE = (float) (2.0f * Math.PI / NUM_VERTICIES);
     private static final float RADIUS = 10f;
     private final float PINCH_THRESHOLD = 0.35f;
+    private final float DYNAMIC_TOUCH_MAX = 0.5f;
     private final KeyboardSetting TOUCH_THRESHOLD; // -0.10f; normalized // -10.0f; not normalized for defaults
     private final Point KEYBOARD_SIZE;
     private final float BORDER_SIZE;
@@ -430,8 +431,8 @@ public class LeapPlane extends KeyboardRenderable {
                     applyPlaneNormalization(leapPoint.getNormalizedPoint());
                     Vector point = leapPoint.getNormalizedPoint();
                     float touchDistance = leapPoint.getTouchDistance();
-                    if(touchDistance > 0.5) {
-                        touchDistance = 0.5f;
+                    if(touchDistance > DYNAMIC_TOUCH_MAX) {
+                        touchDistance = DYNAMIC_TOUCH_MAX;
                     } else if(touchDistance < 0) {
                         touchDistance = 0;
                     }
@@ -444,6 +445,11 @@ public class LeapPlane extends KeyboardRenderable {
                         distanceToPlane = -CAMERA_DISTANCE;
                     }
                     applyPlaneNormalization(leapPoint.getNormalizedPoint());
+                    if(leapHand.pinchStrength() > PINCH_THRESHOLD) {
+                        Vector point = leapPoint.getNormalizedPoint();
+                        point.setZ(0);
+                        leapPoint.setNormalizedPoint(point);
+                    }
                 } else {
                     calcDistToPlane(leapPoint.getNormalizedPoint());
                     applyPlaneNormalization(leapPoint.getNormalizedPoint());

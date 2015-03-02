@@ -39,7 +39,6 @@ import enums.FileExt;
 import enums.FilePath;
 import enums.Key;
 import enums.KeyboardType;
-import leap.LeapListener;
 
 public class ControlCenter {
     // Constants
@@ -63,7 +62,7 @@ public class ControlCenter {
     private boolean isLocked = false;
     
     @SuppressWarnings("unchecked")
-    public ControlCenter(LeapListener leapListener) {
+    public ControlCenter() {
         // Java Swing/AWT important fields and selections
         frame = new JFrame("Experiment Control Center");
         frame.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);

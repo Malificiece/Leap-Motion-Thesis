@@ -12,15 +12,14 @@ import java.util.ArrayList;
 import com.leapmotion.leap.*;
 
 public class LeapListener extends Listener /*implements SaveSettingsObserver*/ {
-    private static Controller CONTROLLER;
+    private static final Controller CONTROLLER = new Controller();
     private static LeapListener LISTENER;
     private static ArrayList<LeapObserver> OBSERVERS = new ArrayList<LeapObserver>();
     private LeapData leapData = new LeapData();
     
-    public LeapListener(Controller controller) {
+    public LeapListener(/*Controller controller*/) {
         super();
         LISTENER = this;
-        CONTROLLER = controller;
     }
     
     public void onInit(Controller controller) {

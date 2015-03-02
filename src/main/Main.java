@@ -1,11 +1,9 @@
 package main;
 
-import ui.ControlCenter;
-import ui.GraphicsController;
 import leap.LeapListener;
 
-import com.leapmotion.leap.Controller;
-
+import ui.ControlCenter;
+import ui.GraphicsController;
 
 public class Main {
     public static ControlCenter controlCenter;
@@ -23,10 +21,10 @@ public class Main {
         GraphicsController.init();
         
         // Create a sample listener and controller
-        Controller controller = new Controller();
-        LeapListener listener = new LeapListener(controller);
+        //Controller controller = new Controller();
+        new LeapListener(/*controller*/);
         
-        controlCenter = new ControlCenter(listener);
+        controlCenter = new ControlCenter();
 
         // Have the sample listener receive events from the controller
         //controller.addListener(listener);
@@ -46,6 +44,6 @@ public class Main {
         
         //si.dispose();
         // Remove the sample listener when done
-        controller.removeListener(listener);
+        //controller.removeListener(listener);
     }
 }

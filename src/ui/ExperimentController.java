@@ -346,13 +346,13 @@ public class ExperimentController extends GraphicsController {
         dataManager.stopRecording();
         dataManager.save(keyboard);
         dataManager = null;
-        wordManager.setDefault();
-        enableUI();
+        //wordManager.setDefault();
+        /*enableUI();
         currentColor = Color.WHITE;
         wordPanel.setBackground(currentColor);
         answerPanel.setBackground(currentColor);
         isFading = false;
-        fadeTimeElapsed = 0;
+        fadeTimeElapsed = 0;*/
         disable();
     }
     
@@ -412,6 +412,13 @@ public class ExperimentController extends GraphicsController {
         }
         wordManager.setDefault();
         enableUI();
+        // Moved here from finish Exp
+        currentColor = Color.WHITE;
+        wordPanel.setBackground(currentColor);
+        answerPanel.setBackground(currentColor);
+        isFading = false;
+        fadeTimeElapsed = 0;
+        
         isEnabled = true;
     }
     

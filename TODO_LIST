@@ -1,22 +1,14 @@
 TODO:
-0) FILL OUT IRB INFORMATION AND SUBMIT IT SOON!!!! YOU NEED TO DO THIS BEFORE THE NEXT DEADLINE. FINISH THIS BEFORE MARCH 6th
-1) There is an issue when calibrating a plane at too much of an angle that the z axis becomes flipped. Try to solve this issue.
-2) Resave tutorial files and add tutorial INFO!
-3) Modify the pinch threshold to further stabilize it and try to account for an actual pinch.
-	Consider using the fingers and measuring the distances to also determine a pinch gesture.
-	Lastly let's consider changing the angle of the leap to have a better view of the fingers.
+1) FILL OUT IRB INFORMATION AND SUBMIT IT SOON!!!! YOU NEED TO DO THIS BEFORE THE NEXT DEADLINE. FINISH THIS BEFORE MARCH 6th
+2) There is an issue when calibrating a plane at too much of an angle that the z axis becomes flipped. Try to solve this issue.
+3) Add unique tutorial INFO!
 4) Implement a hand alternative for both the surface and air keyboards on the leap.
-5) Solve the problem of entering/leaving the touch plane (we move along a sphere) so when
+5) Implement the data parser to convert from playback format to Matlab format.
+6) Implement AR to help with feed back for air based keyboards
+7) Solve the problem of entering/leaving the touch plane (we move along a sphere) so when
 	moving away from the touch plane, you often hit the key above what you're leaving on.
 	This can probably be solved by aligning the touch plane normal to the direction that the
 	tool is pointing.
-6) Consider a moving touch plane that aligns to the normal of the tool as well as the movements of the tool.
-	This will be similar to the leap's already implemented moving touch plane. This will also allow us to
-	test it as an alternative. This could be compared to the AR static keyboard.
-7) Allow the user to move an already pre-calibrated plane using the tool as the center/normal.
-8) Implement the data parser to convert from playback format to Matlab format.
-9) Implement AR to help with feed back for air based keyboards
-10) Consider further stabilizing the leap point based on delta velocity and delta position.
-11) Add another UI/button to the control center. We want a data viewer that
+8) Add another UI/button to the control center. We want a data viewer that
    will allow me to select anything that has been previously recorded and
    view the playback.

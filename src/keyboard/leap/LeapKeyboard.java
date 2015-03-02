@@ -184,21 +184,26 @@ public class LeapKeyboard extends IKeyboard implements LeapObserver, Calibration
             // Update gestures after plane, we need both normalized and non normalized points.
             if(Gesture.ENABLED) leapGestures.update();
                         
-            if(leapTool.isValid() || leapHand.isValid()) {
-                boolean isTouching;
-                if(KEYBOARD_TYPE.equals(KeyboardType.LEAP_AIR_BIMODAL)) {
-                    isTouching = keyBindings.getSimulatedTouch();
-                } else {
-                    isTouching = leapPlane.isTouching();
-                }
-                
-                // Set add to trail and set location.
+            boolean isTouching;
+            if(KEYBOARD_TYPE.equals(KeyboardType.LEAP_AIR_BIMODAL)) {
+                isTouching = keyBindings.getSimulatedTouch();
                 if(isTouching) {
-                    swipeTrail.update(leapPoint.getNormalizedPoint());
-                } else {
-                    swipeTrail.update();
+                    Vector point = leapPoint.getNormalizedPoint();
+                    point.setZ(0);
+                    leapPoint.setNormalizedPoint(point);
                 }
-                
+            } else {
+                isTouching = leapPlane.isTouching();
+            }
+            
+            // Set add to trail and set location.
+            if(isTouching) {
+                swipeTrail.update(leapPoint.getNormalizedPoint());
+            } else {
+                swipeTrail.update();
+            }
+            
+            if(leapTool.isValid() || leapHand.isValid()) {                
                 // Update the swipe keyboard
                 swipeKeyboard.update(isTouching);
             } else {
@@ -262,25 +267,35 @@ public class LeapKeyboard extends IKeyboard implements LeapObserver, Calibration
     
     @Override
     public void addToUI(JPanel panel, GLCanvas canvas) {
-        LeapListener.registerObserver(this);
-        LeapListener.startListening();
-        WordManager.registerObserver(swipeKeyboard);
-        if(KEYBOARD_TYPE.equals(KeyboardType.LEAP_AIR_BIMODAL)) {
-            panel.add(keyBindings);
+        LEAP_LOCK.lock();
+        try {
+            LeapListener.registerObserver(this);
+            LeapListener.startListening();
+            WordManager.registerObserver(swipeKeyboard);
+            if(KEYBOARD_TYPE.equals(KeyboardType.LEAP_AIR_BIMODAL)) {
+                panel.add(keyBindings);
+            }
+        } finally {
+            LEAP_LOCK.unlock();
         }
     }
 
     @Override
     public void removeFromUI(JPanel panel, GLCanvas canvas) {
-        LeapListener.stopListening();
-        LeapListener.removeObserver(this);
-        leapTool.deleteQuadric();
-        if(Gesture.ENABLED) {
-            keyboardGestures.deleteQuadric();
-        }
-        WordManager.removeObserver(swipeKeyboard);
-        if(KEYBOARD_TYPE.equals(KeyboardType.LEAP_AIR_BIMODAL)) {
-            panel.remove(keyBindings);
+        LEAP_LOCK.lock();
+        try {
+            LeapListener.removeObserver(this);
+            LeapListener.stopListening();
+            leapTool.deleteQuadric();
+            if(Gesture.ENABLED) {
+                keyboardGestures.deleteQuadric();
+            }
+            WordManager.removeObserver(swipeKeyboard);
+            if(KEYBOARD_TYPE.equals(KeyboardType.LEAP_AIR_BIMODAL)) {
+                panel.remove(keyBindings);
+            }
+        } finally {
+            LEAP_LOCK.unlock();
         }
     }
     
@@ -321,6 +336,8 @@ public class LeapKeyboard extends IKeyboard implements LeapObserver, Calibration
     public void beginPlayback(PlaybackManager playbackManager) {
         LEAP_LOCK.lock();
         try {
+            LeapListener.removeObserver(this);
+            LeapListener.stopListening();
             System.out.println(KEYBOARD_NAME + " - Loading playback settings from " + playbackManager.getFilePath() + KEYBOARD_FILE_NAME + FileExt.INI.getExt());
             try {
                 MyUtilities.FILE_IO_UTILITIES.readSettingsAndAttributesFromFile(playbackManager.getFilePath(), KEYBOARD_FILE_NAME + FileExt.INI.getExt(), this);
@@ -329,8 +346,6 @@ public class LeapKeyboard extends IKeyboard implements LeapObserver, Calibration
                 e.printStackTrace();
             }
             System.out.println("-------------------------------------------------------");
-            LeapListener.stopListening();
-            LeapListener.removeObserver(this);
         	leapPoint.setNormalizedPoint(Vector.zero());
             isPlayback = true;
             playbackManager.registerObserver(this);
