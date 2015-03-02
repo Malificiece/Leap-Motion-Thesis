@@ -12,6 +12,8 @@ import javax.media.opengl.GL2;
 import utilities.MyUtilities;
 
 import com.leapmotion.leap.InteractionBox;
+import com.leapmotion.leap.Pointable;
+import com.leapmotion.leap.Pointable.Zone;
 import com.leapmotion.leap.Vector;
 
 import enums.Attribute;
@@ -32,6 +34,8 @@ public class SwipePoint extends KeyboardRenderable {
     private final float CAMERA_DISTANCE;
     private Vector point = new Vector();
     private Vector normalizedPoint = Vector.zero();
+    private float touchDistance = 1;
+    private Zone touchZone = Zone.ZONE_NONE;
     private InteractionBox iBox;
     
     public SwipePoint(KeyboardAttributes keyboardAttributes) {
@@ -45,12 +49,34 @@ public class SwipePoint extends KeyboardRenderable {
         this.point = point;
     }
     
+    public void setTouchData(Pointable pointable) {
+        if(pointable != null) {
+            touchDistance = pointable.touchDistance();
+            touchZone = pointable.touchZone();
+        } else {
+            touchDistance = 1;
+            touchZone = Zone.ZONE_NONE;
+        }
+    }
+    
     public void setNormalizedPoint(Vector point) {
         this.normalizedPoint = point;
     }
     
     public Vector getPoint() {
         return point;
+    }
+    
+    public float getTouchDistance() {
+        return touchDistance;
+    }
+    
+    public boolean isTouching() {
+        return touchZone == Zone.ZONE_TOUCHING;
+    }
+    
+    public Zone getTouchZone() {
+        return touchZone;
     }
     
     public Vector getNormalizedPoint() {

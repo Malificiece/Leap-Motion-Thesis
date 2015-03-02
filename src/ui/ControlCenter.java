@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.math.BigInteger;
 import java.security.SecureRandom;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.concurrent.locks.ReentrantLock;
 
 import javax.swing.JButton;
@@ -425,7 +426,7 @@ public class ControlCenter {
         private final Color HTML_TEXT_GREEN = new Color(0, 128, 0);
         private JPanel textPanel;
         private JLabel text;
-        private ArrayList<Boolean> dataExists = new ArrayList<Boolean>();
+        private HashMap<String, Boolean> dataExists = new HashMap<String, Boolean>();
         private ArrayList<String> fileNames = new ArrayList<String>();
 
         public ComboBoxRenderer(JComboBox<String> comboBox) {
@@ -436,7 +437,7 @@ public class ControlCenter {
             text.setFont(comboBox.getFont());
             textPanel.add(text);
             for(int i = 0; i < comboBox.getItemCount(); i++) {
-                dataExists.add(false); // By default we have a unique sujbect ID.
+                dataExists.put(comboBox.getItemAt(i).toString(), false); // By default we have a unique sujbect ID.
                 fileNames.add(KeyboardType.getByName(comboBox.getItemAt(i).toString()).getFileName());
             }
         }
@@ -453,13 +454,13 @@ public class ControlCenter {
                     System.out.println("Error occured while trying to check if wildcard file exists. File: " + filePath + wildcardFileName);
                     e.printStackTrace();
                 }
-                dataExists.set(i, fileExists);
+                dataExists.put(comboBox.getItemAt(i).toString(), fileExists);
             }
         }
         
-        public boolean dataExists(int index) {
-            if(0 <= index && index < dataExists.size()) {
-                return dataExists.get(index);
+        private boolean dataExists(String value) {
+            if(value != null) {
+                return dataExists.get(value);
             }
             return false;
         }
@@ -467,9 +468,10 @@ public class ControlCenter {
         @Override
         public Component getListCellRendererComponent(JList list, Object value,
                 int index, boolean isSelected, boolean cellHasFocus) {
+            boolean dataExists = dataExists(value.toString());
             if (isSelected) {
                 setBackground(list.getSelectionBackground());
-            } else if(dataExists(index)) {
+            } else if(dataExists) {
                 setBackground(LIGHT_GREEN);
             } else {
                 setBackground(Color.WHITE);
@@ -477,7 +479,7 @@ public class ControlCenter {
             text.setBackground(getBackground());
 
             text.setText(value.toString());
-            if(dataExists(index)) {
+            if(dataExists) {
                 text.setForeground(HTML_TEXT_GREEN);
             } else {
                 text.setForeground(UIManager.getColor("Label.foreground"));

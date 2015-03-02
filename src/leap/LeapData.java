@@ -58,8 +58,10 @@ public class LeapData {
         if(leapPoint != null) {
             if(toolData.isValid()) {
                 leapPoint.setPoint(toolData.stabilizedTipPosition());
+                leapPoint.setTouchData(toolData);
             } else {
                 leapPoint.setPoint(Vector.zero());
+                leapPoint.setTouchData(null);
             }
         }
     }

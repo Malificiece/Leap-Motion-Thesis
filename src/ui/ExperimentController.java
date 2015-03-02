@@ -365,7 +365,9 @@ public class ExperimentController extends GraphicsController {
         practiceButton.setEnabled(false);
         experimentButton.setEnabled(false);
         settingsPanel.setEnabled(false);
-        frame.pack();
+        if(isEnabled) {
+            frame.pack();
+        }
     }
     
     public void enableUI() {
@@ -395,8 +397,8 @@ public class ExperimentController extends GraphicsController {
             tmpKeyboard.getKeyboard().removeObserver(this);
         }
         ranPractice = false;
-        disableUI();
         isEnabled = false;
+        disableUI();
         practiceWordCount = 0;
     }
     
@@ -419,6 +421,9 @@ public class ExperimentController extends GraphicsController {
         }
         this.subjectID = subjectID;
         keyboard = Keyboard.getByID(keyboardType.getID()).getKeyboard();
+        if(TUTORIAL.equals(subjectID)) {
+            ranPractice = true;
+        }
         enable();
     }
     

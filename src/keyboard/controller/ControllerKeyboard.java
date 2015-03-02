@@ -316,17 +316,20 @@ public class ControllerKeyboard extends IKeyboard implements ControllerPlaybackO
 	public void pressedEventObserved(Key key) {
 	    switch(key) {
 	        case VK_BACK_SPACE:
-	            Button.checkPressed(Button.B.getIdentifier(), true);
+	            Button.checkPressed(/*Button.B.getIdentifier()*/Button.Y.getIdentifier(), true);
 	            break;
-	        case VK_SPACE:
+	        /*case VK_SPACE:
 	            Button.checkPressed(Button.Y.getIdentifier(), true);
-	            break;
+	            break;*/
 	        case VK_ENTER:
-	            Button.checkPressed(Button.START.getIdentifier(), true);
+	            //Button.checkPressed(Button.START.getIdentifier(), true);
+	            keyPressed = key.getValue();
+	            notifyListenersKeyEvent();
+	            virtualKeyboard.pressed(key);
 	            break;
-	        case VK_SHIFT:
+	        /*case VK_SHIFT:
 	            Button.checkPressed(Button.X.getIdentifier(), true);
-	            break;
+	            break;*/
 	        default:
 	            if(key.isAlphaNumeric()) {
 	                Button.checkPressed(Button.A.getIdentifier(), true);

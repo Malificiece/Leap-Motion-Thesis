@@ -44,6 +44,7 @@ public class LeapPlane extends KeyboardRenderable {
     private static final int NUM_VERTICIES = 32;
     private static final float DELTA_ANGLE = (float) (2.0f * Math.PI / NUM_VERTICIES);
     private static final float RADIUS = 10f;
+    private final float PINCH_THRESHOLD = 0.35f;
     private final KeyboardSetting TOUCH_THRESHOLD; // -0.10f; normalized // -10.0f; not normalized for defaults
     private final Point KEYBOARD_SIZE;
     private final float BORDER_SIZE;
@@ -78,6 +79,7 @@ public class LeapPlane extends KeyboardRenderable {
     private float normalizedPlaneHeight;
     private float planeWidth;
     private float planeHeight;
+    private Vector upDirection = Vector.zAxis().times(-1);
     //private Vector BA;
     //private Vector DA;
     //private Vector intersectionPoint = Vector.zero();
@@ -235,7 +237,7 @@ public class LeapPlane extends KeyboardRenderable {
     }
     
     public boolean isTouching() {
-        return distanceToPlane > TOUCH_THRESHOLD.getValue();
+        return distanceToPlane >= TOUCH_THRESHOLD.getValue();
     }
     
     public boolean isValid() {
@@ -271,9 +273,8 @@ public class LeapPlane extends KeyboardRenderable {
         planeD = MyUtilities.MATH_UTILITILES.calcPlaneD(planeNormal, planeCenter);
         
         // Calculate the axis and angle to the camera.
-        Vector n = Vector.zAxis().times(-1);
-        angleToCamera = planeNormal.angleTo(n);
-        axisToCamera = planeNormal.cross(n).divide(planeNormal.cross(n).magnitude());
+        angleToCamera = planeNormal.angleTo(upDirection);
+        axisToCamera = planeNormal.cross(upDirection).divide(planeNormal.cross(upDirection).magnitude());
         
         // Calculate the width and height of the plane in real world space.
         //planeWidth = MyUtilities.MATH_UTILITILES.findDistanceToPoint(pointB, pointC);
@@ -381,23 +382,25 @@ public class LeapPlane extends KeyboardRenderable {
 
         // Find horizontal position.
         // Find distance to left and right sides. Use the right side to determine if we should negate the distance to the left side.
-        float distAB = MyUtilities.MATH_UTILITILES.findDistanceToLine(point, pointA, pointB)/normalizedPlaneWidth;
+        float distAB = MyUtilities.MATH_UTILITILES.findDistanceToLine(point, pointA, pointB);
         float distDC = MyUtilities.MATH_UTILITILES.findDistanceToLine(point, pointD, pointC);
         if (distDC > normalizedPlaneWidth && distAB < distDC) {
             x = -distAB;
         } else {
             x = distAB;
         }
+        x /= normalizedPlaneWidth;
 
         // Find vertical position.
         // Find distance to top and bottom sides. Use the top side to determine if we should negate the distance to the bottom side.
-        float distAD = MyUtilities.MATH_UTILITILES.findDistanceToLine(point, pointA, pointD)/normalizedPlaneHeight;
+        float distAD = MyUtilities.MATH_UTILITILES.findDistanceToLine(point, pointA, pointD);
         float distBC = MyUtilities.MATH_UTILITILES.findDistanceToLine(point, pointB, pointC);
         if (distBC > normalizedPlaneHeight && distAD < distBC) {
             y = -distAD;
         } else {
             y = distAD;
         }
+        y /= normalizedPlaneHeight;
 
         // Use planeCenter and point's Z's to determine %.
         z = (point.getZ() - planeCenter.getZ()) / distanceToCameraPlane;
@@ -413,12 +416,38 @@ public class LeapPlane extends KeyboardRenderable {
         if(isCalibrating && isCalibrated) { // means we just finished
             finishCalibration();
         }
-        if(isCalibrated) {
+        if(isCalibrated) {            
             // Find point distance, normalize it, and position it.
             if(leapTool.isValid() || leapHand.isValid()) {
                 leapPoint.applyPlaneRotationAndNormalizePoint(axisToCamera, angleToCamera);
-                calcDistToPlane(leapPoint.getNormalizedPoint());
-                applyPlaneNormalization(leapPoint.getNormalizedPoint());
+                // If dynamic, use the touch zone Z.
+                if(keyboardType.equals(KeyboardType.LEAP_AIR_DYNAMIC)) {
+                    if(leapPoint.getTouchDistance() - TOUCH_THRESHOLD.getValue() <= 0) {
+                        distanceToPlane = CAMERA_DISTANCE;
+                    } else {
+                        distanceToPlane = -CAMERA_DISTANCE;
+                    }
+                    applyPlaneNormalization(leapPoint.getNormalizedPoint());
+                    Vector point = leapPoint.getNormalizedPoint();
+                    float touchDistance = leapPoint.getTouchDistance();
+                    if(touchDistance > 0.5) {
+                        touchDistance = 0.5f;
+                    } else if(touchDistance < 0) {
+                        touchDistance = 0;
+                    }
+                    point.setZ(touchDistance);
+                    leapPoint.setNormalizedPoint(point);
+                } else if(keyboardType.equals(KeyboardType.LEAP_AIR_PINCH)) {
+                    if(leapHand.pinchStrength() > PINCH_THRESHOLD) {
+                        distanceToPlane = CAMERA_DISTANCE;
+                    } else {
+                        distanceToPlane = -CAMERA_DISTANCE;
+                    }
+                    applyPlaneNormalization(leapPoint.getNormalizedPoint());
+                } else {
+                    calcDistToPlane(leapPoint.getNormalizedPoint());
+                    applyPlaneNormalization(leapPoint.getNormalizedPoint());
+                }
                 leapPoint.scaleTo3DSpace();
             } else {
                 leapPoint.setNormalizedPoint(Vector.zero());
@@ -436,15 +465,7 @@ public class LeapPlane extends KeyboardRenderable {
                         gesture.update();
                     }
                 }
-            }
-            
-            // Set add to trail and set location.
-            if(isTouching() && (leapTool.isValid() || leapHand.isValid())) {
-                swipeTrail.update(leapPoint.getNormalizedPoint());
-            } else {
-                swipeTrail.update();
-            }
-            
+            }      
         } else if (isCalibrating) {
             if(removeTool) {
                 // If tool is removed from area.
@@ -458,10 +479,6 @@ public class LeapPlane extends KeyboardRenderable {
                     removeTool = false;
                 }
             } else if(leapTool.isValid()) {
-                // While calibrating, add each new point to the plane calibrator object.
-                if(keyboardType.equals(KeyboardType.LEAP_AIR_PINCH)) {
-                    leapPoint.getPoint().setZ(0);
-                }
                 leapPlaneCalibrator.addPoint(leapPoint.getPoint());
                 
                 // Calibration order:

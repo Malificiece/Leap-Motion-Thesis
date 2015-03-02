@@ -28,8 +28,8 @@ public class LeapTool extends KeyboardRenderable {
     private static final float RADS_TO_DEGREES = (float) (180 / Math.PI);
     private static final GLColor TOOL_COLOR = new GLColor(Color.WOOD);
     private static final GLColor LINE_COLOR = new GLColor(Color.YELLOW);
-    private final int DEFAULT_LENGTH = 150;
-    private final float DEFAULT_RADIUS = 3.15f;
+    private final float DEFAULT_LENGTH = 150 * KeyboardImage.SCALE;
+    private final float DEFAULT_RADIUS = 3.15f * KeyboardImage.SCALE;
     private final float CAMERA_DISTANCE;
     private float length;
     private float radius;
