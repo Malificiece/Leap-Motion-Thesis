@@ -35,7 +35,7 @@ import enums.ExitSurveyOptions;
 import enums.FileExt;
 import enums.FilePath;
 import enums.Key;
-import enums.KeyboardType;
+import enums.Keyboard;
 
 public class ExitSurveyController extends GraphicsController {
     // Static text fields and button groups
@@ -99,8 +99,8 @@ public class ExitSurveyController extends GraphicsController {
         ButtonGroup[] subjectButtonGroups = {genderButtonGroup, hasComputerButtonGroup, computerHoursPerWeekButtonGroup, handednessButtonGroup, preferedExperimentHandButtonGroup};
         ButtonGroup[] historyButtonGroups = {physicalImpairmentButtonGroup, gestureDeviceExperienceButtonGroup, touchDeviceExperienceButtonGroup, swipeDeviceExperienceButtonGroup};
         
-        for(KeyboardType keyboardType: KeyboardType.values()) {
-            if(keyboardType != KeyboardType.STANDARD) {
+        for(Keyboard keyboardType: Keyboard.values()) {
+            if(keyboardType != Keyboard.STANDARD) {
                 usedButtonGroups.add(new ButtonGroup());
                 rankingTextFields.add(new JTextField(3));
                 discomfortButtonGroups.add(new ButtonGroup());
@@ -319,48 +319,48 @@ public class ExitSurveyController extends GraphicsController {
     	exitSurveyData.add(ExitSurveyDataType.PREFERED_HANDEDNESS_FOR_EXPERIMENT.name() + ": " + getSelectedButtonText(preferedExperimentHandButtonGroup));
     	
     	// Survey section
-        for(KeyboardType keyboardType: KeyboardType.values()) {
-            if(keyboardType != KeyboardType.STANDARD) {
+        for(Keyboard keyboardType: Keyboard.values()) {
+            if(keyboardType != Keyboard.STANDARD) {
                 JRadioButton radioButton = getYesRadioButton(usedButtonGroups.get(keyboardType.getID() - 1));
                 if(radioButton.isSelected()) {
                     // discomfort
-                    exitSurveyData.add(keyboardType.getFileName() + ExitSurveyDataType._DISCOMFORT_LEVEL.name() + ": "
+                    exitSurveyData.add(keyboardType.getKeyboard().getFileName() + ExitSurveyDataType._DISCOMFORT_LEVEL.name() + ": "
                             + getSelectedButtonText(discomfortButtonGroups.get(keyboardType.getID() - 1)));
                     
                     // fatigue
-                    exitSurveyData.add(keyboardType.getFileName() + ExitSurveyDataType._FATIGUE_LEVEL.name() + ": "
+                    exitSurveyData.add(keyboardType.getKeyboard().getFileName() + ExitSurveyDataType._FATIGUE_LEVEL.name() + ": "
                             + getSelectedButtonText(fatigueButtonGroups.get(keyboardType.getID() - 1)));
                     
                     // difficulty
-                    exitSurveyData.add(keyboardType.getFileName() + ExitSurveyDataType._DIFFICULTY_LEVEL.name() + ": "
+                    exitSurveyData.add(keyboardType.getKeyboard().getFileName() + ExitSurveyDataType._DIFFICULTY_LEVEL.name() + ": "
                             + getSelectedButtonText(difficultyButtonGroups.get(keyboardType.getID() - 1)));
                 } else {
                     // discomfort
-                    exitSurveyData.add(keyboardType.getFileName() + ExitSurveyDataType._DISCOMFORT_LEVEL.name() + ": "
+                    exitSurveyData.add(keyboardType.getKeyboard().getFileName() + ExitSurveyDataType._DISCOMFORT_LEVEL.name() + ": "
                             + ExitSurveyOptions.DID_NOT_USE.getDescription());
                     
                     // fatigue
-                    exitSurveyData.add(keyboardType.getFileName() + ExitSurveyDataType._FATIGUE_LEVEL.name() + ": "
+                    exitSurveyData.add(keyboardType.getKeyboard().getFileName() + ExitSurveyDataType._FATIGUE_LEVEL.name() + ": "
                             + ExitSurveyOptions.DID_NOT_USE.getDescription());
                     
                     // difficulty
-                    exitSurveyData.add(keyboardType.getFileName() + ExitSurveyDataType._DIFFICULTY_LEVEL.name() + ": "
+                    exitSurveyData.add(keyboardType.getKeyboard().getFileName() + ExitSurveyDataType._DIFFICULTY_LEVEL.name() + ": "
                             + ExitSurveyOptions.DID_NOT_USE.getDescription());
                 }
             }
         }
     	
     	// Rank section
-        for(KeyboardType keyboardType: KeyboardType.values()) {
-            if(keyboardType != KeyboardType.STANDARD) {
+        for(Keyboard keyboardType: Keyboard.values()) {
+            if(keyboardType != Keyboard.STANDARD) {
                 JRadioButton radioButton = getYesRadioButton(usedButtonGroups.get(keyboardType.getID() - 1));
                 if(radioButton.isSelected()) {
                     // ranking
-                    exitSurveyData.add(keyboardType.getFileName() + ExitSurveyDataType._PREFERENCE_RANKING.name() + ": "
+                    exitSurveyData.add(keyboardType.getKeyboard().getFileName() + ExitSurveyDataType._PREFERENCE_RANKING.name() + ": "
                             + rankingTextFields.get(keyboardType.getID() - 1).getText());
                 } else {
                     // ranking
-                    exitSurveyData.add(keyboardType.getFileName() + ExitSurveyDataType._PREFERENCE_RANKING.name() + ": "
+                    exitSurveyData.add(keyboardType.getKeyboard().getFileName() + ExitSurveyDataType._PREFERENCE_RANKING.name() + ": "
                             + ExitSurveyOptions.DID_NOT_USE.getDescription());
                 }
             }
@@ -385,7 +385,7 @@ public class ExitSurveyController extends GraphicsController {
     public boolean isFilledOut() {
         ArrayList<JTextField> textFields = new ArrayList<JTextField>();
         textFields.add(subjectIDTextField);
-        textFields.add(subjectIDTextField);
+        textFields.add(ageTextField);
         textFields.add(majorTextField);
         textFields.add(physicalImpairmentTextField);
         textFields.add(gestureDeviceExperienceTextField);
