@@ -519,18 +519,16 @@ public class ExitSurveyController extends GraphicsController {
             Key key = Key.getByValue(str.charAt(str.length() - 1));
             if(key != null && key.isNumeric() &&
                     MIN_RANKING <= Character.getNumericValue(key.getValue()) && Character.getNumericValue(key.getValue()) <= maxRanking) {
-                boolean unique = true;
                 for(JTextField jtf: rankingTextFields) {
                     if(!RANKING_FIELD.equals(jtf) && jtf.getText().length() > 0 && jtf.getText().charAt(0) == key.getValue()) {
-                        unique = false;
+                    	jtf.setText("");
+                        break;
                     }
                 }
-                if(unique) {
-                    if(RANKING_FIELD.getText().length() > 0) {
-                        RANKING_FIELD.setText("");
-                    }
-                    super.insertString(0, str, a);
+                if(RANKING_FIELD.getText().length() > 0) {
+                    RANKING_FIELD.setText("");
                 }
+                super.insertString(0, str, a);
             }
         }
     }
