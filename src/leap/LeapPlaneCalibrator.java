@@ -18,8 +18,8 @@ public class LeapPlaneCalibrator {
     private final int CALCULATE_MIDPOINT = 250;
     private final int CLUSTER_SIZE = 1000 + CALCULATE_MIDPOINT;
     private final int START_SEARCH = 500 + CALCULATE_MIDPOINT;
-    private final float EPSILON = 0.00015f;
-    private final float DELTA_EPSILON = 0.0001f;
+    private final float EPSILON = 0.0002f;
+    private final float DELTA_EPSILON = 0.0002f;
     private float epsilon;
     private Vector[] cluster;
     private int point = 0;
