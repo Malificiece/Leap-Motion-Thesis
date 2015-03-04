@@ -549,6 +549,7 @@ public class LeapPlane extends KeyboardRenderable {
             PLANE_COLOR.glColor(gl);
             gl.glTranslatef((KEYBOARD_SIZE.x+BORDER_SIZE)/2f-planeWidth/2f, (KEYBOARD_SIZE.y+BORDER_SIZE)/2f-planeHeight/2f, -10f);
             drawRectangle(gl);
+            gl.glTranslatef(0, 0, 1); // Render the letters in front of the plane.
             drawCircleWithLetter(gl, scaledPointA, 'A', LeapPlaneCalibrator.POINT_A);
             drawCircleWithLetter(gl, scaledPointB, 'B', LeapPlaneCalibrator.POINT_B);
             drawCircleWithLetter(gl, scaledPointC, 'C', LeapPlaneCalibrator.POINT_C);
