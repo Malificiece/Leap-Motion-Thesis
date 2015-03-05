@@ -1,0 +1,42 @@
+SUBJECT_ID: n3hed152
+AGE: 21
+GENDER: Female
+MAJOR: Health Science Studies 
+HAS_PERSONAL_COMPUTER: Yes
+HOURS_PER_WEEK_ON_COMPUTER: 6 to 10 hours
+HAS_PREVIOUS_GESTURE_DEVICE_EXPERIENCE: Yes
+PREVIOUS_GESTURE_DEVICE_DESCRIPTION: Wii
+HAS_PREVIOUS_TOUCH_DEVICE_EXPERIENCE: Yes
+PREVIOUS_TOUCH_DEVICE_DESCRIPTION: Iphone, ipod, kindle 
+HAS_PREVIOUS_SWIPE_DEVICE_EXPERIENCE: No
+HAS_PHYSICAL_IMPAIRMENT: No
+HANDEDNESS: Right hand
+PREFERED_HANDEDNESS_FOR_EXPERIMENT: Both hands
+controller_DISCOMFORT_LEVEL: strongly disagree
+controller_FATIGUE_LEVEL: disagree
+controller_DIFFICULTY_LEVEL: strongly disagree
+tablet_DISCOMFORT_LEVEL: strongly disagree
+tablet_FATIGUE_LEVEL: strongly disagree
+tablet_DIFFICULTY_LEVEL: strongly disagree
+leapSurface_DISCOMFORT_LEVEL: neutral
+leapSurface_FATIGUE_LEVEL: disagree
+leapSurface_DIFFICULTY_LEVEL: neutral
+leapAirStatic_DISCOMFORT_LEVEL: disagree
+leapAirStatic_FATIGUE_LEVEL: disagree
+leapAirStatic_DIFFICULTY_LEVEL: neutral
+leapAirPinch_DISCOMFORT_LEVEL: disagree
+leapAirPinch_FATIGUE_LEVEL: agree
+leapAirPinch_DIFFICULTY_LEVEL: agree
+leapAirDynamic_DISCOMFORT_LEVEL: agree
+leapAirDynamic_FATIGUE_LEVEL: strongly agree
+leapAirDynamic_DIFFICULTY_LEVEL: agree
+leapAirBimodal_DISCOMFORT_LEVEL: strongly disagree
+leapAirBimodal_FATIGUE_LEVEL: strongly disagree
+leapAirBimodal_DIFFICULTY_LEVEL: disagree
+controller_PREFERENCE_RANKING: 1
+tablet_PREFERENCE_RANKING: 2
+leapSurface_PREFERENCE_RANKING: 3
+leapAirStatic_PREFERENCE_RANKING: 6
+leapAirPinch_PREFERENCE_RANKING: 4
+leapAirDynamic_PREFERENCE_RANKING: 5
+leapAirBimodal_PREFERENCE_RANKING: 7

@@ -1,0 +1,43 @@
+SUBJECT_ID: 1m65atig
+AGE: 23
+GENDER: Female
+MAJOR: env. studies
+HAS_PERSONAL_COMPUTER: Yes
+HOURS_PER_WEEK_ON_COMPUTER: More than 50 hours
+HAS_PREVIOUS_GESTURE_DEVICE_EXPERIENCE: Yes
+PREVIOUS_GESTURE_DEVICE_DESCRIPTION: xbox kinect 
+HAS_PREVIOUS_TOUCH_DEVICE_EXPERIENCE: Yes
+PREVIOUS_TOUCH_DEVICE_DESCRIPTION: ipad, smartphone, laptop, tablet
+HAS_PREVIOUS_SWIPE_DEVICE_EXPERIENCE: Yes
+PREVIOUS_SWIPE_DEVICE_DESCRIPTION: android
+HAS_PHYSICAL_IMPAIRMENT: No
+HANDEDNESS: Right hand
+PREFERED_HANDEDNESS_FOR_EXPERIMENT: Right hand
+controller_DISCOMFORT_LEVEL: strongly disagree
+controller_FATIGUE_LEVEL: strongly disagree
+controller_DIFFICULTY_LEVEL: strongly disagree
+tablet_DISCOMFORT_LEVEL: strongly disagree
+tablet_FATIGUE_LEVEL: strongly disagree
+tablet_DIFFICULTY_LEVEL: strongly disagree
+leapSurface_DISCOMFORT_LEVEL: strongly disagree
+leapSurface_FATIGUE_LEVEL: strongly disagree
+leapSurface_DIFFICULTY_LEVEL: disagree
+leapAirStatic_DISCOMFORT_LEVEL: disagree
+leapAirStatic_FATIGUE_LEVEL: strongly disagree
+leapAirStatic_DIFFICULTY_LEVEL: agree
+leapAirPinch_DISCOMFORT_LEVEL: disagree
+leapAirPinch_FATIGUE_LEVEL: strongly disagree
+leapAirPinch_DIFFICULTY_LEVEL: agree
+leapAirDynamic_DISCOMFORT_LEVEL: strongly disagree
+leapAirDynamic_FATIGUE_LEVEL: strongly disagree
+leapAirDynamic_DIFFICULTY_LEVEL: strongly disagree
+leapAirBimodal_DISCOMFORT_LEVEL: strongly disagree
+leapAirBimodal_FATIGUE_LEVEL: strongly disagree
+leapAirBimodal_DIFFICULTY_LEVEL: strongly disagree
+controller_PREFERENCE_RANKING: 1
+tablet_PREFERENCE_RANKING: 4
+leapSurface_PREFERENCE_RANKING: 5
+leapAirStatic_PREFERENCE_RANKING: 7
+leapAirPinch_PREFERENCE_RANKING: 6
+leapAirDynamic_PREFERENCE_RANKING: 3
+leapAirBimodal_PREFERENCE_RANKING: 2
