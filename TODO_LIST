@@ -15,3 +15,37 @@ TODO:
 8) Add another UI/button to the control center. We want a data viewer that
    will allow me to select anything that has been previously recorded and
    view the playback.
+
+Stats:
+tukey's HSD post hoc for multcompare
+
+one way independent sample anovas:
+total distance traveled
+total distance expected
+distance from key centers
+time
+errors - MSD/MWD error rate
+words per minute
+
+wilcoxin signed rank test:
+rankings
+
+anova / ?
+likert scale
+
+Parse and calculate Raw data first -- put into participant files.
+Then format data like this for Matlab computations with aggregate data:
+
+Example:
+DistV1 = [0, 1, 2......]
+DistV2 = ..
+
+DistS1 = ...
+DistS2 = ...
+
+Then put into columns
+
+Dist Table
+V column		S column
+append V1		append S1
+append V2		append S2
