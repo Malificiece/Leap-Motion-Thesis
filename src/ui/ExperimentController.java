@@ -16,7 +16,7 @@ import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.concurrent.locks.ReentrantLock;
 
-import javax.media.opengl.GLAutoDrawable;
+import javax.media.opengl.GL2;
 import javax.media.opengl.awt.GLCanvas;
 import javax.swing.JButton;
 import javax.swing.JEditorPane;
@@ -60,7 +60,6 @@ public class ExperimentController extends GraphicsController {
     private long previousFadeTime;
     private long fadeTimeElapsed = 0;
     private boolean isFading = false;
-    private JFrame frame;
     private JSplitPane splitPane;
     private Component rightComponent;
     private JPanel canvasPanel;
@@ -90,7 +89,7 @@ public class ExperimentController extends GraphicsController {
     public ExperimentController() {
         keyboard = Keyboard.STANDARD.getKeyboard();
         canvasPanel = new JPanel();
-        canvas = new GLCanvas(capabilities);
+        canvas = new GLCanvas(CAPABILITIES);
         canvas.setPreferredSize(new Dimension(keyboard.getImageWidth(), keyboard.getImageHeight()));
         canvas.setSize(keyboard.getImageWidth(), keyboard.getImageHeight());
         canvasPanel.add(canvas);
@@ -389,10 +388,11 @@ public class ExperimentController extends GraphicsController {
         frame.pack();
     }
     
-    public void disable() {
+    @Override
+    protected void disable() {
         removeKeyboardFromUI();
         frame.setVisible(false);
-        canvas.disposeGLEventListener(this, true);
+        canvas.removeGLEventListener(this);
         for(Keyboard tmpKeyboard: Keyboard.values()) {
             tmpKeyboard.getKeyboard().removeObserver(this);
         }
@@ -400,8 +400,10 @@ public class ExperimentController extends GraphicsController {
         isEnabled = false;
         disableUI();
         practiceWordCount = 0;
+        frame.dispose();
     }
     
+    @Override
     public void enable() {
         addKeyboardToUI();
         frame.setVisible(true);
@@ -477,6 +479,7 @@ public class ExperimentController extends GraphicsController {
                           (int)(screenSize.getHeight()/2 - windowSize.getHeight()/2));
     }
     
+    @Override
     public void update() {        
         EXPERIMENT_LOCK.lock();
         keyboard.update();
@@ -529,7 +532,8 @@ public class ExperimentController extends GraphicsController {
         }
     }
     
-    public void render(GLAutoDrawable drawable) {
+    @Override
+    protected void render(GL2 gl) {
         gl.glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         keyboard.render(gl);
     }

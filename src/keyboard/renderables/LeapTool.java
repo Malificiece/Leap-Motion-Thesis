@@ -50,18 +50,16 @@ public class LeapTool extends KeyboardRenderable {
     }
     
     private void createQuadric() {
-        GraphicsController.gl.getContext().makeCurrent();
         if(quadric != null) {
-            GraphicsController.glu.gluDeleteQuadric(quadric);
+            GraphicsController.GLU.gluDeleteQuadric(quadric);
         }
-        quadric = GraphicsController.glu.gluNewQuadric();
-        GraphicsController.glu.gluQuadricNormals(quadric, GL_TRUE);
+        quadric = GraphicsController.GLU.gluNewQuadric();
+        GraphicsController.GLU.gluQuadricNormals(quadric, GL_TRUE);
     }
     
     public void deleteQuadric() {
         if(quadric != null) {
-            //GraphicsController.gl.getContext().makeCurrent();
-            GraphicsController.glu.gluDeleteQuadric(quadric);
+            GraphicsController.GLU.gluDeleteQuadric(quadric);
         }
     }
     
@@ -144,7 +142,7 @@ public class LeapTool extends KeyboardRenderable {
         if(quadric == null) {
             createQuadric();
         }
-        GraphicsController.glu.gluCylinder(quadric, scaledRadius, scaledRadius, scaledLength, NUM_VERTICIES, NUM_STACKS);
+        GraphicsController.GLU.gluCylinder(quadric, scaledRadius, scaledRadius, scaledLength, NUM_VERTICIES, NUM_STACKS);
         gl.glTranslatef(0, 0, scaledLength);
         gl.glNormal3f(-tipDirection.getX(), -tipDirection.getY(), -tipDirection.getZ());
         drawCircle(gl);

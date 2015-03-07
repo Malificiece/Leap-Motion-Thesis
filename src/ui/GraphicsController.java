@@ -18,32 +18,22 @@ import com.jogamp.opengl.util.gl2.GLUT;
 
 import enums.Color;
 
-public abstract class GraphicsController implements GLEventListener, KeyboardObserver {
-	private static GLProfile profile;
-	protected static GLCapabilities capabilities;
+public abstract class GraphicsController extends WindowController implements GLEventListener, KeyboardObserver {
+    public static GLU GLU;
+    public static GLUT GLUT;
+	protected static GLCapabilities CAPABILITIES;
 	protected GLCanvas canvas;
-	public static GL2 gl;
 	protected IKeyboard keyboard;
-	public static GLU glu;
-	public static GLUT glut;
-	protected boolean isEnabled = false;
 	
 	public static void init() {
 	    GLProfile.initSingleton();
-		profile = GLProfile.getDefault();
-		capabilities = new GLCapabilities(profile);
+	    CAPABILITIES = new GLCapabilities(GLProfile.getDefault());
 	}
 	
-	public abstract void enable();
-	public abstract void disable();
+	protected abstract void render(GL2 gl);
 	public abstract void update();
-	public abstract void render(GLAutoDrawable drawable);
 	
-	public boolean isEnabled() {
-	    return isEnabled;
-	}
-	
-	public void display() {
+	public void render() {
 	    if(canvas != null) {
 	        canvas.display();
 	    }
@@ -51,19 +41,26 @@ public abstract class GraphicsController implements GLEventListener, KeyboardObs
 
     @Override
     public void display(GLAutoDrawable drawable) {
-        render(drawable);
+        render(drawable.getGL().getGL2());
     }
 
     @Override
     public void dispose(GLAutoDrawable drawable) {
-        // TODO Actually dispose the canvas here.
+        // This might not be the right approach. This has the possibility of being an infinite call.
+        if(canvas == drawable) {
+            canvas.destroy();
+            canvas = null;
+        } else {
+            drawable.destroy();
+        }
     }
 
     @Override
     public void init(GLAutoDrawable drawable) {
-        GraphicsController.gl = drawable.getGL().getGL2();  // get the OpenGL graphics context
-        glu = new GLU();  // get GL Utilities
-        glut = new GLUT();
+        drawable.setAutoSwapBufferMode(true);
+        GL2 gl = drawable.getGL().getGL2();  // get the OpenGL graphics context
+        GLU = new GLU();  // get GL Utilities
+        GLUT = new GLUT();
         gl.setSwapInterval(1);
 
         gl.glClearColor(1f, 1f, 1f, 0.0f); // set background (clear) color
@@ -75,7 +72,7 @@ public abstract class GraphicsController implements GLEventListener, KeyboardObs
         gl.glEnable(GL_LIGHTING);
         gl.glPolygonMode(GL_FRONT_AND_BACK, GL_SMOOTH);
    
-        // ----- Your OpenGL initialization code here -----
+        // ----- Init lighting -----
         float globalAmbient[] = {0.2f, 0.2f, 0.2f, 1f};
         float lightPos[] = {0f, 0f, 1f, 0f};
 
@@ -95,7 +92,7 @@ public abstract class GraphicsController implements GLEventListener, KeyboardObs
     }
 
     @Override
-    public void reshape(GLAutoDrawable drawable, int x, int y, int width, int height) { 
-        MyUtilities.OPEN_GL_UTILITIES.reshape(gl, keyboard);
+    public void reshape(GLAutoDrawable drawable, int x, int y, int width, int height) {
+        MyUtilities.OPEN_GL_UTILITIES.reshape(drawable.getGL().getGL2(), keyboard);
     }
 }

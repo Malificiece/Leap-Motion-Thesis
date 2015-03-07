@@ -13,7 +13,6 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Enumeration;
 
-import javax.media.opengl.GLAutoDrawable;
 import javax.swing.AbstractButton;
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
@@ -37,12 +36,11 @@ import enums.FilePath;
 import enums.Key;
 import enums.Keyboard;
 
-public class ExitSurveyController extends GraphicsController {
+public class ExitSurveyController extends WindowController {
     // Static text fields and button groups
     private final int MIN_RANKING = 1;
     private int maxRanking = 0;
     private int questionIndex = 0;
-    private JFrame frame;
     private JTextField subjectIDTextField;
     private JTextField majorTextField;
     private JTextField ageTextField;
@@ -430,9 +428,10 @@ public class ExitSurveyController extends GraphicsController {
     }
 
     @Override
-    public void disable() {
+    protected void disable() {
         frame.setVisible(false);
         isEnabled = false;
+        frame.dispose();
     }
     
     @Override
@@ -470,26 +469,6 @@ public class ExitSurveyController extends GraphicsController {
             }
         }
         return null;
-    }
-
-    @Override
-    public void update() {
-        // Do nothing.
-    }
-
-    @Override
-    public void render(GLAutoDrawable drawable) {
-        // Do nothing.
-    }
-    
-    @Override
-    public void keyboardKeyEventObserved(char key) {
-        // Do nothing.
-    }
-
-    @Override
-    public void keyboardCalibrationFinishedEventObserved() {
-        // Do nothing.
     }
     
     @SuppressWarnings("serial")

@@ -43,9 +43,10 @@ import enums.KeyboardType;
 public class ControlCenter {
     // Constants
     private final int SUBJECT_ID_SIZE = 8;
+    private final ReentrantLock CONTROL_LOCK = new ReentrantLock();
+    private final ReentrantLock RUNNING_LOCK = new ReentrantLock();
     private final ExperimentController EXPERIMENT_CONTROLLER = new ExperimentController();
-    private final CalibrationController CALIBRATION_CONTROLLER = new CalibrationController();
-    private final  ReentrantLock CONTROL_LOCK = new ReentrantLock();
+    private CalibrationController calibrationController;// = new CalibrationController();
     private ExitSurveyController exitSurveyController;
     private DictionaryBuilder dictionaryBuilder;
     
@@ -59,7 +60,8 @@ public class ControlCenter {
     private JButton experimentButton;
     private JButton exitSurveyButton;
     private JButton createDictionariesButton;
-    private boolean isLocked = false;
+    private boolean isDisabled = false;
+    private boolean isRunning = true;
     
     @SuppressWarnings("unchecked")
     public ControlCenter() {
@@ -91,7 +93,7 @@ public class ControlCenter {
             public void windowClosing(WindowEvent e) {
                 if(!experimentInProgress() && !exitSurveyInProgress() && !dictionaryBuildInProgress()) {
                     frame.dispose();
-                    System.exit(0);
+                    exit();
                 } else if(experimentInProgress()){
                     Object[] options = {"Yes", "Cancel"};
                     int selection =
@@ -105,7 +107,7 @@ public class ControlCenter {
                             options[0]);
                     if(selection == JOptionPane.YES_OPTION) {
                         frame.dispose();
-                        System.exit(0);
+                        exit();
                     }
                 } else if(exitSurveyInProgress()) {
                     Object[] options = {"Yes", "Cancel"};
@@ -120,7 +122,7 @@ public class ControlCenter {
                             options[0]);
                     if(selection == JOptionPane.YES_OPTION) {
                         frame.dispose();
-                        System.exit(0);
+                        exit();
                     }
                 } else if(dictionaryBuildInProgress()) {
                     JOptionPane.showMessageDialog(frame,
@@ -213,8 +215,7 @@ public class ControlCenter {
                 try {
                     if(!isInProgress()) {
                         dictionaryBuilder = new DictionaryBuilder();
-                        System.out.println("Building dicitonaries...");
-                        lockUI();
+                        disableUI();
                     }
                 } finally {
                     CONTROL_LOCK.unlock();
@@ -231,7 +232,7 @@ public class ControlCenter {
                     if(!isInProgress()) {
                     	exitSurveyController = new ExitSurveyController();
                     	exitSurveyController.enable(subjectID);
-                        lockUI();
+                    	disableUI();
                     }
                 } finally {
                     CONTROL_LOCK.unlock();
@@ -248,7 +249,7 @@ public class ControlCenter {
                 try {
                     if(!isInProgress()) {
                         EXPERIMENT_CONTROLLER.enable(subjectID, KeyboardType.getByName((String) testTypeComboBox.getSelectedItem()));
-                        lockUI();
+                        disableUI();
                     }
                 } finally {
                     CONTROL_LOCK.unlock();
@@ -265,8 +266,9 @@ public class ControlCenter {
                 CONTROL_LOCK.lock();
                 try {
                     if(!isInProgress()) {
-                        CALIBRATION_CONTROLLER.enable();
-                        lockUI();
+                        calibrationController = new CalibrationController();
+                        calibrationController.enable();
+                        disableUI();
                     }
                 } finally {
                     CONTROL_LOCK.unlock();
@@ -282,13 +284,13 @@ public class ControlCenter {
             if(experimentInProgress()) {
                 EXPERIMENT_CONTROLLER.update();
             } else if(calibrationInProgress()) {
-                CALIBRATION_CONTROLLER.update();
+                calibrationController.update();
             } else if(exitSurveyInProgress()) {
                 // Do nothing
             } else if(dictionaryBuildInProgress()) {
                 dictionaryBuilder.update();
-            } else if(isLocked) {
-                unlockUI();
+            } else if(isDisabled) {
+                enableUI();
             }
         } finally {
             CONTROL_LOCK.unlock();
@@ -299,9 +301,9 @@ public class ControlCenter {
         CONTROL_LOCK.lock();
         try {
             if(experimentInProgress()) {
-                EXPERIMENT_CONTROLLER.display();
+                EXPERIMENT_CONTROLLER.render();
             } else if(calibrationInProgress()) {
-                CALIBRATION_CONTROLLER.display();
+                calibrationController.render();
             } else if(exitSurveyInProgress()) {
                 // Do nothing
             } else if(dictionaryBuildInProgress()) {
@@ -312,22 +314,47 @@ public class ControlCenter {
         }
     }
     
-    public boolean isInProgress() {
+    public boolean isRunning() {
+        RUNNING_LOCK.lock();
+        try {
+            return isRunning;
+        } finally {
+            RUNNING_LOCK.unlock();
+        }
+    }
+    
+    private void exit() {
+        RUNNING_LOCK.lock();
+        try {
+            isRunning = false;
+        } finally {
+            RUNNING_LOCK.unlock();
+        }
+    }
+    
+    private boolean isInProgress() {
         if(calibrationInProgress() || experimentInProgress() || exitSurveyInProgress() || dictionaryBuildInProgress()) {
             return true;
         }
         return false;
     }
     
-    public boolean calibrationInProgress() {
-        return CALIBRATION_CONTROLLER.isEnabled();
+    private boolean calibrationInProgress() {
+        if(calibrationController != null) {
+            if(calibrationController.isEnabled()) {
+                return true;
+            } else {
+                calibrationController = null;
+            }
+        }
+        return false;
     }
     
-    public boolean experimentInProgress() {
+    private boolean experimentInProgress() {
         return EXPERIMENT_CONTROLLER.isEnabled();
     }
     
-    public boolean exitSurveyInProgress() {
+    private boolean exitSurveyInProgress() {
     	if(exitSurveyController != null) {
     		if(exitSurveyController.isEnabled()) {
     			return true;
@@ -338,39 +365,36 @@ public class ControlCenter {
         return false;
     }
     
-    public boolean dictionaryBuildInProgress() {
+    private boolean dictionaryBuildInProgress() {
         if(dictionaryBuilder != null) {
             if(dictionaryBuilder.isEnabled()) {
                 return true;
             } else {
-                System.out.println("Dictionaries built.");
                 dictionaryBuilder = null;
             }
         }
         return false;
     }
     
-    private void lockUI() {
-        isLocked = true;
+    private void disableUI() {
+        isDisabled = true;
         calibrateButton.setEnabled(false);
         experimentButton.setEnabled(false);
         exitSurveyButton.setEnabled(false);
         editSubjectIDButton.setEnabled(false);
         createDictionariesButton.setEnabled(false);
         testTypeComboBox.setEnabled(false);
-        //frame.setVisible(false);
     }
     
-    private void unlockUI() {
+    private void enableUI() {
         ((ComboBoxRenderer) testTypeComboBox.getRenderer()).updateSubjectID(testTypeComboBox, subjectID);
-        isLocked = false;
+        isDisabled = false;
         calibrateButton.setEnabled(true);
         experimentButton.setEnabled(true);
         exitSurveyButton.setEnabled(true);
         editSubjectIDButton.setEnabled(true);
         createDictionariesButton.setEnabled(true);
         testTypeComboBox.setEnabled(true);
-        //frame.setVisible(true);
     }
     
     private String generateSubjectID() {

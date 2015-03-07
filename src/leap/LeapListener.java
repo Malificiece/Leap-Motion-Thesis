@@ -17,9 +17,8 @@ public class LeapListener extends Listener /*implements SaveSettingsObserver*/ {
     private static ArrayList<LeapObserver> OBSERVERS = new ArrayList<LeapObserver>();
     private LeapData leapData = new LeapData();
     
-    public LeapListener(/*Controller controller*/) {
-        super();
-        LISTENER = this;
+    public static void init() {
+        LISTENER = new LeapListener();
     }
     
     public void onInit(Controller controller) {

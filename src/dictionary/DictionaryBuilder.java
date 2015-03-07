@@ -6,6 +6,11 @@ import java.util.LinkedList;
 import java.util.Queue;
 import java.util.Random;
 
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JProgressBar;
+import javax.swing.WindowConstants;
+
 import com.leapmotion.leap.Vector;
 
 import keyboard.renderables.VirtualKeyboard;
@@ -18,9 +23,11 @@ import enums.Keyboard;
 import enums.KeyboardType;
 import enums.Renderable;
 import ui.ExperimentController;
+import ui.WindowBuilder;
+import ui.WindowController;
 import utilities.MyUtilities;
 
-public class DictionaryBuilder {
+public class DictionaryBuilder extends WindowController {
 	// Scan through the library and find like gestures
 	//		- Look for distance between keys
 	//		- Number of like keys / number of keys
@@ -50,28 +57,40 @@ public class DictionaryBuilder {
     private final float MAX_DIFFERENCE_BETWEEN_LETTERS;
     private final float MIN_DISTANCE_BETWEEN_LETTERS;
     private Queue<String> dictionary = new LinkedList<String>();
-	private boolean isEnabled = false;
 	private VirtualKeyboard virtualKeyboard;
+	private JProgressBar totalProgressBar;
+	private JProgressBar stepProgressBar;
+	private JLabel stepName;
 
     public DictionaryBuilder() {
         try {
             dictionary.addAll(MyUtilities.FILE_IO_UTILITIES.readListFromFile(FilePath.DICTIONARY.getPath(), FileName.DICTIONARY.getName() + FileExt.DICTIONARY.getExt()));
             dictionary.removeAll(MyUtilities.FILE_IO_UTILITIES.readListFromFile(FilePath.DICTIONARY.getPath(), FileName.DICTIONARY_FILTER.getName() + FileExt.DICTIONARY.getExt()));
-    		isEnabled = true;
+            frame = new JFrame("Dictionary Builder Running");
+            frame.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
+            // Determine things I need to add a progress bar.
+            // # tasks = dictionary.size + 1 - and it updates after one word calculates its dissimilarity against all other words of it's size.
+            totalProgressBar = new JProgressBar(0, dictionary.size());
+            stepProgressBar = new JProgressBar();
+            stepProgressBar.setMinimum(0);
+            stepName = new JLabel("...");
+            WindowBuilder.buildDictionaryWindow(frame, totalProgressBar, stepName, stepProgressBar);
+            enable();
+            virtualKeyboard = (VirtualKeyboard) Keyboard.TABLET.getKeyboard().getRenderables().getRenderable(Renderable.VIRTUAL_KEYBOARD);
         } catch (IOException e) {
-            System.out.println("Unable to read the default dictionary.");
+            System.out.println("An Error occured when trying to open the default dictionary.");
             e.printStackTrace();
         }
-        virtualKeyboard = (VirtualKeyboard) Keyboard.TABLET.getKeyboard().getRenderables().getRenderable(Renderable.VIRTUAL_KEYBOARD);
-        MIN_DISTANCE_BETWEEN_LETTERS = MyUtilities.MATH_UTILITILES.findDistanceToPoint(virtualKeyboard.getVirtualKey(Key.VK_Q).getCenter(),
-                virtualKeyboard.getVirtualKey(Key.VK_W).getCenter());
-        MAX_DIFFERENCE_BETWEEN_LETTERS = (MyUtilities.MATH_UTILITILES.findDistanceToPoint(virtualKeyboard.getVirtualKey(Key.VK_Q).getCenter(), 
-                virtualKeyboard.getVirtualKey(Key.VK_P).getCenter()) - MIN_DISTANCE_BETWEEN_LETTERS) / MIN_DISTANCE_BETWEEN_LETTERS;
+        if(virtualKeyboard != null) {
+            MIN_DISTANCE_BETWEEN_LETTERS = MyUtilities.MATH_UTILITILES.findDistanceToPoint(virtualKeyboard.getVirtualKey(Key.VK_Q).getCenter(),
+                    virtualKeyboard.getVirtualKey(Key.VK_W).getCenter());
+            MAX_DIFFERENCE_BETWEEN_LETTERS = (MyUtilities.MATH_UTILITILES.findDistanceToPoint(virtualKeyboard.getVirtualKey(Key.VK_Q).getCenter(), 
+                    virtualKeyboard.getVirtualKey(Key.VK_P).getCenter()) - MIN_DISTANCE_BETWEEN_LETTERS) / MIN_DISTANCE_BETWEEN_LETTERS;
+        } else {
+            MIN_DISTANCE_BETWEEN_LETTERS = 0;
+            MAX_DIFFERENCE_BETWEEN_LETTERS = 0;
+        }
 	}
-    
-    public boolean isEnabled() {
-        return isEnabled ;
-    }
     
     public void update() {
         if(isEnabled) {
@@ -91,6 +110,9 @@ public class DictionaryBuilder {
                 // Now we must calculate all of the dissimilarity values. We can do this with n log(n) time and
                 // never make any double comparisons. For n log(n) we need to keep a 2D matrix with the words of
                 // the dictionary part lining each side.
+                stepProgressBar.setMaximum(dictionaryPart.size());
+                stepProgressBar.setValue(0);
+                stepName.setText("Calculating dissimilarity for length " + wordLength + "...");
                 float[][] dissimilarityMatrix = new float[dictionaryPart.size()][dictionaryPart.size()];
                 for(int wordIndex = 0; wordIndex < dictionaryPart.size(); wordIndex++) {
                     for(int compareIndex = wordIndex; compareIndex < dictionaryPart.size(); compareIndex++) {
@@ -104,6 +126,8 @@ public class DictionaryBuilder {
                             dissimilarityMatrix[compareIndex][wordIndex] = dissimilarity;
                         }
                     }
+                    stepProgressBar.setValue(stepProgressBar.getValue() + 1);
+                    totalProgressBar.setValue(totalProgressBar.getValue() + 1);
                 }
                 
                 // Here we go through the matrix and find the best matches for each word equal to the number of
@@ -247,7 +271,7 @@ public class DictionaryBuilder {
             }
             wordsToSave = null;
             dictionary = null;
-            isEnabled = false;
+            disable();
         }
     }
     
@@ -363,5 +387,19 @@ public class DictionaryBuilder {
         public float getDissimilarity() {
             return DISSIMILARITY;
         }
+    }
+
+    @Override
+    public void enable() {
+        frame.setVisible(true);
+        frame.requestFocusInWindow();
+        isEnabled = true;
+    }
+
+    @Override
+    protected void disable() {
+        frame.setVisible(false);
+        isEnabled = false;
+        frame.dispose();
     }
 }

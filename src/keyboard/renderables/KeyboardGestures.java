@@ -38,18 +38,16 @@ public class KeyboardGestures extends KeyboardRenderable {
     }
     
     private void createQuadric() {
-        GraphicsController.gl.getContext().makeCurrent();
         if(quadric != null) {
-            GraphicsController.glu.gluDeleteQuadric(quadric);
+            GraphicsController.GLU.gluDeleteQuadric(quadric);
         }
-        quadric = GraphicsController.glu.gluNewQuadric();
-        GraphicsController.glu.gluQuadricNormals(quadric, GL_TRUE);
+        quadric = GraphicsController.GLU.gluNewQuadric();
+        GraphicsController.GLU.gluQuadricNormals(quadric, GL_TRUE);
     }
     
     public void deleteQuadric() {
         if(quadric != null) {
-            GraphicsController.gl.getContext().makeCurrent();
-            GraphicsController.glu.gluDeleteQuadric(quadric);
+            GraphicsController.GLU.gluDeleteQuadric(quadric);
         }
     }
     
@@ -121,14 +119,14 @@ public class KeyboardGestures extends KeyboardRenderable {
         if(quadric == null) {
             createQuadric();
         }
-        GraphicsController.glu.gluCylinder(quadric, ARROW_LINE_THICKNESS, ARROW_LINE_THICKNESS, gesture.getLength(), NUM_VERTICIES, NUM_STACKS);
+        GraphicsController.GLU.gluCylinder(quadric, ARROW_LINE_THICKNESS, ARROW_LINE_THICKNESS, gesture.getLength(), NUM_VERTICIES, NUM_STACKS);
         gl.glCullFace(GL_FRONT);
         gl.glNormal3f(direction.getX(), direction.getY(), direction.getZ());
         drawCircle(gl, ARROW_LINE_THICKNESS);
         // draw arrow head
         gl.glCullFace(GL_BACK);
         gl.glTranslatef(0, 0, gesture.getLength());
-        GraphicsController.glu.gluCylinder(quadric, ARROW_HEAD_THICKNESS, 0, ARROW_HEAD_LENGTH, NUM_VERTICIES, NUM_STACKS);
+        GraphicsController.GLU.gluCylinder(quadric, ARROW_HEAD_THICKNESS, 0, ARROW_HEAD_LENGTH, NUM_VERTICIES, NUM_STACKS);
         gl.glCullFace(GL_FRONT);
         gl.glNormal3f(direction.getX(), direction.getY(), direction.getZ());
         drawCircle(gl, ARROW_HEAD_THICKNESS);

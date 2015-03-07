@@ -584,7 +584,7 @@ public class LeapPlane extends KeyboardRenderable {
         gl.glTranslatef(-7f, -7f, 0f);
         gl.glScalef(0.15f, 0.15f, 0.15f);
         gl.glLineWidth(2);
-        GraphicsController.glut.glutStrokeCharacter(STROKE_ROMAN, letter);
+        GraphicsController.GLUT.glutStrokeCharacter(STROKE_ROMAN, letter);
         gl.glPopMatrix();
     }
     

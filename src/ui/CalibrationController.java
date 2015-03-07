@@ -9,7 +9,7 @@ import java.awt.event.WindowEvent;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import javax.media.opengl.GLAutoDrawable;
+import javax.media.opengl.GL2;
 import javax.media.opengl.awt.GLCanvas;
 
 import static javax.media.opengl.GL.*;  // GL constants
@@ -31,7 +31,6 @@ import enums.Keyboard;
 import enums.KeyboardType;
 
 public class CalibrationController extends GraphicsController {
-    private JFrame frame;
     private JPanel canvasPanel;
     private JLabel wordLabel;
     private JPanel wordPanel;
@@ -47,7 +46,7 @@ public class CalibrationController extends GraphicsController {
     public CalibrationController() {
         keyboard = Keyboard.STANDARD.getKeyboard();
         canvasPanel = new JPanel();
-        canvas = new GLCanvas(capabilities);
+        canvas = new GLCanvas(CAPABILITIES);
         canvas.setPreferredSize(new Dimension(keyboard.getImageWidth(), keyboard.getImageHeight()));
         canvas.setSize(keyboard.getImageWidth(), keyboard.getImageHeight());
         canvasPanel.add(canvas);
@@ -207,7 +206,8 @@ public class CalibrationController extends GraphicsController {
         frame.pack();
     }
     
-    public void disable() {
+    @Override
+    protected void disable() {
         removeKeyboardFromUI();
         frame.setVisible(false);
         canvas.disposeGLEventListener(this, true);
@@ -216,8 +216,10 @@ public class CalibrationController extends GraphicsController {
         }
         fpsTimer.cancel();
         isEnabled = false;
+        frame.dispose();
     }
     
+    @Override
     public void enable() {
         addKeyboardToUI();
         frame.setVisible(true);
@@ -240,11 +242,13 @@ public class CalibrationController extends GraphicsController {
         isEnabled = true;
     }
     
+    @Override
     public void update() {
         keyboard.update();
     }
     
-    public void render(GLAutoDrawable drawable) {
+    @Override
+    protected void render(GL2 gl) {
        gl.glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
        keyboard.render(gl);
        frameCount++;

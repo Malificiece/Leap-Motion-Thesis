@@ -20,6 +20,7 @@ import javax.swing.JEditorPane;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JProgressBar;
 import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
@@ -125,9 +126,9 @@ public class WindowBuilder {
     	frame.add(background);
         
         // Add subject information section.
-        JPanel subjectInfoPanel = new JPanel(new GridLayout(1,3));
+        JPanel subjectInfoPanel = new JPanel();
         subjectInfoPanel.setLayout(new BoxLayout(subjectInfoPanel, BoxLayout.X_AXIS));
-        subjectInfoPanel.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createTitledBorder("Subject Information"), BorderFactory.createEmptyBorder(5, 10, 10, 10)));
+        subjectInfoPanel.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createEmptyBorder(5, 10, 10, 10), BorderFactory.createTitledBorder("Subject Information")));
         background.add(subjectInfoPanel);
         
         // Subject info left side
@@ -843,6 +844,50 @@ public class WindowBuilder {
         JScrollPane renderOptionsScrollBar = new JScrollPane(panels[2], JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         renderOptionsScrollBar.getVerticalScrollBar().setUnitIncrement(16);
         renderOptionsPanelMain.add(renderOptionsScrollBar);
+        
+        // Arrange the components inside the window
+        frame.pack();
+        frame.setResizable(false); 
+        
+        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+        Dimension windowSize = frame.getSize();
+        frame.setLocation((int)(screenSize.getWidth()/2 - windowSize.getWidth()/2),
+                          (int)(screenSize.getHeight()/2 - windowSize.getHeight()/2));
+    }
+
+    public static void buildDictionaryWindow(JFrame frame,
+            JProgressBar totalProgressBar, JLabel stepName, JProgressBar stepProgressBar) {
+        
+        JPanel background = new JPanel();
+        background.setLayout(new BoxLayout(background, BoxLayout.Y_AXIS));
+        background.setBorder(BorderFactory.createEmptyBorder(5, 10, 10, 10));
+        frame.add(background);
+        
+        // Add build progress section.
+        JPanel buildProgressPanel = new JPanel();
+        buildProgressPanel.setLayout(new BoxLayout(buildProgressPanel, BoxLayout.Y_AXIS));
+        buildProgressPanel.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createTitledBorder("Build Progress"), BorderFactory.createEmptyBorder(5, 10, 10, 10)));
+        background.add(buildProgressPanel);
+        
+        // Add the total progress bar.
+        buildProgressPanel.add(new JLabel("Building dictionaries..."));
+        buildProgressPanel.add(totalProgressBar);
+        totalProgressBar.setValue(0);
+        totalProgressBar.setStringPainted(true);
+        
+        // Add padding between the two progress bars.
+        buildProgressPanel.add(MyUtilities.SWING_UTILITIES.createPadding(5, SwingConstants.VERTICAL));
+        
+        // Add the step progress bar.
+        buildProgressPanel.add(stepName);
+        buildProgressPanel.add(stepProgressBar);
+        stepProgressBar.setValue(0);
+        stepProgressBar.setStringPainted(true);
+        
+        // Resize the Width of the window.
+        Dimension d = buildProgressPanel.getPreferredSize();
+        d.setSize(350, d.getHeight());
+        buildProgressPanel.setPreferredSize(d);
         
         // Arrange the components inside the window
         frame.pack();

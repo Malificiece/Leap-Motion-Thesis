@@ -75,7 +75,7 @@ public class GraphicsUtilities {
         gl.glMatrixMode(GL_PROJECTION);
         gl.glLoadIdentity();
         float aspect = keyboard.getImageWidth()/ (float) keyboard.getImageHeight();
-        GraphicsController.glu.gluPerspective(FOVY, aspect, 0.1, 1000.0);
+        GraphicsController.GLU.gluPerspective(FOVY, aspect, 0.1, 1000.0);
    
         // Enable the model-view transform
         gl.glMatrixMode(GL_MODELVIEW);
