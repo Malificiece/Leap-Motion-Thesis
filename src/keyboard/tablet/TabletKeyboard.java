@@ -265,17 +265,22 @@ public class TabletKeyboard extends IKeyboard implements TabletPlaybackObserver 
             TOUCH_LOCK.lock();
             try {
                 // Add the touch point from the screen.
-                if(isTouching || isLastPoint()) {
+                if(isTouching) {
                     swipePoint.setNormalizedPoint(touchPoint);
                 } else {
-                    swipePoint.setNormalizedPoint(Vector.zero()); // CHANGE TO SOME RIDICULOUS NEGATIVE
+                    swipePoint.setNormalizedPoint(Vector.zero());
                 }
                 
                 // Set add to trail and set location.
-                if(isTouching()) {
+                if(isTouching) {
                     swipeTrail.update(swipePoint.getNormalizedPoint());
                 } else {
                     swipeTrail.update();
+                }
+                
+                // Check to see if this is the last point, to set touch to false.
+                if(isLastPoint()) {
+                    isTouching = false;
                 }
             } finally {
                 TOUCH_LOCK.unlock();
@@ -316,7 +321,6 @@ public class TabletKeyboard extends IKeyboard implements TabletPlaybackObserver 
         public void mouseReleased(MouseEvent e) {
             TOUCH_LOCK.lock();
             try {
-                isTouching = false;
                 isLastPoint = true;
                 touchPoint.setX(e.getX());
                 touchPoint.setY(imageSize.y - e.getY());
