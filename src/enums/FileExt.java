@@ -7,7 +7,8 @@ public enum FileExt {
     FILE(".file"),
     DAT(".dat"),
     DICTIONARY(".dictionary"),
-    DB(".db");
+    DATABASE(".db"),
+    MATLAB(".m");
 
     private final String extension;
     

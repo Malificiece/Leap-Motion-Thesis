@@ -32,10 +32,13 @@ public class FileUtilities {
     public FileUtilities() {
         File file;
         Path path;
-        //Create data folder if it doesn't already exist.
-        createDirectory(FilePath.DATA.getPath());
+        // Create recorded data folder if it doesn't already exist.
+        createDirectory(FilePath.RECORDED_DATA.getPath());
         
-        //Create dictionary folder if it doesn't already exist.
+        // Create formatted data folder if it doesn't already exist.
+        createDirectory(FilePath.STATISTIC_DATA.getPath());
+        
+        // Create dictionary folder if it doesn't already exist.
         createDirectory(FilePath.DICTIONARY.getPath());
         
         // Create config/settings path/files if they don't exist.

@@ -39,6 +39,7 @@ import enums.FileExt;
 import enums.FilePath;
 import enums.Key;
 import enums.KeyboardType;
+import experiment.data.formatter.MatlabDataFormatter;
 
 public class ControlCenter {
     // Constants
@@ -49,6 +50,7 @@ public class ControlCenter {
     private CalibrationController calibrationController;// = new CalibrationController();
     private ExitSurveyController exitSurveyController;
     private DictionaryBuilder dictionaryBuilder;
+    private MatlabDataFormatter experimentDataFormatter;
     
     // Not Constants
     private JFrame frame;
@@ -60,6 +62,7 @@ public class ControlCenter {
     private JButton experimentButton;
     private JButton exitSurveyButton;
     private JButton createDictionariesButton;
+    private JButton formatExperimentDataButton;
     private boolean isDisabled = false;
     private boolean isRunning = true;
     
@@ -76,8 +79,9 @@ public class ControlCenter {
         experimentButton = new JButton("Experiment");
         exitSurveyButton = new JButton("Exit Survey");
         createDictionariesButton = new JButton("Create Dictionaries");
+        formatExperimentDataButton = new JButton("Format Experiment Data");
         
-        JButton[] buttons = {calibrateButton, experimentButton, editSubjectIDButton, exitSurveyButton, createDictionariesButton};
+        JButton[] buttons = {calibrateButton, experimentButton, editSubjectIDButton, exitSurveyButton, createDictionariesButton, formatExperimentDataButton};
         
         // Window builder builds window using important fields here. It adds unimportant fields that we won't use for aesthetics only.
         WindowBuilder.buildControlWindow(frame, testTypeComboBox, subjectField, buttons);
@@ -127,6 +131,12 @@ public class ControlCenter {
                 } else if(dictionaryBuildInProgress()) {
                     JOptionPane.showMessageDialog(frame,
                             "You must wait until the dictionary is built to exit.",
+                            "Error!",
+                            JOptionPane.ERROR_MESSAGE,
+                            null);
+                } else if(dataFormattingInProgress()) {
+                    JOptionPane.showMessageDialog(frame,
+                            "You must wait until the data is finished formatting to exit.",
                             "Error!",
                             JOptionPane.ERROR_MESSAGE,
                             null);
@@ -223,6 +233,22 @@ public class ControlCenter {
             }
         });
         
+        // RUN THE DATA FORMATTER
+        formatExperimentDataButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent arg0) {
+                CONTROL_LOCK.lock();
+                try {
+                    if(!isInProgress()) {
+                        experimentDataFormatter = new MatlabDataFormatter();
+                        disableUI();
+                    }
+                } finally {
+                    CONTROL_LOCK.unlock();
+                }
+            }
+        });
+        
         // RUN EXIT SURVEY CONTROLLER
         exitSurveyButton.addActionListener(new ActionListener() {
             @Override
@@ -289,6 +315,8 @@ public class ControlCenter {
                 // Do nothing
             } else if(dictionaryBuildInProgress()) {
                 dictionaryBuilder.update();
+            } else if(dataFormattingInProgress()) {
+                experimentDataFormatter.update();
             } else if(isDisabled) {
                 enableUI();
             }
@@ -307,6 +335,8 @@ public class ControlCenter {
             } else if(exitSurveyInProgress()) {
                 // Do nothing
             } else if(dictionaryBuildInProgress()) {
+                // Do nothing
+            } else if(dataFormattingInProgress()) {
                 // Do nothing
             }
         } finally {
@@ -333,7 +363,7 @@ public class ControlCenter {
     }
     
     private boolean isInProgress() {
-        if(calibrationInProgress() || experimentInProgress() || exitSurveyInProgress() || dictionaryBuildInProgress()) {
+        if(calibrationInProgress() || experimentInProgress() || exitSurveyInProgress() || dictionaryBuildInProgress() || dataFormattingInProgress()) {
             return true;
         }
         return false;
@@ -376,6 +406,17 @@ public class ControlCenter {
         return false;
     }
     
+    private boolean dataFormattingInProgress() {
+        if(experimentDataFormatter != null) {
+            if(experimentDataFormatter.isEnabled()) {
+                return true;
+            } else {
+                experimentDataFormatter = null;
+            }
+        }
+        return false;
+    }
+    
     private void disableUI() {
         isDisabled = true;
         calibrateButton.setEnabled(false);
@@ -383,6 +424,7 @@ public class ControlCenter {
         exitSurveyButton.setEnabled(false);
         editSubjectIDButton.setEnabled(false);
         createDictionariesButton.setEnabled(false);
+        formatExperimentDataButton.setEnabled(false);
         testTypeComboBox.setEnabled(false);
     }
     
@@ -394,13 +436,14 @@ public class ControlCenter {
         exitSurveyButton.setEnabled(true);
         editSubjectIDButton.setEnabled(true);
         createDictionariesButton.setEnabled(true);
+        formatExperimentDataButton.setEnabled(true);
         testTypeComboBox.setEnabled(true);
     }
     
     private String generateSubjectID() {
         ArrayList<String> subjectIDList = new ArrayList<String>();
         try {
-            subjectIDList = MyUtilities.FILE_IO_UTILITIES.getListOfDirectories(FilePath.DATA.getPath());
+            subjectIDList = MyUtilities.FILE_IO_UTILITIES.getListOfDirectories(FilePath.RECORDED_DATA.getPath());
         } catch (IOException e) {
             System.out.println("Unable to read existing ID's from file.");
             e.printStackTrace();
@@ -418,7 +461,7 @@ public class ControlCenter {
     private boolean checkForUniqueSubjectID(String subjectID) {
         ArrayList<String> subjectIDList = new ArrayList<String>();
         try {
-            subjectIDList = MyUtilities.FILE_IO_UTILITIES.getListOfDirectories(FilePath.DATA.getPath());
+            subjectIDList = MyUtilities.FILE_IO_UTILITIES.getListOfDirectories(FilePath.RECORDED_DATA.getPath());
         } catch (IOException e) {
             System.out.println("Unable to read existing ID's from file.");
             e.printStackTrace();
@@ -466,7 +509,7 @@ public class ControlCenter {
         }
         
         public void updateSubjectID(JComboBox<String> comboBox, String subjectID) {
-            String filePath = FilePath.DATA.getPath() + subjectID + "/";
+            String filePath = FilePath.RECORDED_DATA.getPath() + subjectID + "/";
             for(int i = 0; i < comboBox.getItemCount(); i++) {
                 String wildcardFileName = subjectID + "_" + fileNames.get(i) + FileUtilities.WILDCARD + FileExt.DAT.getExt();
                 boolean fileExists;

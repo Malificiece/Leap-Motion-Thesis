@@ -368,7 +368,7 @@ public class ExitSurveyController extends WindowController {
         String time = "_";
         time += LocalDate.now().format(DateTimeFormatter.BASIC_ISO_DATE);
         time += "_" + LocalTime.now().format(DateTimeFormatter.ofPattern("kkmm"));
-        String filePath = FilePath.DATA.getPath() + subjectIDTextField.getText() + "/";
+        String filePath = FilePath.RECORDED_DATA.getPath() + subjectIDTextField.getText() + "/";
         String fileName = subjectIDTextField.getText() + "_" + "exitSurvey" + time + FileExt.FILE.getExt();
     	try {
 			MyUtilities.FILE_IO_UTILITIES.writeListToFile(exitSurveyData, filePath, fileName, false);

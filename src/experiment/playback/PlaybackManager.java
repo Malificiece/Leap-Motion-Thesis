@@ -11,7 +11,7 @@ import keyboard.IKeyboard;
 
 import com.leapmotion.leap.Vector;
 
-import enums.DataType;
+import enums.RecordedDataType;
 import enums.Direction;
 import enums.FileExt;
 import enums.FileName;
@@ -35,7 +35,7 @@ public class PlaybackManager {
 	public PlaybackManager(boolean repeat, String subjectID, IKeyboard keyboard) {
 	    isTutorial = TUTORIAL.equals(subjectID);
 		isRepeating = repeat;
-		FILE_PATH = FilePath.DATA.getPath() + subjectID + "/";
+		FILE_PATH = FilePath.RECORDED_DATA.getPath() + subjectID + "/";
 		String wildcardFileName = subjectID + "_" + keyboard.getFileName() + FileUtilities.WILDCARD + FileExt.DAT.getExt();
 		try {
             ArrayList<String> fileData = MyUtilities.FILE_IO_UTILITIES.readListFromWildcardFile(FILE_PATH, wildcardFileName);
@@ -63,7 +63,7 @@ public class PlaybackManager {
             PlaybackData currentPlayback = playbackData.get(playbackIndex);
             if(elapsedTime >= currentPlayback.getTime()) {
                 while(currentPlayback.hasNext()) {
-                    Entry<DataType, Object> currentData = currentPlayback.next();
+                    Entry<RecordedDataType, Object> currentData = currentPlayback.next();
                     
                     switch(currentData.getKey()) {
                         case KEY_PRESSED:
@@ -157,7 +157,7 @@ public class PlaybackManager {
             
             // Want to get the event time and a list of data that was recorded at that time.
             long eventTime = 0;
-            LinkedHashMap<DataType, Object> entries = new LinkedHashMap<DataType, Object>();
+            LinkedHashMap<RecordedDataType, Object> entries = new LinkedHashMap<RecordedDataType, Object>();
             
             for(int i = 0; i < events.length; i++) {
                 // Delimit by colon to break into data type, value pair.
@@ -165,7 +165,7 @@ public class PlaybackManager {
                 
                 // Want to get the data type and data value unless it's a time value.
                 Object dataValue = null;
-                DataType dataType = DataType.getByName(eventInfo[0]);
+                RecordedDataType dataType = RecordedDataType.getByName(eventInfo[0]);
                 
                 switch(dataType) {
                     case TIME_EXPERIMENT_START:
@@ -235,17 +235,17 @@ public class PlaybackManager {
                 }
             }
             if(!entries.isEmpty() && eventTime > 0) {
-                playbackData.add(new PlaybackData(eventTime, new ArrayList<Entry<DataType, Object>>(entries.entrySet())));
+                playbackData.add(new PlaybackData(eventTime, new ArrayList<Entry<RecordedDataType, Object>>(entries.entrySet())));
             }
         }
     }
     
     private class PlaybackData {
         private long eventTime;
-        private ArrayList<Entry<DataType, Object>> eventData;
+        private ArrayList<Entry<RecordedDataType, Object>> eventData;
         private int eventIndex = 0;
         
-        PlaybackData(long eventTime, ArrayList<Entry<DataType, Object>> eventData) {
+        PlaybackData(long eventTime, ArrayList<Entry<RecordedDataType, Object>> eventData) {
             this.eventTime = eventTime;
             this.eventData = eventData;
         }
@@ -262,7 +262,7 @@ public class PlaybackManager {
             return false;
         }
         
-        public Entry<DataType, Object> next() {
+        public Entry<RecordedDataType, Object> next() {
             if(hasNext()) {
                 return eventData.get(eventIndex++);
             }

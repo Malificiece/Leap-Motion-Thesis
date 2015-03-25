@@ -3,7 +3,8 @@ package enums;
 public enum FilePath {
     ASSETS("./assets/"),
     CONFIG("./config/"),
-    DATA("./data/"),
+    RECORDED_DATA("./recorded_data/"),
+    STATISTIC_DATA("./statistic_data/"),
     DICTIONARY("./dictionary/");
     //STANDARD("standard/"),
     //LEAP("leap/"),

@@ -1,0 +1,43 @@
+SUBJECT_ID: butqs35u
+AGE: 24
+GENDER: Male
+MAJOR: Computer Science
+HAS_PERSONAL_COMPUTER: Yes
+HOURS_PER_WEEK_ON_COMPUTER: 41 to 50 hours
+HAS_PREVIOUS_GESTURE_DEVICE_EXPERIENCE: Yes
+PREVIOUS_GESTURE_DEVICE_DESCRIPTION: Leap Motion
+HAS_PREVIOUS_TOUCH_DEVICE_EXPERIENCE: Yes
+PREVIOUS_TOUCH_DEVICE_DESCRIPTION: Android phones, tablet
+HAS_PREVIOUS_SWIPE_DEVICE_EXPERIENCE: Yes
+PREVIOUS_SWIPE_DEVICE_DESCRIPTION: phone
+HAS_PHYSICAL_IMPAIRMENT: No
+HANDEDNESS: Right hand
+PREFERED_HANDEDNESS_FOR_EXPERIMENT: Right hand
+controller_DISCOMFORT_LEVEL: agree
+controller_FATIGUE_LEVEL: agree
+controller_DIFFICULTY_LEVEL: disagree
+tablet_DISCOMFORT_LEVEL: disagree
+tablet_FATIGUE_LEVEL: disagree
+tablet_DIFFICULTY_LEVEL: disagree
+leapSurface_DISCOMFORT_LEVEL: disagree
+leapSurface_FATIGUE_LEVEL: strongly disagree
+leapSurface_DIFFICULTY_LEVEL: disagree
+leapAirStatic_DISCOMFORT_LEVEL: neutral
+leapAirStatic_FATIGUE_LEVEL: disagree
+leapAirStatic_DIFFICULTY_LEVEL: disagree
+leapAirPinch_DISCOMFORT_LEVEL: agree
+leapAirPinch_FATIGUE_LEVEL: agree
+leapAirPinch_DIFFICULTY_LEVEL: agree
+leapAirDynamic_DISCOMFORT_LEVEL: neutral
+leapAirDynamic_FATIGUE_LEVEL: disagree
+leapAirDynamic_DIFFICULTY_LEVEL: neutral
+leapAirBimodal_DISCOMFORT_LEVEL: strongly disagree
+leapAirBimodal_FATIGUE_LEVEL: strongly disagree
+leapAirBimodal_DIFFICULTY_LEVEL: strongly disagree
+controller_PREFERENCE_RANKING: 6
+tablet_PREFERENCE_RANKING: 2
+leapSurface_PREFERENCE_RANKING: 3
+leapAirStatic_PREFERENCE_RANKING: 4
+leapAirPinch_PREFERENCE_RANKING: 7
+leapAirDynamic_PREFERENCE_RANKING: 5
+leapAirBimodal_PREFERENCE_RANKING: 1

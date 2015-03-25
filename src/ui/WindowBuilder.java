@@ -39,7 +39,7 @@ public class WindowBuilder {
     public static void buildControlWindow(JFrame frame,
             JComboBox<String> testComboBox,
             JTextField subjectField,
-            JButton[] optionsButtons) { // calibrate, run, edit, exit, dictionary
+            JButton[] optionsButtons) { // calibrate, run, edit, exit, dictionary, formatter
         
         JPanel background = new JPanel();
         background.setLayout(new BoxLayout(background, BoxLayout.Y_AXIS));
@@ -97,6 +97,10 @@ public class WindowBuilder {
         buttonGroup2.add(optionsButtons[0]);
         buttonGroup2.add(MyUtilities.SWING_UTILITIES.createPadding(50, SwingConstants.HORIZONTAL));
         buttonGroup2.add(optionsButtons[3]);
+        
+        JPanel buttonGroup3 = new JPanel();
+        optionsPanel.add(buttonGroup3);
+        buttonGroup2.add(optionsButtons[5]);
         
         // Arrange the components inside the window
         frame.pack();

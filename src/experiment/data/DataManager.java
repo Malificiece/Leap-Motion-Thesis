@@ -7,7 +7,7 @@ import utilities.MyUtilities;
 
 import com.leapmotion.leap.Vector;
 
-import enums.DataType;
+import enums.RecordedDataType;
 import enums.Direction;
 import enums.FileExt;
 import enums.FilePath;
@@ -21,11 +21,11 @@ public class DataManager implements DataObserver {
     private String word;
     
     public DataManager(IKeyboard keyboard, String subjectID, String experimentTime, int practiceWordCount) {
-        FILE_PATH = FilePath.DATA.getPath() + subjectID + "/";
+        FILE_PATH = FilePath.RECORDED_DATA.getPath() + subjectID + "/";
         DATA_FILE_NAME = subjectID + "_" + keyboard.getFileName() + experimentTime + FileExt.DAT.getExt();
         dataList = new ArrayList<String>();
         System.out.println("Starting experiment for " + subjectID + " using " + keyboard.getName());
-        dataList.add(DataType.PRACTICE_WORD_COUNT.name() + ": " + practiceWordCount);
+        dataList.add(RecordedDataType.PRACTICE_WORD_COUNT.name() + ": " + practiceWordCount);
     }
     
     public void save(IKeyboard keyboard) {
@@ -48,57 +48,57 @@ public class DataManager implements DataObserver {
     }
     
     public void startRecording() {
-        dataList.add(DataType.TIME_EXPERIMENT_START.name() + ": " + System.nanoTime());
+        dataList.add(RecordedDataType.TIME_EXPERIMENT_START.name() + ": " + System.nanoTime());
     }
     
     public void stopRecording() {
-        dataList.add(DataType.TIME_EXPERIMENT_END.name() + ": " + System.nanoTime());
+        dataList.add(RecordedDataType.TIME_EXPERIMENT_END.name() + ": " + System.nanoTime());
     }
     
     public void startWord(String currentWord) {
         word = currentWord;
-        dataList.add(DataType.TIME_WORD_START.name() + ": " + System.nanoTime()
-                + "; " + DataType.WORD_VALUE.name() + ": " + word);
+        dataList.add(RecordedDataType.TIME_WORD_START.name() + ": " + System.nanoTime()
+                + "; " + RecordedDataType.WORD_VALUE.name() + ": " + word);
     }
     
     public void stopWord() {
-        dataList.add(DataType.TIME_WORD_END.name() + ": " + System.nanoTime()
-                + "; " + DataType.WORD_VALUE.name() + ": " + word);
+        dataList.add(RecordedDataType.TIME_WORD_END.name() + ": " + System.nanoTime()
+                + "; " + RecordedDataType.WORD_VALUE.name() + ": " + word);
         word = null;
     }
     
     public void keyPressedEvent(char pressedKey, char currentKey) {
         Key pKey = Key.getByValue(pressedKey);
         Key cKey = Key.getByValue(currentKey);
-        dataList.add(DataType.TIME_PRESSED.name() + ": " + System.nanoTime()
-                + "; " + DataType.KEY_PRESSED.name() + ": " + pKey.getName()
-                + "; " + DataType.KEY_EXPECTED.name() + ": " + cKey.getName());
+        dataList.add(RecordedDataType.TIME_PRESSED.name() + ": " + System.nanoTime()
+                + "; " + RecordedDataType.KEY_PRESSED.name() + ": " + pKey.getName()
+                + "; " + RecordedDataType.KEY_EXPECTED.name() + ": " + cKey.getName());
                 //+ "; " + DataType.KEY_PRESSED_UPPER.name() + ": " + pKey.isUpper(pressedKey)
                 //+ "; " + DataType.KEY_EXPECTED_UPPER.name() + ": " + cKey.isUpper(currentKey));
     }
 
     @Override
     public void controllerDataEventObserved(Direction direction) {
-        dataList.add(DataType.TIME_SPECIAL.name() + ": " + System.nanoTime()
-                + "; " + DataType.DIRECTION_PRESSED.name() + ": " + direction.name());
+        dataList.add(RecordedDataType.TIME_SPECIAL.name() + ": " + System.nanoTime()
+                + "; " + RecordedDataType.DIRECTION_PRESSED.name() + ": " + direction.name());
     }
 
     @Override
     public void tabletDataEventObserved(Vector touchPoint) {
-        dataList.add(DataType.TIME_SPECIAL.name() + ": " + System.nanoTime()
-                + "; " + DataType.POINT_POSITION.name() + ": " + touchPoint);
+        dataList.add(RecordedDataType.TIME_SPECIAL.name() + ": " + System.nanoTime()
+                + "; " + RecordedDataType.POINT_POSITION.name() + ": " + touchPoint);
     }
 
     @Override
     public void leapToolDataEventObserved(Vector leapPoint, Vector toolDirection) {
-        dataList.add(DataType.TIME_SPECIAL.name() + ": " + System.nanoTime()
-                + "; " + DataType.POINT_POSITION.name() + ": " + leapPoint
-                + "; " + DataType.TOOL_DIRECTION.name() + ": " + toolDirection);
+        dataList.add(RecordedDataType.TIME_SPECIAL.name() + ": " + System.nanoTime()
+                + "; " + RecordedDataType.POINT_POSITION.name() + ": " + leapPoint
+                + "; " + RecordedDataType.TOOL_DIRECTION.name() + ": " + toolDirection);
     }
 
     @Override
     public void leapHandDataEventObserved(Vector leapPoint) {
-        dataList.add(DataType.TIME_SPECIAL.name() + ": " + System.nanoTime()
-                + "; " + DataType.POINT_POSITION.name() + ": " + leapPoint);
+        dataList.add(RecordedDataType.TIME_SPECIAL.name() + ": " + System.nanoTime()
+                + "; " + RecordedDataType.POINT_POSITION.name() + ": " + leapPoint);
     }
 }

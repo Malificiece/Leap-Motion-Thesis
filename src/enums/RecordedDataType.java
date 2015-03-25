@@ -1,6 +1,6 @@
 package enums;
 
-public enum DataType {
+public enum RecordedDataType {
     TIME_EXPERIMENT_START,
     TIME_EXPERIMENT_END,
     TIME_WORD_START,
@@ -17,8 +17,8 @@ public enum DataType {
     GESTURE_STATE,
     PRACTICE_WORD_COUNT;
     
-    public static DataType getByName(String typeName) {
-        for(DataType dataType: values()) {
+    public static RecordedDataType getByName(String typeName) {
+        for(RecordedDataType dataType: values()) {
             if(dataType.name().equalsIgnoreCase(typeName)) return dataType;
         }
         return null;
