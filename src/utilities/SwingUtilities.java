@@ -2,8 +2,10 @@ package utilities;
 
 import java.awt.Container;
 import java.awt.Font;
+import java.awt.Image;
 
 import javax.swing.BorderFactory;
+import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
@@ -71,6 +73,12 @@ public class SwingUtilities {
         } else if(direction == SwingConstants.VERTICAL) {
             padding.setBorder(BorderFactory.createEmptyBorder(0, 0, size, 0));
         }
+        padding.setOpaque(false);
         return padding;
+    }
+    
+    public ImageIcon resizeImageIcon(ImageIcon icon, int width, int height) {
+        Image resizedImage = icon.getImage().getScaledInstance(width, height, Image.SCALE_SMOOTH);  
+        return new ImageIcon(resizedImage);
     }
 }

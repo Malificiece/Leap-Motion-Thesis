@@ -99,4 +99,71 @@ public class MathUtilities {
     public float findDimensionalAlignment(float height, float borderSize) {
         return (float) (((height + (borderSize * 2f)) / (Math.tan(DEGREES_TO_RADS*GraphicsUtilities.FOVY/2f))/2f)); // Purposefully leaving out negative
     }
+    
+    public float calculateFrechetDistance(Vector[] P, Vector[] Q) {
+        FrechetCalculator fc = new FrechetCalculator(P, Q);
+        try {
+            return fc.calculateFrechetDistanceRecursive(P.length - 1, Q.length - 1);
+        } finally {
+            fc.delete();
+            fc = null;
+        }
+    }
+    
+    private class FrechetCalculator {
+        Vector [] P;
+        Vector [] Q;
+        Float [][] CA;
+        public FrechetCalculator(Vector[] P, Vector[] Q) {
+            this.P = P;
+            this.Q = Q;
+            CA = new Float[P.length][Q.length];
+            for(int i = 0; i < P.length; i++) {
+                for(int j = 0; j < Q.length; j++) {
+                    CA[i][j] = -1.0f;
+                }
+            }
+        }
+        
+        public void delete() {
+            this.P = null;
+            this.Q = null;
+            for(int i = 0; i < P.length; i++) {
+                for(int j = 0; j < Q.length; j++) {
+                    CA[i][j] = null;
+                }
+                CA[i] = null;
+            }
+            CA = null;
+        }
+        
+        private float calculateFrechetDistanceRecursive(int i, int j) {
+            float CAij = 0;
+            // coupling search function
+            if(CA[i][j] > -1) {
+                // don't update CA in this case
+                CAij = CA[i][j];
+            } else if(i == 0 && j == 0) {
+                // update the CA permanent
+                CA[i][j] = findDistanceToPoint(P[0], Q[0]);
+                // set the current relevant value
+                CAij = CA[i][j];
+            } else if(i > 0 && j == 0) {
+                CA[i][j] = Math.max(calculateFrechetDistanceRecursive(i - 1, 0), findDistanceToPoint(P[i], Q[0]));
+                CAij = CA[i][j];
+            } else if(i == 0 && j > 0) {
+                CA[i][j] = Math.max(calculateFrechetDistanceRecursive(0, j - 1), findDistanceToPoint(P[0], Q[j]));
+                CAij = CA[i][j];
+            } else if(i > 0 && j > 0) {
+                float min = Math.min(calculateFrechetDistanceRecursive(i - 1, j), calculateFrechetDistanceRecursive(i - 1, j - 1));
+                min = Math.min(min, calculateFrechetDistanceRecursive(i, j - 1));
+                CA[i][j] = Math.max(min, findDistanceToPoint(P[i], Q[j]));
+                CAij = CA[i][j];
+            } else {
+                CA[i][j] = Float.POSITIVE_INFINITY;
+                System.out.println("This is where we should be assigning infinity"); // This might not be right
+            }
+            return CAij;
+        }
+    }
 }

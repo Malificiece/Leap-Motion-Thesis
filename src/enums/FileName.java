@@ -11,12 +11,19 @@ public enum FileName {
     CONTROLLER("controller"),
     TABLET("tablet"),
     SWIPE("swipe"),
+    EXIT_SURVEY("exitSurvey"),
+    SUBJECT_MERGED_DATA("mergedData"),
     KEYBOARD_IMAGE("_keyboard"),
     KEYBOARD_IMAGE_UPPER("_keyboard_upper"),
     DICTIONARY("English-US"),
     DICTIONARY_FILTER("Terms-to-Block"),
     TEMPORARY("temporary_"),
-    TUTORIAL("tutorial");
+    TUTORIAL("tutorial"),
+    PLAY("play"),
+    PAUSE("pause"),
+    STOP("stop"),
+    HOME("home"),
+    UP_FOLDER("up_folder");
 
     private final String name;
     

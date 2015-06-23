@@ -1,17 +1,19 @@
 TODO:
--1) Unrelated: Find flights for Morocco
-0) Print the new keyboard!!!!
+!!! - FOR PINCH - NEED TO CHANGE THE Z-Value so we know when they are pinching or not
+!!! - FOR BIMODAL - NEED TO CHANGE THE Z-Value so we know when they are pushing the button or not.
+0) Print the new keyboard in high quality!
 1) FILL OUT IRB INFORMATION AND SUBMIT IT SOON!!!! YOU NEED TO DO THIS BEFORE THE NEXT DEADLINE. FINISH THIS BEFORE MARCH 6th
 2) There is an issue when calibrating a plane at too much of an angle that the z axis becomes flipped. Try to solve this issue.
 3) Add unique tutorial INFO!
 4) Implement a hand alternative for both the surface and air keyboards on the leap.
-5) Implement the data parser to convert from playback format to Matlab format.
+5) Implement the data parser to convert from playback format to MATLAB format.
 6) Implement AR to help with feed back for air based keyboards
 7) Solve the problem of entering/leaving the touch plane (we move along a sphere) so when
 	moving away from the touch plane, you often hit the key above what you're leaving on.
 	This can probably be solved by aligning the touch plane normal to the direction that the
 	tool is pointing. Or by determining a certain velocity threshold that only moves us along
-	the Z axis. So if z is greater than x or y then we move on z only perhaps?
+	the Z axis. So if z is greater than x or y then we move on z only perhaps? ---- Tried this
+	and it doesn't work too well. It's really awkward feeling.
 8) Add another UI/button to the control center. We want a data viewer that
    will allow me to select anything that has been previously recorded and
    view the playback.
@@ -34,7 +36,7 @@ anova / ?
 likert scale
 
 Parse and calculate Raw data first -- put into participant files.
-Then format data like this for Matlab computations with aggregate data:
+Then format data like this for MATLAB computations with aggregate data:
 
 Example:
 DistV1 = [0, 1, 2......]

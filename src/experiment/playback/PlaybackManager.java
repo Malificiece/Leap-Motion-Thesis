@@ -1,5 +1,6 @@
 package experiment.playback;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -25,6 +26,7 @@ public class PlaybackManager {
     private final String FILE_PATH;
 	private ArrayList<PlaybackObserver> observers = new ArrayList<PlaybackObserver>();
 	private boolean isRepeating = false;
+	private boolean isPaused = false;
 	private ArrayList<PlaybackData> playbackData = new ArrayList<PlaybackData>();
 	private int playbackIndex = 0;
 	private long startTime = 0;
@@ -36,7 +38,7 @@ public class PlaybackManager {
 	    isTutorial = TUTORIAL.equals(subjectID);
 		isRepeating = repeat;
 		FILE_PATH = FilePath.RECORDED_DATA.getPath() + subjectID + "/";
-		String wildcardFileName = subjectID + "_" + keyboard.getFileName() + FileUtilities.WILDCARD + FileExt.DAT.getExt();
+		String wildcardFileName = subjectID + "_" + keyboard.getFileName() + FileUtilities.WILDCARD + FileExt.PLAYBACK.getExt();
 		try {
             ArrayList<String> fileData = MyUtilities.FILE_IO_UTILITIES.readListFromWildcardFile(FILE_PATH, wildcardFileName);
             parseFileData(fileData);
@@ -48,17 +50,34 @@ public class PlaybackManager {
 		elapsedTime = startTime - SECOND_AS_NANO;
 	}
 	
+	public PlaybackManager(boolean repeat, File file) {
+	    isTutorial = false;
+	    isRepeating = repeat;
+	    FILE_PATH = file.getPath();
+	       try {
+	            ArrayList<String> fileData = MyUtilities.FILE_IO_UTILITIES.readListFromFile(file);
+	            parseFileData(fileData);
+	        } catch (IOException e) {
+	            System.out.println("Failed to open up data file for playback.");
+	            e.printStackTrace();
+	        }
+	        previousTime = System.nanoTime();
+	        elapsedTime = startTime - SECOND_AS_NANO;
+	}
+	
 	public String getFilePath() {
 	    return FILE_PATH;
 	}
 
     public void update() {
         long now = System.nanoTime();
-        elapsedTime += now - previousTime;
+        if(!isPaused) {
+            elapsedTime += now - previousTime;   
+        }
         previousTime = now;
         
 		// Fire off any appropriate events based on their time.
-        if(playbackIndex < playbackData.size()) {            
+        if(playbackIndex < playbackData.size()) {
             // Check if the currentPlayback is ready to fire and then fire all of it's events.
             PlaybackData currentPlayback = playbackData.get(playbackIndex);
             if(elapsedTime >= currentPlayback.getTime()) {
@@ -93,9 +112,33 @@ public class PlaybackManager {
 		    notifyListenersResetEvent();
 		}
 	}
+    
+    public int getStartTime() {
+        return (int) ((startTime - startTime) / SECOND_AS_NANO);
+    }
+    
+    public int getFinishTime() {
+        return (int) ((finishTime - startTime) / SECOND_AS_NANO);
+    }
+    
+    public int getElapsedTime() {
+        return (int) ((elapsedTime - startTime) / SECOND_AS_NANO);
+    }
+    
+    public void playFromBeginning() {
+        // Reset playback and give a 1 second delay before next start.
+        playbackIndex = 0;
+        elapsedTime = startTime - SECOND_AS_NANO;
+        previousTime = System.nanoTime();
+        notifyListenersResetEvent();
+    }
 	
 	public void setRepeat(boolean repeat) {
 		isRepeating = repeat;
+	}
+	
+	public void setPause(boolean pause) {
+	    isPaused = pause;
 	}
 	
     public void registerObserver(PlaybackObserver observer) {

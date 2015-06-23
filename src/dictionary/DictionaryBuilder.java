@@ -298,7 +298,7 @@ public class DictionaryBuilder extends WindowController {
                 float difference = (Math.abs(wordDistance - compareDistance) / MIN_DISTANCE_BETWEEN_LETTERS) / MAX_DIFFERENCE_BETWEEN_LETTERS;
                 float angle = (float) (currentWordPoint.minus(previousWordPoint).angleTo(currentComparePoint.minus(previousComparePoint)) / Math.PI);
                 
-                // Take the average of the normalized difference and angle (which are clamped from [0, 1].
+                // Take the average of the normalized difference and angle (which are clamped from [0, 1]).
                 dissimilarity += (difference + angle) / 2f;
                 
                 // Save the current points as the previous now that we're done.

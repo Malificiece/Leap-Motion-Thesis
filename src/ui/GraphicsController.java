@@ -10,7 +10,6 @@ import javax.media.opengl.glu.GLU;
 
 import utilities.MyUtilities;
 import keyboard.IKeyboard;
-import keyboard.KeyboardObserver;
 import static javax.media.opengl.GL.*;  // GL constants
 import static javax.media.opengl.GL2.*; // GL2 constants
 
@@ -18,7 +17,7 @@ import com.jogamp.opengl.util.gl2.GLUT;
 
 import enums.Color;
 
-public abstract class GraphicsController extends WindowController implements GLEventListener, KeyboardObserver {
+public abstract class GraphicsController extends WindowController implements GLEventListener {
     public static GLU GLU;
     public static GLUT GLUT;
 	protected static GLCapabilities CAPABILITIES;
@@ -48,10 +47,10 @@ public abstract class GraphicsController extends WindowController implements GLE
     public void dispose(GLAutoDrawable drawable) {
         // This might not be the right approach. This has the possibility of being an infinite call.
         if(canvas == drawable) {
-            canvas.destroy();
-            canvas = null;
+            //canvas.destroy();
+            //canvas = null;
         } else {
-            drawable.destroy();
+            //drawable.destroy();
         }
     }
 

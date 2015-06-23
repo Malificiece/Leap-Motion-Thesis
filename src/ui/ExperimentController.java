@@ -31,6 +31,7 @@ import javax.swing.text.html.HTMLDocument;
 
 import utilities.MyUtilities;
 import keyboard.KeyboardAttributes;
+import keyboard.KeyboardObserver;
 import keyboard.KeyboardSetting;
 import enums.Attribute;
 import enums.FileName;
@@ -41,7 +42,7 @@ import experiment.WordManager;
 import experiment.data.DataManager;
 import experiment.playback.PlaybackManager;
 
-public class ExperimentController extends GraphicsController {
+public class ExperimentController extends GraphicsController implements KeyboardObserver {
     private static final String DEFAULT_INFO = "<font><b>CALIBRATE:</b><br>Calibrate the keyboard (if available).<br><br></font>"
             + "<font><b>TUTORIAL:</b><br>A brief example to familiarize yourself with the keyboard.<br><br></font>"
             + "<font><b>PRACTICE:</b><br>A small sample of what you should expect from the experiment.<br><br></font>"
@@ -508,6 +509,7 @@ public class ExperimentController extends GraphicsController {
             EXPERIMENT_LOCK.unlock();
         }
         
+        // Manage the color flash here when an answer is correct/incorrect.
         if(isFading) {
             long now = System.currentTimeMillis();
             fadeTimeElapsed += now - previousFadeTime;

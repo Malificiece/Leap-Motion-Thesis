@@ -165,7 +165,7 @@ public class FileUtilities {
             @Override
             public boolean accept(File dir, String name) {
                 String[] parts = fileName.split("\\" + WILDCARD);
-                return name.contains(parts[0]) && name.endsWith(FileExt.DAT.getExt());
+                return name.contains(parts[0]) && (name.endsWith(FileExt.DAT.getExt()) || name.endsWith(FileExt.PLAYBACK.getExt()));
             }
         })) {
             // Currently we return the first match, but later I might need to get the most recent or specific selection.

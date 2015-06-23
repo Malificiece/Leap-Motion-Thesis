@@ -7,6 +7,7 @@ import java.awt.Font;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.Toolkit;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Enumeration;
 
@@ -19,6 +20,7 @@ import javax.swing.JComboBox;
 import javax.swing.JEditorPane;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.JRadioButton;
@@ -26,9 +28,11 @@ import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import javax.swing.ListSelectionModel;
 import javax.swing.SpringLayout;
 import javax.swing.SwingConstants;
 import javax.swing.UIManager;
+import javax.swing.border.EmptyBorder;
 import javax.swing.text.DefaultCaret;
 
 import utilities.MyUtilities;
@@ -81,26 +85,37 @@ public class WindowBuilder {
         // Build layout for calibration and run buttons
         background.add(MyUtilities.SWING_UTILITIES.createPadding(10, SwingConstants.VERTICAL));
         
-        JPanel optionsPanel = new JPanel();
-        optionsPanel.setLayout(new BoxLayout(optionsPanel, BoxLayout.Y_AXIS));
-        optionsPanel.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createTitledBorder("Options"), BorderFactory.createEmptyBorder(5, 10, 10, 10)));
-        background.add(optionsPanel);
+        JPanel experimentOptionsPanel = new JPanel();
+        experimentOptionsPanel.setLayout(new BoxLayout(experimentOptionsPanel, BoxLayout.Y_AXIS));
+        experimentOptionsPanel.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createTitledBorder("Experiment Options"), BorderFactory.createEmptyBorder(5, 10, 10, 10)));
+        background.add(experimentOptionsPanel);
         
         JPanel buttonGroup1 = new JPanel();
-        optionsPanel.add(buttonGroup1);
-        buttonGroup1.add(optionsButtons[4]);
-        buttonGroup1.add(MyUtilities.SWING_UTILITIES.createPadding(0, SwingConstants.HORIZONTAL));
+        experimentOptionsPanel.add(buttonGroup1);
         buttonGroup1.add(optionsButtons[1]);
+        buttonGroup1.add(MyUtilities.SWING_UTILITIES.createPadding(50, SwingConstants.HORIZONTAL));
+        buttonGroup1.add(optionsButtons[3]);
+        
+        JPanel calibrationOptionsPanel = new JPanel();
+        calibrationOptionsPanel.setLayout(new BoxLayout(calibrationOptionsPanel, BoxLayout.Y_AXIS));
+        calibrationOptionsPanel.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createTitledBorder("Calibration Options"), BorderFactory.createEmptyBorder(5, 10, 10, 10)));
+        background.add(calibrationOptionsPanel);
         
         JPanel buttonGroup2 = new JPanel();
-        optionsPanel.add(buttonGroup2);
+        calibrationOptionsPanel.add(buttonGroup2);
+        buttonGroup2.add(MyUtilities.SWING_UTILITIES.createPadding(155, SwingConstants.HORIZONTAL));
         buttonGroup2.add(optionsButtons[0]);
-        buttonGroup2.add(MyUtilities.SWING_UTILITIES.createPadding(50, SwingConstants.HORIZONTAL));
-        buttonGroup2.add(optionsButtons[3]);
+        
+        JPanel toolOptionsPanel = new JPanel();
+        toolOptionsPanel.setLayout(new BoxLayout(toolOptionsPanel, BoxLayout.Y_AXIS));
+        toolOptionsPanel.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createTitledBorder("Tool Options"), BorderFactory.createEmptyBorder(5, 10, 10, 10)));
+        background.add(toolOptionsPanel);
         
         JPanel buttonGroup3 = new JPanel();
-        optionsPanel.add(buttonGroup3);
-        buttonGroup2.add(optionsButtons[5]);
+        toolOptionsPanel.add(buttonGroup3);
+        buttonGroup3.add(optionsButtons[4]);
+        buttonGroup3.add(MyUtilities.SWING_UTILITIES.createPadding(0, SwingConstants.HORIZONTAL));
+        buttonGroup3.add(optionsButtons[5]);
         
         // Arrange the components inside the window
         frame.pack();
@@ -641,6 +656,7 @@ public class WindowBuilder {
         
         // Add split pane.
         background.add(splitPane);
+        splitPane.setEnabled(false);
         
         // Left panel (word and keyboard preview)
         JPanel leftPanelSetBackground = new JPanel();
@@ -892,6 +908,210 @@ public class WindowBuilder {
         Dimension d = buildProgressPanel.getPreferredSize();
         d.setSize(350, d.getHeight());
         buildProgressPanel.setPreferredSize(d);
+        
+        // Arrange the components inside the window
+        frame.pack();
+        frame.setResizable(false); 
+        
+        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+        Dimension windowSize = frame.getSize();
+        frame.setLocation((int)(screenSize.getWidth()/2 - windowSize.getWidth()/2),
+                          (int)(screenSize.getHeight()/2 - windowSize.getHeight()/2));
+    }
+    
+    public static void buildDataCenterWindow(JFrame frame,
+            JPanel canvasPanel,
+            JTextArea fileDetailsTextArea,
+            JTextField[] textFields, // homeFolder, fileSelected
+            JList<File>[] lists, // currentDirectory, fileViewer
+            JButton[] buttons, // browse, consolidate, back, home, calculate, pause/play, stop
+            JSplitPane splitPane,
+            JLabel[] labels, // current, max
+            JProgressBar playbackProgressBar) {
+
+        JPanel background = new JPanel();
+        background.setLayout(new BoxLayout(background, BoxLayout.X_AXIS));
+        frame.add(background);
+        
+        // Add split pane.
+        background.add(splitPane);
+        splitPane.setEnabled(false);
+        
+        // Top panel (file selection, data manipulation buttons, file previewer)
+        JPanel topPanelSetBackground = new JPanel();
+        topPanelSetBackground.setLayout(new BoxLayout(topPanelSetBackground, BoxLayout.X_AXIS));
+        topPanelSetBackground.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        splitPane.setTopComponent(topPanelSetBackground);
+        
+        // Left side, files selection and options
+        JPanel fileOptionsBackground = new JPanel();
+        fileOptionsBackground.setLayout(new BoxLayout(fileOptionsBackground, BoxLayout.Y_AXIS));
+        fileOptionsBackground.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createTitledBorder("File Options"), BorderFactory.createEmptyBorder(5, 10, 10, 10)));
+        topPanelSetBackground.add(fileOptionsBackground);
+        
+        // Data folder browser
+        JPanel dataFolderChooserPanel = new JPanel();
+        dataFolderChooserPanel.setLayout(new BoxLayout(dataFolderChooserPanel, BoxLayout.X_AXIS));
+        dataFolderChooserPanel.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createTitledBorder("Home Folder"), BorderFactory.createEmptyBorder(5, 10, 10, 10)));
+        fileOptionsBackground.add(dataFolderChooserPanel);
+        
+        JLabel selectDataFolderLabel = new JLabel("Home: ");
+        dataFolderChooserPanel.add(selectDataFolderLabel);
+        
+        dataFolderChooserPanel.add(MyUtilities.SWING_UTILITIES.createPadding(0, SwingConstants.HORIZONTAL));
+        
+        textFields[0].setEditable(false);
+        //textFields[0].setHighlighter(null);
+        dataFolderChooserPanel.add(textFields[0]);
+        
+        dataFolderChooserPanel.add(MyUtilities.SWING_UTILITIES.createPadding(10, SwingConstants.HORIZONTAL));
+        
+        dataFolderChooserPanel.add(buttons[0]);
+        
+        // Formatter buttons
+        JPanel dataFormatButtons = new JPanel();
+        dataFormatButtons.setLayout(new BoxLayout(dataFormatButtons, BoxLayout.X_AXIS));
+        fileOptionsBackground.add(dataFormatButtons);
+        
+        JPanel consolidateButtonPanel = new JPanel();
+        consolidateButtonPanel.setLayout(new BoxLayout(consolidateButtonPanel, BoxLayout.Y_AXIS));
+        consolidateButtonPanel.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createTitledBorder("Consolidate Data"), BorderFactory.createEmptyBorder(5, 10, 10, 10)));
+        dataFormatButtons.add(consolidateButtonPanel);
+        
+        JTextArea consolidateButtonInfo = new JTextArea("Consolidate the data from all of the subjects of the home folder.");
+        consolidateButtonInfo.setEditable(false);
+        consolidateButtonInfo.setHighlighter(null);
+        consolidateButtonInfo.setBackground(UIManager.getColor("Panel.background"));
+        consolidateButtonInfo.setWrapStyleWord(true);
+        consolidateButtonInfo.setLineWrap(true);
+        consolidateButtonPanel.add(consolidateButtonInfo);
+        
+        consolidateButtonPanel.add(MyUtilities.SWING_UTILITIES.createPadding(5, SwingConstants.VERTICAL));
+        JPanel consolidateButtonCenter = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        consolidateButtonCenter.add(buttons[1]);
+        consolidateButtonPanel.add(consolidateButtonCenter);
+        
+        consolidateButtonPanel.add(MyUtilities.SWING_UTILITIES.createPadding(0, SwingConstants.VERTICAL));
+        
+        Dimension d = consolidateButtonPanel.getPreferredSize();
+        d.setSize(300, d.getHeight());
+        consolidateButtonPanel.setPreferredSize(d);
+        
+        dataFormatButtons.add(MyUtilities.SWING_UTILITIES.createPadding(10, SwingConstants.HORIZONTAL));
+        
+        JPanel calculateButtonPanel = new JPanel();
+        calculateButtonPanel.setLayout(new BoxLayout(calculateButtonPanel, BoxLayout.Y_AXIS));
+        calculateButtonPanel.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createTitledBorder("Calculate Data"), BorderFactory.createEmptyBorder(5, 10, 10, 10)));
+        dataFormatButtons.add(calculateButtonPanel);
+        
+        JTextArea calculateButtonInfo = new JTextArea("Calculate all of the stastistical data for subjects in the home folder.");
+        calculateButtonInfo.setEditable(false);
+        calculateButtonInfo.setHighlighter(null);
+        calculateButtonInfo.setBackground(UIManager.getColor("Panel.background"));
+        calculateButtonInfo.setWrapStyleWord(true);
+        calculateButtonInfo.setLineWrap(true);
+        calculateButtonPanel.add(calculateButtonInfo);
+        
+        calculateButtonPanel.add(MyUtilities.SWING_UTILITIES.createPadding(5, SwingConstants.VERTICAL));
+        JPanel calculateButtonCenter = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        calculateButtonCenter.add(buttons[4]);
+        calculateButtonPanel.add(calculateButtonCenter);
+        
+        calculateButtonPanel.add(MyUtilities.SWING_UTILITIES.createPadding(0, SwingConstants.VERTICAL));
+        
+        calculateButtonPanel.setPreferredSize(d);
+        
+        // File selector
+        JPanel fileSelectorPanel = new JPanel();
+        fileSelectorPanel.setLayout(new BoxLayout(fileSelectorPanel, BoxLayout.X_AXIS));
+        fileSelectorPanel.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createTitledBorder("File Selector"), BorderFactory.createEmptyBorder(5, 10, 10, 10)));
+        fileOptionsBackground.add(fileSelectorPanel);
+        
+        // File navigation tools
+        JPanel navigationToolsPanel = new JPanel();
+        navigationToolsPanel.setLayout(new BoxLayout(navigationToolsPanel, BoxLayout.Y_AXIS));
+        fileSelectorPanel.add(navigationToolsPanel);
+        
+        navigationToolsPanel.add(buttons[2]);
+        navigationToolsPanel.add(buttons[3]);
+        
+        // Add the current directory to a scroll pane.
+        lists[0].setSelectionMode (ListSelectionModel.SINGLE_SELECTION);
+        JScrollPane currentDirectoryScrollBar = new JScrollPane(lists[0], JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        currentDirectoryScrollBar.getVerticalScrollBar().setUnitIncrement(16);
+        currentDirectoryScrollBar.setPreferredSize(new Dimension(115, 120));
+        fileSelectorPanel.add(currentDirectoryScrollBar);
+        
+        // Add the direcotry contents to a scroll pane.
+        lists[1].setSelectionMode (ListSelectionModel.SINGLE_SELECTION);
+        //lists[1].setVisibleRowCount(5);
+        JScrollPane directoryContentsScrollBar = new JScrollPane(lists[1], JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        directoryContentsScrollBar.getVerticalScrollBar().setUnitIncrement(16);
+        directoryContentsScrollBar.setPreferredSize(new Dimension(330, 120));
+        fileSelectorPanel.add(directoryContentsScrollBar);
+        
+        // File preview
+        JPanel filePreviewerPanel = new JPanel();
+        filePreviewerPanel.setLayout(new BoxLayout(filePreviewerPanel, BoxLayout.Y_AXIS));
+        filePreviewerPanel.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createTitledBorder("File Preview"), BorderFactory.createEmptyBorder(5, 10, 10, 10)));
+        topPanelSetBackground.add(filePreviewerPanel);
+        
+        //fileDetailsTextArea.setFont(new Font("TimesNewRoman", Font.BOLD, 12));
+        fileDetailsTextArea.setEditable(false);
+        fileDetailsTextArea.setBorder(new EmptyBorder(3,3,3,3));
+        ((DefaultCaret) fileDetailsTextArea.getCaret()).setUpdatePolicy(DefaultCaret.NEVER_UPDATE);
+        //fileDetailsTextArea.setWrapStyleWord(true);
+        //fileDetailsTextArea.setLineWrap(true);
+        
+        JScrollPane filePreviewScrollBar = new JScrollPane(fileDetailsTextArea, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        filePreviewScrollBar.getVerticalScrollBar().setUnitIncrement(16);
+        filePreviewScrollBar.setPreferredSize(new Dimension(450, fileOptionsBackground.getPreferredSize().height - 75));
+        filePreviewerPanel.add(filePreviewScrollBar);
+        
+        JPanel previewDetailsPanel = new JPanel();
+        filePreviewerPanel.add(previewDetailsPanel);
+        
+        JLabel previewedFileLabel = new JLabel("File: ");
+        previewDetailsPanel.add(previewedFileLabel);
+        
+        textFields[1].setEditable(false);
+        textFields[1].setPreferredSize(new Dimension(425, textFields[1].getPreferredSize().height));
+        //textFields[1].setHighlighter(null);
+        previewDetailsPanel.add(textFields[1]);
+        
+        // Bottom panel (playback buttons and preview).
+        JPanel bottomPanelSet = new JPanel();
+        bottomPanelSet.setLayout(new BoxLayout(bottomPanelSet, BoxLayout.Y_AXIS));
+        bottomPanelSet.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        splitPane.setBottomComponent(bottomPanelSet);
+        
+        JPanel playbackPanel = new JPanel();
+        playbackPanel.setLayout(new BoxLayout(playbackPanel, BoxLayout.Y_AXIS));
+        playbackPanel.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createTitledBorder("Playback"), BorderFactory.createEmptyBorder(5, 10, 10, 10)));
+        bottomPanelSet.add(playbackPanel);
+        
+        // Add the keyboard canvas.
+        playbackPanel.add(canvasPanel);
+        
+        // Add the progress bar.
+        playbackProgressBar.setValue(0);
+        playbackProgressBar.setStringPainted(true);
+        playbackPanel.add(playbackProgressBar);
+        
+        // Add the playback controls here.
+        // play/pause, stop, progress bar, time
+        JPanel playbackControlPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        playbackControlPanel.add(buttons[5]);
+        playbackControlPanel.add(buttons[6]);
+        playbackPanel.add(playbackControlPanel);
+        
+        playbackControlPanel.add(MyUtilities.SWING_UTILITIES.createPadding(20, SwingConstants.HORIZONTAL));
+        
+        JPanel playbackTimePanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        playbackTimePanel.add(labels[0]);
+        playbackTimePanel.add(new JLabel("/"));
+        playbackTimePanel.add(labels[1]);
+        playbackControlPanel.add(playbackTimePanel);
         
         // Arrange the components inside the window
         frame.pack();

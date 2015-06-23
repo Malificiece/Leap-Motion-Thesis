@@ -6,6 +6,7 @@ public enum FileExt {
     PNG(".png"),
     FILE(".file"),
     DAT(".dat"),
+    PLAYBACK(".playback"),
     DICTIONARY(".dictionary"),
     DATABASE(".db"),
     MATLAB(".m");

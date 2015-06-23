@@ -23,6 +23,7 @@ import javax.swing.JPanel;
 import javax.swing.WindowConstants;
 
 import keyboard.KeyboardAttributes;
+import keyboard.KeyboardObserver;
 import keyboard.KeyboardRenderable;
 import keyboard.KeyboardSetting;
 import utilities.MyUtilities;
@@ -30,7 +31,7 @@ import enums.Attribute;
 import enums.Keyboard;
 import enums.KeyboardType;
 
-public class CalibrationController extends GraphicsController {
+public class CalibrationController extends GraphicsController implements KeyboardObserver {
     private JPanel canvasPanel;
     private JLabel wordLabel;
     private JPanel wordPanel;

@@ -39,7 +39,6 @@ import enums.FileExt;
 import enums.FilePath;
 import enums.Key;
 import enums.KeyboardType;
-import experiment.data.formatter.MatlabDataFormatter;
 
 public class ControlCenter {
     // Constants
@@ -50,7 +49,7 @@ public class ControlCenter {
     private CalibrationController calibrationController;// = new CalibrationController();
     private ExitSurveyController exitSurveyController;
     private DictionaryBuilder dictionaryBuilder;
-    private MatlabDataFormatter experimentDataFormatter;
+    private DataCenterController dataCenterController;
     
     // Not Constants
     private JFrame frame;
@@ -62,7 +61,7 @@ public class ControlCenter {
     private JButton experimentButton;
     private JButton exitSurveyButton;
     private JButton createDictionariesButton;
-    private JButton formatExperimentDataButton;
+    private JButton dataCenterButton;
     private boolean isDisabled = false;
     private boolean isRunning = true;
     
@@ -79,9 +78,9 @@ public class ControlCenter {
         experimentButton = new JButton("Experiment");
         exitSurveyButton = new JButton("Exit Survey");
         createDictionariesButton = new JButton("Create Dictionaries");
-        formatExperimentDataButton = new JButton("Format Experiment Data");
+        dataCenterButton = new JButton("Data Center");
         
-        JButton[] buttons = {calibrateButton, experimentButton, editSubjectIDButton, exitSurveyButton, createDictionariesButton, formatExperimentDataButton};
+        JButton[] buttons = {calibrateButton, experimentButton, editSubjectIDButton, exitSurveyButton, createDictionariesButton, dataCenterButton};
         
         // Window builder builds window using important fields here. It adds unimportant fields that we won't use for aesthetics only.
         WindowBuilder.buildControlWindow(frame, testTypeComboBox, subjectField, buttons);
@@ -234,13 +233,14 @@ public class ControlCenter {
         });
         
         // RUN THE DATA FORMATTER
-        formatExperimentDataButton.addActionListener(new ActionListener() {
+        dataCenterButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent arg0) {
                 CONTROL_LOCK.lock();
                 try {
                     if(!isInProgress()) {
-                        experimentDataFormatter = new MatlabDataFormatter();
+                        dataCenterController = new DataCenterController();
+                        dataCenterController.enable();
                         disableUI();
                     }
                 } finally {
@@ -316,7 +316,7 @@ public class ControlCenter {
             } else if(dictionaryBuildInProgress()) {
                 dictionaryBuilder.update();
             } else if(dataFormattingInProgress()) {
-                experimentDataFormatter.update();
+                dataCenterController.update();
             } else if(isDisabled) {
                 enableUI();
             }
@@ -337,7 +337,7 @@ public class ControlCenter {
             } else if(dictionaryBuildInProgress()) {
                 // Do nothing
             } else if(dataFormattingInProgress()) {
-                // Do nothing
+                dataCenterController.render();
             }
         } finally {
             CONTROL_LOCK.unlock();
@@ -407,11 +407,11 @@ public class ControlCenter {
     }
     
     private boolean dataFormattingInProgress() {
-        if(experimentDataFormatter != null) {
-            if(experimentDataFormatter.isEnabled()) {
+        if(dataCenterController != null) {
+            if(dataCenterController.isEnabled()) {
                 return true;
             } else {
-                experimentDataFormatter = null;
+                dataCenterController = null;
             }
         }
         return false;
@@ -424,7 +424,7 @@ public class ControlCenter {
         exitSurveyButton.setEnabled(false);
         editSubjectIDButton.setEnabled(false);
         createDictionariesButton.setEnabled(false);
-        formatExperimentDataButton.setEnabled(false);
+        dataCenterButton.setEnabled(false);
         testTypeComboBox.setEnabled(false);
     }
     
@@ -436,7 +436,7 @@ public class ControlCenter {
         exitSurveyButton.setEnabled(true);
         editSubjectIDButton.setEnabled(true);
         createDictionariesButton.setEnabled(true);
-        formatExperimentDataButton.setEnabled(true);
+        dataCenterButton.setEnabled(true);
         testTypeComboBox.setEnabled(true);
     }
     
@@ -511,7 +511,7 @@ public class ControlCenter {
         public void updateSubjectID(JComboBox<String> comboBox, String subjectID) {
             String filePath = FilePath.RECORDED_DATA.getPath() + subjectID + "/";
             for(int i = 0; i < comboBox.getItemCount(); i++) {
-                String wildcardFileName = subjectID + "_" + fileNames.get(i) + FileUtilities.WILDCARD + FileExt.DAT.getExt();
+                String wildcardFileName = subjectID + "_" + fileNames.get(i) + FileUtilities.WILDCARD + FileExt.PLAYBACK.getExt();
                 boolean fileExists;
                 try {
                     fileExists = MyUtilities.FILE_IO_UTILITIES.checkWildcardFileExists(filePath, wildcardFileName);

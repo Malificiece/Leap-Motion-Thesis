@@ -22,7 +22,7 @@ public class DataManager implements DataObserver {
     
     public DataManager(IKeyboard keyboard, String subjectID, String experimentTime, int practiceWordCount) {
         FILE_PATH = FilePath.RECORDED_DATA.getPath() + subjectID + "/";
-        DATA_FILE_NAME = subjectID + "_" + keyboard.getFileName() + experimentTime + FileExt.DAT.getExt();
+        DATA_FILE_NAME = subjectID + "_" + keyboard.getFileName() + experimentTime + FileExt.PLAYBACK.getExt(); // We record a playback file
         dataList = new ArrayList<String>();
         System.out.println("Starting experiment for " + subjectID + " using " + keyboard.getName());
         dataList.add(RecordedDataType.PRACTICE_WORD_COUNT.name() + ": " + practiceWordCount);
