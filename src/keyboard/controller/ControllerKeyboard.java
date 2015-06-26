@@ -424,7 +424,7 @@ public class ControllerKeyboard extends IKeyboard implements ControllerPlaybackO
         }
     }
     
-    public KeyboardGesture createSwipeGesture(Direction direction) {
+    private KeyboardGesture createSwipeGesture(Direction direction) {
         if(Gesture.ENABLED) {
             KeyboardGesture gesture = null;
             switch(direction) {

@@ -23,6 +23,7 @@ import enums.KeyboardType;
 import enums.RecordedDataType;
 import enums.Renderable;
 import enums.StatisticDataType;
+import ui.ExperimentController;
 import utilities.FileUtilities;
 import utilities.MyUtilities;
 
@@ -31,7 +32,8 @@ public class DataFormatter implements Runnable {
         CONSOLIDATE,
         CALCULATE;
     }
-    private static final long SECOND_AS_NANO = 1000000000;
+    private final double SECOND_AS_NANO = 1000000000;
+    private final float PIXEL_TO_METER = 1f;//0.000264583f;
     private final String TUTORIAL = FileName.TUTORIAL.getName();
     private FormatProcessType type;
     private File directory;
@@ -130,37 +132,88 @@ public class DataFormatter implements Runnable {
     }
     
     private ArrayList<String> calculateSubjectDataController(ArrayList<String> fileContents, IKeyboard keyboard) {
+        SimulateController simulateController = new SimulateController(keyboard);
         ArrayList<String> subjectData = new ArrayList<String>();
         subjectData.add(StatisticDataType.KEYBOARD_TYPE.name() + ": " + keyboard.getFileName());
         VirtualKeyboard virtualKeyboard = (VirtualKeyboard) keyboard.getRenderables().getRenderable(Renderable.VIRTUAL_KEYBOARD);
+        // Determine key distances for controller.
+        final float DISTANCE_RIGHT_LEFT;
+        final float DISTANCE_UP_DOWN;
+        {
+            Vector Q = virtualKeyboard.getVirtualKey(Key.VK_Q).getCenter();
+            Vector W = virtualKeyboard.getVirtualKey(Key.VK_W).getCenter();
+            Vector A = virtualKeyboard.getVirtualKey(Key.VK_A).getCenter();
+            DISTANCE_RIGHT_LEFT = MyUtilities.MATH_UTILITILES.findDistanceToPoint(Q, W);
+            DISTANCE_UP_DOWN = MyUtilities.MATH_UTILITILES.findDistanceToPoint(Q, A);
+        }
+        // Arrays
+        ArrayList<String> wordList = new ArrayList<String>();
+        ArrayList<Integer> planeBreachedCountArray = new ArrayList<Integer>();
+        ArrayList<Float> distanceTraveledArray = new ArrayList<Float>();
+        ArrayList<Float> distanceTraveledShortArray = new ArrayList<Float>();
+        ArrayList<Float> timeDurationArray = new ArrayList<Float>();
+        ArrayList<Float> timeDurationShortArray = new ArrayList<Float>();
+        ArrayList<Float> reactionTimeFirstPressedArray = new ArrayList<Float>();
+        ArrayList<Float> reactionTimeFirstTouchArray = new ArrayList<Float>();
+        ArrayList<Float> reactionTimeToErrorAvgArray = new ArrayList<Float>();
+        ArrayList<Float> handVelocityAvgArray = new ArrayList<Float>();
+        ArrayList<Float> WPM_Array = new ArrayList<Float>();
+        ArrayList<Float> modShortWPM_Array = new ArrayList<Float>();
+        ArrayList<Float> modVultureWPM_Array = new ArrayList<Float>();
+        ArrayList<Float> modShortVultureWPM_Array = new ArrayList<Float>();
+        ArrayList<Float> KSPC_Array = new ArrayList<Float>();
+        ArrayList<Float> modShortMSD_Array = new ArrayList<Float>();
+        ArrayList<Float> modBackspaceMSD_Array = new ArrayList<Float>();
+        ArrayList<Float> frechetDistanceArray = new ArrayList<Float>();
+        ArrayList<Float> modShortFrechetDistanceArray = new ArrayList<Float>();
+        ArrayList<Float> modBackspaceFrechetDistanceArray = new ArrayList<Float>();
+        
         // Tracked Variables
-        String currentWord = "";
-        long currentTime = 0l;
-        Key currentKey = null;
+        boolean firstLetter = true;
+        boolean firstTouch = false;
+        String currentWord = null;
+        long wordStartTime = 0l;
+        long previousTime = 0l;
+        Key previousKey = null;
+        
+        int planeBreachedCount = 0;
+        
         float distanceTraveled = 0f;
-        float reactionTime = 0f; // convert to seconds
-        float reactionTimeToErrorAvg = 0f; // convert to seconds
-        float handVelocityAvg = 0f; // convert to m/s
+        float distanceTraveledShort = 0f;
+        
         float timeDuration = 0f; // convert to seconds
+        float timeDurationShort = 0f;
         
-        ArrayList<Vector> expectedPath;
-        ArrayList<Vector> takenPath;
-        ArrayList<Vector> expectedPathModified;
-        ArrayList<Vector> takenPathModified;
+        float reactionTimeFirstPressed = 0f; // convert to seconds
+        float reactionTimeFirstTouch = 0;
         
-        int KSPC_C = 0;
-        int KSPC_INF = 0;
-        int KSPC_IF = 0;
-        int KSPC_F = 0;
+        float reactionTimeToError = 0f; // convert to seconds
+        long timeErrorOccured = 0l;
+        int responseToErrorsCount = 0;
         
-        int modMSD_C = 0;
-        int modMSD_INF = 0;
+        float handVelocity = 0f; // convert to m/s
+        int numberOfActionsCount = 0;
         
-        // WPM = (currentWord.length / timeDuration) * 60 * (1/5);
-        // KSPC = (KSPC_C + KSPC_INF + KSPC_IF + KSPC_F) / (KSPC_C + KSPC_INF)
-        // modMSD = (modMSD_INF / (modMSD_C + modMSD_INF)) * 100;
+        ArrayList<Vector> expectedPath = new ArrayList<Vector>();
+        ArrayList<Vector> takenPath = new ArrayList<Vector>();
+        ArrayList<Vector> takenPathModifiedShortest = new ArrayList<Vector>();
+        ArrayList<Vector> expectedPathModifiedBackspace = new ArrayList<Vector>();
+        
+        float KSPC_C = 0f;
+        float KSPC_INF = 0f;
+        float KSPC_IF = 0f;
+        float KSPC_F = 0f;
+        
+        int modShortMSD_C = 0;
+        float modShortMSD_INF = 0f;
+        
+        float modBackspaceMSD_C = 0f;
+        float modBackspaceMSD_INF = 0f;
+        
+        boolean detectedShortestComplete = false;
         
         for(FileData currentLine: fileData) {
+            Key pressedKey = null;
             while(currentLine.hasNext()) {
                 Entry<RecordedDataType, Object> currentData = currentLine.next();
                 // Total distance traveled per word. (Array)
@@ -173,91 +226,505 @@ public class DataFormatter implements Runnable {
                 // Calculate WPM
                 // Calculate Frechet Distance - Use Djikstra's for shortest path for controller keyboard to find expected path.
                 // Calculate Frechet Distance Modified - this will use same set as mod-MSD
+                boolean reportData = false;
                 switch(currentData.getKey()) {
-                    case TIME_EXPERIMENT_START:
-                        long start = currentLine.getTime();
-                        break;
-                    case TIME_EXPERIMENT_END:
-                        long end = currentLine.getTime();
-                        break;
                     case WORD_VALUE:
-                        String w = (String) currentData.getValue();
+                        previousTime = currentLine.getTime();
+                        wordStartTime = currentLine.getTime();
+                        numberOfActionsCount = 0;
+                        responseToErrorsCount = 0;
+                        detectedShortestComplete = false;
+                        
+                        // This path should contain the last key used or where the selection started.
+                        String newWord = (String) currentData.getValue();
+                        if(currentWord == null) {
+                            simulateController.selectKey(Key.VK_Q);
+                            expectedPath.add(virtualKeyboard.getVirtualKey(Key.VK_Q).getCenter());
+                            expectedPathModifiedBackspace.add(virtualKeyboard.getVirtualKey(Key.VK_Q).getCenter());
+                            for(char c: newWord.toCharArray()) {
+                                // This path should contain the last key used or where the selection started.
+                                expectedPath.add(virtualKeyboard.getVirtualKey(Key.getByValue(c)).getCenter());
+                            }
+                            takenPath.add(virtualKeyboard.getVirtualKey(Key.VK_Q).getCenter());
+                            takenPathModifiedShortest.add(virtualKeyboard.getVirtualKey(Key.VK_Q).getCenter());
+                        } else if(!currentWord.equals(newWord)) {
+                            expectedPath.add(virtualKeyboard.getVirtualKey(simulateController.getSelectedKey()).getCenter());
+                            expectedPathModifiedBackspace.add(virtualKeyboard.getVirtualKey(simulateController.getSelectedKey()).getCenter());
+                            for(char c: newWord.toCharArray()) {
+                                // This path should contain the last key used or where the selection started.
+                                expectedPath.add(virtualKeyboard.getVirtualKey(Key.getByValue(c)).getCenter());
+                            }
+                            takenPath.add(virtualKeyboard.getVirtualKey(simulateController.getSelectedKey()).getCenter());
+                            takenPathModifiedShortest.add(virtualKeyboard.getVirtualKey(simulateController.getSelectedKey()).getCenter());
+                            previousKey = null;
+                        }
+                        currentWord = newWord;
                         break;
                     case KEY_PRESSED:
-                        currentKey = (Key) currentData.getValue();
-                        break;
-                    case KEY_EXPECTED:
-                        Key k = (Key) currentData.getValue();
-                        if(currentKey == Key.VK_BACK_SPACE && k == Key.VK_BACK_SPACE) {
-                            KSPC_F++;
+                        // First letter of word
+                        pressedKey = (Key) currentData.getValue();
+                        if(!firstTouch) {
+                            firstTouch = true;
+                            reactionTimeFirstTouch = (float) ((currentLine.getTime() - wordStartTime) / SECOND_AS_NANO);
+                            timeDuration = (float) (currentLine.getTime() / SECOND_AS_NANO);
+                        }
+                        if(!detectedShortestComplete && pressedKey == Key.getByValue(currentWord.charAt(modShortMSD_C))) {
+                            modShortMSD_C++;
+                            if(modShortMSD_C == currentWord.length()) {
+                                detectedShortestComplete = true;
+                                distanceTraveledShort = distanceTraveled;
+                                timeDurationShort = (float) ((currentLine.getTime() / SECOND_AS_NANO) - timeDuration);
+                            }
+                        }
+                        if(pressedKey == Key.VK_ENTER) {
+                            planeBreachedCount++;
                         }
                         break;
+                    case KEY_EXPECTED:
+                        Key expectedKey = (Key) currentData.getValue();
+                        if(pressedKey.equals(Key.VK_ENTER) && expectedKey.equals(Key.VK_ENTER)) {
+                            reportData = true;
+                            timeDuration = (float) ((previousTime / SECOND_AS_NANO) - timeDuration);
+                        } else if(pressedKey.equals(Key.VK_BACK_SPACE) && expectedKey.equals(Key.VK_BACK_SPACE)) {
+                            KSPC_F++;
+                            KSPC_IF++;
+                            modBackspaceMSD_C++;
+                            expectedPathModifiedBackspace.add(virtualKeyboard.getVirtualKey(Key.VK_BACK_SPACE).getCenter());
+                            if(!simulateController.getSelectedKey().equals(Key.VK_BACK_SPACE)) {
+                                takenPath.add(virtualKeyboard.getVirtualKey(Key.VK_BACK_SPACE).getCenter());
+                            }
+                            if(timeErrorOccured > 0) {
+                                reactionTimeToError += (currentLine.getTime() - timeErrorOccured) / SECOND_AS_NANO;
+                                timeErrorOccured = 0;
+                                responseToErrorsCount++;
+                            }
+                        } else if(pressedKey.equals(expectedKey)) {
+                            KSPC_C++;
+                            modBackspaceMSD_C++;
+                            expectedPathModifiedBackspace.add(virtualKeyboard.getVirtualKey(pressedKey).getCenter());
+                            if(pressedKey.equals(previousKey)) {
+                                takenPath.add(virtualKeyboard.getVirtualKey(simulateController.getSelectedKey()).getCenter());
+                            }
+                            if(firstLetter) {
+                                firstLetter = false;
+                                reactionTimeFirstPressed = (float) ((currentLine.getTime() - wordStartTime) / SECOND_AS_NANO);
+                            }
+                        } else if(!pressedKey.equals(expectedKey) && pressedKey != Key.VK_ENTER) {
+                            if(timeErrorOccured == 0 && expectedKey != Key.VK_BACK_SPACE && pressedKey != Key.VK_BACK_SPACE) {
+                                timeErrorOccured = currentLine.getTime();
+                                if(!detectedShortestComplete) modShortMSD_INF++;
+                                modBackspaceMSD_INF++;
+                            } else if(expectedKey != Key.VK_BACK_SPACE && pressedKey == Key.VK_BACK_SPACE) {
+                                KSPC_F++;
+                                //KSPC_INF++; - not quite right
+                            } else if(expectedKey == Key.VK_BACK_SPACE && pressedKey != Key.VK_BACK_SPACE) {
+                                if(!detectedShortestComplete) modShortMSD_INF++;
+                                modBackspaceMSD_INF++;
+                            }
+                        }
+                        previousTime = currentLine.getTime();
+                        previousKey = pressedKey;
+                        break;
                     case DIRECTION_PRESSED:
-                        Direction d = (Direction) currentData.getValue();
+                        Direction direction = (Direction) currentData.getValue();
+                        if(direction.equals(Direction.RIGHT) || direction.equals(Direction.LEFT)) {
+                            distanceTraveled += DISTANCE_RIGHT_LEFT;
+                            if(firstTouch) handVelocity += (DISTANCE_RIGHT_LEFT * PIXEL_TO_METER) / ((currentLine.getTime() - previousTime) / SECOND_AS_NANO);
+                        } else if(direction.equals(Direction.UP) || direction.equals(Direction.DOWN)) {
+                            distanceTraveled += DISTANCE_UP_DOWN;
+                            if(firstTouch) handVelocity += (DISTANCE_UP_DOWN * PIXEL_TO_METER) / ((currentLine.getTime() - previousTime) / SECOND_AS_NANO);
+                        }
+                        if(firstTouch) numberOfActionsCount++;
+                        simulateController.moveSelectedKey(direction);
+                        takenPath.add(virtualKeyboard.getVirtualKey(simulateController.getSelectedKey()).getCenter());
+                        if(!detectedShortestComplete) takenPathModifiedShortest.add(virtualKeyboard.getVirtualKey(simulateController.getSelectedKey()).getCenter());
+                        if(!firstTouch) {
+                            firstTouch = true;
+                            reactionTimeFirstTouch = (float) ((currentLine.getTime() - wordStartTime) / SECOND_AS_NANO);
+                            timeDuration = (float) (currentLine.getTime() / SECOND_AS_NANO);
+                        }
+                        previousTime = currentLine.getTime();
                         break;
                     case PRACTICE_WORD_COUNT:
                         subjectData.add(StatisticDataType.PRACTICE_WORDS_PER_INPUT.name() + ": " + currentData.getValue());
                         break;
                     default: break;
                 }
+                
+                if(reportData) {
+                    // WPM = (currentWord.length() / timeDuration) * 60 * (1/5);
+                    // KSPC = (KSPC_C + KSPC_INF + KSPC_IF + KSPC_F) / (KSPC_C + KSPC_INF)
+                    // modMSD = (modMSD_INF / (modMSD_C + modMSD_INF)) * 100;
+                    wordList.add(currentWord);
+                    planeBreachedCountArray.add(planeBreachedCount);
+                    distanceTraveledArray.add(distanceTraveled *= PIXEL_TO_METER);
+                    distanceTraveledShortArray.add(distanceTraveledShort *= PIXEL_TO_METER);
+                    timeDurationArray.add(timeDuration);
+                    timeDurationShortArray.add(timeDurationShort);
+                    handVelocityAvgArray.add(handVelocity / numberOfActionsCount);
+                    reactionTimeFirstPressedArray.add(reactionTimeFirstPressed);
+                    reactionTimeFirstTouchArray.add(reactionTimeFirstTouch);
+                    if(responseToErrorsCount == 0) {
+                        reactionTimeToErrorAvgArray.add(-1f);
+                    } else {
+                        reactionTimeToErrorAvgArray.add(reactionTimeToError / responseToErrorsCount);   
+                    }
+                    WPM_Array.add(((currentWord.length() - 1) / ((timeDuration + reactionTimeFirstTouch) - reactionTimeFirstPressed)) * 60f * (1f / 5f));
+                    modShortWPM_Array.add(((currentWord.length() - 1) / ((timeDurationShort + reactionTimeFirstTouch) - reactionTimeFirstPressed)) * 60f * (1f / 5f));
+                    modVultureWPM_Array.add((currentWord.length() / (timeDuration + reactionTimeFirstTouch)) * 60f * (1f / 5f));
+                    modShortVultureWPM_Array.add((currentWord.length() / (timeDurationShort + reactionTimeFirstTouch)) * 60f * (1f / 5f));
+                    KSPC_Array.add((KSPC_C + KSPC_INF + KSPC_IF + KSPC_F) / (KSPC_C + KSPC_INF));
+                    modShortMSD_Array.add((modShortMSD_INF / (modShortMSD_C + modShortMSD_INF)) * 100);
+                    modBackspaceMSD_Array.add((modBackspaceMSD_INF / (modBackspaceMSD_C + modBackspaceMSD_INF)) * 100);
+                    /*System.out.println(currentWord + " ----------------------------------------------");
+                    System.out.print("TakenMod:  ");
+                    for(Vector v: takenPathModifiedShortest) {
+                        System.out.print(virtualKeyboard.getNearestKeyNoEnter(v, 9999).getKey() + "  ");
+                    }
+                    System.out.println("\n-------------------------------------------------------------");*/
+                    frechetDistanceArray.add(MyUtilities.MATH_UTILITILES.calculateFrechetDistance(
+                            takenPath.toArray(new Vector[takenPath.size()]),
+                            expectedPath.toArray(new Vector[expectedPath.size()])));
+                    modShortFrechetDistanceArray.add(MyUtilities.MATH_UTILITILES.calculateFrechetDistance(
+                            takenPathModifiedShortest.toArray(new Vector[takenPathModifiedShortest.size()]),
+                            expectedPath.toArray(new Vector[expectedPath.size()])));
+                    modBackspaceFrechetDistanceArray.add(MyUtilities.MATH_UTILITILES.calculateFrechetDistance(
+                            takenPath.toArray(new Vector[takenPath.size()]),
+                            expectedPathModifiedBackspace.toArray(new Vector[expectedPathModifiedBackspace.size()])));
+                    reportData = false;
+                    firstLetter = true;
+                    firstTouch = false;
+                    planeBreachedCount = 0;
+                    distanceTraveled = 0f;
+                    distanceTraveledShort = 0f;
+                    timeDuration = 0f; // convert to seconds
+                    timeDurationShort = 0f;
+                    reactionTimeFirstPressed = 0f; // convert to seconds
+                    reactionTimeFirstTouch = 0f;
+                    reactionTimeToError = 0f; // convert to seconds
+                    responseToErrorsCount = 0;
+                    handVelocity = 0f; // convert to m/s
+                    numberOfActionsCount = 0;
+                    expectedPath.clear();
+                    takenPath.clear();
+                    takenPathModifiedShortest.clear();
+                    expectedPathModifiedBackspace.clear();
+                    KSPC_C = 0;
+                    KSPC_INF = 0;
+                    KSPC_IF = 0;
+                    KSPC_F = 0;
+                    modShortMSD_C = 0;
+                    modShortMSD_INF = 0;
+                    modBackspaceMSD_C = 0;
+                    modBackspaceMSD_INF = 0;
+                }
             }
         }
+        // stuff arrays into subject Data
+        subjectData.add(StatisticDataType.WORD_ORDER.name() + ": " + wordList.toString());
+        subjectData.add(StatisticDataType.NUMBER_OF_TIMES_PLANE_BREACHED.name() + ": " + planeBreachedCountArray.toString());
+        subjectData.add(StatisticDataType.DISTANCE_TRAVELED_FIRST_TOUCH.name() + ": " + distanceTraveledArray.toString());
+        subjectData.add(StatisticDataType.DISTANCE_TRAVELED_FIRST_TOUCH_SHORTEST.name() + ": " + distanceTraveledShortArray.toString());
+        subjectData.add(StatisticDataType.TIME_DURATION_FIRST_TOUCH.name() + ": " + timeDurationArray.toString());
+        subjectData.add(StatisticDataType.TIME_DURATION_FIRST_TOUCH_SHORTEST.name() + ": " + timeDurationShortArray.toString());
+        subjectData.add(StatisticDataType.AVERAGE_TOUCH_VELOCITY.name() + ": " + handVelocityAvgArray.toString());
+        subjectData.add(StatisticDataType.REACTION_TIME_FIRST_PRESSED.name() + ": " + reactionTimeFirstPressedArray.toString());
+        subjectData.add(StatisticDataType.REACTION_TIME_FIRST_TOUCH.name() + ": " + reactionTimeFirstTouchArray.toString());
+        subjectData.add(StatisticDataType.AVERAGE_REACTION_TIME_TO_ERRORS.name() + ": " + reactionTimeToErrorAvgArray.toString());
+        subjectData.add(StatisticDataType.TEXT_ENTRY_RATE_WPM.name() + ": " + WPM_Array.toString());
+        subjectData.add(StatisticDataType.TEXT_ENTRY_RATE_MODIFIED_WPM_SHORTEST.name() + ": " + modShortWPM_Array.toString());
+        subjectData.add(StatisticDataType.TEXT_ENTRY_RATE_MODIFIED_WPM_VULTURE.name() + ": " + modVultureWPM_Array.toString());
+        subjectData.add(StatisticDataType.TEXT_ENTRY_RATE_MODIFIED_WPM_SHORTEST_VULTURE.name() + ": " + modShortVultureWPM_Array.toString());
+        subjectData.add(StatisticDataType.ERROR_RATE_KSPC.name() + ": " + KSPC_Array.toString());
+        subjectData.add(StatisticDataType.ERROR_RATE_MODIFIED_MSD_SHORTEST.name() + ": " + modShortMSD_Array.toString());
+        subjectData.add(StatisticDataType.ERROR_RATE_MODIFIED_MSD_WITH_BACKSPACE.name() + ": " + modBackspaceMSD_Array.toString());
+        subjectData.add(StatisticDataType.FRECHET_DISTANCE_TOUCH_ONLY.name() + ": " + frechetDistanceArray.toString());
+        subjectData.add(StatisticDataType.FRECHET_DISTANCE_TOUCH_ONLY_MODIFIED_SHORTEST.name() + ": " + modShortFrechetDistanceArray.toString());
+        subjectData.add(StatisticDataType.FRECHET_DISTANCE_TOUCH_ONLY_MODIFIED_WITH_BACKSPACE.name() + ": " + modBackspaceFrechetDistanceArray.toString());
         return subjectData;
     }
     
     private ArrayList<String> calculateSubjectData(ArrayList<String> fileContents, IKeyboard keyboard) {
         ArrayList<String> subjectData = new ArrayList<String>();
+        subjectData.add(StatisticDataType.KEYBOARD_TYPE.name() + ": " + keyboard.getFileName());
         VirtualKeyboard virtualKeyboard = (VirtualKeyboard) keyboard.getRenderables().getRenderable(Renderable.VIRTUAL_KEYBOARD);
-        // First thing to write in the file is the file name of the keyboard:
-        //KeyboardType.getByID(keyboardType.getID()).getFileName();
+        
+        // Arrays
+        ArrayList<String> wordList = new ArrayList<String>();
+        ArrayList<Integer> planeBreachedCountArray = new ArrayList<Integer>();
+        ArrayList<Float> distanceTraveledArray = new ArrayList<Float>();
+        ArrayList<Float> distanceTraveledShortArray = new ArrayList<Float>();
+        ArrayList<Float> timeDurationArray = new ArrayList<Float>();
+        ArrayList<Float> timeDurationShortArray = new ArrayList<Float>();
+        ArrayList<Float> reactionTimeFirstPressedArray = new ArrayList<Float>();
+        ArrayList<Float> reactionTimeFirstTouchArray = new ArrayList<Float>();
+        ArrayList<Float> reactionTimeToErrorAvgArray = new ArrayList<Float>();
+        ArrayList<Float> handVelocityAvgArray = new ArrayList<Float>();
+        ArrayList<Float> WPM_Array = new ArrayList<Float>();
+        ArrayList<Float> modShortWPM_Array = new ArrayList<Float>();
+        ArrayList<Float> modVultureWPM_Array = new ArrayList<Float>();
+        ArrayList<Float> modShortVultureWPM_Array = new ArrayList<Float>();
+        ArrayList<Float> KSPC_Array = new ArrayList<Float>();
+        ArrayList<Float> modShortMSD_Array = new ArrayList<Float>();
+        ArrayList<Float> modBackspaceMSD_Array = new ArrayList<Float>();
+        ArrayList<Float> frechetDistanceArray = new ArrayList<Float>();
+        ArrayList<Float> modShortFrechetDistanceArray = new ArrayList<Float>();
+        ArrayList<Float> modBackspaceFrechetDistanceArray = new ArrayList<Float>();
+        
+        // Tracked Variables
+        boolean firstLetter = true;
+        String currentWord = null;
+        long wordStartTime = 0l;
+        long previousTime = 0l;
+        
+        boolean isTouching = false;
+        boolean firstTouch = false;
+        
+        int planeBreachedCount = 0;
+        
+        float distanceTraveled = 0f;
+        float distanceTraveledShort = 0f;
+        Vector previousPosition = null;
+        
+        float timeDuration = 0f; // convert to seconds
+        float timeDurationShort = 0f;
+        
+        float reactionTimeFirstPressed = 0f; // convert to seconds
+        float reactionTimeFirstTouch = 0;
+        
+        float reactionTimeToError = 0f; // convert to seconds
+        long timeErrorOccured = 0l;
+        int responseToErrorsCount = 0;
+        
+        float handVelocity = 0f; // convert to m/s
+        int numberOfActionsCount = 0;
+        
+        ArrayList<Vector> expectedPath = new ArrayList<Vector>();
+        ArrayList<Vector> takenPath = new ArrayList<Vector>();
+        ArrayList<Vector> takenPathModifiedShortest = new ArrayList<Vector>();
+        ArrayList<Vector> expectedPathModifiedBackspace = new ArrayList<Vector>();
+        
+        float KSPC_C = 0f;
+        float KSPC_INF = 0f;
+        float KSPC_IF = 0f;
+        float KSPC_F = 0f; // TODO: Figure out the problem here
+        
+        int modShortMSD_C = 0;
+        float modShortMSD_INF = 0f;
+        
+        float modBackspaceMSD_C = 0f;
+        float modBackspaceMSD_INF = 0f;
+        
+        boolean detectedShortestComplete = false;
+        boolean lastEnterAfterShortestComplete = false;
+        
         for(FileData currentLine: fileData) {
+            Key pressedKey = null;
             while(currentLine.hasNext()) {
                 Entry<RecordedDataType, Object> currentData = currentLine.next();
-                
+                // Total distance traveled per word. (Array)
+                // Average hand velocity per word. (Array)
+                // Time duration per word. (Array)
+                // Reaction time per word. (Array)
+                // Average reaction time to errors per word. (Array)
+                // Calculate KSPC
+                // Calculate modified-MSD
+                // Calculate WPM
+                // Calculate Frechet Distance - Use Djikstra's for shortest path for controller keyboard to find expected path.
+                // Calculate Frechet Distance Modified - this will use same set as mod-MSD
+                boolean reportData = false;
                 switch(currentData.getKey()) {
-                    case TIME_EXPERIMENT_START:
-                        long start = currentLine.getTime();
-                        break;
-                    case TIME_EXPERIMENT_END:
-                        long end = currentLine.getTime();
-                        break;
                     case WORD_VALUE:
-                        String w = (String) currentData.getValue();
+                        previousTime = currentLine.getTime();
+                        wordStartTime = currentLine.getTime();
+                        numberOfActionsCount = 0;
+                        responseToErrorsCount = 0;
+                        detectedShortestComplete = false;
+                        lastEnterAfterShortestComplete = false;
+                        previousPosition = null;
+                        String newWord = (String) currentData.getValue();
+                        for(char c: newWord.toCharArray()) {
+                            expectedPath.add(virtualKeyboard.getVirtualKey(Key.getByValue(c)).getCenter());
+                        }
+                        currentWord = newWord;
                         break;
                     case KEY_PRESSED:
-                        Key kp = (Key) currentData.getValue();
+                        // First letter of word
+                        pressedKey = (Key) currentData.getValue();
+                        if(!detectedShortestComplete && pressedKey == Key.getByValue(currentWord.charAt(modShortMSD_C))) {
+                            modShortMSD_C++;
+                            if(modShortMSD_C == currentWord.length()) {
+                                detectedShortestComplete = true;
+                            }
+                        }
+                        if(!firstTouch) {
+                            firstTouch = true;
+                            reactionTimeFirstTouch = (float) ((previousTime - wordStartTime) / SECOND_AS_NANO);
+                            timeDuration = (float) (previousTime / SECOND_AS_NANO);
+                        }
+                        if(!isTouching) {
+                            isTouching = true;
+                            takenPath.add(previousPosition);
+                            if(!detectedShortestComplete) takenPathModifiedShortest.add(previousPosition);
+                        }
+                        if(pressedKey == Key.VK_ENTER) {
+                            isTouching = false;
+                            planeBreachedCount++;
+                            if(detectedShortestComplete && !lastEnterAfterShortestComplete) {
+                                lastEnterAfterShortestComplete = true;
+                                distanceTraveledShort = distanceTraveled;
+                                timeDurationShort = (float) ((previousTime / SECOND_AS_NANO) - timeDuration);
+                            }
+                        }
                         break;
                     case KEY_EXPECTED:
-                        Key ke = (Key) currentData.getValue();
+                        Key expectedKey = (Key) currentData.getValue();
+                        if(pressedKey.equals(Key.VK_ENTER) && expectedKey.equals(Key.VK_ENTER)) {
+                            reportData = true;
+                            timeDuration = (float) ((previousTime / SECOND_AS_NANO) - timeDuration);
+                        } else if(pressedKey.equals(Key.VK_BACK_SPACE) && expectedKey.equals(Key.VK_BACK_SPACE)) {
+                            KSPC_F++;
+                            KSPC_IF++;
+                            modBackspaceMSD_C++;
+                            expectedPathModifiedBackspace.add(virtualKeyboard.getVirtualKey(Key.VK_BACK_SPACE).getCenter());
+                            if(timeErrorOccured > 0) {
+                                reactionTimeToError += (previousTime - timeErrorOccured) / SECOND_AS_NANO;
+                                timeErrorOccured = 0;
+                                responseToErrorsCount++;
+                            }
+                        } else if(pressedKey.equals(expectedKey)) {
+                            KSPC_C++;
+                            modBackspaceMSD_C++;
+                            expectedPathModifiedBackspace.add(virtualKeyboard.getVirtualKey(pressedKey).getCenter());
+                            if(firstLetter) {
+                                firstLetter = false;
+                                reactionTimeFirstPressed = (float) ((previousTime - wordStartTime) / SECOND_AS_NANO);
+                            }
+                        } else if(!pressedKey.equals(expectedKey) && pressedKey != Key.VK_ENTER) {
+                            if(timeErrorOccured == 0 && expectedKey != Key.VK_BACK_SPACE && pressedKey != Key.VK_BACK_SPACE) {
+                                timeErrorOccured = currentLine.getTime();
+                                if(!detectedShortestComplete) modShortMSD_INF++;
+                                modBackspaceMSD_INF++;
+                            } else if(expectedKey != Key.VK_BACK_SPACE && pressedKey == Key.VK_BACK_SPACE) {
+                                KSPC_F++; // If you hit backspace more than you should...
+                                //KSPC_INF++; - not quite right
+                            } else if(expectedKey == Key.VK_BACK_SPACE && pressedKey != Key.VK_BACK_SPACE) {
+                                if(!detectedShortestComplete) modShortMSD_INF++;
+                                modBackspaceMSD_INF++;
+                            }
+                        }
+                        previousTime = currentLine.getTime();
                         break;
                     case POINT_POSITION:
-                        Vector v = (Vector) currentData.getValue();
-                        break;
-                    case DIRECTION_PRESSED:
-                        Direction d = (Direction) currentData.getValue();
+                        Vector newPosition = (Vector) currentData.getValue();
+                        if(isTouching && previousPosition != null) {
+                            takenPath.add(newPosition);
+                            if(!detectedShortestComplete) takenPathModifiedShortest.add(newPosition);
+                            if(isTouching) {
+                                numberOfActionsCount++;
+                                handVelocity += 
+                                        (MyUtilities.MATH_UTILITILES.findDistanceToPoint(previousPosition, newPosition) * PIXEL_TO_METER)
+                                        / ((currentLine.getTime() - previousTime) / SECOND_AS_NANO);
+                            }
+                        }
+                        if(firstTouch && previousPosition != null) {
+                            distanceTraveled += MyUtilities.MATH_UTILITILES.findDistanceToPoint(previousPosition, newPosition);
+                        }
+                        previousPosition = newPosition;
+                        previousTime = currentLine.getTime();
                         break;
                     case PRACTICE_WORD_COUNT:
-                        int pwc = (Integer) currentData.getValue();
+                        subjectData.add(StatisticDataType.PRACTICE_WORDS_PER_INPUT.name() + ": " + currentData.getValue());
                         break;
                     default: break;
                 }
-                System.out.println(currentData.getKey() + " " + currentData.getValue());
+                
+                if(reportData) {
+                    // WPM = (currentWord.length() / timeDuration) * 60 * (1/5);
+                    // KSPC = (KSPC_C + KSPC_INF + KSPC_IF + KSPC_F) / (KSPC_C + KSPC_INF)
+                    // modMSD = (modMSD_INF / (modMSD_C + modMSD_INF)) * 100;
+                    wordList.add(currentWord);
+                    planeBreachedCountArray.add(planeBreachedCount);
+                    distanceTraveledArray.add(distanceTraveled *= PIXEL_TO_METER);
+                    distanceTraveledShortArray.add(distanceTraveledShort *= PIXEL_TO_METER);
+                    timeDurationArray.add(timeDuration);
+                    timeDurationShortArray.add(timeDurationShort);
+                    handVelocityAvgArray.add(handVelocity / numberOfActionsCount);
+                    reactionTimeFirstPressedArray.add(reactionTimeFirstPressed);
+                    reactionTimeFirstTouchArray.add(reactionTimeFirstTouch);
+                    if(responseToErrorsCount == 0) {
+                        reactionTimeToErrorAvgArray.add(-1f);
+                    } else {
+                        reactionTimeToErrorAvgArray.add(reactionTimeToError / responseToErrorsCount);   
+                    }
+                    WPM_Array.add(((currentWord.length() - 1) / ((timeDuration + reactionTimeFirstTouch) - reactionTimeFirstPressed)) * 60f * (1f / 5f));
+                    modShortWPM_Array.add(((currentWord.length() - 1) / ((timeDurationShort + reactionTimeFirstTouch) - reactionTimeFirstPressed)) * 60f * (1f / 5f));
+                    modVultureWPM_Array.add((currentWord.length() / (timeDuration + reactionTimeFirstTouch)) * 60f * (1f / 5f));
+                    modShortVultureWPM_Array.add((currentWord.length() / (timeDurationShort + reactionTimeFirstTouch)) * 60f * (1f / 5f));
+                    KSPC_Array.add((KSPC_C + KSPC_INF + KSPC_IF + KSPC_F) / (KSPC_C + KSPC_INF));
+                    modShortMSD_Array.add((modShortMSD_INF / (modShortMSD_C + modShortMSD_INF)) * 100);
+                    modBackspaceMSD_Array.add((modBackspaceMSD_INF / (modBackspaceMSD_C + modBackspaceMSD_INF)) * 100);
+                    frechetDistanceArray.add(MyUtilities.MATH_UTILITILES.calculateFrechetDistance(
+                            takenPath.toArray(new Vector[takenPath.size()]),
+                            expectedPath.toArray(new Vector[expectedPath.size()])));
+                    modShortFrechetDistanceArray.add(MyUtilities.MATH_UTILITILES.calculateFrechetDistance(
+                            takenPathModifiedShortest.toArray(new Vector[takenPathModifiedShortest.size()]),
+                            expectedPath.toArray(new Vector[expectedPath.size()])));
+                    modBackspaceFrechetDistanceArray.add(MyUtilities.MATH_UTILITILES.calculateFrechetDistance(
+                            takenPath.toArray(new Vector[takenPath.size()]),
+                            expectedPathModifiedBackspace.toArray(new Vector[expectedPathModifiedBackspace.size()])));
+                    reportData = false;
+                    firstLetter = true;
+                    planeBreachedCount = 0;
+                    isTouching = false;
+                    firstTouch = false;
+                    distanceTraveled = 0f;
+                    distanceTraveledShort = 0f;
+                    timeDuration = 0f; // convert to seconds
+                    timeDurationShort = 0f;
+                    previousPosition = null;
+                    reactionTimeFirstPressed = 0f; // convert to seconds
+                    reactionTimeFirstTouch = 0f;
+                    reactionTimeToError = 0f; // convert to seconds
+                    responseToErrorsCount = 0;
+                    handVelocity = 0f; // convert to m/s
+                    numberOfActionsCount = 0;
+                    expectedPath.clear();
+                    takenPath.clear();
+                    takenPathModifiedShortest.clear();
+                    expectedPathModifiedBackspace.clear();
+                    KSPC_C = 0;
+                    KSPC_INF = 0;
+                    KSPC_IF = 0;
+                    KSPC_F = 0;
+                    modShortMSD_C = 0;
+                    modShortMSD_INF = 0;
+                    modBackspaceMSD_C = 0;
+                    modBackspaceMSD_INF = 0;
+                }
             }
         }
-        // File Layout:
-        // Keyboard Name: name
-        // Practice words: #
-        // Total distance traveled per word. (Array)
-        // Reaction time per word. (Array)
-        // Average reaction time to errors per word. (Array)
-        // Time duration per word. (Array)
-        
-        
-        // Calculate Frechet Distance - Use Djikstra's for shortest path for controller keyboard to find expected path.
-        // Calculate Frechet Distance Modified - this will use same set as mod-MSD
-        // Calculate KSPC
-        // Calculate modified-MSD
-        // Calculate WPM
+        // stuff arrays into subject Data
+        subjectData.add(StatisticDataType.WORD_ORDER.name() + ": " + wordList.toString());
+        subjectData.add(StatisticDataType.NUMBER_OF_TIMES_PLANE_BREACHED.name() + ": " + planeBreachedCountArray.toString());
+        subjectData.add(StatisticDataType.DISTANCE_TRAVELED_FIRST_TOUCH.name() + ": " + distanceTraveledArray.toString());
+        subjectData.add(StatisticDataType.DISTANCE_TRAVELED_FIRST_TOUCH_SHORTEST.name() + ": " + distanceTraveledShortArray.toString());
+        subjectData.add(StatisticDataType.TIME_DURATION_FIRST_TOUCH.name() + ": " + timeDurationArray.toString());
+        subjectData.add(StatisticDataType.TIME_DURATION_FIRST_TOUCH_SHORTEST.name() + ": " + timeDurationShortArray.toString());
+        subjectData.add(StatisticDataType.AVERAGE_TOUCH_VELOCITY.name() + ": " + handVelocityAvgArray.toString());
+        subjectData.add(StatisticDataType.REACTION_TIME_FIRST_PRESSED.name() + ": " + reactionTimeFirstPressedArray.toString());
+        subjectData.add(StatisticDataType.REACTION_TIME_FIRST_TOUCH.name() + ": " + reactionTimeFirstTouchArray.toString());
+        subjectData.add(StatisticDataType.AVERAGE_REACTION_TIME_TO_ERRORS.name() + ": " + reactionTimeToErrorAvgArray.toString());
+        subjectData.add(StatisticDataType.TEXT_ENTRY_RATE_WPM.name() + ": " + WPM_Array.toString());
+        subjectData.add(StatisticDataType.TEXT_ENTRY_RATE_MODIFIED_WPM_SHORTEST.name() + ": " + modShortWPM_Array.toString());
+        subjectData.add(StatisticDataType.TEXT_ENTRY_RATE_MODIFIED_WPM_VULTURE.name() + ": " + modVultureWPM_Array.toString());
+        subjectData.add(StatisticDataType.TEXT_ENTRY_RATE_MODIFIED_WPM_SHORTEST_VULTURE.name() + ": " + modShortVultureWPM_Array.toString());
+        subjectData.add(StatisticDataType.ERROR_RATE_KSPC.name() + ": " + KSPC_Array.toString());
+        subjectData.add(StatisticDataType.ERROR_RATE_MODIFIED_MSD_SHORTEST.name() + ": " + modShortMSD_Array.toString());
+        subjectData.add(StatisticDataType.ERROR_RATE_MODIFIED_MSD_WITH_BACKSPACE.name() + ": " + modBackspaceMSD_Array.toString());
+        subjectData.add(StatisticDataType.FRECHET_DISTANCE_TOUCH_ONLY.name() + ": " + frechetDistanceArray.toString());
+        subjectData.add(StatisticDataType.FRECHET_DISTANCE_TOUCH_ONLY_MODIFIED_SHORTEST.name() + ": " + modShortFrechetDistanceArray.toString());
+        subjectData.add(StatisticDataType.FRECHET_DISTANCE_TOUCH_ONLY_MODIFIED_WITH_BACKSPACE.name() + ": " + modBackspaceFrechetDistanceArray.toString());
         return subjectData;
     }
     
@@ -293,14 +760,6 @@ public class DataFormatter implements Runnable {
                 RecordedDataType dataType = RecordedDataType.getByName(eventInfo[0]);
                 
                 switch(dataType) {
-                    case TIME_EXPERIMENT_START:
-                        eventTime = Long.valueOf(eventInfo[1]);
-                        dataValue = eventTime;
-                        break;
-                    case TIME_EXPERIMENT_END:
-                        eventTime = Long.valueOf(eventInfo[1]);
-                        dataValue = eventTime;
-                        break;
                     case TIME_WORD_START:
                         eventTime = Long.valueOf(eventInfo[1]);
                         break;

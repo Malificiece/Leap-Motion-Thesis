@@ -126,14 +126,14 @@ public class MathUtilities {
         }
         
         public void delete() {
-            this.P = null;
-            this.Q = null;
             for(int i = 0; i < P.length; i++) {
                 for(int j = 0; j < Q.length; j++) {
                     CA[i][j] = null;
                 }
                 CA[i] = null;
             }
+            P = null;
+            Q = null;
             CA = null;
         }
         
