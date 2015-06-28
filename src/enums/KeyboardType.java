@@ -48,6 +48,9 @@ public enum KeyboardType {
     public static KeyboardType getByName(String keyboardName) {
         for(KeyboardType keyboardType: values()) {
             if(keyboardType.getName().equalsIgnoreCase(keyboardName)) return keyboardType;
+            if(keyboardType.getFileName().equalsIgnoreCase(keyboardName)) return keyboardType;
+            if(keyboardName != null && keyboardName.contains(keyboardType.getName())) return keyboardType;
+            if(keyboardName != null && keyboardName.contains(keyboardType.getFileName())) return keyboardType;
         }
         return null;
     }

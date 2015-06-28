@@ -17,18 +17,32 @@ public enum ExitSurveyDataType {
     PHYSICAL_INPAIRMENT_DESCRIPTION,
     HANDEDNESS,
     PREFERED_HANDEDNESS_FOR_EXPERIMENT,
-    _DISCOMFORT_LEVEL,
-    _FATIGUE_LEVEL,
-    _DIFFICULTY_LEVEL,
-    _PREFERENCE_RANKING;
+    DISCOMFORT_LEVEL,
+    FATIGUE_LEVEL,
+    DIFFICULTY_LEVEL,
+    PREFERENCE_RANKING;
     
-    /*public static ExitSurveyDataType getByName(String typeName) {
+    public static ExitSurveyDataType getByName(String typeName) {
         for(ExitSurveyDataType esdt: values()) {
             if(esdt.name().equalsIgnoreCase(typeName)) return esdt;
-        }
-        for(ExitSurveyDataType esdt: values()) {
-            if(esdt.name().contains(typeName)) return esdt;
+            if(typeName != null && typeName.contains(esdt.name())) return esdt;
         }
         return null;
-    }*/
+    }
+    
+    public static boolean isLikert(ExitSurveyDataType esdt) {
+        if(esdt == DISCOMFORT_LEVEL ||
+                esdt == FATIGUE_LEVEL ||
+                esdt == DIFFICULTY_LEVEL) {
+            return true;
+        }
+        return false;
+    }
+    
+    public static boolean isRanking(ExitSurveyDataType esdt) {
+        if(esdt == PREFERENCE_RANKING) {
+            return true;
+        }
+        return false;
+    }
 }

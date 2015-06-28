@@ -35,10 +35,36 @@ public enum ExitSurveyOptions {
         return description;
     }
     
-    public static ExitSurveyOptions getByDescription(String description) {
+    public static ExitSurveyOptions getByDescriptionExact(String description) {
         for(ExitSurveyOptions eso: values()) {
-            if(eso.getDescription().contains(description)) return eso;
+            if(eso.getDescription().equalsIgnoreCase(description)) return eso;
         }
         return null;
+    }
+    
+    public static ExitSurveyOptions getByDescriptionPartial(String description) {
+        for(ExitSurveyOptions eso: values()) {
+            if(description != null && description.contains(eso.getDescription())) return eso;
+        }
+        return null;
+    }
+    
+    public static int getNumericValuebyDescription(String description) {
+        ExitSurveyOptions surveyOption = getByDescriptionExact(description);
+        if(surveyOption == null) return 0;
+        switch(surveyOption) {
+            case STRONGLY_AGREE:
+                return 2;
+            case AGREE:
+                return 1;
+            case NEUTRAL:
+                return 0;
+            case DISAGREE:
+                return -1;
+            case STRONGLY_DISAGREE:
+                return -2;
+            default:
+                return 0;
+        }
     }
 }

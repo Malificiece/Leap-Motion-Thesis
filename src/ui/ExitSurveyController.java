@@ -323,27 +323,27 @@ public class ExitSurveyController extends WindowController {
                 JRadioButton radioButton = getYesRadioButton(usedButtonGroups.get(keyboardType.getID() - 1));
                 if(radioButton.isSelected()) {
                     // discomfort
-                    exitSurveyData.add(keyboardType.getKeyboard().getFileName() + ExitSurveyDataType._DISCOMFORT_LEVEL.name() + ": "
+                    exitSurveyData.add(keyboardType.getKeyboard().getFileName() + "_" + ExitSurveyDataType.DISCOMFORT_LEVEL.name() + ": "
                             + getSelectedButtonText(discomfortButtonGroups.get(keyboardType.getID() - 1)));
                     
                     // fatigue
-                    exitSurveyData.add(keyboardType.getKeyboard().getFileName() + ExitSurveyDataType._FATIGUE_LEVEL.name() + ": "
+                    exitSurveyData.add(keyboardType.getKeyboard().getFileName() + "_" + ExitSurveyDataType.FATIGUE_LEVEL.name() + ": "
                             + getSelectedButtonText(fatigueButtonGroups.get(keyboardType.getID() - 1)));
                     
                     // difficulty
-                    exitSurveyData.add(keyboardType.getKeyboard().getFileName() + ExitSurveyDataType._DIFFICULTY_LEVEL.name() + ": "
+                    exitSurveyData.add(keyboardType.getKeyboard().getFileName() + "_" + ExitSurveyDataType.DIFFICULTY_LEVEL.name() + ": "
                             + getSelectedButtonText(difficultyButtonGroups.get(keyboardType.getID() - 1)));
                 } else {
                     // discomfort
-                    exitSurveyData.add(keyboardType.getKeyboard().getFileName() + ExitSurveyDataType._DISCOMFORT_LEVEL.name() + ": "
+                    exitSurveyData.add(keyboardType.getKeyboard().getFileName() + "_" + ExitSurveyDataType.DISCOMFORT_LEVEL.name() + ": "
                             + ExitSurveyOptions.DID_NOT_USE.getDescription());
                     
                     // fatigue
-                    exitSurveyData.add(keyboardType.getKeyboard().getFileName() + ExitSurveyDataType._FATIGUE_LEVEL.name() + ": "
+                    exitSurveyData.add(keyboardType.getKeyboard().getFileName() + "_" + ExitSurveyDataType.FATIGUE_LEVEL.name() + ": "
                             + ExitSurveyOptions.DID_NOT_USE.getDescription());
                     
                     // difficulty
-                    exitSurveyData.add(keyboardType.getKeyboard().getFileName() + ExitSurveyDataType._DIFFICULTY_LEVEL.name() + ": "
+                    exitSurveyData.add(keyboardType.getKeyboard().getFileName() + "_" + ExitSurveyDataType.DIFFICULTY_LEVEL.name() + ": "
                             + ExitSurveyOptions.DID_NOT_USE.getDescription());
                 }
             }
@@ -355,11 +355,11 @@ public class ExitSurveyController extends WindowController {
                 JRadioButton radioButton = getYesRadioButton(usedButtonGroups.get(keyboardType.getID() - 1));
                 if(radioButton.isSelected()) {
                     // ranking
-                    exitSurveyData.add(keyboardType.getKeyboard().getFileName() + ExitSurveyDataType._PREFERENCE_RANKING.name() + ": "
+                    exitSurveyData.add(keyboardType.getKeyboard().getFileName() + "_" + ExitSurveyDataType.PREFERENCE_RANKING.name() + ": "
                             + rankingTextFields.get(keyboardType.getID() - 1).getText());
                 } else {
                     // ranking
-                    exitSurveyData.add(keyboardType.getKeyboard().getFileName() + ExitSurveyDataType._PREFERENCE_RANKING.name() + ": "
+                    exitSurveyData.add(keyboardType.getKeyboard().getFileName() + "_" + ExitSurveyDataType.PREFERENCE_RANKING.name() + ": "
                             + ExitSurveyOptions.DID_NOT_USE.getDescription());
                 }
             }
@@ -454,7 +454,7 @@ public class ExitSurveyController extends WindowController {
     public JRadioButton getYesRadioButton(ButtonGroup group) {
         for (Enumeration<AbstractButton> e = group.getElements(); e.hasMoreElements();) {
         	JRadioButton radioButton = (JRadioButton) e.nextElement();
-        	ExitSurveyOptions option = ExitSurveyOptions.getByDescription(radioButton.getText());
+        	ExitSurveyOptions option = ExitSurveyOptions.getByDescriptionPartial(radioButton.getText());
         	if (option == ExitSurveyOptions.YES) {
         		return radioButton;
         	}
