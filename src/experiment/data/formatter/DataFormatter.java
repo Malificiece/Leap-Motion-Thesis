@@ -22,7 +22,6 @@ import enums.FileName;
 import enums.Key;
 import enums.Keyboard;
 import enums.KeyboardType;
-import enums.MatlabFunctions;
 import enums.RecordedDataType;
 import enums.Renderable;
 import enums.StatisticDataType;
