@@ -1,0 +1,16 @@
+clear controller*
+clear leapAirBimodal*
+clear leapAirDynamic*
+clear leapAirPinch*
+clear leapAirStatic*
+clear leapAirSurface*
+clear leapSurface*
+clear tablet*
+
+[p, tbl, stats] = anova1(TEXT_ENTRY_RATE_MODIFIED_WPM_SHORTEST_VULTURE, KEYBOARD_ORDER)
+powerAOVI(tbl{2,5}, tbl{2,3}, tbl{3,3}, tbl{2,2}/tbl{3,4}, 0.05)
+powerAOVII(tbl{2,5}, tbl{2,3}, tbl{3,3}, 0.05)
+[c,m,~,~] = multcompare(stats)
+
+
+[p, tbl, stats] = anova1([tablet_FRECHET_DISTANCE_TOUCH_ONLY_MODIFIED_SHORTEST, leapAirBimodal_FRECHET_DISTANCE_TOUCH_ONLY_MODIFIED_SHORTEST])

@@ -34,7 +34,7 @@ public class DataFormatter implements Runnable {
         CALCULATE;
     }
     private final double SECOND_AS_NANO = 1000000000;
-    private final float PIXEL_TO_METER = 1f;//0.000264583f;
+    private final float PIXEL_TO_CENTIMETER = 0.0264583f;
     private final String TUTORIAL = FileName.TUTORIAL.getName();
     private FormatProcessType type;
     private File directory;
@@ -91,10 +91,22 @@ public class DataFormatter implements Runnable {
                         } else if(dataType != StatisticDataType.WORD_ORDER) {
                             String key = keyboardName + "_" + dataType.name();
                             String value = consolidatedData.get(key);
-                            if(value != null) {
+                            /*if(value != null) {
                                 consolidatedData.put(key, value + "; " + dataInfo[1].replaceAll(",", "; "));
                             } else {
                                 consolidatedData.put(key, dataInfo[1].replaceAll(",", "; "));
+                            }*/
+                            String [] values = dataInfo[1].split(",");
+                            float average = 0;
+                            for(String s: values) {
+                                float v = Float.parseFloat(s);
+                                average += v;
+                            }
+                            average /= values.length;
+                            if(value != null) {
+                                consolidatedData.put(key, value + "; " + average);
+                            } else {
+                                consolidatedData.put(key, "" + average);
                             }
                         }
                     }
@@ -138,6 +150,8 @@ public class DataFormatter implements Runnable {
                 }
             }
         }
+        LinkedHashMap<String, ArrayList<Float>> standardDeviations = new LinkedHashMap<String, ArrayList<Float>>();
+        LinkedHashMap<String, ArrayList<Float>> means = new LinkedHashMap<String, ArrayList<Float>>();
         // Set up the matrices we'll perform ANOVAs on.
         LinkedHashMap<String, String> matrices = new LinkedHashMap<String, String>();
         for(Keyboard keyboard: Keyboard.values()) {
@@ -155,11 +169,36 @@ public class DataFormatter implements Runnable {
                                 key = ExitSurveyDataType.getByName(key).name();
                             }
                         }
+                        
+                        // Find the SD and Mean of the list
+                        String [] values = entry.getValue().split("; ");
+                        float avgM = 0;
+                        for(String s: values) {
+                            float v = Float.parseFloat(s);
+                            avgM += v;
+                        }
+                        avgM /= values.length;
+                        double avgSD = 0;
+                        for(String s: values) {
+                            float v = Float.parseFloat(s);
+                            avgSD += Math.pow((v - avgM), 2);
+                        }
+                        avgSD /= values.length;
+                        avgSD = Math.sqrt(avgSD);
+    
                         String value = matrices.get(key);
                         if(value != null) {
                             matrices.put(key, value + ", " + entry.getKey());
+                            standardDeviations.get(key).add((float) avgSD);
+                            means.get(key).add(avgM);
                         } else {
                             matrices.put(key, entry.getKey());
+                            ArrayList<Float> arraySD = new ArrayList<Float>();
+                            ArrayList<Float> arrayM = new ArrayList<Float>();
+                            arraySD.add((float) avgSD);
+                            arrayM.add(avgM);
+                            standardDeviations.put(key, arraySD);
+                            means.put(key, arrayM);
                         }
                     }
                 }
@@ -173,6 +212,106 @@ public class DataFormatter implements Runnable {
             }
         }
         matrices.put(StatisticDataType.SUBJECT_ORDER.name(), subjectOrder);
+        
+        ArrayList<Entry<String, ArrayList<Float>>> meanEntries = new ArrayList<Entry<String, ArrayList<Float>>>();
+        ArrayList<Entry<String, ArrayList<Float>>> sdEntries = new ArrayList<Entry<String, ArrayList<Float>>>();
+        for(Entry<String, ArrayList<Float>> entry: means.entrySet()) {
+            meanEntries.add(entry);
+        }
+        for(Entry<String, ArrayList<Float>> entry: standardDeviations.entrySet()) {
+            sdEntries.add(entry);
+        }
+        
+        float finalAverageSamplePooled = 0;
+        float finalAverageSamplePop = 0;
+        int finalCount = 0;
+        for(int i = 0; i < meanEntries.size(); i++) {
+            ArrayList<Float> arrayM = meanEntries.get(i).getValue();
+            ArrayList<Float> arraySD = sdEntries.get(i).getValue();
+            float minM = Float.POSITIVE_INFINITY;
+            float maxM = -1;
+            float avgM = 0;
+            float minSD = Float.POSITIVE_INFINITY;
+            float maxSD = -1;
+            float avgSD = 0;
+            for(int j = 0; j < arrayM.size(); j++) {
+                float m = arrayM.get(j);
+                float sd = arraySD.get(j);
+                if(m < minM) minM = m;
+                if(sd < minSD) minSD = sd;
+                if(m > maxM) maxM = m;
+                if(sd > maxSD) maxSD = sd;
+                avgM += m;
+                avgSD += sd;
+            }
+            avgM /= arrayM.size();
+            avgSD /= arraySD.size();
+            /*System.out.println(meanEntries.get(i).getKey() + " | minMean: " + minM + " avgMean: " + avgM + " maxMean: " + maxM
+                    + " | minSD: " + minSD + " avgSD: " + avgSD + " maxSD: " + maxSD);*/
+            //System.out.println(meanEntries.get(i).getKey() + "\t\t\t | mean = " + avgM + "\t\t | sd = " + avgSD);
+            System.out.println(meanEntries.get(i).getKey());
+            System.out.print("means: ");
+            for(int j = 0; j < arrayM.size(); j++) {
+                if(j == 0) {
+                    System.out.print(arrayM.get(j));
+                } else {
+                    System.out.print(", " + arrayM.get(j));
+                }
+            }
+            System.out.println();
+            System.out.print("stds: ");
+            for(int j = 0; j < arraySD.size(); j++) {
+                if(j == 0) {
+                    System.out.print(arraySD.get(j));
+                } else {
+                    System.out.print(", " + arraySD.get(j));
+                }
+            }
+            System.out.println();
+            
+            StatisticDataType sdt = StatisticDataType.getByName(meanEntries.get(i).getKey());
+            if(sdt != null
+                    && !sdt.equals(StatisticDataType.PRACTICE_WORDS_PER_INPUT)
+                    && !sdt.equals(StatisticDataType.REACTION_TIME_FIRST_PRESSED)
+                    && !sdt.equals(StatisticDataType.REACTION_TIME_FIRST_TOUCH)) {
+                // Use population standard deviation
+                float averageSamplePooled = 0;
+                float averageSamplePop = 0;
+                int count = 0;
+                int tablet = 1;
+                float maxSamplePooled = -1;
+                float maxSamplePop = -1;
+                for(int j = tablet + 1; j < arrayM.size(); j++) {
+                    float sdPop = arraySD.get(tablet);
+                    float sdPooled = (float) Math.pow(((6 * Math.pow(sdPop, 2)) + (6 * Math.pow(arraySD.get(j), 2))) / (12), 0.5);
+                    float meanChange = arrayM.get(tablet) - arrayM.get(j);
+                    float zVal = (float) Math.pow(1.96f + 0.84f, 2);
+                    float nPop = (float) (2 * zVal / Math.pow(meanChange / sdPop, 2));
+                    float nPool = (float) (2 * zVal / Math.pow(meanChange / sdPooled, 2));
+                    System.out.println(KeyboardType.getByID(tablet + 1).getFileName() +  " | " + KeyboardType.getByID(j + 1).getFileName()
+                            + ": sampleSize(Pop): " + nPop + " sampleSize(Pool): " + nPool);
+                    count++;
+                    averageSamplePooled += nPool;
+                    averageSamplePop += nPop;
+                    if(nPop > maxSamplePop) maxSamplePop = nPop;
+                    if(nPool > maxSamplePooled) maxSamplePooled = nPool;
+                }
+                averageSamplePooled /= count;
+                averageSamplePop /= count;
+                System.out.println("Average sample size    (pop): " + averageSamplePop);
+                System.out.println("Average sample size (pooled): " + averageSamplePooled);
+                finalAverageSamplePooled += averageSamplePooled;
+                finalAverageSamplePop += averageSamplePop;
+                finalCount++;
+            }
+            System.out.println("-------------------------------------------------------");
+        }
+        
+        finalAverageSamplePooled /= finalCount;
+        finalAverageSamplePop /= finalCount;
+        
+        System.out.println("Final Average Sample    (pop): " + finalAverageSamplePop);
+        System.out.println("Final Average Sample (pooled): " + finalAverageSamplePooled);
         
         // write to file
         try {
@@ -293,7 +432,7 @@ public class DataFormatter implements Runnable {
         ArrayList<Float> modShortVultureWPM_Array = new ArrayList<Float>();
         ArrayList<Float> KSPC_Array = new ArrayList<Float>();
         ArrayList<Float> modShortKSPC_Array = new ArrayList<Float>();
-        ArrayList<Float> modBackspaceKSPC_Array = new ArrayList<Float>();
+        //ArrayList<Float> modBackspaceKSPC_Array = new ArrayList<Float>();
         ArrayList<Float> modShortMSD_Array = new ArrayList<Float>();
         ArrayList<Float> modBackspaceMSD_Array = new ArrayList<Float>();
         ArrayList<Float> totalErrorRateArray = new ArrayList<Float>();
@@ -484,10 +623,10 @@ public class DataFormatter implements Runnable {
                         Direction direction = (Direction) currentData.getValue();
                         if(direction.equals(Direction.RIGHT) || direction.equals(Direction.LEFT)) {
                             distanceTraveled += DISTANCE_RIGHT_LEFT;
-                            if(firstTouch) handVelocity += (DISTANCE_RIGHT_LEFT * PIXEL_TO_METER) / ((currentLine.getTime() - previousTime) / SECOND_AS_NANO);
+                            if(firstTouch) handVelocity += (DISTANCE_RIGHT_LEFT * PIXEL_TO_CENTIMETER) / ((currentLine.getTime() - previousTime) / SECOND_AS_NANO);
                         } else if(direction.equals(Direction.UP) || direction.equals(Direction.DOWN)) {
                             distanceTraveled += DISTANCE_UP_DOWN;
-                            if(firstTouch) handVelocity += (DISTANCE_UP_DOWN * PIXEL_TO_METER) / ((currentLine.getTime() - previousTime) / SECOND_AS_NANO);
+                            if(firstTouch) handVelocity += (DISTANCE_UP_DOWN * PIXEL_TO_CENTIMETER) / ((currentLine.getTime() - previousTime) / SECOND_AS_NANO);
                         }
                         if(firstTouch) numberOfActionsCount++;
                         simulateController.moveSelectedKey(direction);
@@ -509,8 +648,8 @@ public class DataFormatter implements Runnable {
                 if(reportData) {
                     wordList.add(currentWord);
                     planeBreachedCountArray.add(planeBreachedCount);
-                    distanceTraveledArray.add(distanceTraveled *= PIXEL_TO_METER);
-                    distanceTraveledShortArray.add(distanceTraveledShort *= PIXEL_TO_METER);
+                    distanceTraveledArray.add(distanceTraveled *= PIXEL_TO_CENTIMETER);
+                    distanceTraveledShortArray.add(distanceTraveledShort *= PIXEL_TO_CENTIMETER);
                     timeDurationArray.add(timeDuration);
                     timeDurationShortArray.add(timeDurationShort);
                     handVelocityAvgArray.add(handVelocity / numberOfActionsCount);
@@ -523,11 +662,11 @@ public class DataFormatter implements Runnable {
                     }
                     WPM_Array.add(((currentWord.length() - 1) / ((timeDuration + reactionTimeFirstTouch) - reactionTimeFirstPressed)) * 60f * (1f / 5f));
                     modShortWPM_Array.add(((currentWord.length() - 1) / ((timeDurationShort + reactionTimeFirstTouch) - reactionTimeFirstPressed)) * 60f * (1f / 5f));
-                    modVultureWPM_Array.add((currentWord.length() / (timeDuration + reactionTimeFirstTouch)) * 60f * (1f / 5f));
-                    modShortVultureWPM_Array.add((currentWord.length() / (timeDurationShort + reactionTimeFirstTouch)) * 60f * (1f / 5f));
+                    modVultureWPM_Array.add((currentWord.length() / (timeDuration + (reactionTimeFirstPressed - reactionTimeFirstTouch))) * 60f * (1f / 5f));
+                    modShortVultureWPM_Array.add((currentWord.length() / (timeDurationShort + (reactionTimeFirstPressed - reactionTimeFirstTouch))) * 60f * (1f / 5f));
                     KSPC_Array.add((C + INF + IF + F) / (C + INF));
                     modShortKSPC_Array.add((shortC + shortINF + shortIF + shortF) / (shortC + shortINF));
-                    modBackspaceKSPC_Array.add((backspaceC + backspaceINF + backspaceIF + backspaceF) / (backspaceC + backspaceINF));
+                    //modBackspaceKSPC_Array.add((backspaceC + backspaceINF + backspaceIF + backspaceF) / (backspaceC + backspaceINF));
                     modShortMSD_Array.add((shortINF / (shortC + shortINF)) * 100);
                     modBackspaceMSD_Array.add((backspaceINF / (backspaceC + backspaceINF)) * 100);
                     totalErrorRateArray.add(((INF + IF) / (C + INF + IF)) * 100);
@@ -600,10 +739,10 @@ public class DataFormatter implements Runnable {
         // stuff arrays into subject Data
         subjectData.add(StatisticDataType.WORD_ORDER.name() + ": " + wordList.toString());
         subjectData.add(StatisticDataType.NUMBER_OF_TIMES_PLANE_BREACHED.name() + ": " + planeBreachedCountArray.toString());
-        subjectData.add(StatisticDataType.DISTANCE_TRAVELED_FIRST_TOUCH.name() + ": " + distanceTraveledArray.toString());
-        subjectData.add(StatisticDataType.DISTANCE_TRAVELED_FIRST_TOUCH_SHORTEST.name() + ": " + distanceTraveledShortArray.toString());
-        subjectData.add(StatisticDataType.TIME_DURATION_FIRST_TOUCH.name() + ": " + timeDurationArray.toString());
-        subjectData.add(StatisticDataType.TIME_DURATION_FIRST_TOUCH_SHORTEST.name() + ": " + timeDurationShortArray.toString());
+        subjectData.add(StatisticDataType.DISTANCE_TRAVELED_TOUCH_ONLY.name() + ": " + distanceTraveledArray.toString());
+        subjectData.add(StatisticDataType.DISTANCE_TRAVELED_TOUCH_ONLY_SHORTEST.name() + ": " + distanceTraveledShortArray.toString());
+        subjectData.add(StatisticDataType.TIME_DURATION_TOUCH_ONLY.name() + ": " + timeDurationArray.toString());
+        subjectData.add(StatisticDataType.TIME_DURATION_TOUCH_ONLY_SHORTEST.name() + ": " + timeDurationShortArray.toString());
         subjectData.add(StatisticDataType.AVERAGE_PIXEL_VELOCITY.name() + ": " + handVelocityAvgArray.toString());
         subjectData.add(StatisticDataType.REACTION_TIME_FIRST_PRESSED.name() + ": " + reactionTimeFirstPressedArray.toString());
         subjectData.add(StatisticDataType.REACTION_TIME_FIRST_TOUCH.name() + ": " + reactionTimeFirstTouchArray.toString());
@@ -614,7 +753,7 @@ public class DataFormatter implements Runnable {
         subjectData.add(StatisticDataType.TEXT_ENTRY_RATE_MODIFIED_WPM_SHORTEST_VULTURE.name() + ": " + modShortVultureWPM_Array.toString());
         subjectData.add(StatisticDataType.ERROR_RATE_KSPC.name() + ": " + KSPC_Array.toString());
         subjectData.add(StatisticDataType.ERROR_RATE_MODIFIED_KSPC_SHORTEST.name() + ": " + modShortKSPC_Array.toString());
-        subjectData.add(StatisticDataType.ERROR_RATE_MODIFIED_KSPC_BACKSPACE.name() + ": " + modBackspaceKSPC_Array.toString());
+        //subjectData.add(StatisticDataType.ERROR_RATE_MODIFIED_KSPC_BACKSPACE.name() + ": " + modBackspaceKSPC_Array.toString());
         subjectData.add(StatisticDataType.ERROR_RATE_MODIFIED_MSD_SHORTEST.name() + ": " + modShortMSD_Array.toString());
         subjectData.add(StatisticDataType.ERROR_RATE_MODIFIED_MSD_BACKSPACE.name() + ": " + modBackspaceMSD_Array.toString());
         subjectData.add(StatisticDataType.TOTAL_ERROR_RATE.name() + ": " + totalErrorRateArray.toString());
@@ -648,7 +787,7 @@ public class DataFormatter implements Runnable {
         ArrayList<Float> modShortVultureWPM_Array = new ArrayList<Float>();
         ArrayList<Float> KSPC_Array = new ArrayList<Float>();
         ArrayList<Float> modShortKSPC_Array = new ArrayList<Float>();
-        ArrayList<Float> modBackspaceKSPC_Array = new ArrayList<Float>();
+        //ArrayList<Float> modBackspaceKSPC_Array = new ArrayList<Float>();
         ArrayList<Float> modShortMSD_Array = new ArrayList<Float>();
         ArrayList<Float> modBackspaceMSD_Array = new ArrayList<Float>();
         ArrayList<Float> totalErrorRateArray = new ArrayList<Float>();
@@ -676,6 +815,8 @@ public class DataFormatter implements Runnable {
         
         float timeDuration = 0f; // convert to seconds
         float timeDurationShort = 0f;
+        
+        float touchDuration = 0f;
         
         float reactionTimeFirstPressed = 0f; // convert to seconds
         float reactionTimeFirstTouch = 0;
@@ -745,20 +886,24 @@ public class DataFormatter implements Runnable {
                         if(!firstTouch) {
                             firstTouch = true;
                             reactionTimeFirstTouch = (float) ((previousTime - wordStartTime) / SECOND_AS_NANO);
-                            timeDuration = (float) (previousTime / SECOND_AS_NANO);
+                            //timeDuration = (float) (previousTime / SECOND_AS_NANO);
                         }
                         if(!isTouching) {
                             isTouching = true;
                             takenPath.add(previousPosition);
                             if(!detectedShortestComplete) takenPathModifiedShortest.add(previousPosition);
+                            touchDuration = (float) (previousTime / SECOND_AS_NANO); 
                         }
                         if(pressedKey == Key.VK_ENTER) {
                             isTouching = false;
                             planeBreachedCount++;
+                            // Update time duration here
+                            if(!firstLetter) timeDuration += (float) ((previousTime / SECOND_AS_NANO) - touchDuration);
                             if(detectedShortestComplete && !lastEnterAfterShortestComplete) {
                                 lastEnterAfterShortestComplete = true;
                                 distanceTraveledShort = distanceTraveled;
-                                timeDurationShort = (float) ((previousTime / SECOND_AS_NANO) - timeDuration);
+                                //timeDurationShort = (float) ((previousTime / SECOND_AS_NANO) - timeDuration);
+                                timeDurationShort = timeDuration;
                             }
                         }
                         break;
@@ -766,7 +911,7 @@ public class DataFormatter implements Runnable {
                         Key expectedKey = (Key) currentData.getValue();
                         if(pressedKey.equals(Key.VK_ENTER) && expectedKey.equals(Key.VK_ENTER)) {
                             reportData = true;
-                            timeDuration = (float) ((previousTime / SECOND_AS_NANO) - timeDuration);
+                            //timeDuration = (float) ((previousTime / SECOND_AS_NANO) - timeDuration);
                         } else if(pressedKey.equals(Key.VK_BACK_SPACE) && expectedKey.equals(Key.VK_BACK_SPACE)) {
                             INF--;
                             F++;
@@ -832,15 +977,15 @@ public class DataFormatter implements Runnable {
                         if(isTouching && previousPosition != null) {
                             takenPath.add(newPosition);
                             if(!lastEnterAfterShortestComplete) takenPathModifiedShortest.add(newPosition);
-                            if(isTouching) {
-                                numberOfActionsCount++;
-                                handVelocity += 
-                                        (MyUtilities.MATH_UTILITILES.findDistanceToPoint(previousPosition, newPosition) * PIXEL_TO_METER)
-                                        / ((currentLine.getTime() - previousTime) / SECOND_AS_NANO);
-                            }
+                            numberOfActionsCount++;
+                            handVelocity += 
+                                    (MyUtilities.MATH_UTILITILES.findDistanceToPoint(previousPosition, newPosition) * PIXEL_TO_CENTIMETER)
+                                    / ((currentLine.getTime() - previousTime) / SECOND_AS_NANO);
+                            // MOVED TO HERE
+                            distanceTraveled += MyUtilities.MATH_UTILITILES.findDistanceToPoint(previousPosition, newPosition);
                         }
                         if(firstTouch && previousPosition != null) {
-                            distanceTraveled += MyUtilities.MATH_UTILITILES.findDistanceToPoint(previousPosition, newPosition);
+                            //distanceTraveled += MyUtilities.MATH_UTILITILES.findDistanceToPoint(previousPosition, newPosition);
                         }
                         previousPosition = newPosition;
                         previousTime = currentLine.getTime();
@@ -854,8 +999,8 @@ public class DataFormatter implements Runnable {
                 if(reportData) {
                     wordList.add(currentWord);
                     planeBreachedCountArray.add(planeBreachedCount);
-                    distanceTraveledArray.add(distanceTraveled *= PIXEL_TO_METER);
-                    distanceTraveledShortArray.add(distanceTraveledShort *= PIXEL_TO_METER);
+                    distanceTraveledArray.add(distanceTraveled *= PIXEL_TO_CENTIMETER);
+                    distanceTraveledShortArray.add(distanceTraveledShort *= PIXEL_TO_CENTIMETER);
                     timeDurationArray.add(timeDuration);
                     timeDurationShortArray.add(timeDurationShort);
                     handVelocityAvgArray.add(handVelocity / numberOfActionsCount);
@@ -866,13 +1011,17 @@ public class DataFormatter implements Runnable {
                     } else {
                         reactionTimeToErrorAvgArray.add(reactionTimeToError / responseToErrorsCount);   
                     }
-                    WPM_Array.add(((currentWord.length() - 1) / ((timeDuration + reactionTimeFirstTouch) - reactionTimeFirstPressed)) * 60f * (1f / 5f));
-                    modShortWPM_Array.add(((currentWord.length() - 1) / ((timeDurationShort + reactionTimeFirstTouch) - reactionTimeFirstPressed)) * 60f * (1f / 5f));
-                    modVultureWPM_Array.add((currentWord.length() / (timeDuration + reactionTimeFirstTouch)) * 60f * (1f / 5f));
-                    modShortVultureWPM_Array.add((currentWord.length() / (timeDurationShort + reactionTimeFirstTouch)) * 60f * (1f / 5f));
+                    WPM_Array.add(((currentWord.length() - 1) / timeDuration) * 60f * (1f / 5f));
+                    modShortWPM_Array.add(((currentWord.length() - 1) / timeDuration) * 60f * (1f / 5f));
+                    modVultureWPM_Array.add((currentWord.length() / (timeDuration + (reactionTimeFirstPressed - reactionTimeFirstTouch))) * 60f * (1f / 5f));
+                    modShortVultureWPM_Array.add((currentWord.length() / (timeDurationShort + (reactionTimeFirstPressed - reactionTimeFirstTouch))) * 60f * (1f / 5f));
+                    //WPM_Array.add(((currentWord.length() - 1) / ((timeDuration + reactionTimeFirstTouch) - reactionTimeFirstPressed)) * 60f * (1f / 5f));
+                    //modShortWPM_Array.add(((currentWord.length() - 1) / ((timeDurationShort + reactionTimeFirstTouch) - reactionTimeFirstPressed)) * 60f * (1f / 5f));
+                    //modVultureWPM_Array.add((currentWord.length() / (timeDuration + reactionTimeFirstTouch)) * 60f * (1f / 5f));
+                    //modShortVultureWPM_Array.add((currentWord.length() / (timeDurationShort + reactionTimeFirstTouch)) * 60f * (1f / 5f));
                     KSPC_Array.add((C + INF + IF + F) / (C + INF));
                     modShortKSPC_Array.add((shortC + shortINF + shortIF + shortF) / (shortC + shortINF));
-                    modBackspaceKSPC_Array.add((backspaceC + backspaceINF + backspaceIF + backspaceF) / (backspaceC + backspaceINF));
+                    //modBackspaceKSPC_Array.add((backspaceC + backspaceINF + backspaceIF + backspaceF) / (backspaceC + backspaceINF));
                     modShortMSD_Array.add((shortINF / (shortC + shortINF)) * 100);
                     modBackspaceMSD_Array.add((backspaceINF / (backspaceC + backspaceINF)) * 100);
                     totalErrorRateArray.add(((INF + IF) / (C + INF + IF)) * 100);
@@ -948,10 +1097,10 @@ public class DataFormatter implements Runnable {
         // stuff arrays into subject Data
         subjectData.add(StatisticDataType.WORD_ORDER.name() + ": " + wordList.toString());
         subjectData.add(StatisticDataType.NUMBER_OF_TIMES_PLANE_BREACHED.name() + ": " + planeBreachedCountArray.toString());
-        subjectData.add(StatisticDataType.DISTANCE_TRAVELED_FIRST_TOUCH.name() + ": " + distanceTraveledArray.toString());
-        subjectData.add(StatisticDataType.DISTANCE_TRAVELED_FIRST_TOUCH_SHORTEST.name() + ": " + distanceTraveledShortArray.toString());
-        subjectData.add(StatisticDataType.TIME_DURATION_FIRST_TOUCH.name() + ": " + timeDurationArray.toString());
-        subjectData.add(StatisticDataType.TIME_DURATION_FIRST_TOUCH_SHORTEST.name() + ": " + timeDurationShortArray.toString());
+        subjectData.add(StatisticDataType.DISTANCE_TRAVELED_TOUCH_ONLY.name() + ": " + distanceTraveledArray.toString());
+        subjectData.add(StatisticDataType.DISTANCE_TRAVELED_TOUCH_ONLY_SHORTEST.name() + ": " + distanceTraveledShortArray.toString());
+        subjectData.add(StatisticDataType.TIME_DURATION_TOUCH_ONLY.name() + ": " + timeDurationArray.toString());
+        subjectData.add(StatisticDataType.TIME_DURATION_TOUCH_ONLY_SHORTEST.name() + ": " + timeDurationShortArray.toString());
         subjectData.add(StatisticDataType.AVERAGE_PIXEL_VELOCITY.name() + ": " + handVelocityAvgArray.toString());
         subjectData.add(StatisticDataType.REACTION_TIME_FIRST_PRESSED.name() + ": " + reactionTimeFirstPressedArray.toString());
         subjectData.add(StatisticDataType.REACTION_TIME_FIRST_TOUCH.name() + ": " + reactionTimeFirstTouchArray.toString());
@@ -962,7 +1111,7 @@ public class DataFormatter implements Runnable {
         subjectData.add(StatisticDataType.TEXT_ENTRY_RATE_MODIFIED_WPM_SHORTEST_VULTURE.name() + ": " + modShortVultureWPM_Array.toString());
         subjectData.add(StatisticDataType.ERROR_RATE_KSPC.name() + ": " + KSPC_Array.toString());
         subjectData.add(StatisticDataType.ERROR_RATE_MODIFIED_KSPC_SHORTEST.name() + ": " + modShortKSPC_Array.toString());
-        subjectData.add(StatisticDataType.ERROR_RATE_MODIFIED_KSPC_BACKSPACE.name() + ": " + modBackspaceKSPC_Array.toString());
+        //subjectData.add(StatisticDataType.ERROR_RATE_MODIFIED_KSPC_BACKSPACE.name() + ": " + modBackspaceKSPC_Array.toString());
         subjectData.add(StatisticDataType.ERROR_RATE_MODIFIED_MSD_SHORTEST.name() + ": " + modShortMSD_Array.toString());
         subjectData.add(StatisticDataType.ERROR_RATE_MODIFIED_MSD_BACKSPACE.name() + ": " + modBackspaceMSD_Array.toString());
         subjectData.add(StatisticDataType.TOTAL_ERROR_RATE.name() + ": " + totalErrorRateArray.toString());
