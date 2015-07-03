@@ -142,6 +142,15 @@ public class DataFormatter implements Runnable {
                             } else {
                                 consolidatedData.put(key, dataInfo[1]);
                             }
+                        } else if(dataType == ExitSurveyDataType.HAS_PREVIOUS_SWIPE_DEVICE_EXPERIENCE) {
+                            String key = dataInfo[0];
+                            String value = consolidatedData.get(key);
+                            int numeric = ExitSurveyOptions.getNumericValuebyDescription(dataInfo[1]);
+                            if(value != null) {
+                                consolidatedData.put(key, value + "; " + numeric);
+                            } else {
+                                consolidatedData.put(key,  "" + numeric);
+                            }
                         }
                     }
                 } catch (IOException e) {
@@ -212,6 +221,8 @@ public class DataFormatter implements Runnable {
             }
         }
         matrices.put(StatisticDataType.SUBJECT_ORDER.name(), subjectOrder);
+        matrices.put(ExitSurveyDataType.HAS_PREVIOUS_SWIPE_DEVICE_EXPERIENCE.name(),
+                consolidatedData.get(ExitSurveyDataType.HAS_PREVIOUS_SWIPE_DEVICE_EXPERIENCE.name()));
         
         ArrayList<Entry<String, ArrayList<Float>>> meanEntries = new ArrayList<Entry<String, ArrayList<Float>>>();
         ArrayList<Entry<String, ArrayList<Float>>> sdEntries = new ArrayList<Entry<String, ArrayList<Float>>>();
@@ -246,11 +257,12 @@ public class DataFormatter implements Runnable {
             }
             avgM /= arrayM.size();
             avgSD /= arraySD.size();
+            
             /*System.out.println(meanEntries.get(i).getKey() + " | minMean: " + minM + " avgMean: " + avgM + " maxMean: " + maxM
                     + " | minSD: " + minSD + " avgSD: " + avgSD + " maxSD: " + maxSD);*/
             //System.out.println(meanEntries.get(i).getKey() + "\t\t\t | mean = " + avgM + "\t\t | sd = " + avgSD);
-            System.out.println(meanEntries.get(i).getKey());
-            System.out.print("means: ");
+            
+            /*System.out.print("means: ");
             for(int j = 0; j < arrayM.size(); j++) {
                 if(j == 0) {
                     System.out.print(arrayM.get(j));
@@ -267,51 +279,88 @@ public class DataFormatter implements Runnable {
                     System.out.print(", " + arraySD.get(j));
                 }
             }
-            System.out.println();
+            System.out.println();*/
             
             StatisticDataType sdt = StatisticDataType.getByName(meanEntries.get(i).getKey());
             if(sdt != null
                     && !sdt.equals(StatisticDataType.PRACTICE_WORDS_PER_INPUT)
                     && !sdt.equals(StatisticDataType.REACTION_TIME_FIRST_PRESSED)
                     && !sdt.equals(StatisticDataType.REACTION_TIME_FIRST_TOUCH)) {
+                System.out.println("Variable: " + meanEntries.get(i).getKey());
+                System.out.println("-------------------------------------------------------");
                 // Use population standard deviation
                 float averageSamplePooled = 0;
                 float averageSamplePop = 0;
                 int count = 0;
+                
+                // Tablet vs all Leap
                 int tablet = 1;
-                float maxSamplePooled = -1;
-                float maxSamplePop = -1;
-                for(int j = tablet + 1; j < arrayM.size(); j++) {
-                    float sdPop = arraySD.get(tablet);
-                    float sdPooled = (float) Math.pow(((6 * Math.pow(sdPop, 2)) + (6 * Math.pow(arraySD.get(j), 2))) / (12), 0.5);
-                    float meanChange = arrayM.get(tablet) - arrayM.get(j);
-                    float zVal = (float) Math.pow(1.96f + 0.84f, 2);
-                    float nPop = (float) (2 * zVal / Math.pow(meanChange / sdPop, 2));
-                    float nPool = (float) (2 * zVal / Math.pow(meanChange / sdPooled, 2));
-                    System.out.println(KeyboardType.getByID(tablet + 1).getFileName() +  " | " + KeyboardType.getByID(j + 1).getFileName()
-                            + ": sampleSize(Pop): " + nPop + " sampleSize(Pool): " + nPool);
-                    count++;
-                    averageSamplePooled += nPool;
-                    averageSamplePop += nPop;
-                    if(nPop > maxSamplePop) maxSamplePop = nPop;
-                    if(nPool > maxSamplePooled) maxSamplePooled = nPool;
+                //float maxSamplePooled = -1;
+                //float maxSamplePop = -1;
+                for(int j = 2; j < arrayM.size(); j++) {
+                    if(tablet != j) {
+                        float sdPop = arraySD.get(tablet);
+                        float sdPooled = (float) Math.pow(((6 * Math.pow(sdPop, 2)) + (6 * Math.pow(arraySD.get(j), 2))) / (12), 0.5);
+                        float meanChange = arrayM.get(tablet) - arrayM.get(j);
+                        float zVal = (float) Math.pow(1.96f + 0.84f, 2);
+                        float nPop = (float) (2 * zVal / Math.pow(meanChange / sdPop, 2));
+                        float nPool = (float) (2 * zVal / Math.pow(meanChange / sdPooled, 2));
+                        System.out.println("Population: " + KeyboardType.getByID(tablet + 1).getFileName() + " (mean=" + arrayM.get(tablet) + ")"
+                                +  " | Sample: " + KeyboardType.getByID(j + 1).getFileName() + " (mean=" + arrayM.get(j) + ")");
+                        System.out.println("sample size (population st. dev): " + nPop);
+                        System.out.println("sample size     (pooled st. dev): " + nPool + "\n");
+                        count++;
+                        averageSamplePooled += nPool;
+                        averageSamplePop += nPop;
+                        //if(nPop > maxSamplePop) maxSamplePop = nPop;
+                        //if(nPool > maxSamplePooled) maxSamplePooled = nPool;
+                    }
                 }
-                averageSamplePooled /= count;
-                averageSamplePop /= count;
-                System.out.println("Average sample size    (pop): " + averageSamplePop);
-                System.out.println("Average sample size (pooled): " + averageSamplePooled);
+                
+                // AirPinch vs other AirLeap
+                int airPinch = 4;
+                //float maxSamplePooled = -1;
+                //float maxSamplePop = -1;
+                for(int j = tablet + 2; j < arrayM.size(); j++) {
+                    if(airPinch != j) {
+                        float sdPop = arraySD.get(airPinch);
+                        float sdPooled = (float) Math.pow(((6 * Math.pow(sdPop, 2)) + (6 * Math.pow(arraySD.get(j), 2))) / (12), 0.5);
+                        float meanChange = arrayM.get(airPinch) - arrayM.get(j);
+                        float zVal = (float) Math.pow(1.96f + 0.84f, 2);
+                        float nPop = (float) (2 * zVal / Math.pow(meanChange / sdPop, 2));
+                        float nPool = (float) (2 * zVal / Math.pow(meanChange / sdPooled, 2));
+                        if(nPop <= 100 && nPool <= 100) {
+                            System.out.println("Population: " + KeyboardType.getByID(airPinch + 1).getFileName() + " (mean=" + arrayM.get(airPinch) + ")"
+                                    +  " | Sample: " + KeyboardType.getByID(j + 1).getFileName() + " (mean=" + arrayM.get(j) + ")");
+                            System.out.println("sample size (population st. dev): " + nPop);
+                            System.out.println("sample size     (pooled st. dev): " + nPool + "\n");
+                            count++;
+                            averageSamplePooled += nPool;
+                            averageSamplePop += nPop;
+                            //if(nPop > maxSamplePop) maxSamplePop = nPop;
+                            //if(nPool > maxSamplePooled) maxSamplePooled = nPool;
+                        }
+                    }
+                }
                 finalAverageSamplePooled += averageSamplePooled;
                 finalAverageSamplePop += averageSamplePop;
-                finalCount++;
+                finalCount += count;
+                averageSamplePooled /= count;
+                averageSamplePop /= count;
+                System.out.println("Average sample size (population st. dev): " + averageSamplePop);
+                System.out.println("Average sample size     (pooled st. dev): " + averageSamplePooled + "\n");
+                System.out.println("-------------------------------------------------------");
+            } else {
+                //System.out.println(meanEntries.get(i).getKey() + " --- (not used to calculate sample size)");
+                //System.out.println("-------------------------------------------------------");
             }
-            System.out.println("-------------------------------------------------------");
         }
         
         finalAverageSamplePooled /= finalCount;
         finalAverageSamplePop /= finalCount;
         
-        System.out.println("Final Average Sample    (pop): " + finalAverageSamplePop);
-        System.out.println("Final Average Sample (pooled): " + finalAverageSamplePooled);
+        System.out.println("Final average sample size (population st. dev): " + finalAverageSamplePop);
+        System.out.println("Final average sample size     (pooled st. dev): " + finalAverageSamplePooled);
         
         // write to file
         try {
@@ -1012,7 +1061,7 @@ public class DataFormatter implements Runnable {
                         reactionTimeToErrorAvgArray.add(reactionTimeToError / responseToErrorsCount);   
                     }
                     WPM_Array.add(((currentWord.length() - 1) / timeDuration) * 60f * (1f / 5f));
-                    modShortWPM_Array.add(((currentWord.length() - 1) / timeDuration) * 60f * (1f / 5f));
+                    modShortWPM_Array.add(((currentWord.length() - 1) / timeDurationShort) * 60f * (1f / 5f));
                     modVultureWPM_Array.add((currentWord.length() / (timeDuration + (reactionTimeFirstPressed - reactionTimeFirstTouch))) * 60f * (1f / 5f));
                     modShortVultureWPM_Array.add((currentWord.length() / (timeDurationShort + (reactionTimeFirstPressed - reactionTimeFirstTouch))) * 60f * (1f / 5f));
                     //WPM_Array.add(((currentWord.length() - 1) / ((timeDuration + reactionTimeFirstTouch) - reactionTimeFirstPressed)) * 60f * (1f / 5f));

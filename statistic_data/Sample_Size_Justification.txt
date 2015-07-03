@@ -1,261 +1,191 @@
-PRACTICE_WORDS_PER_INPUT
-means: 3.0, 6.714286, 10.857142, 6.428571, 10.0, 9.857142, 7.714286
-stds: 0.9258201, 2.2497165, 3.5225222, 1.3997084, 3.380617, 3.6421568, 1.6659863
--------------------------------------------------------
 NUMBER_OF_TIMES_PLANE_BREACHED
-means: 1.0, 1.5714284, 3.3142858, 2.714286, 3.3142855, 3.5285714, 1.2285715
-stds: 0.0, 0.39538154, 1.8145669, 1.3611219, 1.1752552, 3.137658, 0.3452299
-tablet | leapSurface: sampleSize(Pop): 0.8069659 sampleSize(Pool): 8.901906
-tablet | leapAirStatic: sampleSize(Pop): 1.8766987 sampleSize(Pool): 12.058887
-tablet | leapAirPinch: sampleSize(Pop): 0.80696607 sampleSize(Pool): 3.9684606
-tablet | leapAirDynamic: sampleSize(Pop): 0.6399319 sampleSize(Pool): 20.470295
-tablet | leapAirBimodal: sampleSize(Pop): 20.852259 sampleSize(Pool): 18.37503
-Average sample size    (pop): 4.9965644
-Average sample size (pooled): 12.754915
+touchscreen | leapSurface: 		sampleSize (population standard deviation): 0.8069659 	sampleSize (pooled standard deviation): 8.901906
+touchscreen | leapAirStatic: 	sampleSize (population standard deviation): 1.8766987 	sampleSize (pooled standard deviation): 12.058887
+touchscreen | leapAirPinch: 	sampleSize (population standard deviation): 0.80696607 	sampleSize (pooled standard deviation): 3.9684606
+touchscreen | leapAirDynamic: 	sampleSize (population standard deviation): 0.6399319 	sampleSize (pooled standard deviation): 20.470295
+touchscreen | leapAirBimodal: 	sampleSize (population standard deviation): 20.852259 	sampleSize (pooled standard deviation): 18.37503
+Average sample size (population standard deviation): 4.9965644
+Average sample size     (pooled standard deviation): 12.754915
 -------------------------------------------------------
 DISTANCE_TRAVELED_TOUCH_ONLY
-means: 27.64061, 29.520864, 38.744167, 35.50528, 57.925205, 46.434593, 32.844707
-stds: 2.9477956, 3.170041, 6.4576483, 5.9102454, 15.529296, 25.893896, 6.5728106
-tablet | leapSurface: sampleSize(Pop): 1.8522639 sampleSize(Pool): 4.7693224
-tablet | leapAirStatic: sampleSize(Pop): 4.3997946 sampleSize(Pool): 9.846765
-tablet | leapAirPinch: sampleSize(Pop): 0.19530185 sampleSize(Pool): 2.4410708
-tablet | leapAirDynamic: sampleSize(Pop): 0.55080396 sampleSize(Pool): 18.650604
-tablet | leapAirBimodal: sampleSize(Pop): 14.262472 sampleSize(Pool): 37.788776
-Average sample size    (pop): 4.2521276
-Average sample size (pooled): 14.699307
+touchscreen | leapSurface: 		sampleSize (population standard deviation): 1.8522639 	sampleSize (pooled standard deviation): 4.7693224
+touchscreen | leapAirStatic: 	sampleSize (population standard deviation): 4.3997946 	sampleSize (pooled standard deviation): 9.846765
+touchscreen | leapAirPinch: 	sampleSize (population standard deviation): 0.19530185 	sampleSize (pooled standard deviation): 2.4410708
+touchscreen | leapAirDynamic: 	sampleSize (population standard deviation): 0.55080396 	sampleSize (pooled standard deviation): 18.650604
+touchscreen | leapAirBimodal: 	sampleSize (population standard deviation): 14.262472 	sampleSize (pooled standard deviation): 37.788776
+Average sample size (population standard deviation): 4.2521276
+Average sample size     (pooled standard deviation): 14.699307
 -------------------------------------------------------
 DISTANCE_TRAVELED_TOUCH_ONLY_SHORTEST
-means: 27.58845, 29.379469, 36.864117, 34.082874, 56.22159, 42.57166, 32.840015
-stds: 2.9131343, 3.0041943, 5.1938167, 5.452419, 15.039164, 20.028086, 6.573985
-tablet | leapSurface: sampleSize(Pop): 2.5261514 sampleSize(Pool): 5.0383325
-tablet | leapAirStatic: sampleSize(Pop): 6.397013 sampleSize(Pool): 13.734359
-tablet | leapAirPinch: sampleSize(Pop): 0.1964122 sampleSize(Pool): 2.5593095
-tablet | leapAirDynamic: sampleSize(Pop): 0.8131455 sampleSize(Pool): 18.476696
-tablet | leapAirBimodal: sampleSize(Pop): 11.817148 sampleSize(Pool): 34.201904
-Average sample size    (pop): 4.349974
-Average sample size (pooled): 14.802121
+touchscreen | leapSurface: 		sampleSize (population standard deviation): 2.5261514 	sampleSize (pooled standard deviation): 5.0383325
+touchscreen | leapAirStatic: 	sampleSize (population standard deviation): 6.397013 	sampleSize (pooled standard deviation): 13.734359
+touchscreen | leapAirPinch: 	sampleSize (population standard deviation): 0.1964122 	sampleSize (pooled standard deviation): 2.5593095
+touchscreen | leapAirDynamic: 	sampleSize (population standard deviation): 0.8131455 	sampleSize (pooled standard deviation): 18.476696
+touchscreen | leapAirBimodal: 	sampleSize (population standard deviation): 11.817148 	sampleSize (pooled standard deviation): 34.201904
+Average sample size (population standard deviation): 4.349974
+Average sample size     (pooled standard deviation): 14.802121
 -------------------------------------------------------
 TIME_DURATION_TOUCH_ONLY
-means: 5.659465, 1.6933258, 2.7025666, 3.7155678, 4.5676656, 3.7717762, 2.2981203
-stds: 0.9046683, 0.27056476, 0.69959897, 0.7707642, 0.99657094, 1.2495474, 0.27839023
-tablet | leapSurface: sampleSize(Pop): 1.1269349 sampleSize(Pool): 4.3307195
-tablet | leapAirStatic: sampleSize(Pop): 0.28068694 sampleSize(Pool): 1.2792623
-tablet | leapAirPinch: sampleSize(Pop): 0.1389352 sampleSize(Pool): 1.0119132
-tablet | leapAirDynamic: sampleSize(Pop): 0.26571077 sampleSize(Pool): 2.9664788
-tablet | leapAirBimodal: sampleSize(Pop): 3.1381435 sampleSize(Pool): 3.2302196
-Average sample size    (pop): 0.99008226
-Average sample size (pooled): 2.5637186
+touchscreen | leapSurface: 		sampleSize (population standard deviation): 1.1269349 	sampleSize (pooled standard deviation): 4.3307195
+touchscreen | leapAirStatic: 	sampleSize (population standard deviation): 0.28068694 	sampleSize (pooled standard deviation): 1.2792623
+touchscreen | leapAirPinch: 	sampleSize (population standard deviation): 0.1389352 	sampleSize (pooled standard deviation): 1.0119132
+touchscreen | leapAirDynamic: 	sampleSize (population standard deviation): 0.26571077 	sampleSize (pooled standard deviation): 2.9664788
+touchscreen | leapAirBimodal: 	sampleSize (population standard deviation): 3.1381435 	sampleSize (pooled standard deviation): 3.2302196
+Average sample size (population standard deviation): 0.99008226
+Average sample size     (pooled standard deviation): 2.5637186
 -------------------------------------------------------
 TIME_DURATION_TOUCH_ONLY_SHORTEST
-means: 5.6258783, 1.6562965, 2.5160997, 3.5609848, 4.480059, 3.3997264, 2.295076
-stds: 0.92580324, 0.23431383, 0.6135546, 0.82881695, 0.9372292, 0.74469787, 0.2834218
-tablet | leapSurface: sampleSize(Pop): 1.1645116 sampleSize(Pool): 4.5745664
-tablet | leapAirStatic: sampleSize(Pop): 0.23729798 sampleSize(Pool): 1.6031669
-tablet | leapAirPinch: sampleSize(Pop): 0.10796563 sampleSize(Pool): 0.91765976
-tablet | leapAirDynamic: sampleSize(Pop): 0.28322586 sampleSize(Pool): 1.5720451
-tablet | leapAirBimodal: sampleSize(Pop): 2.1097941 sampleSize(Pool): 2.598305
-Average sample size    (pop): 0.78055906
-Average sample size (pooled): 2.2531486
+touchscreen | leapSurface: 		sampleSize (population standard deviation): 1.1645116 	sampleSize (pooled standard deviation): 4.5745664
+touchscreen | leapAirStatic: 	sampleSize (population standard deviation): 0.23729798 	sampleSize (pooled standard deviation): 1.6031669
+touchscreen | leapAirPinch: 	sampleSize (population standard deviation): 0.10796563 	sampleSize (pooled standard deviation): 0.91765976
+touchscreen | leapAirDynamic: 	sampleSize (population standard deviation): 0.28322586 	sampleSize (pooled standard deviation): 1.5720451
+touchscreen | leapAirBimodal: 	sampleSize (population standard deviation): 2.1097941 	sampleSize (pooled standard deviation): 2.598305
+Average sample size (population standard deviation): 0.78055906
+Average sample size     (pooled standard deviation): 2.2531486
 -------------------------------------------------------
 AVERAGE_PIXEL_VELOCITY
-means: 8.786888, 16.063488, 14.460002, 9.403055, 12.412285, 10.171748, 14.040971
-stds: 2.6052713, 2.0191088, 3.5162928, 2.248733, 2.70671, 1.831132, 1.9227421
-tablet | leapSurface: sampleSize(Pop): 24.861944 sampleSize(Pool): 50.13222
-tablet | leapAirStatic: sampleSize(Pop): 1.4409887 sampleSize(Pool): 1.6141844
-tablet | leapAirPinch: sampleSize(Pop): 4.795054 sampleSize(Pool): 6.7060404
-tablet | leapAirDynamic: sampleSize(Pop): 1.8415282 sampleSize(Pool): 1.6780645
-tablet | leapAirBimodal: sampleSize(Pop): 15.627193 sampleSize(Pool): 14.899151
-Average sample size    (pop): 9.713342
-Average sample size (pooled): 15.005933
--------------------------------------------------------
-REACTION_TIME_FIRST_PRESSED
-means: 1.4414827, 1.6404417, 1.7635597, 2.473372, 2.7364583, 3.7481987, 1.301733
-stds: 0.16966945, 0.36397982, 0.5048747, 0.56622547, 0.75311255, 2.5436213, 0.16833693
--------------------------------------------------------
-REACTION_TIME_FIRST_TOUCH
-means: 0.78641766, 1.2296971, 1.3779134, 2.0467534, 1.8386786, 1.86116, 1.2529014
-stds: 0.086998135, 0.116411746, 0.39312556, 0.4282729, 0.39287955, 0.3114282, 0.12570472
+touchscreen | leapSurface: 		sampleSize (population standard deviation): 24.861944 	sampleSize (pooled standard deviation): 50.13222
+touchscreen | leapAirStatic: 	sampleSize (population standard deviation): 1.4409887 	sampleSize (pooled standard deviation): 1.6141844
+touchscreen | leapAirPinch: 	sampleSize (population standard deviation): 4.795054 	sampleSize (pooled standard deviation): 6.7060404
+touchscreen | leapAirDynamic: 	sampleSize (population standard deviation): 1.8415282 	sampleSize (pooled standard deviation): 1.6780645
+touchscreen | leapAirBimodal: 	sampleSize (population standard deviation): 15.627193 	sampleSize (pooled standard deviation): 14.899151
+Average sample size (population standard deviation): 9.713342
+Average sample size     (pooled standard deviation): 15.005933
 -------------------------------------------------------
 AVERAGE_REACTION_TIME_TO_ERRORS
-means: 0.14744385, 0.3647123, 0.6203111, 0.6460565, 1.2011653, 0.7458354, 0.107308336
-stds: 0.1778026, 0.28852075, 0.34361967, 0.450047, 0.798227, 0.6954008, 0.13560276
-tablet | leapSurface: sampleSize(Pop): 19.979406 sampleSize(Pool): 24.159203
-tablet | leapAirStatic: sampleSize(Pop): 16.490137 sampleSize(Pool): 28.306223
-tablet | leapAirPinch: sampleSize(Pop): 1.8655937 sampleSize(Pool): 8.072592
-tablet | leapAirDynamic: sampleSize(Pop): 8.986066 sampleSize(Pool): 30.593948
-tablet | leapAirBimodal: sampleSize(Pop): 19.700155 sampleSize(Pool): 12.025895
-Average sample size    (pop): 13.404271
-Average sample size (pooled): 20.631573
+touchscreen | leapSurface: 		sampleSize (population standard deviation): 19.979406 	sampleSize (pooled standard deviation): 24.159203
+touchscreen | leapAirStatic: 	sampleSize (population standard deviation): 16.490137 	sampleSize (pooled standard deviation): 28.306223
+touchscreen | leapAirPinch: 	sampleSize (population standard deviation): 1.8655937 	sampleSize (pooled standard deviation): 8.072592
+touchscreen | leapAirDynamic: 	sampleSize (population standard deviation): 8.986066 	sampleSize (pooled standard deviation): 30.593948
+touchscreen | leapAirBimodal: 	sampleSize (population standard deviation): 19.700155 	sampleSize (pooled standard deviation): 12.025895
+Average sample size (population standard deviation): 13.404271
+Average sample size     (pooled standard deviation): 20.631573
 -------------------------------------------------------
 TEXT_ENTRY_RATE_WPM
-means: 9.676584, 27.644205, 19.240625, 13.148508, 11.084381, 13.548956, 19.821716
-stds: 1.5878305, 4.04275, 4.995321, 2.2057276, 2.1351213, 2.3378513, 2.4891918
-tablet | leapSurface: sampleSize(Pop): 3.6288679 sampleSize(Pool): 4.5846534
-tablet | leapAirStatic: sampleSize(Pop): 1.2196116 sampleSize(Pool): 0.79133296
-tablet | leapAirPinch: sampleSize(Pop): 0.9345195 sampleSize(Pool): 0.5975913
-tablet | leapAirDynamic: sampleSize(Pop): 1.2898948 sampleSize(Pool): 0.86062455
-tablet | leapAirBimodal: sampleSize(Pop): 4.1880307 sampleSize(Pool): 2.8878734
-Average sample size    (pop): 2.252185
-Average sample size (pooled): 1.9444151
+touchscreen | leapSurface: 		sampleSize (population standard deviation): 3.6288679 	sampleSize (pooled standard deviation): 4.5846534
+touchscreen | leapAirStatic: 	sampleSize (population standard deviation): 1.2196116 	sampleSize (pooled standard deviation): 0.79133296
+touchscreen | leapAirPinch: 	sampleSize (population standard deviation): 0.9345195 	sampleSize (pooled standard deviation): 0.5975913
+touchscreen | leapAirDynamic: 	sampleSize (population standard deviation): 1.2898948 	sampleSize (pooled standard deviation): 0.86062455
+touchscreen | leapAirBimodal: 	sampleSize (population standard deviation): 4.1880307 	sampleSize (pooled standard deviation): 2.8878734
+Average sample size (population standard deviation): 2.252185
+Average sample size     (pooled standard deviation): 1.9444151
 -------------------------------------------------------
 TEXT_ENTRY_RATE_MODIFIED_WPM_SHORTEST
-means: 9.717218, 27.644205, 19.240625, 13.148508, 11.084381, 13.548956, 19.821716
-stds: 1.6152892, 4.04275, 4.995321, 2.2057276, 2.1351213, 2.3378513, 2.4891918
-tablet | leapSurface: sampleSize(Pop): 3.6288679 sampleSize(Pool): 4.5846534
-tablet | leapAirStatic: sampleSize(Pop): 1.2196116 sampleSize(Pool): 0.79133296
-tablet | leapAirPinch: sampleSize(Pop): 0.9345195 sampleSize(Pool): 0.5975913
-tablet | leapAirDynamic: sampleSize(Pop): 1.2898948 sampleSize(Pool): 0.86062455
-tablet | leapAirBimodal: sampleSize(Pop): 4.1880307 sampleSize(Pool): 2.8878734
-Average sample size    (pop): 2.252185
-Average sample size (pooled): 1.9444151
+touchscreen | leapSurface: 		sampleSize (population standard deviation): 3.6288679 	sampleSize (pooled standard deviation): 4.5846534
+touchscreen | leapAirStatic: 	sampleSize (population standard deviation): 1.2196116 	sampleSize (pooled standard deviation): 0.79133296
+touchscreen | leapAirPinch: 	sampleSize (population standard deviation): 0.9345195 	sampleSize (pooled standard deviation): 0.5975913
+touchscreen | leapAirDynamic: 	sampleSize (population standard deviation): 1.2898948 	sampleSize (pooled standard deviation): 0.86062455
+touchscreen | leapAirBimodal: 	sampleSize (population standard deviation): 4.1880307 	sampleSize (pooled standard deviation): 2.8878734
+Average sample size (population standard deviation): 2.252185
+Average sample size     (pooled standard deviation): 1.9444151
 -------------------------------------------------------
 TEXT_ENTRY_RATE_MODIFIED_WPM_VULTURE
-means: 9.607256, 33.364857, 23.878973, 16.092752, 12.939225, 15.560683, 25.428244
-stds: 1.4182411, 3.7715535, 6.49692, 2.501065, 2.624461, 4.1603446, 2.7944548
-tablet | leapSurface: sampleSize(Pop): 2.4787402 sampleSize(Pool): 4.9170628
-tablet | leapAirStatic: sampleSize(Pop): 0.7476462 sampleSize(Pool): 0.53821313
-tablet | leapAirPinch: sampleSize(Pop): 0.5346081 sampleSize(Pool): 0.39673713
-tablet | leapAirDynamic: sampleSize(Pop): 0.7036278 sampleSize(Pool): 0.77989995
-tablet | leapAirBimodal: sampleSize(Pop): 3.5409203 sampleSize(Pool): 2.742401
-Average sample size    (pop): 1.6011086
-Average sample size (pooled): 1.8748629
+touchscreen | leapSurface: 		sampleSize (population standard deviation): 2.4787402 	sampleSize (pooled standard deviation): 4.9170628
+touchscreen | leapAirStatic: 	sampleSize (population standard deviation): 0.7476462 	sampleSize (pooled standard deviation): 0.53821313
+touchscreen | leapAirPinch: 	sampleSize (population standard deviation): 0.5346081 	sampleSize (pooled standard deviation): 0.39673713
+touchscreen | leapAirDynamic: 	sampleSize (population standard deviation): 0.7036278 	sampleSize (pooled standard deviation): 0.77989995
+touchscreen | leapAirBimodal: 	sampleSize (population standard deviation): 3.5409203 	sampleSize (pooled standard deviation): 2.742401
+Average sample size (population standard deviation): 1.6011086
+Average sample size     (pooled standard deviation): 1.8748629
 -------------------------------------------------------
 TEXT_ENTRY_RATE_MODIFIED_WPM_SHORTEST_VULTURE
-means: 9.651542, 33.948418, 25.32666, 16.642725, 13.076587, 16.749353, 25.503717
-stds: 1.4488109, 3.2793746, 7.153701, 2.8378224, 2.5381014, 3.1715987, 2.935359
-tablet | leapSurface: sampleSize(Pop): 2.2684882 sampleSize(Pool): 6.531662
-tablet | leapAirStatic: sampleSize(Pop): 0.5630541 sampleSize(Pool): 0.49234545
-tablet | leapAirPinch: sampleSize(Pop): 0.38708562 sampleSize(Pool): 0.3094774
-tablet | leapAirDynamic: sampleSize(Pop): 0.5700573 sampleSize(Pool): 0.55163026
-tablet | leapAirBimodal: sampleSize(Pop): 2.3646107 sampleSize(Pool): 2.1295671
-Average sample size    (pop): 1.2306592
-Average sample size (pooled): 2.0029364
+touchscreen | leapSurface: 		sampleSize (population standard deviation): 2.2684882 	sampleSize (pooled standard deviation): 6.531662
+touchscreen | leapAirStatic: 	sampleSize (population standard deviation): 0.5630541 	sampleSize (pooled standard deviation): 0.49234545
+touchscreen | leapAirPinch: 	sampleSize (population standard deviation): 0.38708562 	sampleSize (pooled standard deviation): 0.3094774
+touchscreen | leapAirDynamic: 	sampleSize (population standard deviation): 0.5700573 	sampleSize (pooled standard deviation): 0.55163026
+touchscreen | leapAirBimodal: 	sampleSize (population standard deviation): 2.3646107 	sampleSize (pooled standard deviation): 2.1295671
+Average sample size (population standard deviation): 1.2306592
+Average sample size     (pooled standard deviation): 2.0029364
 -------------------------------------------------------
 ERROR_RATE_KSPC
-means: 1.0552381, 1.2700001, 1.777619, 1.607619, 1.8042859, 1.9633331, 1.0714285
-stds: 0.06519465, 0.14897531, 0.5079049, 0.4149534, 0.47298357, 1.1949618, 0.116057664
-tablet | leapSurface: sampleSize(Pop): 1.350514 sampleSize(Pool): 8.524093
-tablet | leapAirStatic: sampleSize(Pop): 3.0529594 sampleSize(Pool): 13.369462
-tablet | leapAirPinch: sampleSize(Pop): 1.2190666 sampleSize(Pool): 6.753671
-tablet | leapAirDynamic: sampleSize(Pop): 0.7239206 sampleSize(Pool): 23.650394
-tablet | leapAirBimodal: sampleSize(Pop): 8.825525 sampleSize(Pool): 7.0908794
-Average sample size    (pop): 3.0343971
-Average sample size (pooled): 11.877701
+touchscreen | leapSurface: 		sampleSize (population standard deviation): 1.350514 	sampleSize (pooled standard deviation): 8.524093
+touchscreen | leapAirStatic: 	sampleSize (population standard deviation): 3.0529594 	sampleSize (pooled standard deviation): 13.369462
+touchscreen | leapAirPinch: 	sampleSize (population standard deviation): 1.2190666 	sampleSize (pooled standard deviation): 6.753671
+touchscreen | leapAirDynamic: 	sampleSize (population standard deviation): 0.7239206 	sampleSize (pooled standard deviation): 23.650394
+touchscreen | leapAirBimodal: 	sampleSize (population standard deviation): 8.825525 	sampleSize (pooled standard deviation): 7.0908794
+Average sample size (population standard deviation): 3.0343971
+Average sample size     (pooled standard deviation): 11.877701
 -------------------------------------------------------
 ERROR_RATE_MODIFIED_KSPC_SHORTEST
-means: 1.0409523, 1.2176191, 1.5420129, 1.4461902, 1.6728573, 1.559966, 1.0619047
-stds: 0.055254545, 0.14656612, 0.34846404, 0.4419569, 0.4561149, 0.6124416, 0.113289274
-tablet | leapSurface: sampleSize(Pop): 3.2008698 sampleSize(Pool): 10.647061
-tablet | leapAirStatic: sampleSize(Pop): 6.447188 sampleSize(Pool): 32.534748
-tablet | leapAirPinch: sampleSize(Pop): 1.6253085 sampleSize(Pool): 8.682879
-tablet | leapAirDynamic: sampleSize(Pop): 2.873958 sampleSize(Pool): 26.527672
-tablet | leapAirBimodal: sampleSize(Pop): 13.891709 sampleSize(Pool): 11.095741
-Average sample size    (pop): 5.607807
-Average sample size (pooled): 17.897621
+touchscreen | leapSurface: 		sampleSize (population standard deviation): 3.2008698 	sampleSize (pooled standard deviation): 10.647061
+touchscreen | leapAirStatic: 	sampleSize (population standard deviation): 6.447188 	sampleSize (pooled standard deviation): 32.534748
+touchscreen | leapAirPinch: 	sampleSize (population standard deviation): 1.6253085 	sampleSize (pooled standard deviation): 8.682879
+touchscreen | leapAirDynamic: 	sampleSize (population standard deviation): 2.873958 	sampleSize (pooled standard deviation): 26.527672
+touchscreen | leapAirBimodal: 	sampleSize (population standard deviation): 13.891709 	sampleSize (pooled standard deviation): 11.095741
+Average sample size (population standard deviation): 5.607807
+Average sample size     (pooled standard deviation): 17.897621
 -------------------------------------------------------
 ERROR_RATE_MODIFIED_MSD_SHORTEST
-means: 0.2857143, 1.5476191, 6.131424, 4.073129, 3.5816329, 5.7636056, 0.35714287
-stds: 0.6998542, 2.4571152, 6.5206237, 3.4640691, 3.4564924, 6.4685473, 0.8748177
-tablet | leapSurface: sampleSize(Pop): 4.5055184 sampleSize(Pool): 18.117832
-tablet | leapAirStatic: sampleSize(Pop): 14.842218 sampleSize(Pool): 22.171074
-tablet | leapAirPinch: sampleSize(Pop): 22.881752 sampleSize(Pool): 34.08103
-tablet | leapAirDynamic: sampleSize(Pop): 5.3259697 sampleSize(Pool): 21.118715
-tablet | leapAirBimodal: sampleSize(Pop): 66.7968 sampleSize(Pool): 37.631992
-Average sample size    (pop): 22.870451
-Average sample size (pooled): 26.624126
+touchscreen | leapSurface: 		sampleSize (population standard deviation): 4.5055184 	sampleSize (pooled standard deviation): 18.117832
+touchscreen | leapAirStatic: 	sampleSize (population standard deviation): 14.842218 	sampleSize (pooled standard deviation): 22.171074
+touchscreen | leapAirPinch: 	sampleSize (population standard deviation): 22.881752 	sampleSize (pooled standard deviation): 34.08103
+touchscreen | leapAirDynamic: 	sampleSize (population standard deviation): 5.3259697 	sampleSize (pooled standard deviation): 21.118715
+touchscreen | leapAirBimodal: 	sampleSize (population standard deviation): 66.7968 	sampleSize (pooled standard deviation): 37.631992
+Average sample size (population standard deviation): 22.870451
+Average sample size     (pooled standard deviation): 26.624126
 -------------------------------------------------------
 ERROR_RATE_MODIFIED_MSD_BACKSPACE
-means: 1.6286848, 5.2551026, 12.185191, 11.180794, 14.983635, 11.629054, 1.7976191
-stds: 1.8994373, 3.2513416, 8.596566, 7.244651, 6.6179314, 10.485744, 2.6381876
-tablet | leapSurface: sampleSize(Pop): 3.4513867 sampleSize(Pool): 13.789615
-tablet | leapAirStatic: sampleSize(Pop): 4.7205563 sampleSize(Pool): 14.078802
-tablet | leapAirPinch: sampleSize(Pop): 1.7513645 sampleSize(Pool): 4.50367
-tablet | leapAirDynamic: sampleSize(Pop): 4.07994 sampleSize(Pool): 23.25761
-tablet | leapAirBimodal: sampleSize(Pop): 13.865993 sampleSize(Pool): 11.497642
-Average sample size    (pop): 5.573848
-Average sample size (pooled): 13.425467
+touchscreen | leapSurface: 		sampleSize (population standard deviation): 3.4513867 	sampleSize (pooled standard deviation): 13.789615
+touchscreen | leapAirStatic: 	sampleSize (population standard deviation): 4.7205563 	sampleSize (pooled standard deviation): 14.078802
+touchscreen | leapAirPinch: 	sampleSize (population standard deviation): 1.7513645 	sampleSize (pooled standard deviation): 4.50367
+touchscreen | leapAirDynamic: 	sampleSize (population standard deviation): 4.07994 	sampleSize (pooled standard deviation): 23.25761
+touchscreen | leapAirBimodal: 	sampleSize (population standard deviation): 13.865993 	sampleSize (pooled standard deviation): 11.497642
+Average sample size (population standard deviation): 5.573848
+Average sample size     (pooled standard deviation): 13.425467
 -------------------------------------------------------
 TOTAL_ERROR_RATE
-means: 2.0408165, 7.493198, 18.255587, 15.8877125, 21.40366, 17.793009, 2.3469388
-stds: 2.389804, 4.4791336, 12.816413, 10.309597, 10.19262, 17.213844, 3.5553575
-tablet | leapSurface: sampleSize(Pop): 2.7159188 sampleSize(Pool): 12.47609
-tablet | leapAirStatic: sampleSize(Pop): 4.464193 sampleSize(Pool): 14.057291
-tablet | leapAirPinch: sampleSize(Pop): 1.6257396 sampleSize(Pool): 5.0221195
-tablet | leapAirDynamic: sampleSize(Pop): 2.9653475 sampleSize(Pool): 23.381123
-tablet | leapAirBimodal: sampleSize(Pop): 11.878202 sampleSize(Pool): 9.681063
-Average sample size    (pop): 4.7298803
-Average sample size (pooled): 12.923536
+touchscreen | leapSurface: 		sampleSize (population standard deviation): 2.7159188 	sampleSize (pooled standard deviation): 12.47609
+touchscreen | leapAirStatic: 	sampleSize (population standard deviation): 4.464193 	sampleSize (pooled standard deviation): 14.057291
+touchscreen | leapAirPinch: 	sampleSize (population standard deviation): 1.6257396 	sampleSize (pooled standard deviation): 5.0221195
+touchscreen | leapAirDynamic: 	sampleSize (population standard deviation): 2.9653475 	sampleSize (pooled standard deviation): 23.381123
+touchscreen | leapAirBimodal: 	sampleSize (population standard deviation): 11.878202 	sampleSize (pooled standard deviation): 9.681063
+Average sample size (population standard deviation): 4.7298803
+Average sample size     (pooled standard deviation): 12.923536
 -------------------------------------------------------
 TOTAL_ERROR_RATE_MODIFIED_SHORTEST
-means: 1.8503401, 7.493198, 17.888762, 15.406112, 21.046518, 16.795582, 2.3469388
-stds: 2.191242, 4.4791336, 12.480939, 10.579467, 10.143111, 15.886193, 3.5553575
-tablet | leapSurface: sampleSize(Pop): 2.9109719 sampleSize(Pool): 12.756424
-tablet | leapAirStatic: sampleSize(Pop): 5.0241337 sampleSize(Pool): 16.526346
-tablet | leapAirPinch: sampleSize(Pop): 1.7125477 sampleSize(Pool): 5.2473097
-tablet | leapAirDynamic: sampleSize(Pop): 3.6353445 sampleSize(Pool): 24.682463
-tablet | leapAirBimodal: sampleSize(Pop): 11.878202 sampleSize(Pool): 9.681063
-Average sample size    (pop): 5.03224
-Average sample size (pooled): 13.77872
+touchscreen | leapSurface: 		sampleSize (population standard deviation): 2.9109719 	sampleSize (pooled standard deviation): 12.756424
+touchscreen | leapAirStatic: 	sampleSize (population standard deviation): 5.0241337 	sampleSize (pooled standard deviation): 16.526346
+touchscreen | leapAirPinch: 	sampleSize (population standard deviation): 1.7125477 	sampleSize (pooled standard deviation): 5.2473097
+touchscreen | leapAirDynamic: 	sampleSize (population standard deviation): 3.6353445 	sampleSize (pooled standard deviation): 24.682463
+touchscreen | leapAirBimodal: 	sampleSize (population standard deviation): 11.878202 	sampleSize (pooled standard deviation): 9.681063
+Average sample size (population standard deviation): 5.03224
+Average sample size     (pooled standard deviation): 13.77872
 -------------------------------------------------------
 TOTAL_ERROR_RATE_MODIFIED_BACKSPACE
-means: 1.6286848, 5.2551026, 12.185191, 11.180794, 14.983635, 11.629054, 1.7976191
-stds: 1.8994373, 3.2513416, 8.596566, 7.244651, 6.6179314, 10.485744, 2.6381876
-tablet | leapSurface: sampleSize(Pop): 3.4513867 sampleSize(Pool): 13.789615
-tablet | leapAirStatic: sampleSize(Pop): 4.7205563 sampleSize(Pool): 14.078802
-tablet | leapAirPinch: sampleSize(Pop): 1.7513645 sampleSize(Pool): 4.50367
-tablet | leapAirDynamic: sampleSize(Pop): 4.07994 sampleSize(Pool): 23.25761
-tablet | leapAirBimodal: sampleSize(Pop): 13.865993 sampleSize(Pool): 11.497642
-Average sample size    (pop): 5.573848
-Average sample size (pooled): 13.425467
+touchscreen | leapSurface: 		sampleSize (population standard deviation): 3.4513867 	sampleSize (pooled standard deviation): 13.789615
+touchscreen | leapAirStatic: 	sampleSize (population standard deviation): 4.7205563 	sampleSize (pooled standard deviation): 14.078802
+touchscreen | leapAirPinch: 	sampleSize (population standard deviation): 1.7513645 	sampleSize (pooled standard deviation): 4.50367
+touchscreen | leapAirDynamic: 	sampleSize (population standard deviation): 4.07994 	sampleSize (pooled standard deviation): 23.25761
+touchscreen | leapAirBimodal: 	sampleSize (population standard deviation): 13.865993 	sampleSize (pooled standard deviation): 11.497642
+Average sample size (population standard deviation): 5.573848
+Average sample size     (pooled standard deviation): 13.425467
 -------------------------------------------------------
 FRECHET_DISTANCE_TOUCH_ONLY
-means: 156.43698, 228.82646, 278.0489, 310.01685, 489.6292, 312.15744, 258.36456
-stds: 33.484985, 20.38359, 54.510868, 56.198822, 77.20978, 113.36701, 69.00108
-tablet | leapSurface: sampleSize(Pop): 2.6889412 sampleSize(Pool): 10.959621
-tablet | leapAirStatic: sampleSize(Pop): 0.9883215 sampleSize(Pool): 4.250469
-tablet | leapAirPinch: sampleSize(Pop): 0.09578183 sampleSize(Pool): 0.7350168
-tablet | leapAirDynamic: sampleSize(Pop): 0.9381978 sampleSize(Pool): 14.979402
-tablet | leapAirBimodal: sampleSize(Pop): 7.466933 sampleSize(Pool): 46.51563
-Average sample size    (pop): 2.435635
-Average sample size (pooled): 15.488028
+touchscreen | leapSurface: 		sampleSize (population standard deviation): 2.6889412 	sampleSize (pooled standard deviation): 10.959621
+touchscreen | leapAirStatic: 	sampleSize (population standard deviation): 0.9883215 	sampleSize (pooled standard deviation): 4.250469
+touchscreen | leapAirPinch: 	sampleSize (population standard deviation): 0.09578183 	sampleSize (pooled standard deviation): 0.7350168
+touchscreen | leapAirDynamic: 	sampleSize (population standard deviation): 0.9381978 	sampleSize (pooled standard deviation): 14.979402
+touchscreen | leapAirBimodal: 	sampleSize (population standard deviation): 7.466933 	sampleSize (pooled standard deviation): 46.51563
+Average sample size (population standard deviation): 2.435635
+Average sample size     (pooled standard deviation): 15.488028
 -------------------------------------------------------
 FRECHET_DISTANCE_TOUCH_ONLY_MODIFIED_SHORTEST
-means: 152.16698, 220.38719, 262.39178, 267.0899, 465.5955, 261.63043, 256.34583
-stds: 33.420734, 13.526668, 42.81514, 48.98351, 55.756306, 57.642906, 70.09061
-tablet | leapSurface: sampleSize(Pop): 1.6260508 sampleSize(Pool): 8.958514
-tablet | leapAirStatic: sampleSize(Pop): 1.3153564 sampleSize(Pool): 9.282132
-tablet | leapAirPinch: sampleSize(Pop): 0.04771527 sampleSize(Pool): 0.42921096
-tablet | leapAirDynamic: sampleSize(Pop): 1.6866391 sampleSize(Pool): 16.1578
-tablet | leapAirBimodal: sampleSize(Pop): 2.2188163 sampleSize(Pool): 30.89658
-Average sample size    (pop): 1.3789155
-Average sample size (pooled): 13.144849
+touchscreen | leapSurface: 		sampleSize (population standard deviation): 1.6260508 	sampleSize (pooled standard deviation): 8.958514
+touchscreen | leapAirStatic: 	sampleSize (population standard deviation): 1.3153564 	sampleSize (pooled standard deviation): 9.282132
+touchscreen | leapAirPinch: 	sampleSize (population standard deviation): 0.04771527 	sampleSize (pooled standard deviation): 0.42921096
+touchscreen | leapAirDynamic: 	sampleSize (population standard deviation): 1.6866391 	sampleSize (pooled standard deviation): 16.1578
+touchscreen | leapAirBimodal: 	sampleSize (population standard deviation): 2.2188163 	sampleSize (pooled standard deviation): 30.89658
+Average sample size (population standard deviation): 1.3789155
+Average sample size     (pooled standard deviation): 13.144849
 -------------------------------------------------------
 FRECHET_DISTANCE_TOUCH_ONLY_MODIFIED_BACKSPACE
-means: 150.04065, 213.73047, 238.80981, 231.23036, 418.9602, 235.47542, 253.69768
-stds: 32.36273, 12.636228, 30.66633, 14.897618, 79.814514, 36.518543, 66.4879
-tablet | leapSurface: sampleSize(Pop): 3.9805996 sampleSize(Pool): 13.712451
-tablet | leapAirStatic: sampleSize(Pop): 8.175421 sampleSize(Pool): 9.769418
-tablet | leapAirPinch: sampleSize(Pop): 0.05944295 sampleSize(Pool): 1.2154881
-tablet | leapAirDynamic: sampleSize(Pop): 5.294977 sampleSize(Pool): 24.759392
-tablet | leapAirBimodal: sampleSize(Pop): 1.5673764 sampleSize(Pool): 22.480385
-Average sample size    (pop): 3.8155637
-Average sample size (pooled): 14.387426
+touchscreen | leapSurface: 		sampleSize (population standard deviation): 3.9805996 	sampleSize (pooled standard deviation): 13.712451
+touchscreen | leapAirStatic: 	sampleSize (population standard deviation): 8.175421 	sampleSize (pooled standard deviation): 9.769418
+touchscreen | leapAirPinch: 	sampleSize (population standard deviation): 0.05944295 	sampleSize (pooled standard deviation): 1.2154881
+touchscreen | leapAirDynamic: 	sampleSize (population standard deviation): 5.294977 	sampleSize (pooled standard deviation): 24.759392
+touchscreen | leapAirBimodal: 	sampleSize (population standard deviation): 1.5673764 	sampleSize (pooled standard deviation): 22.480385
+Average sample size (population standard deviation): 3.8155637
+Average sample size     (pooled standard deviation): 14.387426
 -------------------------------------------------------
-DISCOMFORT_LEVEL
-means: -1.5714285, -1.7142857, -1.2857143, -0.71428573, -0.5714286, -0.85714287, -2.0
-stds: 1.0497813, 0.45175394, 0.6998542, 1.0301576, 1.1780301, 1.1248583, 0.0
--------------------------------------------------------
-FATIGUE_LEVEL
-means: -1.2857143, -1.8571428, -1.7142857, -1.0, -0.14285715, -0.5714286, -1.7142857
-stds: 1.0301574, 0.3499271, 0.45175394, 1.069045, 1.6413035, 1.4982984, 0.6998542
--------------------------------------------------------
-DIFFICULTY_LEVEL
-means: -1.5714285, -1.8571428, -0.5714286, -0.2857143, 1.2857143, 0.0, -1.7142857
-stds: 0.49487165, 0.3499271, 0.7284314, 1.0301576, 0.45175394, 1.4142135, 0.45175394
--------------------------------------------------------
-PREFERENCE_RANKING
-means: 3.0, 2.142857, 3.5714285, 5.0, 6.428571, 4.857143, 3.0
-stds: 1.9272482, 0.83299315, 1.0497813, 1.8516402, 1.0497813, 0.9897433, 1.9272482
--------------------------------------------------------
-Final Average Sample    (pop): 5.0416975
-Final Average Sample (pooled): 11.59287
+Final Average Sample Size (population standard deviation): 5.0416975
+Final Average Sample Size     (pooled standard deviation): 11.59287

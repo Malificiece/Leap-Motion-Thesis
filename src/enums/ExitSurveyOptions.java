@@ -63,6 +63,10 @@ public enum ExitSurveyOptions {
                 return -1;
             case STRONGLY_DISAGREE:
                 return -2;
+            case YES:
+                return 1;
+            case NO:
+                return 0;
             default:
                 return 0;
         }
