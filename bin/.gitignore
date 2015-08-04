@@ -1,3 +1,5 @@
+/ui/
+/utilities/
 /dictionary/
 /enums/
 /experiment/
@@ -5,5 +7,3 @@
 /leap/
 /main/
 /swipe/
-/ui/
-/utilities/

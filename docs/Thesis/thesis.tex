@@ -1,0 +1,77 @@
+% Garrett Benoit
+% Thesis class, based on report
+\documentclass
+[
+	%short,	% omit front matter
+	%draft, 	% draft heading, don't load graphics, etc.
+]
+{thesis}
+
+% Optional additional packages
+\usepackage{graphicx}
+\usepackage{amsmath}
+\usepackage{chicago}
+\usepackage{lipsum} % Because this comes with a demo
+
+% Thesis parameters
+\title{Alternatives using the Leap Motion to extend Mid-Air Word-Gesture Keyboards}
+\author{Garrett Benoit}
+\holding{B.S.}
+\seeking{M.S.}
+\degree{Master of Science}
+\date{July 2015 (DATE TBD)}
+
+% Administration
+\graduateDean{J. Larry Lyon, Ph.D.}
+\department{Department of Computer Science}
+\departmentChair{Gregory D. Speegle, Ph.D.}
+
+% Supervisor (adviser / mentor)
+\supervisor{Michael G. Poor, Ph.D.}
+\supervisorTitle{Faculty Adviser}
+
+%  Readers (committee members)
+\readerOne{Bill Poucher, Ph.D.}
+\readerTwo{Brian Garner, Ph.D.}
+%\readerThree{...}
+%\readerFour{...}
+%\readerFive{...}
+
+% Abstract
+\abstract{Abstract goes here}
+
+% Acknowledgments (optional)
+\acknowledgements{I want to express my great appreciation to several people. Acknowledgements.}
+
+% Dedication (optional)
+\dedication{\it Pour la rose qui fait important le temps qu'on perd}
+
+% List of figures (optional)
+\makeListOfFigures
+
+% List of tables (optional)
+\makeListOfTables
+
+% Document body
+\begin{document}
+
+	% Chapters
+	\include{ch1}
+	\include{ch2}
+	\include{ch3}
+	\include{ch4}
+	\include{ch5}
+	
+	% Appendices (optional)
+	% TODO: make the thesisAppendixPage automagic if the \begin{appendices} exists
+	\thesisAppendixPage 
+	\begin{appendices}
+		\include{appendixA}
+		\include{appendixB}
+	\end{appendices}
+	
+	% Bibliography
+	\bibliographystyle{chicago} % or whatever style your department uses
+	\bibliography{thesis}
+	
+\end{document}

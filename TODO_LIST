@@ -3,7 +3,8 @@ TODO:
 !!! - FOR BIMODAL - NEED TO CHANGE THE Z-Value so we know when they are pushing the button or not.
 !!! - FOR CONTROLLER - NEED TO RECORD KEY WE ARE ON AT ALL TIMES
 --- maybe do this for all the inputs. Might help out
-0) Print the new keyboard in high quality!
+0) Intermittent Surveys / WGK for controller / hand alternative for mid-air keyboards with leap instead of stylus
+1) Print the new keyboard in high quality!
 2) There is an issue when calibrating a plane at too much of an angle that the z axis becomes flipped. Try to solve this issue.
 3) Add unique tutorial INFO!
 4) Implement a hand alternative for both the surface and air keyboards on the leap.
