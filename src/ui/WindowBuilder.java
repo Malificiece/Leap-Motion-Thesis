@@ -9,9 +9,7 @@ import java.awt.GridLayout;
 import java.awt.Toolkit;
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Enumeration;
 
-import javax.swing.AbstractButton;
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
@@ -43,7 +41,7 @@ public class WindowBuilder {
     public static void buildControlWindow(JFrame frame,
             JComboBox<String> testComboBox,
             JTextField subjectField,
-            JButton[] optionsButtons) { // calibrate, run, edit, exit, dictionary, formatter
+            JButton[] optionsButtons) { // calibrate, run, edit, exit, dictionary, formatter, likert
         
         JPanel background = new JPanel();
         background.setLayout(new BoxLayout(background, BoxLayout.Y_AXIS));
@@ -72,6 +70,7 @@ public class WindowBuilder {
         background.add(MyUtilities.SWING_UTILITIES.createPadding(10, SwingConstants.VERTICAL));
         
         JPanel testPanel = new JPanel();
+        testPanel.setLayout(new BoxLayout(testPanel, BoxLayout.Y_AXIS));
         testPanel.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createTitledBorder("Test Selection"), BorderFactory.createEmptyBorder(5, 10, 10, 10)));
         background.add(testPanel);
 
@@ -81,6 +80,11 @@ public class WindowBuilder {
         }
         testComboBox.setBackground(Color.WHITE);
         testPanel.add(testComboBox);
+        
+        JPanel buttonGroup0 = new JPanel();
+        testPanel.add(buttonGroup0);
+        optionsButtons[6].setEnabled(false);
+        buttonGroup0.add(optionsButtons[6]);
         
         // Build layout for calibration and run buttons
         background.add(MyUtilities.SWING_UTILITIES.createPadding(10, SwingConstants.VERTICAL));
@@ -127,17 +131,200 @@ public class WindowBuilder {
                           (int)(screenSize.getHeight()/2 - windowSize.getHeight()/2));
     }
     
-    public static int buildExitSurveyWindow(JFrame frame,
+    public static void buildExitSurveyWindow(JFrame frame,
+            JTextField subjectIDTextField,
+            KeyboardType exitSurveyType,
+            ButtonGroup[] likertButtonGroups, // discomfort, fatigue, difficulty
+            JButton saveButton) {
+        
+        JPanel background = new JPanel();
+        background.setLayout(new BoxLayout(background, BoxLayout.Y_AXIS));
+        frame.add(background);
+        
+        // Add subject information section.
+        JPanel subjectInfoPanel = new JPanel();
+        subjectInfoPanel.setLayout(new BoxLayout(subjectInfoPanel, BoxLayout.X_AXIS));
+        subjectInfoPanel.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createEmptyBorder(5, 10, 10, 10), BorderFactory.createTitledBorder("Subject Information")));
+        background.add(subjectInfoPanel);
+        
+        // Subject info left side
+        JPanel leftSubjectInfoPanel = new JPanel(new SpringLayout());
+        subjectInfoPanel.add(leftSubjectInfoPanel);
+        
+        JLabel subjectIDLabel = new JLabel("Subject ID:", JLabel.LEADING);        
+        leftSubjectInfoPanel.add(subjectIDLabel);
+        subjectIDTextField.setHorizontalAlignment(JTextField.CENTER);
+        leftSubjectInfoPanel.add(subjectIDTextField);
+        
+        MyUtilities.SPRING_UTILITIES.makeCompactGrid(leftSubjectInfoPanel,
+                1, 2,        //rows, cols
+                6, 6,        //initX, initY
+                6, 6);       //xPad, yPad
+        
+        // Add some padding in between
+        subjectInfoPanel.add(MyUtilities.SWING_UTILITIES.createPadding(100, SwingConstants.HORIZONTAL));
+        
+        // Keyboard info right side
+        JPanel rightSubjectInfoPanel = new JPanel(new SpringLayout());
+        subjectInfoPanel.add(rightSubjectInfoPanel);
+        
+        JTextField keyboardTypeTextField = new JTextField(25);
+        keyboardTypeTextField.setText(exitSurveyType.getName());
+        keyboardTypeTextField.setEnabled(false);
+        JLabel ageLabel = new JLabel("Keyboard:", JLabel.TRAILING);        
+        rightSubjectInfoPanel.add(ageLabel);
+        keyboardTypeTextField.setHorizontalAlignment(JTextField.CENTER);
+        rightSubjectInfoPanel.add(keyboardTypeTextField);
+        
+        MyUtilities.SPRING_UTILITIES.makeCompactGrid(rightSubjectInfoPanel,
+                1, 2,        //rows, cols
+                6, 6,        //initX, initY
+                6, 6);       //xPad, yPad
+        
+        // Create the content pane and scroll pane
+        JPanel scrollPanel = new JPanel(new GridLayout(0,1));
+        scrollPanel.setPreferredSize(new Dimension(675, 300));
+        background.add(scrollPanel);
+        
+        JPanel contentPanel = new JPanel();
+        contentPanel.setLayout(new BoxLayout(contentPanel, BoxLayout.Y_AXIS));
+        contentPanel.setBorder(BorderFactory.createEmptyBorder(10, 25, 10, 25));
+        
+        // Questions - Discomfort, Fatigue, Difficulty
+        JTextArea deviceSurveySection = new JTextArea("Please indicate if you agree or disagree with the following statements.\n");
+        deviceSurveySection.setFont(new Font(deviceSurveySection.getFont().getName(), Font.BOLD, deviceSurveySection.getFont().getSize()+2));
+        deviceSurveySection.setEditable(false);
+        deviceSurveySection.setHighlighter(null);
+        deviceSurveySection.setBackground(UIManager.getColor("Panel.background"));
+        deviceSurveySection.setFont(UIManager.getFont("Label.font"));
+        deviceSurveySection.setLineWrap(true);
+        deviceSurveySection.setWrapStyleWord(true);
+        contentPanel.add(deviceSurveySection);
+
+        // Discomfort Question
+        JTextArea discomfortQuestion = new JTextArea("1. I experienced discomfort today while using the " + exitSurveyType.getName() + ". It was painful or awkward to use.");
+        discomfortQuestion.setEditable(false);
+        discomfortQuestion.setHighlighter(null);
+        discomfortQuestion.setBackground(UIManager.getColor("Panel.background"));
+        discomfortQuestion.setFont(UIManager.getFont("Label.font"));
+        discomfortQuestion.setLineWrap(true);
+        discomfortQuestion.setWrapStyleWord(true);
+        contentPanel.add(discomfortQuestion);
+        
+        JPanel discomfortGroup = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        JRadioButton discomfortRadioButton0 = new JRadioButton(ExitSurveyOptions.STRONGLY_AGREE.getDescription());
+        JRadioButton discomfortRadioButton1 = new JRadioButton(ExitSurveyOptions.AGREE.getDescription());
+        JRadioButton discomfortRadioButton2 = new JRadioButton(ExitSurveyOptions.NEUTRAL.getDescription());
+        JRadioButton discomfortRadioButton3 = new JRadioButton(ExitSurveyOptions.DISAGREE.getDescription());
+        JRadioButton discomfortRadioButton4 = new JRadioButton(ExitSurveyOptions.STRONGLY_DISAGREE.getDescription());
+        discomfortGroup.add(discomfortRadioButton0);
+        discomfortGroup.add(discomfortRadioButton1);
+        discomfortGroup.add(discomfortRadioButton2);
+        discomfortGroup.add(discomfortRadioButton3);
+        discomfortGroup.add(discomfortRadioButton4);
+        contentPanel.add(discomfortGroup);
+        likertButtonGroups[0].add(discomfortRadioButton0);
+        likertButtonGroups[0].add(discomfortRadioButton1);
+        likertButtonGroups[0].add(discomfortRadioButton2);
+        likertButtonGroups[0].add(discomfortRadioButton3);
+        likertButtonGroups[0].add(discomfortRadioButton4);
+        
+        // Fatigue Question
+        contentPanel.add(MyUtilities.SWING_UTILITIES.createPadding(25, SwingConstants.VERTICAL));
+        JTextArea fatigueQuestion = new JTextArea("2. I experienced fatigue today while using the " + exitSurveyType.getName() + ". It made my arm/hand tired and sore.");
+        fatigueQuestion.setEditable(false);
+        fatigueQuestion.setHighlighter(null);
+        fatigueQuestion.setBackground(UIManager.getColor("Panel.background"));
+        fatigueQuestion.setFont(UIManager.getFont("Label.font"));
+        fatigueQuestion.setLineWrap(true);
+        fatigueQuestion.setWrapStyleWord(true);
+        contentPanel.add(fatigueQuestion);
+        
+        JPanel fatigueGroup = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        JRadioButton fatigueRadioButton0 = new JRadioButton(ExitSurveyOptions.STRONGLY_AGREE.getDescription());
+        JRadioButton fatigueRadioButton1 = new JRadioButton(ExitSurveyOptions.AGREE.getDescription());
+        JRadioButton fatigueRadioButton2 = new JRadioButton(ExitSurveyOptions.NEUTRAL.getDescription());
+        JRadioButton fatigueRadioButton3 = new JRadioButton(ExitSurveyOptions.DISAGREE.getDescription());
+        JRadioButton fatigueRadioButton4 = new JRadioButton(ExitSurveyOptions.STRONGLY_DISAGREE.getDescription());
+        fatigueGroup.add(fatigueRadioButton0);
+        fatigueGroup.add(fatigueRadioButton1);
+        fatigueGroup.add(fatigueRadioButton2);
+        fatigueGroup.add(fatigueRadioButton3);
+        fatigueGroup.add(fatigueRadioButton4);
+        contentPanel.add(fatigueGroup);
+        likertButtonGroups[1].add(fatigueRadioButton0);
+        likertButtonGroups[1].add(fatigueRadioButton1);
+        likertButtonGroups[1].add(fatigueRadioButton2);
+        likertButtonGroups[1].add(fatigueRadioButton3);
+        likertButtonGroups[1].add(fatigueRadioButton4);
+        
+        // Difficulty Question
+        contentPanel.add(MyUtilities.SWING_UTILITIES.createPadding(25, SwingConstants.VERTICAL));
+        JTextArea difficultyQuestion = new JTextArea("3. I experienced difficulty today when using the " + exitSurveyType.getName() + ". This keyboard was confusing or hard to use.");
+        difficultyQuestion.setEditable(false);
+        difficultyQuestion.setHighlighter(null);
+        difficultyQuestion.setBackground(UIManager.getColor("Panel.background"));
+        difficultyQuestion.setFont(UIManager.getFont("Label.font"));
+        difficultyQuestion.setLineWrap(true);
+        difficultyQuestion.setWrapStyleWord(true);
+        contentPanel.add(difficultyQuestion);
+        
+        JPanel difficultyGroup = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        JRadioButton difficultyRadioButton0 = new JRadioButton(ExitSurveyOptions.STRONGLY_AGREE.getDescription());
+        JRadioButton difficultyRadioButton1 = new JRadioButton(ExitSurveyOptions.AGREE.getDescription());
+        JRadioButton difficultyRadioButton2 = new JRadioButton(ExitSurveyOptions.NEUTRAL.getDescription());
+        JRadioButton difficultyRadioButton3 = new JRadioButton(ExitSurveyOptions.DISAGREE.getDescription());
+        JRadioButton difficultyRadioButton4 = new JRadioButton(ExitSurveyOptions.STRONGLY_DISAGREE.getDescription());
+        difficultyGroup.add(difficultyRadioButton0);
+        difficultyGroup.add(difficultyRadioButton1);
+        difficultyGroup.add(difficultyRadioButton2);
+        difficultyGroup.add(difficultyRadioButton3);
+        difficultyGroup.add(difficultyRadioButton4);
+        contentPanel.add(difficultyGroup);
+        likertButtonGroups[2].add(difficultyRadioButton0);
+        likertButtonGroups[2].add(difficultyRadioButton1);
+        likertButtonGroups[2].add(difficultyRadioButton2);
+        likertButtonGroups[2].add(difficultyRadioButton3);
+        likertButtonGroups[2].add(difficultyRadioButton4);
+
+        // Add the entire content panel to a scroll pane.
+        JScrollPane contentScrollBar = new JScrollPane(contentPanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        contentScrollBar.getVerticalScrollBar().setUnitIncrement(16);
+        scrollPanel.add(contentScrollBar);
+        
+        javax.swing.SwingUtilities.invokeLater(new Runnable() {
+            public void run() { 
+                contentScrollBar.getVerticalScrollBar().setValue(0);
+            }
+        });
+        
+        // Add save button
+        saveButton.setHorizontalAlignment(JButton.RIGHT);
+        background.add(MyUtilities.SWING_UTILITIES.createPadding(5, SwingConstants.VERTICAL));
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        buttonPanel.add(saveButton);
+        buttonPanel.add(MyUtilities.SWING_UTILITIES.createPadding(5, SwingConstants.HORIZONTAL));
+        background.add(buttonPanel);
+        background.add(MyUtilities.SWING_UTILITIES.createPadding(5, SwingConstants.VERTICAL));
+        
+        // Arrange the components inside the window
+        frame.pack();
+        frame.setResizable(false);
+        
+        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+        Dimension windowSize = frame.getSize();
+        frame.setLocation((int)(screenSize.getWidth()/2 - windowSize.getWidth()/2),
+                          (int)(screenSize.getHeight()/2 - windowSize.getHeight()/2));
+    }
+    
+    public static void buildExitSurveyWindow(JFrame frame,
             JTextField[] subjectTextFields, // id, age, major
             JTextField[] historyTextFields, // physical, gesture, touch, swipe
             ArrayList<JTextField> rankingTextFields, // Follows Keyboard Type order
             ButtonGroup[] subjectButtonGroups, // gender, own computer, hours, handedness, touch hand
             ButtonGroup[] historyButtonGroups, // physical, gesture, touch, swipe
-            ArrayList<ButtonGroup> discomfortButtonGroups, // The following button groups follow Keyboard Type order
-            ArrayList<ButtonGroup> fatigueButtonGroups,
-            ArrayList<ButtonGroup> difficultyButtonGroups,
-            ArrayList<ButtonGroup> usedButtonGroups,
-            int maxRanking, JTextArea rankingQuestion,
+            int maxRanking,
+            JTextArea rankingQuestion,
             JButton saveButton) {
     	
     	JPanel background = new JPanel();
@@ -199,7 +386,6 @@ public class WindowBuilder {
                 2, 2,        //rows, cols
                 6, 6,        //initX, initY
                 6, 6);       //xPad, yPad
-        
         
         // Create the content pane and scroll pane
         JPanel scrollPanel = new JPanel(new GridLayout(0,1));
@@ -441,145 +627,11 @@ public class WindowBuilder {
         contentPanel.add(experimentHandGroup);
         subjectButtonGroups[4].add(experimentRightHandRadioButton);
         subjectButtonGroups[4].add(experimentLeftHandRadioButton);
-        subjectButtonGroups[4].add(experimentBothRadioButton);
+        subjectButtonGroups[4].add(experimentBothRadioButton); 
         
-        // Questions - Discomfort, Fatigue, Difficulty
+        // Question 9 - Rank the keyboards from best to worst
         contentPanel.add(MyUtilities.SWING_UTILITIES.createPadding(25, SwingConstants.VERTICAL));
-        JTextArea deviceSurveySection = new JTextArea("Please indicate if you agree or disagree with the following statements.\n");
-        deviceSurveySection.setFont(new Font(deviceSurveySection.getFont().getName(), Font.BOLD, deviceSurveySection.getFont().getSize()+2));
-        deviceSurveySection.setEditable(false);
-        deviceSurveySection.setHighlighter(null);
-        deviceSurveySection.setBackground(UIManager.getColor("Panel.background"));
-        deviceSurveySection.setFont(UIManager.getFont("Label.font"));
-        deviceSurveySection.setLineWrap(true);
-        deviceSurveySection.setWrapStyleWord(true);
-        contentPanel.add(deviceSurveySection);
-        
-        int questionIndex = 0;
-        for(Keyboard keyboardType: Keyboard.values()) {
-        	if(KeyboardType.getByID(keyboardType.getID()) != KeyboardType.STANDARD) {
-        	    // Did you use this keyboard type question
-                JTextArea usedKeyboardQuestion = new JTextArea("Did you use the " + keyboardType.getName() + " during the experiment?");
-                usedKeyboardQuestion.setEditable(false);
-                usedKeyboardQuestion.setHighlighter(null);
-                usedKeyboardQuestion.setBackground(UIManager.getColor("Panel.background"));
-                usedKeyboardQuestion.setFont(UIManager.getFont("Label.font"));
-                usedKeyboardQuestion.setLineWrap(true);
-                usedKeyboardQuestion.setWrapStyleWord(true);
-                contentPanel.add(usedKeyboardQuestion);
-                
-                JPanel usedKeyboardGroup = new JPanel(new FlowLayout(FlowLayout.LEFT));
-                JRadioButton yesUsedKeyboardRadioButton = new JRadioButton(ExitSurveyOptions.YES.getDescription());
-                JRadioButton noUsedKeyboardRadioButton = new JRadioButton(ExitSurveyOptions.NO.getDescription());
-                usedKeyboardGroup.add(yesUsedKeyboardRadioButton);
-                usedKeyboardGroup.add(noUsedKeyboardRadioButton);
-                contentPanel.add(usedKeyboardGroup);
-                usedButtonGroups.get(keyboardType.getID() - 1).add(yesUsedKeyboardRadioButton);
-                usedButtonGroups.get(keyboardType.getID() - 1).add(noUsedKeyboardRadioButton);
-        	    
-        		// Discomfort Question
-                JTextArea discomfortQuestion = new JTextArea(questionIndex + ". I experienced discomfort today while using the " + keyboardType.getName() + ".");
-                discomfortQuestion.setEditable(false);
-                discomfortQuestion.setHighlighter(null);
-                discomfortQuestion.setBackground(UIManager.getColor("Panel.background"));
-                discomfortQuestion.setFont(UIManager.getFont("Label.font"));
-                discomfortQuestion.setLineWrap(true);
-                discomfortQuestion.setWrapStyleWord(true);
-                contentPanel.add(discomfortQuestion);
-                
-                JPanel discomfortGroup = new JPanel(new FlowLayout(FlowLayout.LEFT));
-                JRadioButton discomfortRadioButton0 = new JRadioButton(ExitSurveyOptions.STRONGLY_AGREE.getDescription());
-                JRadioButton discomfortRadioButton1 = new JRadioButton(ExitSurveyOptions.AGREE.getDescription());
-                JRadioButton discomfortRadioButton2 = new JRadioButton(ExitSurveyOptions.NEUTRAL.getDescription());
-                JRadioButton discomfortRadioButton3 = new JRadioButton(ExitSurveyOptions.DISAGREE.getDescription());
-                JRadioButton discomfortRadioButton4 = new JRadioButton(ExitSurveyOptions.STRONGLY_DISAGREE.getDescription());
-                discomfortGroup.add(discomfortRadioButton0);
-                discomfortGroup.add(discomfortRadioButton1);
-                discomfortGroup.add(discomfortRadioButton2);
-                discomfortGroup.add(discomfortRadioButton3);
-                discomfortGroup.add(discomfortRadioButton4);
-                contentPanel.add(discomfortGroup);
-                discomfortButtonGroups.get(keyboardType.getID() - 1).add(discomfortRadioButton0);
-                discomfortButtonGroups.get(keyboardType.getID() - 1).add(discomfortRadioButton1);
-                discomfortButtonGroups.get(keyboardType.getID() - 1).add(discomfortRadioButton2);
-                discomfortButtonGroups.get(keyboardType.getID() - 1).add(discomfortRadioButton3);
-                discomfortButtonGroups.get(keyboardType.getID() - 1).add(discomfortRadioButton4);
-                for (Enumeration<AbstractButton> buttons = discomfortButtonGroups.get(keyboardType.getID() - 1).getElements(); buttons.hasMoreElements();) {
-                    AbstractButton button = buttons.nextElement();
-                    button.setEnabled(false);
-                }
-                
-                // Fatigue Question
-                JTextArea fatigueQuestion = new JTextArea(++questionIndex + ". I experienced fatigue today while using the " + keyboardType.getName() + ".");
-                fatigueQuestion.setEditable(false);
-                fatigueQuestion.setHighlighter(null);
-                fatigueQuestion.setBackground(UIManager.getColor("Panel.background"));
-                fatigueQuestion.setFont(UIManager.getFont("Label.font"));
-                fatigueQuestion.setLineWrap(true);
-                fatigueQuestion.setWrapStyleWord(true);
-                contentPanel.add(fatigueQuestion);
-                
-                JPanel fatigueGroup = new JPanel(new FlowLayout(FlowLayout.LEFT));
-                JRadioButton fatigueRadioButton0 = new JRadioButton(ExitSurveyOptions.STRONGLY_AGREE.getDescription());
-                JRadioButton fatigueRadioButton1 = new JRadioButton(ExitSurveyOptions.AGREE.getDescription());
-                JRadioButton fatigueRadioButton2 = new JRadioButton(ExitSurveyOptions.NEUTRAL.getDescription());
-                JRadioButton fatigueRadioButton3 = new JRadioButton(ExitSurveyOptions.DISAGREE.getDescription());
-                JRadioButton fatigueRadioButton4 = new JRadioButton(ExitSurveyOptions.STRONGLY_DISAGREE.getDescription());
-                fatigueGroup.add(fatigueRadioButton0);
-                fatigueGroup.add(fatigueRadioButton1);
-                fatigueGroup.add(fatigueRadioButton2);
-                fatigueGroup.add(fatigueRadioButton3);
-                fatigueGroup.add(fatigueRadioButton4);
-                contentPanel.add(fatigueGroup);
-                fatigueButtonGroups.get(keyboardType.getID() - 1).add(fatigueRadioButton0);
-                fatigueButtonGroups.get(keyboardType.getID() - 1).add(fatigueRadioButton1);
-                fatigueButtonGroups.get(keyboardType.getID() - 1).add(fatigueRadioButton2);
-                fatigueButtonGroups.get(keyboardType.getID() - 1).add(fatigueRadioButton3);
-                fatigueButtonGroups.get(keyboardType.getID() - 1).add(fatigueRadioButton4);
-                for (Enumeration<AbstractButton> buttons = fatigueButtonGroups.get(keyboardType.getID() - 1).getElements(); buttons.hasMoreElements();) {
-                    AbstractButton button = buttons.nextElement();
-                    button.setEnabled(false);
-                }
-                
-                // Difficulty Question
-                JTextArea difficultyQuestion = new JTextArea(++questionIndex + ". I experienced difficulty today when using the " + keyboardType.getName() + ".");
-                difficultyQuestion.setEditable(false);
-                difficultyQuestion.setHighlighter(null);
-                difficultyQuestion.setBackground(UIManager.getColor("Panel.background"));
-                difficultyQuestion.setFont(UIManager.getFont("Label.font"));
-                difficultyQuestion.setLineWrap(true);
-                difficultyQuestion.setWrapStyleWord(true);
-                contentPanel.add(difficultyQuestion);
-                
-                JPanel difficultyGroup = new JPanel(new FlowLayout(FlowLayout.LEFT));
-                JRadioButton difficultyRadioButton0 = new JRadioButton(ExitSurveyOptions.STRONGLY_AGREE.getDescription());
-                JRadioButton difficultyRadioButton1 = new JRadioButton(ExitSurveyOptions.AGREE.getDescription());
-                JRadioButton difficultyRadioButton2 = new JRadioButton(ExitSurveyOptions.NEUTRAL.getDescription());
-                JRadioButton difficultyRadioButton3 = new JRadioButton(ExitSurveyOptions.DISAGREE.getDescription());
-                JRadioButton difficultyRadioButton4 = new JRadioButton(ExitSurveyOptions.STRONGLY_DISAGREE.getDescription());
-                difficultyGroup.add(difficultyRadioButton0);
-                difficultyGroup.add(difficultyRadioButton1);
-                difficultyGroup.add(difficultyRadioButton2);
-                difficultyGroup.add(difficultyRadioButton3);
-                difficultyGroup.add(difficultyRadioButton4);
-                contentPanel.add(difficultyGroup);
-                difficultyButtonGroups.get(keyboardType.getID() - 1).add(difficultyRadioButton0);
-                difficultyButtonGroups.get(keyboardType.getID() - 1).add(difficultyRadioButton1);
-                difficultyButtonGroups.get(keyboardType.getID() - 1).add(difficultyRadioButton2);
-                difficultyButtonGroups.get(keyboardType.getID() - 1).add(difficultyRadioButton3);
-                difficultyButtonGroups.get(keyboardType.getID() - 1).add(difficultyRadioButton4);
-                for (Enumeration<AbstractButton> buttons = difficultyButtonGroups.get(keyboardType.getID() - 1).getElements(); buttons.hasMoreElements();) {
-                    AbstractButton button = buttons.nextElement();
-                    button.setEnabled(false);
-                }
-
-                contentPanel.add(MyUtilities.SWING_UTILITIES.createPadding(25, SwingConstants.VERTICAL));
-        	}
-        }
-        
-        
-        // Final question - Rank the keyboards from best to worst
-        rankingQuestion.setText(++questionIndex + ". Please rank the keyboards from most preferred (1), to least preferred ("+ maxRanking + ").");
+        rankingQuestion.setText("9. Please rank the keyboards from most preferred (1), to least preferred ("+ maxRanking + ").");
         DefaultCaret caret = (DefaultCaret)rankingQuestion.getCaret();
         caret.setUpdatePolicy(DefaultCaret.NEVER_UPDATE);
         rankingQuestion.setEditable(false);
@@ -590,17 +642,16 @@ public class WindowBuilder {
         rankingQuestion.setWrapStyleWord(true);
         contentPanel.add(rankingQuestion);
         
-        // Subject info left side
         JPanel rankingPanel = new JPanel(new SpringLayout());
         contentPanel.add(rankingPanel);
         
-        for(Keyboard keyboardType: Keyboard.values()) {
-        	if(KeyboardType.getByID(keyboardType.getID()) != KeyboardType.STANDARD) {
-        		JLabel rankingLabel = new JLabel(keyboardType.getName() + ":");
-        		rankingTextFields.get(keyboardType.getID() - 1).setEditable(false);
-        		rankingTextFields.get(keyboardType.getID() - 1).setHorizontalAlignment(JTextField.CENTER);
+        for(Keyboard keyboard: Keyboard.values()) {
+        	if(KeyboardType.getByID(keyboard.getID()) != KeyboardType.STANDARD) {
+                int keyboardID = keyboard.getID() - 1;
+        		JLabel rankingLabel = new JLabel(keyboard.getName() + ":");
+        		rankingTextFields.get(keyboardID).setHorizontalAlignment(JTextField.CENTER);
         		rankingPanel.add(rankingLabel);
-        		rankingPanel.add(rankingTextFields.get(keyboardType.getID() - 1));
+        		rankingPanel.add(rankingTextFields.get(keyboardID));
         		rankingPanel.add(MyUtilities.SWING_UTILITIES.createPadding(500, SwingConstants.HORIZONTAL));
         	}
         }
@@ -638,8 +689,6 @@ public class WindowBuilder {
         Dimension windowSize = frame.getSize();
         frame.setLocation((int)(screenSize.getWidth()/2 - windowSize.getWidth()/2),
                           (int)(screenSize.getHeight()/2 - windowSize.getHeight()/2));
-        
-        return questionIndex;
     }
     
     public static void buildExperimentWindow(JFrame frame,
@@ -876,7 +925,9 @@ public class WindowBuilder {
     }
 
     public static void buildDictionaryWindow(JFrame frame,
-            JProgressBar totalProgressBar, JLabel stepName, JProgressBar stepProgressBar) {
+            JProgressBar totalProgressBar,
+            JLabel stepName,
+            JProgressBar stepProgressBar) {
         
         JPanel background = new JPanel();
         background.setLayout(new BoxLayout(background, BoxLayout.Y_AXIS));
@@ -1042,7 +1093,7 @@ public class WindowBuilder {
         currentDirectoryScrollBar.setPreferredSize(new Dimension(115, 120));
         fileSelectorPanel.add(currentDirectoryScrollBar);
         
-        // Add the direcotry contents to a scroll pane.
+        // Add the directory contents to a scroll pane.
         lists[1].setSelectionMode (ListSelectionModel.SINGLE_SELECTION);
         //lists[1].setVisibleRowCount(5);
         JScrollPane directoryContentsScrollBar = new JScrollPane(lists[1], JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);

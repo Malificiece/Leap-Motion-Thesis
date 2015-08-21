@@ -11,6 +11,7 @@ import ui.GraphicsController;
 import utilities.GLColor;
 import utilities.MyUtilities;
 
+import com.leapmotion.leap.Finger;
 import com.leapmotion.leap.Tool;
 import com.leapmotion.leap.Vector;
 
@@ -67,6 +68,16 @@ public class LeapTool extends KeyboardRenderable {
         length = DEFAULT_LENGTH;
         radius = DEFAULT_RADIUS;
         tipDirection = direction;
+    }
+    
+    public void setTool(Finger finger) {
+        isValid = finger.isValid();
+        if(isValid) {
+            length = finger.length();
+            radius = finger.width()/2;
+            tipDirection = finger.direction();
+        }
+        tipVelocity = finger.tipVelocity();
     }
     
     public void setTool(Tool tool) {

@@ -79,6 +79,7 @@ public class ExperimentController extends GraphicsController implements Keyboard
     private boolean runningTutorial = false;
     private boolean runningPractice = false;
     private boolean runningExperiment = false;
+    private boolean experimentCompletedSuccessfully = false;
     private boolean ranPractice = false;
     private String subjectID;
     private WordManager wordManager = new WordManager();
@@ -342,6 +343,7 @@ public class ExperimentController extends GraphicsController implements Keyboard
     
     private void finishExperiment() {
         runningExperiment = false;
+        experimentCompletedSuccessfully = true;
         splitPane.setRightComponent(rightComponent);
         dataManager.stopRecording();
         dataManager.save(keyboard);
@@ -354,6 +356,15 @@ public class ExperimentController extends GraphicsController implements Keyboard
         isFading = false;
         fadeTimeElapsed = 0;*/
         disable();
+    }
+    
+    public boolean experimentCompletedSuccessfully() {
+        try {
+            return experimentCompletedSuccessfully;
+        } finally {
+            // consume boolean
+            experimentCompletedSuccessfully = false;
+        }
     }
     
     public void disableUI() {

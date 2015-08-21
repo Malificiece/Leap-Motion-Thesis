@@ -7,10 +7,10 @@ import com.leapmotion.leap.Hand;
 import com.leapmotion.leap.Tool;
 import com.leapmotion.leap.Vector;
 
-
 public class LeapData {
     private Tool toolData;
     private Hand handData;
+    public int frameCount = 0;
     
     public LeapData() {
         // On creation, be safe and create non-null invalid data
@@ -50,7 +50,11 @@ public class LeapData {
     
     private void populateToolData(LeapTool leapTool) {
         if(leapTool != null) {
-            leapTool.setTool(toolData);
+            if(!toolData.isValid() && handData.isValid()) {
+                leapTool.setTool(handData.fingers().get(1));
+            } else {
+                leapTool.setTool(toolData);
+            }
         }
     }
     
@@ -59,6 +63,10 @@ public class LeapData {
             if(toolData.isValid()) {
                 leapPoint.setPoint(toolData.stabilizedTipPosition());
                 leapPoint.setTouchData(toolData);
+            } else if(handData.isValid()) {
+                // NOTE: Using the stabilizedTipPosition here causes some odd lag along the z-axis.
+                leapPoint.setPoint(handData.fingers().get(1).tipPosition());
+                leapPoint.setTouchData(handData.fingers().get(1));
             } else {
                 leapPoint.setPoint(Vector.zero());
                 leapPoint.setTouchData(null);

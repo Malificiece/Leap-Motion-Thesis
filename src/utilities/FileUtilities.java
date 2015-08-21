@@ -158,7 +158,7 @@ public class FileUtilities {
     }
     
     // Attempt to open wildcard file, do nothing if it doesn't exist
-    private File openWildcardFile(String filePath, String fileName) throws IOException {
+    public File openWildcardFile(String filePath, String fileName) throws IOException {
         // Attempt to open directory, create it if it doesn't exist
         File directory = createDirectory(filePath);
         for(File file: directory.listFiles(new FilenameFilter() {
@@ -473,6 +473,11 @@ public class FileUtilities {
         // Attempt to open file, create it if it doesn't exist.
         File file = createFile(filePath, fileName);
         
+        // Write our data to file.
+        writeDataToFile(file, savedData, report);
+    }
+    
+    public void writeListToFile(ArrayList<String> savedData, File file, boolean report) throws IOException {
         // Write our data to file.
         writeDataToFile(file, savedData, report);
     }

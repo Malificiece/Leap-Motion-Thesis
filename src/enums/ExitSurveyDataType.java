@@ -25,7 +25,9 @@ public enum ExitSurveyDataType {
     public static ExitSurveyDataType getByName(String typeName) {
         for(ExitSurveyDataType esdt: values()) {
             if(esdt.name().equalsIgnoreCase(typeName)) return esdt;
-            if(typeName != null && typeName.contains(esdt.name())) return esdt;
+            if(ExitSurveyDataType.isLikert(esdt) || ExitSurveyDataType.isRanking(esdt)) {
+                if(typeName != null && typeName.contains(esdt.name())) return esdt;
+            }
         }
         return null;
     }

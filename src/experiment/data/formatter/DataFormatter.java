@@ -401,34 +401,34 @@ public class DataFormatter implements Runnable {
             String subjectID = subjectDirectory.getName();
             if(subjectDirectory.isDirectory() && !TUTORIAL.equals(subjectID)) {
                 ArrayList<String> subjectData = new ArrayList<String>();
-                for(Keyboard keyboardType: Keyboard.values()) {
-                    if(KeyboardType.getByID(keyboardType.getID()) != KeyboardType.STANDARD) {
-                        IKeyboard keyboard = keyboardType.getKeyboard();
-                        String wildcardFileName = subjectID + "_" + keyboard.getFileName() + FileUtilities.WILDCARD + FileExt.PLAYBACK.getExt();
+                for(Keyboard keyboard: Keyboard.values()) {
+                    if(KeyboardType.getByID(keyboard.getID()) != KeyboardType.STANDARD) {
+                        IKeyboard iKeyboard = keyboard.getKeyboard();
+                        String wildcardFileName = subjectID + "_" + iKeyboard.getFileName() + FileUtilities.WILDCARD + FileExt.PLAYBACK.getExt();
                         try {
                             ArrayList<String> fileContents = MyUtilities.FILE_IO_UTILITIES.readListFromWildcardFile(subjectDirectory.getPath() + "\\", wildcardFileName);
                             ArrayList<PlaybackFileData> fileData = parsePlaybackFileContents(fileContents);
-                            switch(keyboardType) {
+                            switch(keyboard) {
                                 case CONTROLLER:
-                                    subjectData.addAll(calculateSubjectDataController(fileData, keyboard));
+                                    subjectData.addAll(calculateSubjectDataController(fileData, iKeyboard));
                                     break;
                                 case TABLET:
-                                    subjectData.addAll(calculateSubjectData(fileData, keyboard));
+                                    subjectData.addAll(calculateSubjectData(fileData, iKeyboard));
                                     break;
                                 case LEAP_SURFACE:
-                                    subjectData.addAll(calculateSubjectData(fileData, keyboard));
+                                    subjectData.addAll(calculateSubjectData(fileData, iKeyboard));
                                     break;
                                 case LEAP_AIR_STATIC:
-                                    subjectData.addAll(calculateSubjectData(fileData, keyboard));
+                                    subjectData.addAll(calculateSubjectData(fileData, iKeyboard));
                                     break;
                                 case LEAP_AIR_DYNAMIC:
-                                    subjectData.addAll(calculateSubjectData(fileData, keyboard));
+                                    subjectData.addAll(calculateSubjectData(fileData, iKeyboard));
                                     break;
                                 case LEAP_AIR_PINCH:
-                                    subjectData.addAll(calculateSubjectData(fileData, keyboard));
+                                    subjectData.addAll(calculateSubjectData(fileData, iKeyboard));
                                     break;
                                 case LEAP_AIR_BIMODAL:
-                                    subjectData.addAll(calculateSubjectData(fileData, keyboard));
+                                    subjectData.addAll(calculateSubjectData(fileData, iKeyboard));
                                     break;
                                 default: break;
                             }

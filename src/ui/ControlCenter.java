@@ -60,6 +60,7 @@ public class ControlCenter {
     private JButton calibrateButton;
     private JButton experimentButton;
     private JButton exitSurveyButton;
+    private JButton likertSurveyButton;
     private JButton createDictionariesButton;
     private JButton dataCenterButton;
     private boolean isDisabled = false;
@@ -77,10 +78,11 @@ public class ControlCenter {
         calibrateButton = new JButton("Calibration");
         experimentButton = new JButton("Experiment");
         exitSurveyButton = new JButton("Exit Survey");
+        likertSurveyButton = new JButton("Likert Survey");
         createDictionariesButton = new JButton("Create Dictionaries");
         dataCenterButton = new JButton("Data Center");
         
-        JButton[] buttons = {calibrateButton, experimentButton, editSubjectIDButton, exitSurveyButton, createDictionariesButton, dataCenterButton};
+        JButton[] buttons = {calibrateButton, experimentButton, editSubjectIDButton, exitSurveyButton, createDictionariesButton, dataCenterButton, likertSurveyButton};
         
         // Window builder builds window using important fields here. It adds unimportant fields that we won't use for aesthetics only.
         WindowBuilder.buildControlWindow(frame, testTypeComboBox, subjectField, buttons);
@@ -143,6 +145,7 @@ public class ControlCenter {
             }
         });
         
+        // This triggers the prompt for changing the subjectID
         subjectField.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent arg0) {
@@ -164,6 +167,7 @@ public class ControlCenter {
                             subjectField.requestFocusInWindow();
                             subjectField.selectAll();
                             editSubjectIDButton.setText("Save");
+                            disableUI(false);
                         } else if(subjectField.getText().length() != SUBJECT_ID_SIZE) {
                             JOptionPane.showMessageDialog(frame,
                                     "The subject ID must be 8 character long.",
@@ -201,6 +205,7 @@ public class ControlCenter {
                                 subjectField.setText(subjectID);
                             }
                             subjectField.setFocusable(false);
+                            enableUI();
                         } else {
                             subjectField.setEditable(false);
                             subjectField.setHighlighter(null);
@@ -208,10 +213,22 @@ public class ControlCenter {
                             subjectID = subjectField.getText();
                             ((ComboBoxRenderer) testTypeComboBox.getRenderer()).updateSubjectID(testTypeComboBox, subjectID);
                             subjectField.setFocusable(false);
+                            enableUI();
                         }
                     }
                 } finally {
                     CONTROL_LOCK.unlock();
+                }
+            }
+        });
+        
+        testTypeComboBox.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent arg0) {
+                if(((ComboBoxRenderer) testTypeComboBox.getRenderer()).dataExists(testTypeComboBox.getSelectedItem().toString())) {
+                    likertSurveyButton.setEnabled(true);
+                } else {
+                    likertSurveyButton.setEnabled(false);
                 }
             }
         });
@@ -224,7 +241,7 @@ public class ControlCenter {
                 try {
                     if(!isInProgress()) {
                         dictionaryBuilder = new DictionaryBuilder();
-                        disableUI();
+                        disableUI(true);
                     }
                 } finally {
                     CONTROL_LOCK.unlock();
@@ -241,7 +258,7 @@ public class ControlCenter {
                     if(!isInProgress()) {
                         dataCenterController = new DataCenterController();
                         dataCenterController.enable();
-                        disableUI();
+                        disableUI(true);
                     }
                 } finally {
                     CONTROL_LOCK.unlock();
@@ -256,9 +273,26 @@ public class ControlCenter {
                 CONTROL_LOCK.lock();
                 try {
                     if(!isInProgress()) {
-                    	exitSurveyController = new ExitSurveyController();
-                    	exitSurveyController.enable(subjectID);
-                    	disableUI();
+                    	exitSurveyController = new ExitSurveyController(subjectID, null);
+                    	exitSurveyController.enable();
+                    	disableUI(true);
+                    }
+                } finally {
+                    CONTROL_LOCK.unlock();
+                }
+            }
+        });
+        
+        // RUN LIKERT SURVEY CONTROLLER
+        likertSurveyButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                CONTROL_LOCK.lock();
+                try {
+                    if(!isInProgress()) {
+                        exitSurveyController = new ExitSurveyController(subjectID, KeyboardType.getByName((String) testTypeComboBox.getSelectedItem()));
+                        exitSurveyController.enable();
+                        disableUI(true);
                     }
                 } finally {
                     CONTROL_LOCK.unlock();
@@ -275,7 +309,7 @@ public class ControlCenter {
                 try {
                     if(!isInProgress()) {
                         EXPERIMENT_CONTROLLER.enable(subjectID, KeyboardType.getByName((String) testTypeComboBox.getSelectedItem()));
-                        disableUI();
+                        disableUI(true);
                     }
                 } finally {
                     CONTROL_LOCK.unlock();
@@ -294,7 +328,7 @@ public class ControlCenter {
                     if(!isInProgress()) {
                         calibrationController = new CalibrationController();
                         calibrationController.enable();
-                        disableUI();
+                        disableUI(true);
                     }
                 } finally {
                     CONTROL_LOCK.unlock();
@@ -318,7 +352,12 @@ public class ControlCenter {
             } else if(dataFormattingInProgress()) {
                 dataCenterController.update();
             } else if(isDisabled) {
-                enableUI();
+                if(EXPERIMENT_CONTROLLER.experimentCompletedSuccessfully()) {
+                    exitSurveyController = new ExitSurveyController(subjectID, KeyboardType.getByName((String) testTypeComboBox.getSelectedItem()));
+                    exitSurveyController.enable();
+                } else {
+                    enableUI();
+                }
             }
         } finally {
             CONTROL_LOCK.unlock();
@@ -417,12 +456,13 @@ public class ControlCenter {
         return false;
     }
     
-    private void disableUI() {
-        isDisabled = true;
+    private void disableUI(boolean fullDisable) {
+        isDisabled = fullDisable;
         calibrateButton.setEnabled(false);
         experimentButton.setEnabled(false);
         exitSurveyButton.setEnabled(false);
-        editSubjectIDButton.setEnabled(false);
+        likertSurveyButton.setEnabled(false);
+        if(fullDisable) editSubjectIDButton.setEnabled(false);
         createDictionariesButton.setEnabled(false);
         dataCenterButton.setEnabled(false);
         testTypeComboBox.setEnabled(false);
@@ -434,6 +474,11 @@ public class ControlCenter {
         calibrateButton.setEnabled(true);
         experimentButton.setEnabled(true);
         exitSurveyButton.setEnabled(true);
+        if(((ComboBoxRenderer) testTypeComboBox.getRenderer()).dataExists(testTypeComboBox.getSelectedItem().toString())) {
+            likertSurveyButton.setEnabled(true);
+        } else {
+            likertSurveyButton.setEnabled(false);
+        }
         editSubjectIDButton.setEnabled(true);
         createDictionariesButton.setEnabled(true);
         dataCenterButton.setEnabled(true);
@@ -524,7 +569,7 @@ public class ControlCenter {
             }
         }
         
-        private boolean dataExists(String value) {
+        public boolean dataExists(String value) {
             if(value != null) {
                 return dataExists.get(value);
             }

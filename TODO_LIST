@@ -1,26 +1,35 @@
-TODO:
+1) WGK for controller
+2) hand alternative for mid-air keyboards with leap instead of stylus --- this is done
+		--- Need to see if we should change the recording information to include if they used hand or tool / just use hand notes to record this
+3) Print the new keyboard in high quality!
+
+
+
+Things to possibly change before experiment starts: 
+Note --- These were accounted for using interpretation of the data, so technically they are no longer necessary.
 !!! - FOR PINCH - NEED TO CHANGE THE Z-Value so we know when they are pinching or not
 !!! - FOR BIMODAL - NEED TO CHANGE THE Z-Value so we know when they are pushing the button or not.
 !!! - FOR CONTROLLER - NEED TO RECORD KEY WE ARE ON AT ALL TIMES
 --- maybe do this for all the inputs. Might help out
-0) Intermittent Surveys / WGK for controller / hand alternative for mid-air keyboards with leap instead of stylus
-1) Print the new keyboard in high quality!
-2) There is an issue when calibrating a plane at too much of an angle that the z axis becomes flipped. Try to solve this issue.
-3) Add unique tutorial INFO!
-4) Implement a hand alternative for both the surface and air keyboards on the leap.
-5) Implement the data parser to convert from playback format to MATLAB format.
-6) Implement AR to help with feed back for air based keyboards
-7) Solve the problem of entering/leaving the touch plane (we move along a sphere) so when
+
+
+
+Things to look into fixing later on:
+1) There is an issue when calibrating a plane at too much of an angle that the z axis becomes flipped. Try to solve this issue.
+2) Add unique tutorial INFO!
+3) Implement a hand alternative for both the surface and air keyboards on the leap.
+4) Implement the data parser to convert from playback format to MATLAB format.
+5) Implement AR to help with feed back for air based keyboards
+6) Solve the problem of entering/leaving the touch plane (we move along a sphere) so when
 	moving away from the touch plane, you often hit the key above what you're leaving on.
 	This can probably be solved by aligning the touch plane normal to the direction that the
 	tool is pointing. Or by determining a certain velocity threshold that only moves us along
 	the Z axis. So if z is greater than x or y then we move on z only perhaps? ---- Tried this
 	and it doesn't work too well. It's really awkward feeling.
-8) Add another UI/button to the control center. We want a data viewer that
-   will allow me to select anything that has been previously recorded and
-   view the playback.
 
-Stats:
+
+
+Statical Analysis Information:
 tukey's HSD post hoc for multcompare
 
 one way independent sample anovas:
