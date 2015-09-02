@@ -51,7 +51,6 @@ import leap.LeapListener;
 import leap.LeapObserver;
 
 public class LeapKeyboard extends IKeyboard implements LeapObserver, CalibrationObserver, LeapPlaybackObserver {
-    private final KeyboardType KEYBOARD_TYPE;
     private final ReentrantLock LEAP_LOCK = new ReentrantLock();
     private final float CAMERA_DISTANCE;
     private ArrayList<LeapDataObserver> observers = new ArrayList<LeapDataObserver>();
@@ -73,7 +72,6 @@ public class LeapKeyboard extends IKeyboard implements LeapObserver, Calibration
     
     public LeapKeyboard(KeyboardType keyboardType) {
         super(keyboardType);
-        KEYBOARD_TYPE = keyboardType;
         keyboardAttributes = new LeapAttributes(this);
         keyboardSettings = new LeapSettings(this);
         System.out.println(KEYBOARD_NAME + " - Loading Settings from " + FilePath.CONFIG.getPath() + KEYBOARD_FILE_NAME + FileExt.INI.getExt());
@@ -90,7 +88,7 @@ public class LeapKeyboard extends IKeyboard implements LeapObserver, Calibration
         imageSize = new Point(keyboardSize.x + borderSize, keyboardSize.y + borderSize);
         CAMERA_DISTANCE = keyboardAttributes.getAttributeAsFloat(Attribute.CAMERA_DISTANCE);
         virtualKeyboard = (VirtualKeyboard) keyboardRenderables.getRenderable(Renderable.VIRTUAL_KEYBOARD);
-        if(KEYBOARD_TYPE.equals(KeyboardType.LEAP_AIR_BIMODAL)) {
+        if(KEYBOARD_TYPE == KeyboardType.LEAP_AIR_BIMODAL) {
             keyBindings = new KeyBindings();
         }
         leapPoint = (SwipePoint) keyboardRenderables.getRenderable(Renderable.SWIPE_POINT);
@@ -114,7 +112,7 @@ public class LeapKeyboard extends IKeyboard implements LeapObserver, Calibration
             leapGestures = new LeapGestures();
         }
         swipeKeyboard = new SwipeKeyboard(this);
-        if(KEYBOARD_TYPE.equals(KeyboardType.LEAP_AIR_PINCH)) {
+        if(KEYBOARD_TYPE == KeyboardType.LEAP_AIR_PINCH) {
             leapTool.blockAccess(true);
         }
     }
@@ -133,7 +131,7 @@ public class LeapKeyboard extends IKeyboard implements LeapObserver, Calibration
         LEAP_LOCK.lock();
         try {
             if(leapData != null) {
-                if(KEYBOARD_TYPE.equals(KeyboardType.LEAP_AIR_PINCH) && isCalibrated) {
+                if(KEYBOARD_TYPE == KeyboardType.LEAP_AIR_PINCH && isCalibrated) {
                     leapData.populateHandData(leapPoint);
                     leapHand = leapData.getHandData();
                 } else {
@@ -145,7 +143,7 @@ public class LeapKeyboard extends IKeyboard implements LeapObserver, Calibration
         }
 
         if(isPlayingBack()) {
-            if(KEYBOARD_TYPE.equals(KeyboardType.LEAP_AIR_PINCH) || KEYBOARD_TYPE.equals(KeyboardType.LEAP_AIR_BIMODAL)) {
+            if(KEYBOARD_TYPE == KeyboardType.LEAP_AIR_PINCH || KEYBOARD_TYPE == KeyboardType.LEAP_AIR_BIMODAL) {
                 Vector point = leapPoint.getNormalizedPoint();
                 point.setZ(lastZ);
                 leapPoint.setNormalizedPoint(point);
@@ -185,7 +183,7 @@ public class LeapKeyboard extends IKeyboard implements LeapObserver, Calibration
             if(Gesture.ENABLED) leapGestures.update();
                         
             boolean isTouching;
-            if(KEYBOARD_TYPE.equals(KeyboardType.LEAP_AIR_BIMODAL)) {
+            if(KEYBOARD_TYPE == KeyboardType.LEAP_AIR_BIMODAL) {
                 isTouching = keyBindings.getSimulatedTouch();
                 if(isTouching) {
                     Vector point = leapPoint.getNormalizedPoint();
@@ -218,7 +216,7 @@ public class LeapKeyboard extends IKeyboard implements LeapObserver, Calibration
                 notifyListenersLeapEvent(leapPoint.getNormalizedPoint());
             }
             
-            if(KEYBOARD_TYPE.equals(KeyboardType.LEAP_AIR_PINCH) || KEYBOARD_TYPE.equals(KeyboardType.LEAP_AIR_BIMODAL)) {
+            if(KEYBOARD_TYPE == KeyboardType.LEAP_AIR_PINCH || KEYBOARD_TYPE == KeyboardType.LEAP_AIR_BIMODAL) {
                 Vector point = leapPoint.getNormalizedPoint();
                 lastZ = point.getZ();
                 point.setZ(0);
@@ -272,7 +270,7 @@ public class LeapKeyboard extends IKeyboard implements LeapObserver, Calibration
             LeapListener.registerObserver(this);
             LeapListener.startListening();
             WordManager.registerObserver(swipeKeyboard);
-            if(KEYBOARD_TYPE.equals(KeyboardType.LEAP_AIR_BIMODAL)) {
+            if(KEYBOARD_TYPE == KeyboardType.LEAP_AIR_BIMODAL) {
                 panel.add(keyBindings);
             }
         } finally {
@@ -291,7 +289,7 @@ public class LeapKeyboard extends IKeyboard implements LeapObserver, Calibration
                 keyboardGestures.deleteQuadric();
             }
             WordManager.removeObserver(swipeKeyboard);
-            if(KEYBOARD_TYPE.equals(KeyboardType.LEAP_AIR_BIMODAL)) {
+            if(KEYBOARD_TYPE == KeyboardType.LEAP_AIR_BIMODAL) {
                 panel.remove(keyBindings);
             }
         } finally {
@@ -430,7 +428,7 @@ public class LeapKeyboard extends IKeyboard implements LeapObserver, Calibration
     @Override
     protected void finishCalibration() {
         leapPoint.grantAccess(true);
-        if(!KEYBOARD_TYPE.equals(KeyboardType.LEAP_AIR_PINCH)) {
+        if(KEYBOARD_TYPE != KeyboardType.LEAP_AIR_PINCH) {
             leapTool.grantAccess(true);
         }
         if(Gesture.ENABLED) {

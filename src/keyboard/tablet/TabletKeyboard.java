@@ -46,8 +46,8 @@ public class TabletKeyboard extends IKeyboard implements TabletPlaybackObserver 
     private boolean shiftOnce = false;
     private boolean shiftTwice = false;
     
-    public TabletKeyboard() {
-        super(KeyboardType.TABLET);
+    public TabletKeyboard(KeyboardType keyboardType) {
+        super(keyboardType);
         keyboardAttributes = new TabletAttributes(this);
         keyboardSettings = new TabletSettings(this);
         System.out.println(KEYBOARD_NAME + " - Loading Settings from " + FilePath.CONFIG.getPath() + KEYBOARD_FILE_NAME + FileExt.INI.getExt());

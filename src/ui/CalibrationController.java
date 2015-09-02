@@ -45,11 +45,11 @@ public class CalibrationController extends GraphicsController implements Keyboar
     private boolean runningCalibration = false;
     
     public CalibrationController() {
-        keyboard = Keyboard.STANDARD.getKeyboard();
+        //keyboard = Keyboard.STANDARD.getKeyboard();
         canvasPanel = new JPanel();
         canvas = new GLCanvas(CAPABILITIES);
-        canvas.setPreferredSize(new Dimension(keyboard.getImageWidth(), keyboard.getImageHeight()));
-        canvas.setSize(keyboard.getImageWidth(), keyboard.getImageHeight());
+        //canvas.setPreferredSize(new Dimension(keyboard.getImageWidth(), keyboard.getImageHeight()));
+        //canvas.setSize(keyboard.getImageWidth(), keyboard.getImageHeight());
         canvasPanel.add(canvas);
         frame = new JFrame("Calibration - FPS: 0");
         frame.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
@@ -114,12 +114,12 @@ public class CalibrationController extends GraphicsController implements Keyboar
             @Override
             public void actionPerformed(ActionEvent e) {
                 KeyboardType keyboardType = KeyboardType.getByName((String) keyboardTypeComboBox.getSelectedItem());
-                if(keyboard.getID() != keyboardType.getID()) {
+                if(keyboard.getType() != keyboardType) {
                     // Remove all settings, attributes, and renderables from the previous keyboard.
                     removeKeyboardFromUI();
                     
                     // Add all settings, attributes, and renderables from the new keyboard.
-                    keyboard = Keyboard.getByID(keyboardType.getID()).getKeyboard();
+                    keyboard = Keyboard.getByType(keyboardType).getKeyboard();
                     addKeyboardToUI();
                 }
                 frame.requestFocusInWindow();
@@ -213,7 +213,9 @@ public class CalibrationController extends GraphicsController implements Keyboar
         frame.setVisible(false);
         canvas.disposeGLEventListener(this, true);
         for(Keyboard tmpKeyboard: Keyboard.values()) {
-            tmpKeyboard.getKeyboard().removeObserver(this);
+            if(tmpKeyboard.getType() != KeyboardType.DISABLED) {
+                tmpKeyboard.getKeyboard().removeObserver(this);
+            }
         }
         fpsTimer.cancel();
         isEnabled = false;
@@ -222,12 +224,15 @@ public class CalibrationController extends GraphicsController implements Keyboar
     
     @Override
     public void enable() {
+        keyboard = Keyboard.getByName((String) keyboardTypeComboBox.getSelectedItem()).getKeyboard();
         addKeyboardToUI();
         frame.setVisible(true);
         frame.requestFocusInWindow();
         canvas.addGLEventListener(this);
         for(Keyboard tmpKeyboard: Keyboard.values()) {
-            tmpKeyboard.getKeyboard().registerObserver(this);
+            if(tmpKeyboard.getType() != KeyboardType.DISABLED) {
+                tmpKeyboard.getKeyboard().registerObserver(this);
+            }
         }
         TimerTask updateFPS = new TimerTask() {
             @Override
@@ -296,6 +301,6 @@ public class CalibrationController extends GraphicsController implements Keyboar
     }
     
     private boolean isLeapKeyboard() {
-        return KeyboardType.getByID(keyboard.getID()).isLeap();
+        return keyboard.getType().isLeap();
     }
 }

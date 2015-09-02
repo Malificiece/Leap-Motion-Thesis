@@ -355,19 +355,19 @@ public class DataCenterController extends GraphicsController {
                                     if(playbackManager != null) keyboard.finishPlayback(playbackManager);
                                     playbackManager = null;
                                     // Swap keyboards
-                                    if(keyboard.getID() != keyboardType.getID()) {
+                                    if(keyboard.getType() != keyboardType) {
                                         // Remove all settings, attributes, and renderables from the previous keyboard.
                                         removeKeyboardFromUI();
                                         
                                         // Add all settings, attributes, and renderables from the new keyboard.
-                                        keyboard = Keyboard.getByID(keyboardType.getID()).getKeyboard();
+                                        keyboard = Keyboard.getByType(keyboardType).getKeyboard();
                                         addKeyboardToUI();
                                     }
                                     playPauseButton.setIcon(playIcon);
                                     isPlayButton = true;
                                 } else {
                                     // Add all settings, attributes, and renderables from the new keyboard.
-                                    keyboard = Keyboard.getByID(keyboardType.getID()).getKeyboard();
+                                    keyboard = Keyboard.getByType(keyboardType).getKeyboard();
                                     enablePlaybackUI();
                                     addKeyboardToUI();
                                 }

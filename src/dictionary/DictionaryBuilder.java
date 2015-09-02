@@ -119,7 +119,10 @@ public class DictionaryBuilder extends WindowController {
                         if(wordIndex == compareIndex) {
                             dissimilarityMatrix[wordIndex][compareIndex] = -1f;
                         } else {
+                            // TODO: Pick the best option
                             float dissimilarity = measureDissimilarity(dictionaryPart.get(wordIndex), dictionaryPart.get(compareIndex), wordLength);
+                            //float dissimilarity = calculateFrechetDistance(dictionaryPart.get(wordIndex), dictionaryPart.get(compareIndex));
+                            
                             // The space is already allocated so we might as well fill up the matrix on both sides of the diagonal
                             // even though the information is redundant. This makes for easier traversal later on.
                             dissimilarityMatrix[wordIndex][compareIndex] = dissimilarity;
@@ -274,6 +277,20 @@ public class DictionaryBuilder extends WindowController {
             disable();
         }
     }
+    
+    /*private float calculateFrechetDistance(String word, String compare) {
+        ArrayList<Vector> wordPath = new ArrayList<Vector>();
+        for(char c: word.toCharArray()) {
+            wordPath.add(virtualKeyboard.getVirtualKey(Key.getByValue(c)).getCenter());
+        }
+        ArrayList<Vector> comparePath = new ArrayList<Vector>();
+        for(char c: compare.toCharArray()) {
+            comparePath.add(virtualKeyboard.getVirtualKey(Key.getByValue(c)).getCenter());
+        }
+        return MyUtilities.MATH_UTILITILES.calculateFrechetDistance(
+                wordPath.toArray(new Vector[wordPath.size()]),
+                comparePath.toArray(new Vector[comparePath.size()]));
+    }*/
     
     private float measureDissimilarity(String word, String compare, int wordLength) {
         // For now, words must be the same length.

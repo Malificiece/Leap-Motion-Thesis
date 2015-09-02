@@ -12,6 +12,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -132,21 +133,23 @@ public class ExitSurveyController extends WindowController {
             ButtonGroup[] historyButtonGroups = {physicalImpairmentButtonGroup, gestureDeviceExperienceButtonGroup, touchDeviceExperienceButtonGroup, swipeDeviceExperienceButtonGroup};
             
             for(Keyboard keyboard: Keyboard.values()) {
-                if(keyboard != Keyboard.STANDARD) {
+                if(keyboard.getType() != KeyboardType.DISABLED) {
                     rankingTextFields.add(new JTextField(3));
                 }
             }
             
             // Make the ranking system reflect the keyboards that are detected to be on record.
             ArrayList<KeyboardType> detectedKeyboardTypes = getSurveyKeyboardsDetected(fileContents);
-            for(int index = 0; index < Keyboard.values().length; index++) {
-                KeyboardType keyboardType = KeyboardType.getByID(Keyboard.values()[index].getID());
-                if(keyboardType != KeyboardType.STANDARD) {
-                    rankingTextFields.get(index - 1).setEditable(false);
+            Iterator<JTextField> rankingTextFieldIterator = rankingTextFields.iterator();
+            for(Keyboard keyboard: Keyboard.values()) {
+                KeyboardType keyboardType = keyboard.getType();
+                if(keyboardType != KeyboardType.DISABLED && rankingTextFieldIterator.hasNext()) {
+                    JTextField rankingTextField = rankingTextFieldIterator.next();
+                    rankingTextField.setEditable(false);
                     for(KeyboardType detectedType: detectedKeyboardTypes) {
-                        if(keyboardType.equals(detectedType)) {
+                        if(keyboardType == detectedType) {
                             // If on the file record
-                            rankingTextFields.get(index - 1).setEditable(true);
+                            rankingTextField.setEditable(true);
                             maxRanking++;   
                             break;
                         }
@@ -340,12 +343,12 @@ public class ExitSurveyController extends WindowController {
             
             // Survey section
             ArrayList<KeyboardType> detectedKeyboardTypes = getSurveyKeyboardsDetected(fileContents);
-            for(int index = 0; index < Keyboard.values().length; index++) {
-                KeyboardType keyboardType = KeyboardType.getByID(Keyboard.values()[index].getID());
-                if(keyboardType != KeyboardType.STANDARD) {
+            for(Keyboard keyboard: Keyboard.values()) {
+                KeyboardType keyboardType = keyboard.getType();
+                if(keyboardType != KeyboardType.DISABLED) {
                     boolean detected = false;
                     for(KeyboardType detectedType: detectedKeyboardTypes) {
-                        if(keyboardType.equals(detectedType)) {
+                        if(keyboardType == detectedType) {
                             detected = true;
                             break;
                         }
@@ -368,9 +371,10 @@ public class ExitSurveyController extends WindowController {
             }
             
             // Rank section
+            Iterator<JTextField> rankingTextFieldIterator = rankingTextFields.iterator();
             for(Keyboard keyboard: Keyboard.values()) {
-                if(keyboard != Keyboard.STANDARD) {
-                    JTextField rankingTextField = rankingTextFields.get(keyboard.getID() - 1);
+                if(keyboard.getType() != KeyboardType.DISABLED && rankingTextFieldIterator.hasNext()) {
+                    JTextField rankingTextField = rankingTextFieldIterator.next();
                     if(rankingTextField.isEnabled() && !rankingTextField.getText().trim().equals("")) {
                         // used ranking
                         surveyData.put(keyboard.getKeyboard().getFileName() + "_" + ExitSurveyDataType.PREFERENCE_RANKING.name(),
@@ -487,7 +491,7 @@ public class ExitSurveyController extends WindowController {
                         AbstractButton button = buttons.nextElement();
                         ExitSurveyOptions buttonOption = ExitSurveyOptions.getByDescriptionExact(button.getText());
                         ExitSurveyOptions dataOption = ExitSurveyOptions.getByDescriptionExact(entry.getValue());
-                        if(dataOption.equals(buttonOption)) {
+                        if(dataOption == buttonOption) {
                             button.doClick();
                             break;
                         }
@@ -501,7 +505,7 @@ public class ExitSurveyController extends WindowController {
                         AbstractButton button = buttons.nextElement();
                         ExitSurveyOptions buttonOption = ExitSurveyOptions.getByDescriptionExact(button.getText());
                         ExitSurveyOptions dataOption = ExitSurveyOptions.getByDescriptionExact(entry.getValue());
-                        if(dataOption.equals(buttonOption)) {
+                        if(dataOption == buttonOption) {
                             button.doClick();
                             break;
                         }
@@ -512,7 +516,7 @@ public class ExitSurveyController extends WindowController {
                         AbstractButton button = buttons.nextElement();
                         ExitSurveyOptions buttonOption = ExitSurveyOptions.getByDescriptionPartial(button.getText());
                         ExitSurveyOptions dataOption = ExitSurveyOptions.getByDescriptionPartial(entry.getValue());
-                        if(dataOption.equals(buttonOption)) {
+                        if(dataOption == buttonOption) {
                             button.doClick();
                             break;
                         }
@@ -523,7 +527,7 @@ public class ExitSurveyController extends WindowController {
                         AbstractButton button = buttons.nextElement();
                         ExitSurveyOptions buttonOption = ExitSurveyOptions.getByDescriptionExact(button.getText());
                         ExitSurveyOptions dataOption = ExitSurveyOptions.getByDescriptionExact(entry.getValue());
-                        if(dataOption.equals(buttonOption)) {
+                        if(dataOption == buttonOption) {
                             button.doClick();
                             break;
                         }
@@ -537,7 +541,7 @@ public class ExitSurveyController extends WindowController {
                         AbstractButton button = buttons.nextElement();
                         ExitSurveyOptions buttonOption = ExitSurveyOptions.getByDescriptionExact(button.getText());
                         ExitSurveyOptions dataOption = ExitSurveyOptions.getByDescriptionExact(entry.getValue());
-                        if(dataOption.equals(buttonOption)) {
+                        if(dataOption == buttonOption) {
                             button.doClick();
                             break;
                         }
@@ -551,7 +555,7 @@ public class ExitSurveyController extends WindowController {
                         AbstractButton button = buttons.nextElement();
                         ExitSurveyOptions buttonOption = ExitSurveyOptions.getByDescriptionExact(button.getText());
                         ExitSurveyOptions dataOption = ExitSurveyOptions.getByDescriptionExact(entry.getValue());
-                        if(dataOption.equals(buttonOption)) {
+                        if(dataOption == buttonOption) {
                             button.doClick();
                             break;
                         }
@@ -565,7 +569,7 @@ public class ExitSurveyController extends WindowController {
                         AbstractButton button = buttons.nextElement();
                         ExitSurveyOptions buttonOption = ExitSurveyOptions.getByDescriptionExact(button.getText());
                         ExitSurveyOptions dataOption = ExitSurveyOptions.getByDescriptionExact(entry.getValue());
-                        if(dataOption.equals(buttonOption)) {
+                        if(dataOption == buttonOption) {
                             button.doClick();
                             break;
                         }
@@ -579,7 +583,7 @@ public class ExitSurveyController extends WindowController {
                         AbstractButton button = buttons.nextElement();
                         ExitSurveyOptions buttonOption = ExitSurveyOptions.getByDescriptionPartial(button.getText());
                         ExitSurveyOptions dataOption = ExitSurveyOptions.getByDescriptionPartial(entry.getValue());
-                        if(dataOption.equals(buttonOption)) {
+                        if(dataOption == buttonOption) {
                             button.doClick();
                             break;
                         }
@@ -590,7 +594,7 @@ public class ExitSurveyController extends WindowController {
                         AbstractButton button = buttons.nextElement();
                         ExitSurveyOptions buttonOption = ExitSurveyOptions.getByDescriptionPartial(button.getText());
                         ExitSurveyOptions dataOption = ExitSurveyOptions.getByDescriptionPartial(entry.getValue());
-                        if(dataOption.equals(buttonOption)) {
+                        if(dataOption == buttonOption) {
                             button.doClick();
                             break;
                         }
@@ -600,11 +604,15 @@ public class ExitSurveyController extends WindowController {
                     if(ExitSurveyOptions.getByDescriptionExact(entry.getValue()) != ExitSurveyOptions.DID_NOT_USE) {
                         String[] details = entry.getKey().split("_", 2);
                         if(details.length > 1) {
+                            int keyboardIndex = 0;
                             for(Keyboard keyboard: Keyboard.values()) {
-                                KeyboardType keyboardType = KeyboardType.getByID(keyboard.getID());
-                                if(keyboardType != KeyboardType.STANDARD && keyboardType == KeyboardType.getByName(details[0])) {
-                                    rankingTextFields.get(keyboard.getID() - 1).setText(entry.getValue());
+                                KeyboardType keyboardType = keyboard.getType();
+                                if(keyboardType != KeyboardType.DISABLED && keyboardType == KeyboardType.getByName(details[0])) {
+                                    rankingTextFields.get(keyboardIndex).setText(entry.getValue());
                                     break;
+                                }
+                                if(keyboardType != KeyboardType.DISABLED) {
+                                    keyboardIndex++;
                                 }
                             }
                         }
@@ -628,7 +636,7 @@ public class ExitSurveyController extends WindowController {
                                 AbstractButton button = buttons.nextElement();
                                 ExitSurveyOptions buttonOption = ExitSurveyOptions.getByDescriptionExact(button.getText());
                                 ExitSurveyOptions dataOption = ExitSurveyOptions.getByDescriptionExact(entry.getValue());
-                                if(dataOption.equals(buttonOption)) {
+                                if(dataOption == buttonOption) {
                                     button.doClick();
                                     break;
                                 }
@@ -644,7 +652,7 @@ public class ExitSurveyController extends WindowController {
                                 AbstractButton button = buttons.nextElement();
                                 ExitSurveyOptions buttonOption = ExitSurveyOptions.getByDescriptionExact(button.getText());
                                 ExitSurveyOptions dataOption = ExitSurveyOptions.getByDescriptionExact(entry.getValue());
-                                if(dataOption.equals(buttonOption)) {
+                                if(dataOption == buttonOption) {
                                     button.doClick();
                                     break;
                                 }
@@ -660,7 +668,7 @@ public class ExitSurveyController extends WindowController {
                                 AbstractButton button = buttons.nextElement();
                                 ExitSurveyOptions buttonOption = ExitSurveyOptions.getByDescriptionExact(button.getText());
                                 ExitSurveyOptions dataOption = ExitSurveyOptions.getByDescriptionExact(entry.getValue());
-                                if(dataOption.equals(buttonOption)) {
+                                if(dataOption == buttonOption) {
                                     button.doClick();
                                     break;
                                 }
@@ -682,8 +690,8 @@ public class ExitSurveyController extends WindowController {
                 String[] details = parts[0].split("_", 2);
                 if(details.length > 1) {
                     for(Keyboard keyboard: Keyboard.values()) {
-                        KeyboardType keyboardType = KeyboardType.getByID(keyboard.getID());
-                        if(keyboardType != KeyboardType.STANDARD && keyboardType == KeyboardType.getByName(details[0])) {
+                        KeyboardType keyboardType = keyboard.getType();
+                        if(keyboardType != KeyboardType.DISABLED && keyboardType == KeyboardType.getByName(details[0])) {
                             keyboardTypes.add(keyboardType);
                             break;
                         }
@@ -769,9 +777,10 @@ public class ExitSurveyController extends WindowController {
             Key key = Key.getByValue(str.charAt(str.length() - 1));
             if(key != null && key.isNumeric() &&
                     MIN_RANKING <= Character.getNumericValue(key.getValue()) && Character.getNumericValue(key.getValue()) <= maxRanking) {
-                for(JTextField jtf: rankingTextFields) {
-                    if(!RANKING_FIELD.equals(jtf) && jtf.getText().length() > 0 && jtf.getText().charAt(0) == key.getValue()) {
-                    	jtf.setText("");
+                for(JTextField rankingTextField: rankingTextFields) {
+                    if(!RANKING_FIELD.equals(rankingTextField) && rankingTextField.getText().length() > 0
+                            && rankingTextField.getText().charAt(0) == key.getValue()) {
+                        rankingTextField.setText("");
                         break;
                     }
                 }

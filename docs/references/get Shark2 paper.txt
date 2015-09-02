@@ -1,5 +1,7 @@
 Shark^2 paper give a lot of insight on word-regonition, and is a good reference when talking about word-regonition in word-gesture keyboards, but also giving reason that this method works and has been demonstrated to work. We're mostly concerned with the technique used to interact with the word-gesture keyboard rather than the word-regonition system used to recognize the words written. This is why my method is still adequate.
 
 
-another reference:
-The Word-Gesture Keyboard: Reimagining Keyboard Interaction
+
+
+Another though:
+The angle of the keyboard matters for ease of use

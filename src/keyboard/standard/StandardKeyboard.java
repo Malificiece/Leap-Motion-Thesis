@@ -59,8 +59,8 @@ public class StandardKeyboard extends IKeyboard implements PlaybackObserver, Wor
     private ReentrantLock gestureLock;
     private Timer detectedMatchTimer;
     
-    public StandardKeyboard() {
-        super(KeyboardType.STANDARD);
+    public StandardKeyboard(KeyboardType keyboardType) {
+        super(keyboardType);
         keyboardAttributes = new StandardAttributes(this);
         keyboardSettings = new StandardSettings(this);
         System.out.println(KEYBOARD_NAME + " - Loading Settings from " + FilePath.CONFIG.getPath() + KEYBOARD_FILE_NAME + FileExt.INI.getExt());

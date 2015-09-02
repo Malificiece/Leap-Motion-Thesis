@@ -422,7 +422,7 @@ public class LeapPlane extends KeyboardRenderable {
             if(leapTool.isValid() || leapHand.isValid()) {
                 leapPoint.applyPlaneRotationAndNormalizePoint(axisToCamera, angleToCamera);
                 // If dynamic, use the touch zone Z.
-                if(keyboardType.equals(KeyboardType.LEAP_AIR_DYNAMIC)) {
+                if(keyboardType == KeyboardType.LEAP_AIR_DYNAMIC) {
                     if(leapPoint.getTouchDistance() - TOUCH_THRESHOLD.getValue() <= 0) {
                         distanceToPlane = CAMERA_DISTANCE;
                     } else {
@@ -438,7 +438,7 @@ public class LeapPlane extends KeyboardRenderable {
                     }
                     point.setZ(touchDistance);
                     leapPoint.setNormalizedPoint(point);
-                } else if(keyboardType.equals(KeyboardType.LEAP_AIR_PINCH)) {
+                } else if(keyboardType == KeyboardType.LEAP_AIR_PINCH) {
                     if(leapHand.pinchStrength() > PINCH_THRESHOLD) {
                         distanceToPlane = CAMERA_DISTANCE;
                     } else {

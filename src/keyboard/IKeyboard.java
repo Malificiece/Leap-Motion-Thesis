@@ -17,7 +17,7 @@ import experiment.playback.PlaybackManager;
 import utilities.MyUtilities;
 
 public abstract class IKeyboard {
-    protected final int KEYBOARD_ID;
+    protected final KeyboardType KEYBOARD_TYPE;
     protected final String KEYBOARD_NAME;
     protected final String KEYBOARD_FILE_NAME;
     protected final String KEYBOARD_FILE_PATH;
@@ -32,7 +32,7 @@ public abstract class IKeyboard {
     protected PlaybackManager playbackManager;
     
     public IKeyboard(KeyboardType keyboardType) {
-        KEYBOARD_ID = keyboardType.getID();
+        KEYBOARD_TYPE = keyboardType;
         KEYBOARD_NAME = keyboardType.getName();
         KEYBOARD_FILE_NAME = keyboardType.getFileName();
         KEYBOARD_FILE_PATH = keyboardType.getFileName() + "/";
@@ -55,8 +55,8 @@ public abstract class IKeyboard {
     public abstract void addToUI(JPanel panel, GLCanvas canvas);
     public abstract void removeFromUI(JPanel panel, GLCanvas canvas);
     
-    public int getID() {
-        return KEYBOARD_ID;
+    public KeyboardType getType() {
+        return KEYBOARD_TYPE;
     }
     
     public String getName() {

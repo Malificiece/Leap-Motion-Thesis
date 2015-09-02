@@ -120,12 +120,12 @@ public enum Key {
     }
     
     public boolean isSpecial() {
-        return this.equals(VK_ENTER) ||
-                this.equals(VK_PERIOD) ||
-                this.equals(VK_COMMA) ||
-                this.equals(VK_SHIFT) ||
-                this.equals(VK_BACK_SPACE) ||
-                this.equals(VK_SPACE);
+        return this == VK_ENTER ||
+                this == VK_PERIOD ||
+                this == VK_COMMA ||
+                this == VK_SHIFT ||
+                this == VK_BACK_SPACE ||
+                this == VK_SPACE;
     }
     
     public static Key getByValue(int keyValue) {

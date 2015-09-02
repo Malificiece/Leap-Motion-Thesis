@@ -47,12 +47,14 @@ public class FileUtilities {
         
         // Create .ini's
         for(KeyboardType keyboardType: KeyboardType.values()) {
-            path = FileSystems.getDefault().getPath(FilePath.CONFIG.getPath(), keyboardType.getFileName() + FileExt.INI.getExt());
-            if(!Files.exists(path)) {
-                file = path.toFile();
-                try {
-                    file.createNewFile();
-                } catch (IOException e) {e.printStackTrace();}
+            if(keyboardType != KeyboardType.DISABLED) {
+                path = FileSystems.getDefault().getPath(FilePath.CONFIG.getPath(), keyboardType.getFileName() + FileExt.INI.getExt());
+                if(!Files.exists(path)) {
+                    file = path.toFile();
+                    try {
+                        file.createNewFile();
+                    } catch (IOException e) {e.printStackTrace();}
+                }
             }
         }
     }

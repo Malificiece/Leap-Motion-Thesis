@@ -49,7 +49,7 @@ public class DataFormatter implements Runnable {
     @Override
     public void run() {
         try {
-            if(type.equals(FormatProcessType.CALCULATE)) {
+            if(type == FormatProcessType.CALCULATE) {
                 calculate();
             } else {
                 consolidate();
@@ -164,8 +164,8 @@ public class DataFormatter implements Runnable {
         // Set up the matrices we'll perform ANOVAs on.
         LinkedHashMap<String, String> matrices = new LinkedHashMap<String, String>();
         for(Keyboard keyboard: Keyboard.values()) {
-            KeyboardType keyboardType = KeyboardType.getByID(keyboard.getID());
-            if(keyboardType != KeyboardType.STANDARD) {
+            KeyboardType keyboardType = keyboard.getType();
+            if(keyboardType != KeyboardType.DISABLED) {
                 for(Entry<String, String> entry: consolidatedData.entrySet()) {
                     if(KeyboardType.getByName(entry.getKey()) == keyboardType) {
                         
@@ -224,22 +224,16 @@ public class DataFormatter implements Runnable {
         matrices.put(ExitSurveyDataType.HAS_PREVIOUS_SWIPE_DEVICE_EXPERIENCE.name(),
                 consolidatedData.get(ExitSurveyDataType.HAS_PREVIOUS_SWIPE_DEVICE_EXPERIENCE.name()));
         
-        ArrayList<Entry<String, ArrayList<Float>>> meanEntries = new ArrayList<Entry<String, ArrayList<Float>>>();
-        ArrayList<Entry<String, ArrayList<Float>>> sdEntries = new ArrayList<Entry<String, ArrayList<Float>>>();
-        for(Entry<String, ArrayList<Float>> entry: means.entrySet()) {
-            meanEntries.add(entry);
-        }
-        for(Entry<String, ArrayList<Float>> entry: standardDeviations.entrySet()) {
-            sdEntries.add(entry);
-        }
+        ArrayList<Entry<String, ArrayList<Float>>> meanEntries = new ArrayList<Entry<String, ArrayList<Float>>>(means.entrySet());
+        ArrayList<Entry<String, ArrayList<Float>>> sdEntries = new ArrayList<Entry<String, ArrayList<Float>>>(standardDeviations.entrySet());
         
         float finalAverageSamplePooled = 0;
         float finalAverageSamplePop = 0;
         int finalCount = 0;
-        for(int i = 0; i < meanEntries.size(); i++) {
-            ArrayList<Float> arrayM = meanEntries.get(i).getValue();
-            ArrayList<Float> arraySD = sdEntries.get(i).getValue();
-            float minM = Float.POSITIVE_INFINITY;
+        for(int entryIndex = 0; entryIndex < meanEntries.size(); entryIndex++) {
+            ArrayList<Float> arrayM = meanEntries.get(entryIndex).getValue();
+            ArrayList<Float> arraySD = sdEntries.get(entryIndex).getValue();
+            /*float minM = Float.POSITIVE_INFINITY;
             float maxM = -1;
             float avgM = 0;
             float minSD = Float.POSITIVE_INFINITY;
@@ -258,7 +252,7 @@ public class DataFormatter implements Runnable {
             avgM /= arrayM.size();
             avgSD /= arraySD.size();
             
-            /*System.out.println(meanEntries.get(i).getKey() + " | minMean: " + minM + " avgMean: " + avgM + " maxMean: " + maxM
+            System.out.println(meanEntries.get(i).getKey() + " | minMean: " + minM + " avgMean: " + avgM + " maxMean: " + maxM
                     + " | minSD: " + minSD + " avgSD: " + avgSD + " maxSD: " + maxSD);*/
             //System.out.println(meanEntries.get(i).getKey() + "\t\t\t | mean = " + avgM + "\t\t | sd = " + avgSD);
             
@@ -281,12 +275,12 @@ public class DataFormatter implements Runnable {
             }
             System.out.println();*/
             
-            StatisticDataType sdt = StatisticDataType.getByName(meanEntries.get(i).getKey());
+            StatisticDataType sdt = StatisticDataType.getByName(meanEntries.get(entryIndex).getKey());
             if(sdt != null
-                    && !sdt.equals(StatisticDataType.PRACTICE_WORDS_PER_INPUT)
-                    && !sdt.equals(StatisticDataType.REACTION_TIME_FIRST_PRESSED)
-                    && !sdt.equals(StatisticDataType.REACTION_TIME_FIRST_TOUCH)) {
-                System.out.println("Variable: " + meanEntries.get(i).getKey());
+                    && sdt != StatisticDataType.PRACTICE_WORDS_PER_INPUT
+                    && sdt != StatisticDataType.REACTION_TIME_FIRST_PRESSED
+                    && sdt != StatisticDataType.REACTION_TIME_FIRST_TOUCH) {
+                System.out.println("Variable: " + meanEntries.get(entryIndex).getKey());
                 System.out.println("-------------------------------------------------------");
                 // Use population standard deviation
                 float averageSamplePooled = 0;
@@ -294,44 +288,31 @@ public class DataFormatter implements Runnable {
                 int count = 0;
                 
                 // Tablet vs all Leap
-                int tablet = 1;
-                //float maxSamplePooled = -1;
-                //float maxSamplePop = -1;
-                for(int j = 2; j < arrayM.size(); j++) {
-                    if(tablet != j) {
-                        float sdPop = arraySD.get(tablet);
-                        float sdPooled = (float) Math.pow(((6 * Math.pow(sdPop, 2)) + (6 * Math.pow(arraySD.get(j), 2))) / (12), 0.5);
-                        float meanChange = arrayM.get(tablet) - arrayM.get(j);
-                        float zVal = (float) Math.pow(1.96f + 0.84f, 2);
-                        float nPop = (float) (2 * zVal / Math.pow(meanChange / sdPop, 2));
-                        float nPool = (float) (2 * zVal / Math.pow(meanChange / sdPooled, 2));
-                        System.out.println("Population: " + KeyboardType.getByID(tablet + 1).getFileName() + " (mean=" + arrayM.get(tablet) + ")"
-                                +  " | Sample: " + KeyboardType.getByID(j + 1).getFileName() + " (mean=" + arrayM.get(j) + ")");
-                        System.out.println("sample size (population st. dev): " + nPop);
-                        System.out.println("sample size     (pooled st. dev): " + nPool + "\n");
-                        count++;
-                        averageSamplePooled += nPool;
-                        averageSamplePop += nPop;
-                        //if(nPop > maxSamplePop) maxSamplePop = nPop;
-                        //if(nPool > maxSamplePooled) maxSamplePooled = nPool;
+                int tabletIndex = 0;
+                for(Keyboard keyboard: Keyboard.values()) {
+                    if(keyboard.getType() != KeyboardType.DISABLED) {
+                        if(keyboard.getType() == KeyboardType.TABLET) {
+                            break;
+                        } else {
+                            tabletIndex++;
+                        }
                     }
                 }
-                
-                // AirPinch vs other AirLeap
-                int airPinch = 4;
                 //float maxSamplePooled = -1;
                 //float maxSamplePop = -1;
-                for(int j = tablet + 2; j < arrayM.size(); j++) {
-                    if(airPinch != j) {
-                        float sdPop = arraySD.get(airPinch);
-                        float sdPooled = (float) Math.pow(((6 * Math.pow(sdPop, 2)) + (6 * Math.pow(arraySD.get(j), 2))) / (12), 0.5);
-                        float meanChange = arrayM.get(airPinch) - arrayM.get(j);
-                        float zVal = (float) Math.pow(1.96f + 0.84f, 2);
-                        float nPop = (float) (2 * zVal / Math.pow(meanChange / sdPop, 2));
-                        float nPool = (float) (2 * zVal / Math.pow(meanChange / sdPooled, 2));
-                        if(nPop <= 100 && nPool <= 100) {
-                            System.out.println("Population: " + KeyboardType.getByID(airPinch + 1).getFileName() + " (mean=" + arrayM.get(airPinch) + ")"
-                                    +  " | Sample: " + KeyboardType.getByID(j + 1).getFileName() + " (mean=" + arrayM.get(j) + ")");
+                {
+                    int keyboardIndex = 0;
+                    for(Keyboard keyboard: Keyboard.values()) {
+                        KeyboardType keyboardType = keyboard.getType();
+                        if(keyboardType.isLeap()) {
+                            float sdPop = arraySD.get(tabletIndex);
+                            float sdPooled = (float) Math.pow(((6 * Math.pow(sdPop, 2)) + (6 * Math.pow(arraySD.get(keyboardIndex), 2))) / (12), 0.5);
+                            float meanChange = arrayM.get(tabletIndex) - arrayM.get(keyboardIndex);
+                            float zVal = (float) Math.pow(1.96f + 0.84f, 2);
+                            float nPop = (float) (2 * zVal / Math.pow(meanChange / sdPop, 2));
+                            float nPool = (float) (2 * zVal / Math.pow(meanChange / sdPooled, 2));
+                            System.out.println("Population: " + KeyboardType.TABLET.getFileName() + " (mean=" + arrayM.get(tabletIndex) + ")"
+                                    +  " | Sample: " + keyboardType.getFileName() + " (mean=" + arrayM.get(keyboardIndex) + ")");
                             System.out.println("sample size (population st. dev): " + nPop);
                             System.out.println("sample size     (pooled st. dev): " + nPool + "\n");
                             count++;
@@ -339,6 +320,51 @@ public class DataFormatter implements Runnable {
                             averageSamplePop += nPop;
                             //if(nPop > maxSamplePop) maxSamplePop = nPop;
                             //if(nPool > maxSamplePooled) maxSamplePooled = nPool;
+                        }
+                        if(keyboardType != KeyboardType.DISABLED) {
+                            keyboardIndex++;
+                        }
+                    }
+                }
+                
+                // AirPinch vs other AirLeap
+                int airPinchIndex = 0;
+                for(Keyboard keyboard: Keyboard.values()) {
+                    if(keyboard.getType() != KeyboardType.DISABLED) {
+                        if(keyboard.getType() == KeyboardType.LEAP_AIR_PINCH) {
+                            break;
+                        } else {
+                            airPinchIndex++;
+                        }
+                    }
+                }
+                //float maxSamplePooled = -1;
+                //float maxSamplePop = -1;
+                {
+                    int keyboardIndex = 0;
+                    for(Keyboard keyboard: Keyboard.values()) {
+                        KeyboardType keyboardType = keyboard.getType();
+                        if(keyboardType != KeyboardType.LEAP_AIR_PINCH && keyboardType.isLeap()) {
+                            float sdPop = arraySD.get(airPinchIndex);
+                            float sdPooled = (float) Math.pow(((6 * Math.pow(sdPop, 2)) + (6 * Math.pow(arraySD.get(keyboardIndex), 2))) / (12), 0.5);
+                            float meanChange = arrayM.get(airPinchIndex) - arrayM.get(keyboardIndex);
+                            float zVal = (float) Math.pow(1.96f + 0.84f, 2);
+                            float nPop = (float) (2 * zVal / Math.pow(meanChange / sdPop, 2));
+                            float nPool = (float) (2 * zVal / Math.pow(meanChange / sdPooled, 2));
+                            if(nPop <= 100 && nPool <= 100) {
+                                System.out.println("Population: " + KeyboardType.LEAP_AIR_PINCH.getFileName() + " (mean=" + arrayM.get(airPinchIndex) + ")"
+                                        +  " | Sample: " + keyboardType.getFileName() + " (mean=" + arrayM.get(keyboardIndex) + ")");
+                                System.out.println("sample size (population st. dev): " + nPop);
+                                System.out.println("sample size     (pooled st. dev): " + nPool + "\n");
+                                count++;
+                                averageSamplePooled += nPool;
+                                averageSamplePop += nPop;
+                                //if(nPop > maxSamplePop) maxSamplePop = nPop;
+                                //if(nPool > maxSamplePooled) maxSamplePooled = nPool;
+                            }
+                        }
+                        if(keyboardType != KeyboardType.DISABLED) {
+                            keyboardIndex++;
                         }
                     }
                 }
@@ -367,8 +393,8 @@ public class DataFormatter implements Runnable {
             ArrayList<String> data = new ArrayList<String>();
             data.add("% Input Variables");
             for(Keyboard keyboard: Keyboard.values()) {
-                KeyboardType keyboardType = KeyboardType.getByID(keyboard.getID());
-                if(keyboardType != KeyboardType.STANDARD) {
+                KeyboardType keyboardType = keyboard.getType();
+                if(keyboardType != KeyboardType.DISABLED) {
                     for(Entry<String, String> entry: consolidatedData.entrySet()) {
                         if(KeyboardType.getByName(entry.getKey()) == keyboardType) {
                             data.add(entry.getKey() + " = [" + entry.getValue() + "];");
@@ -402,14 +428,14 @@ public class DataFormatter implements Runnable {
             if(subjectDirectory.isDirectory() && !TUTORIAL.equals(subjectID)) {
                 ArrayList<String> subjectData = new ArrayList<String>();
                 for(Keyboard keyboard: Keyboard.values()) {
-                    if(KeyboardType.getByID(keyboard.getID()) != KeyboardType.STANDARD) {
+                    if(keyboard.getType() != KeyboardType.DISABLED) {
                         IKeyboard iKeyboard = keyboard.getKeyboard();
                         String wildcardFileName = subjectID + "_" + iKeyboard.getFileName() + FileUtilities.WILDCARD + FileExt.PLAYBACK.getExt();
                         try {
                             ArrayList<String> fileContents = MyUtilities.FILE_IO_UTILITIES.readListFromWildcardFile(subjectDirectory.getPath() + "\\", wildcardFileName);
                             ArrayList<PlaybackFileData> fileData = parsePlaybackFileContents(fileContents);
                             switch(keyboard) {
-                                case CONTROLLER:
+                                case CONTROLLER_CONSOLE:
                                     subjectData.addAll(calculateSubjectDataController(fileData, iKeyboard));
                                     break;
                                 case TABLET:
@@ -535,7 +561,7 @@ public class DataFormatter implements Runnable {
         float backspaceC = 0f;
         float backspaceINF = 0f;
         float backspaceIF = 0f;
-        float backspaceF = 0f;
+        //float backspaceF = 0f;
         
         boolean detectedShortestComplete = false;
         
@@ -599,10 +625,10 @@ public class DataFormatter implements Runnable {
                         break;
                     case KEY_EXPECTED:
                         Key expectedKey = (Key) currentData.getValue();
-                        if(pressedKey.equals(Key.VK_ENTER) && expectedKey.equals(Key.VK_ENTER)) {
+                        if(pressedKey == Key.VK_ENTER && expectedKey == Key.VK_ENTER) {
                             reportData = true;
                             timeDuration = (float) ((previousTime / SECOND_AS_NANO) - timeDuration);
-                        } else if(pressedKey.equals(Key.VK_BACK_SPACE) && expectedKey.equals(Key.VK_BACK_SPACE)) {
+                        } else if(pressedKey == Key.VK_BACK_SPACE && expectedKey == Key.VK_BACK_SPACE) {
                             INF--;
                             F++;
                             IF++;
@@ -613,7 +639,7 @@ public class DataFormatter implements Runnable {
                             }
                             backspaceC++;
                             expectedPathModifiedBackspace.add(virtualKeyboard.getVirtualKey(Key.VK_BACK_SPACE).getCenter());
-                            if(!simulateController.getSelectedKey().equals(Key.VK_BACK_SPACE)) {
+                            if(simulateController.getSelectedKey() != Key.VK_BACK_SPACE) {
                                 takenPath.add(virtualKeyboard.getVirtualKey(Key.VK_BACK_SPACE).getCenter());
                             }
                             if(timeErrorOccured > 0) {
@@ -621,18 +647,18 @@ public class DataFormatter implements Runnable {
                                 timeErrorOccured = 0;
                                 responseToErrorsCount++;
                             }
-                        } else if(pressedKey.equals(expectedKey)) {
+                        } else if(pressedKey == expectedKey) {
                             C++;
                             backspaceC++;
                             expectedPathModifiedBackspace.add(virtualKeyboard.getVirtualKey(pressedKey).getCenter());
-                            if(pressedKey.equals(previousKey)) {
+                            if(pressedKey == previousKey) {
                                 takenPath.add(virtualKeyboard.getVirtualKey(simulateController.getSelectedKey()).getCenter());
                             }
                             if(firstLetter) {
                                 firstLetter = false;
                                 reactionTimeFirstPressed = (float) ((currentLine.getTime() - wordStartTime) / SECOND_AS_NANO);
                             }
-                        } else if(!pressedKey.equals(expectedKey) && pressedKey != Key.VK_ENTER) {
+                        } else if(pressedKey != expectedKey && pressedKey != Key.VK_ENTER) {
                             if(timeErrorOccured == 0 && expectedKey != Key.VK_BACK_SPACE && pressedKey != Key.VK_BACK_SPACE) {
                                 timeErrorOccured = currentLine.getTime();
                                 if(!detectedShortestComplete) shortINF++;
@@ -670,10 +696,10 @@ public class DataFormatter implements Runnable {
                         break;
                     case DIRECTION_PRESSED:
                         Direction direction = (Direction) currentData.getValue();
-                        if(direction.equals(Direction.RIGHT) || direction.equals(Direction.LEFT)) {
+                        if(direction == Direction.RIGHT || direction == Direction.LEFT) {
                             distanceTraveled += DISTANCE_RIGHT_LEFT;
                             if(firstTouch) handVelocity += (DISTANCE_RIGHT_LEFT * PIXEL_TO_CENTIMETER) / ((currentLine.getTime() - previousTime) / SECOND_AS_NANO);
-                        } else if(direction.equals(Direction.UP) || direction.equals(Direction.DOWN)) {
+                        } else if(direction == Direction.UP || direction == Direction.DOWN) {
                             distanceTraveled += DISTANCE_UP_DOWN;
                             if(firstTouch) handVelocity += (DISTANCE_UP_DOWN * PIXEL_TO_CENTIMETER) / ((currentLine.getTime() - previousTime) / SECOND_AS_NANO);
                         }
@@ -781,7 +807,7 @@ public class DataFormatter implements Runnable {
                     backspaceC = 0f;
                     backspaceINF = 0f;
                     backspaceIF = 0f;
-                    backspaceF = 0f;
+                    //backspaceF = 0f;
                 }
             }
         }
@@ -895,7 +921,7 @@ public class DataFormatter implements Runnable {
         float backspaceC = 0f;
         float backspaceINF = 0f;
         float backspaceIF = 0f;
-        float backspaceF = 0f;
+        //float backspaceF = 0f;
         
         boolean detectedShortestComplete = false;
         boolean lastEnterAfterShortestComplete = false;
@@ -958,10 +984,10 @@ public class DataFormatter implements Runnable {
                         break;
                     case KEY_EXPECTED:
                         Key expectedKey = (Key) currentData.getValue();
-                        if(pressedKey.equals(Key.VK_ENTER) && expectedKey.equals(Key.VK_ENTER)) {
+                        if(pressedKey == Key.VK_ENTER && expectedKey == Key.VK_ENTER) {
                             reportData = true;
                             //timeDuration = (float) ((previousTime / SECOND_AS_NANO) - timeDuration);
-                        } else if(pressedKey.equals(Key.VK_BACK_SPACE) && expectedKey.equals(Key.VK_BACK_SPACE)) {
+                        } else if(pressedKey == Key.VK_BACK_SPACE && expectedKey == Key.VK_BACK_SPACE) {
                             INF--;
                             F++;
                             IF++;
@@ -977,7 +1003,7 @@ public class DataFormatter implements Runnable {
                                 timeErrorOccured = 0;
                                 responseToErrorsCount++;
                             }
-                        } else if(pressedKey.equals(expectedKey)) {
+                        } else if(pressedKey == expectedKey) {
                             C++;
                             backspaceC++;
                             expectedPathModifiedBackspace.add(virtualKeyboard.getVirtualKey(pressedKey).getCenter());
@@ -985,7 +1011,7 @@ public class DataFormatter implements Runnable {
                                 firstLetter = false;
                                 reactionTimeFirstPressed = (float) ((previousTime - wordStartTime) / SECOND_AS_NANO);
                             }
-                        } else if(!pressedKey.equals(expectedKey) && pressedKey != Key.VK_ENTER) {
+                        } else if(pressedKey != expectedKey && pressedKey != Key.VK_ENTER) {
                             if(timeErrorOccured == 0 && expectedKey != Key.VK_BACK_SPACE && pressedKey != Key.VK_BACK_SPACE) {
                                 timeErrorOccured = currentLine.getTime();
                                 if(!lastEnterAfterShortestComplete) shortINF++;
@@ -1139,7 +1165,7 @@ public class DataFormatter implements Runnable {
                     backspaceC = 0f;
                     backspaceINF = 0f;
                     backspaceIF = 0f;
-                    backspaceF = 0f;
+                    //backspaceF = 0f;
                 }
             }
         }

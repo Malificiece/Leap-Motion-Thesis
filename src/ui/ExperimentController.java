@@ -47,7 +47,7 @@ public class ExperimentController extends GraphicsController implements Keyboard
             + "<font><b>TUTORIAL:</b><br>A brief example to familiarize yourself with the keyboard.<br><br></font>"
             + "<font><b>PRACTICE:</b><br>A small sample of what you should expect from the experiment.<br><br></font>"
             + "<font><b>EXPERIMENT:</b><br>The actual experiment with recorded data.</font>";
-    public static final int EXPERIMENT_SIZE = 10;
+    public static final int EXPERIMENT_SIZE = 15;
     private final int PRACTICE_SIZE = EXPERIMENT_SIZE;
     private final String TUTORIAL = FileName.TUTORIAL.getName();
     private final ReentrantLock EXPERIMENT_LOCK = new ReentrantLock();
@@ -89,11 +89,8 @@ public class ExperimentController extends GraphicsController implements Keyboard
     private Timer delayedStart;
     
     public ExperimentController() {
-        keyboard = Keyboard.STANDARD.getKeyboard();
         canvasPanel = new JPanel();
         canvas = new GLCanvas(CAPABILITIES);
-        canvas.setPreferredSize(new Dimension(keyboard.getImageWidth(), keyboard.getImageHeight()));
-        canvas.setSize(keyboard.getImageWidth(), keyboard.getImageHeight());
         canvasPanel.add(canvas);
         frame = new JFrame();
         frame.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
@@ -405,9 +402,7 @@ public class ExperimentController extends GraphicsController implements Keyboard
         removeKeyboardFromUI();
         frame.setVisible(false);
         canvas.removeGLEventListener(this);
-        for(Keyboard tmpKeyboard: Keyboard.values()) {
-            tmpKeyboard.getKeyboard().removeObserver(this);
-        }
+        keyboard.removeObserver(this);
         ranPractice = false;
         isEnabled = false;
         disableUI();
@@ -421,9 +416,7 @@ public class ExperimentController extends GraphicsController implements Keyboard
         frame.setVisible(true);
         frame.requestFocusInWindow();
         canvas.addGLEventListener(this);
-        for(Keyboard tmpKeyboard: Keyboard.values()) {
-            tmpKeyboard.getKeyboard().registerObserver(this);
-        }
+        keyboard.registerObserver(this);
         wordManager.setDefault();
         enableUI();
         // Moved here from finish Exp
@@ -441,7 +434,7 @@ public class ExperimentController extends GraphicsController implements Keyboard
             frame.setTitle("Experiment - Subject ID: " + subjectID + " Test: " + keyboardType.getName());
         }
         this.subjectID = subjectID;
-        keyboard = Keyboard.getByID(keyboardType.getID()).getKeyboard();
+        keyboard = Keyboard.getByType(keyboardType).getKeyboard();
         if(TUTORIAL.equals(subjectID)) {
             ranPractice = true;
         }
@@ -621,7 +614,7 @@ public class ExperimentController extends GraphicsController implements Keyboard
     }
     
     private boolean isLeapKeyboard() {
-        return KeyboardType.getByID(keyboard.getID()).isLeap();
+        return keyboard.getType().isLeap();
     }
     
     private void delayedStart() {

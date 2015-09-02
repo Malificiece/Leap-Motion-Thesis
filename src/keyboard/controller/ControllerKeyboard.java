@@ -61,8 +61,8 @@ public class ControllerKeyboard extends IKeyboard implements ControllerPlaybackO
     private boolean shiftTwice = false;
     private Timer detectedMatchTimer;
     
-    public ControllerKeyboard() {
-        super(KeyboardType.CONTROLLER);
+    public ControllerKeyboard(KeyboardType keyboardType) {
+        super(keyboardType);
         keyboardAttributes = new ControllerAttributes(this);
         keyboardSettings = new ControllerSettings(this);
         System.out.println(KEYBOARD_NAME + " - Loading Settings from " + FilePath.CONFIG.getPath() + KEYBOARD_FILE_NAME + FileExt.INI.getExt());

@@ -9,6 +9,7 @@ import java.awt.GridLayout;
 import java.awt.Toolkit;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Iterator;
 
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
@@ -76,7 +77,9 @@ public class WindowBuilder {
 
         // combo box
         for(Keyboard keyboard: Keyboard.values()) {
-            testComboBox.addItem(keyboard.getName());
+            if(keyboard.getType() != KeyboardType.DISABLED) {
+                testComboBox.addItem(keyboard.getName());
+            }
         }
         testComboBox.setBackground(Color.WHITE);
         testPanel.add(testComboBox);
@@ -645,19 +648,20 @@ public class WindowBuilder {
         JPanel rankingPanel = new JPanel(new SpringLayout());
         contentPanel.add(rankingPanel);
         
+        Iterator<JTextField> rankingTextFieldIterator = rankingTextFields.iterator();
         for(Keyboard keyboard: Keyboard.values()) {
-        	if(KeyboardType.getByID(keyboard.getID()) != KeyboardType.STANDARD) {
-                int keyboardID = keyboard.getID() - 1;
+        	if(keyboard.getType() != KeyboardType.DISABLED && rankingTextFieldIterator.hasNext()) {
         		JLabel rankingLabel = new JLabel(keyboard.getName() + ":");
-        		rankingTextFields.get(keyboardID).setHorizontalAlignment(JTextField.CENTER);
+        		JTextField rankingTextField = rankingTextFieldIterator.next();
+        		rankingTextField.setHorizontalAlignment(JTextField.CENTER);
         		rankingPanel.add(rankingLabel);
-        		rankingPanel.add(rankingTextFields.get(keyboardID));
+        		rankingPanel.add(rankingTextField);
         		rankingPanel.add(MyUtilities.SWING_UTILITIES.createPadding(500, SwingConstants.HORIZONTAL));
         	}
         }
         
         MyUtilities.SPRING_UTILITIES.makeCompactGrid(rankingPanel,
-                Keyboard.values().length - 1, 3,        //rows, cols
+                rankingTextFields.size(), 3,        //rows, cols
                 6, 6,        //initX, initY
                 6, 6);       //xPad, yPad
         
@@ -871,7 +875,9 @@ public class WindowBuilder {
         
         // keyboard combo box
         for(Keyboard keyboard: Keyboard.values()) {
-            keyboardTypeComboBox.addItem(keyboard.getName());
+            if(keyboard.getType() != KeyboardType.DISABLED) {
+                keyboardTypeComboBox.addItem(keyboard.getName());
+            }
         }
         keyboardTypeComboBox.setBackground(Color.WHITE);
         keyboardTypeComboBox.setMaximumSize(new Dimension(keyboardTypeComboBox.getMaximumSize().width, keyboardTypeComboBox.getMinimumSize().height));
