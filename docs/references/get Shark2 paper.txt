@@ -3,5 +3,8 @@ Shark^2 paper give a lot of insight on word-regonition, and is a good reference 
 
 
 
-Another though:
+Another thought:
 The angle of the keyboard matters for ease of use
+
+Talk about how I did the mock swipe - path support as well as making keys larger
+

@@ -25,6 +25,7 @@ import enums.Color;
 import enums.FileExt;
 import enums.FilePath;
 import enums.Gesture;
+import enums.Keyboard;
 import enums.KeyboardType;
 import enums.Renderable;
 import enums.Setting;
@@ -54,7 +55,7 @@ public class LeapPlane extends KeyboardRenderable {
     private final KeyboardAttribute POINT_B_ATTRIBUTE;
     private final KeyboardAttribute POINT_C_ATTRIBUTE;
     private final KeyboardAttribute POINT_D_ATTRIBUTE;
-    private final String FILE_NAME;
+    private final KeyboardType KEYBOARD_TYPE;
     private ArrayList<CalibrationObserver> observers = new ArrayList<CalibrationObserver>();
     private InteractionBox iBox;
     private Vector pointA; // min
@@ -95,7 +96,7 @@ public class LeapPlane extends KeyboardRenderable {
         BORDER_SIZE = keyboard.getAttributes().getAttributeAsFloat(Attribute.BORDER_SIZE);
         CAMERA_DISTANCE = keyboard.getAttributes().getAttributeAsFloat(Attribute.CAMERA_DISTANCE);
         TOUCH_THRESHOLD = keyboard.getSettings().getSetting(Setting.TOUCH_THRESHOLD);
-        FILE_NAME = keyboard.getFileName();
+        KEYBOARD_TYPE = keyboard.getType();
         POINT_A_ATTRIBUTE = keyboard.getAttributes().getAttribute(Attribute.LEAP_PLANE_POINT_A);
         POINT_B_ATTRIBUTE = keyboard.getAttributes().getAttribute(Attribute.LEAP_PLANE_POINT_B);
         POINT_C_ATTRIBUTE = keyboard.getAttributes().getAttribute(Attribute.LEAP_PLANE_POINT_C);
@@ -155,17 +156,47 @@ public class LeapPlane extends KeyboardRenderable {
         isCalibrating = false;
         notifyListenersCalibrationFinished();
         
-        // Write the newly calibrated coordinates to file.
-        try {
-            System.out.println("Saving calibrated Leap Motion Interaction Plane points to " + FilePath.CONFIG.getPath() + FILE_NAME + FileExt.INI.getExt());
-            MyUtilities.FILE_IO_UTILITIES.writeAttributeToFile(FilePath.CONFIG.getPath(), FILE_NAME + FileExt.INI.getExt(), POINT_A_ATTRIBUTE);
-            MyUtilities.FILE_IO_UTILITIES.writeAttributeToFile(FilePath.CONFIG.getPath(), FILE_NAME + FileExt.INI.getExt(), POINT_B_ATTRIBUTE);
-            MyUtilities.FILE_IO_UTILITIES.writeAttributeToFile(FilePath.CONFIG.getPath(), FILE_NAME + FileExt.INI.getExt(), POINT_C_ATTRIBUTE);
-            MyUtilities.FILE_IO_UTILITIES.writeAttributeToFile(FilePath.CONFIG.getPath(), FILE_NAME + FileExt.INI.getExt(), POINT_D_ATTRIBUTE);
-            System.out.println("Save Success");
-        } catch (IOException e) {
-            System.out.println("Save Failure. Try using the \"Save Settings\" button to save calibration to file.");
-            e.printStackTrace();
+        // Write the newly calibrated coordinates to file. If the keyboard is a mid-air 3-dimensional keyboard,
+        // then we share the calibration with all of them (excludes the Leap Pinch and Leap Surface keyboards).
+        if(KEYBOARD_TYPE.isLeap() &&
+                KEYBOARD_TYPE != KeyboardType.LEAP_AIR_PINCH &&
+                KEYBOARD_TYPE != KeyboardType.LEAP_SURFACE) {
+            // Record calibration to other relevant leap keyboards.
+            for(Keyboard keyboard: Keyboard.values()) {
+                KeyboardType keyboardType = keyboard.getType();
+                if(keyboardType.isLeap() &&
+                        keyboardType != KeyboardType.LEAP_AIR_PINCH &&
+                        keyboardType != KeyboardType.LEAP_SURFACE) {
+                    try {
+                        System.out.println("Saving calibrated Leap Motion Interaction Plane points to " + FilePath.CONFIG.getPath() + keyboardType.getFileName() + FileExt.INI.getExt());
+                        MyUtilities.FILE_IO_UTILITIES.writeAttributeToFile(FilePath.CONFIG.getPath(), keyboardType.getFileName() + FileExt.INI.getExt(), POINT_A_ATTRIBUTE);
+                        MyUtilities.FILE_IO_UTILITIES.writeAttributeToFile(FilePath.CONFIG.getPath(), keyboardType.getFileName() + FileExt.INI.getExt(), POINT_B_ATTRIBUTE);
+                        MyUtilities.FILE_IO_UTILITIES.writeAttributeToFile(FilePath.CONFIG.getPath(), keyboardType.getFileName() + FileExt.INI.getExt(), POINT_C_ATTRIBUTE);
+                        MyUtilities.FILE_IO_UTILITIES.writeAttributeToFile(FilePath.CONFIG.getPath(), keyboardType.getFileName() + FileExt.INI.getExt(), POINT_D_ATTRIBUTE);
+                        System.out.println("Save Success");
+                    } catch (IOException e) {
+                        if(keyboardType == KEYBOARD_TYPE) {
+                            System.out.println("Save Failure. Try using the \"Save Settings\" button to save calibration to file.");
+                        } else {
+                            System.out.println("Save Failure. Copy calibration data over manually.");
+                        }
+                        e.printStackTrace();
+                    }
+                }
+            }
+        } else {
+            // Save single calibration record.
+            try {
+                System.out.println("Saving calibrated Leap Motion Interaction Plane points to " + FilePath.CONFIG.getPath() + KEYBOARD_TYPE.getFileName() + FileExt.INI.getExt());
+                MyUtilities.FILE_IO_UTILITIES.writeAttributeToFile(FilePath.CONFIG.getPath(), KEYBOARD_TYPE.getFileName() + FileExt.INI.getExt(), POINT_A_ATTRIBUTE);
+                MyUtilities.FILE_IO_UTILITIES.writeAttributeToFile(FilePath.CONFIG.getPath(), KEYBOARD_TYPE.getFileName() + FileExt.INI.getExt(), POINT_B_ATTRIBUTE);
+                MyUtilities.FILE_IO_UTILITIES.writeAttributeToFile(FilePath.CONFIG.getPath(), KEYBOARD_TYPE.getFileName() + FileExt.INI.getExt(), POINT_C_ATTRIBUTE);
+                MyUtilities.FILE_IO_UTILITIES.writeAttributeToFile(FilePath.CONFIG.getPath(), KEYBOARD_TYPE.getFileName() + FileExt.INI.getExt(), POINT_D_ATTRIBUTE);
+                System.out.println("Save Success");
+            } catch (IOException e) {
+                System.out.println("Save Failure. Try using the \"Save Settings\" button to save calibration to file.");
+                e.printStackTrace();
+            }
         }
     }
     
