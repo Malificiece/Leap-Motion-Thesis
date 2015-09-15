@@ -20,7 +20,7 @@ public class LeapPlaneCalibrator {
     private final int START_SEARCH = 500 + CALCULATE_MIDPOINT;
     private final float EPSILON = 0.0002f;
     //private final float DELTA_EPSILON = 0.00001f; // Laptop
-    private final float DELTA_EPSILON = 0.0002f; // School Computer
+    private final float DELTA_EPSILON = 0.001f; // School Computer
     private float epsilon;
     private Vector[] cluster;
     private int point = 0;
