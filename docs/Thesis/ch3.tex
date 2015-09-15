@@ -33,6 +33,10 @@ Observed:
 - sphere problem with touching plane
 - light matters
 
+Study Notes:
+In some cases, the calibrated plane normal flips and the direction the tool travels is reversed.
+If the plane is angled downward the touch threshold (possible culprit)??? seems to be far off the plane so the touch seems "instant".. it snaps to the touch plane and when removed it lifts high off the keyboard
+
  This chapter describes and justifies the data gathering method used. This chapter also outlines how you
 analyzed your data.
 
@@ -67,13 +71,16 @@ analysis)
 
 --- This should really be a description of the exact task performed (the number of trials, the number of words, the number of input devices) and what they were trying to do, the procedure doesn't include this, it just talks about the experiment ordering as a whole.
 
-The task performed by the subjects consisted of 10 trials for each of the 7 keyboard input devices for a total of 70 trials per subject. In each trial, a predetermined word appears on the screen. Subjects were required to correctly type in the displayed word with the active keyboard, using the active keyboard's backspace key to remove errors. Correct letters in a word are protected from the backspace key 
-
 \subsection{Pilot Study 1}
 
 \subsection{Pilot Study 2}
 
 \subsection{Final Study}
+
+HINDSIGHT:
+A greater number of trials per keyboard would have been better, in the future we need to reduce the number of keyboards each person is using so that each person can instead do something closer to 100 trials per keyboard. This number can be further increased by having reoccuring visits. It would be good to have people train for each keyboard and have multiple study visits in order to get past the learning curve and get a better indication of each keyboards performance.
+
+The task performed by the subjects consisted of 15 trials for each of the 6 keyboard input devices giving a total of 90 trials per subject. For each trial, a word is selected at random from a predetermined dictionary of 15 words corresponding to the active keyboard input and appears on the screen. This process is repeated until all of the words in the dictionary have been selected. TODO: See section DICTIONARY_EXPLANATION for details on how the predetermined dictionaries were generated. Once a word appears on the screen, subjects were required to correctly type in the displayed word using the active keyboard. During the gesture-typing process, correctly matching letters were highlighted in green and errors are highlighted in red. The user was required to use the active keyboard's backspace key to remove errors. Correct letters in a word are protected from the backspace key 
 
 \section{Study Setup === Input Devices and Interaction}
 
