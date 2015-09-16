@@ -1,0 +1,39 @@
+SUBJECT_ID: t2qcj5nu
+leapAirBimodal_DISCOMFORT_LEVEL: disagree
+leapAirBimodal_FATIGUE_LEVEL: neutral
+leapAirBimodal_DIFFICULTY_LEVEL: neutral
+leapAirStatic_DISCOMFORT_LEVEL: agree
+leapAirStatic_FATIGUE_LEVEL: agree
+leapAirStatic_DIFFICULTY_LEVEL: strongly agree
+leapAirDynamic_DISCOMFORT_LEVEL: neutral
+leapAirDynamic_FATIGUE_LEVEL: agree
+leapAirDynamic_DIFFICULTY_LEVEL: disagree
+tablet_DISCOMFORT_LEVEL: strongly disagree
+tablet_FATIGUE_LEVEL: disagree
+tablet_DIFFICULTY_LEVEL: disagree
+leapSurface_DISCOMFORT_LEVEL: disagree
+leapSurface_FATIGUE_LEVEL: disagree
+leapSurface_DIFFICULTY_LEVEL: disagree
+leapAirPinch_DISCOMFORT_LEVEL: disagree
+leapAirPinch_FATIGUE_LEVEL: disagree
+leapAirPinch_DIFFICULTY_LEVEL: disagree
+AGE: 23
+GENDER: Male
+MAJOR: CS
+HAS_PERSONAL_COMPUTER: Yes
+HOURS_PER_WEEK_ON_COMPUTER: 31 to 40 hours
+HAS_PREVIOUS_GESTURE_DEVICE_EXPERIENCE: Yes
+PREVIOUS_GESTURE_DEVICE_DESCRIPTION: Kinect, Leam Motion, Myo
+HAS_PREVIOUS_TOUCH_DEVICE_EXPERIENCE: Yes
+PREVIOUS_TOUCH_DEVICE_DESCRIPTION: Nexus 10, Smartphone,  Laptop, Collaborative Table
+HAS_PREVIOUS_SWIPE_DEVICE_EXPERIENCE: Yes
+PREVIOUS_SWIPE_DEVICE_DESCRIPTION: Android
+HAS_PHYSICAL_IMPAIRMENT: No
+HANDEDNESS: Right hand
+PREFERED_HANDEDNESS_FOR_EXPERIMENT: Right hand
+tablet_PREFERENCE_RANKING: 1
+leapSurface_PREFERENCE_RANKING: 2
+leapAirStatic_PREFERENCE_RANKING: 6
+leapAirPinch_PREFERENCE_RANKING: 5
+leapAirDynamic_PREFERENCE_RANKING: 3
+leapAirBimodal_PREFERENCE_RANKING: 4
