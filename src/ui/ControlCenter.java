@@ -9,6 +9,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.io.File;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.security.SecureRandom;
@@ -18,6 +19,7 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
@@ -57,6 +59,8 @@ public class ControlCenter {
     private String subjectID;
     private JComboBox<String> testTypeComboBox;
     private JButton editSubjectIDButton;
+    private JButton randomizeSubjectIDButton;
+    private JButton browseSubjectIDButton;
     private JButton calibrateButton;
     private JButton experimentButton;
     private JButton exitSurveyButton;
@@ -72,17 +76,21 @@ public class ControlCenter {
         frame = new JFrame("Experiment Control Center");
         frame.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
         subjectID = generateSubjectID();
-        subjectField = new JTextField(subjectID);
+        subjectField = new JTextField(subjectID, 10);
         testTypeComboBox = new JComboBox<String>();
         editSubjectIDButton = new JButton("Edit");
-        calibrateButton = new JButton("Calibration");
+        randomizeSubjectIDButton = new JButton("Randomize");
+        browseSubjectIDButton = new JButton("Browse...");
+        calibrateButton = new JButton("Calibration Center");
         experimentButton = new JButton("Experiment");
         exitSurveyButton = new JButton("Exit Survey");
         likertSurveyButton = new JButton("Likert Survey");
         createDictionariesButton = new JButton("Create Dictionaries");
         dataCenterButton = new JButton("Data Center");
         
-        JButton[] buttons = {calibrateButton, experimentButton, editSubjectIDButton, exitSurveyButton, createDictionariesButton, dataCenterButton, likertSurveyButton};
+        JButton[] buttons = {calibrateButton, experimentButton, editSubjectIDButton,
+        		exitSurveyButton, createDictionariesButton, dataCenterButton,
+        		likertSurveyButton, randomizeSubjectIDButton, browseSubjectIDButton};
         
         // Window builder builds window using important fields here. It adds unimportant fields that we won't use for aesthetics only.
         WindowBuilder.buildControlWindow(frame, testTypeComboBox, subjectField, buttons);
@@ -220,6 +228,58 @@ public class ControlCenter {
                     CONTROL_LOCK.unlock();
                 }
             }
+        });
+        
+        randomizeSubjectIDButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+                CONTROL_LOCK.lock();
+                try {
+                    subjectID = generateSubjectID();
+                    subjectField.setText(subjectID);
+                    ((ComboBoxRenderer) testTypeComboBox.getRenderer()).updateSubjectID(testTypeComboBox, subjectID);
+                    if(((ComboBoxRenderer) testTypeComboBox.getRenderer()).dataExists(testTypeComboBox.getSelectedItem().toString())) {
+                        likertSurveyButton.setEnabled(true);
+                    } else {
+                        likertSurveyButton.setEnabled(false);
+                    }
+	            } finally {
+	                CONTROL_LOCK.unlock();
+	            }
+			}
+        });
+        
+        browseSubjectIDButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+                CONTROL_LOCK.lock();
+                try {
+                    // needs to prompt the file chooser
+                    JFileChooser fileChooser = new JFileChooser();
+                    fileChooser.setCurrentDirectory(new File(FilePath.RECORDED_DATA.getPath()));
+                    fileChooser.setDialogTitle("Choose Data Folder...");
+                    fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+                    fileChooser.setAcceptAllFileFilterUsed(false);
+                    if(fileChooser.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
+                        File selectedFile = fileChooser.getSelectedFile();
+                        if(selectedFile != null) {
+                        	subjectID = selectedFile.getName();
+                            subjectField.setText(subjectID);
+                            ((ComboBoxRenderer) testTypeComboBox.getRenderer()).updateSubjectID(testTypeComboBox, subjectID);
+                            if(((ComboBoxRenderer) testTypeComboBox.getRenderer()).dataExists(testTypeComboBox.getSelectedItem().toString())) {
+                                likertSurveyButton.setEnabled(true);
+                            } else {
+                                likertSurveyButton.setEnabled(false);
+                            }
+                        }
+                    } else {
+                        // canceled, do nothing
+                    }
+                    fileChooser = null;
+	            } finally {
+	                CONTROL_LOCK.unlock();
+	            }
+			}
         });
         
         testTypeComboBox.addActionListener(new ActionListener() {
@@ -463,6 +523,8 @@ public class ControlCenter {
         exitSurveyButton.setEnabled(false);
         likertSurveyButton.setEnabled(false);
         if(fullDisable) editSubjectIDButton.setEnabled(false);
+        randomizeSubjectIDButton.setEnabled(false);
+        browseSubjectIDButton.setEnabled(false);
         createDictionariesButton.setEnabled(false);
         dataCenterButton.setEnabled(false);
         testTypeComboBox.setEnabled(false);
@@ -480,6 +542,8 @@ public class ControlCenter {
             likertSurveyButton.setEnabled(false);
         }
         editSubjectIDButton.setEnabled(true);
+        randomizeSubjectIDButton.setEnabled(true);
+        browseSubjectIDButton.setEnabled(true);
         createDictionariesButton.setEnabled(true);
         dataCenterButton.setEnabled(true);
         testTypeComboBox.setEnabled(true);

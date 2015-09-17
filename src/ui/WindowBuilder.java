@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 
 import javax.swing.BorderFactory;
+import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
@@ -42,7 +43,7 @@ public class WindowBuilder {
     public static void buildControlWindow(JFrame frame,
             JComboBox<String> testComboBox,
             JTextField subjectField,
-            JButton[] optionsButtons) { // calibrate, run, edit, exit, dictionary, formatter, likert
+            JButton[] optionsButtons) { // calibrate, run, edit, exit, dictionary, formatter, likert, randomize, browse
         
         JPanel background = new JPanel();
         background.setLayout(new BoxLayout(background, BoxLayout.Y_AXIS));
@@ -59,13 +60,25 @@ public class WindowBuilder {
         subjectPanel.add(subjectLabel);
         subjectPanel.add(MyUtilities.SWING_UTILITIES.createPadding(10, SwingConstants.HORIZONTAL));
         subjectPanel.add(subjectField);
+        subjectField.setMaximumSize(new Dimension(subjectField.getPreferredSize().width, subjectField.getPreferredSize().height + 5));
         subjectField.setFocusable(false);
         subjectField.setEditable(false);
         subjectField.setHighlighter(null);
         subjectField.setHorizontalAlignment(JTextField.CENTER);
         
         subjectPanel.add(MyUtilities.SWING_UTILITIES.createPadding(10, SwingConstants.HORIZONTAL));
-        subjectPanel.add(optionsButtons[2]);
+        
+        JPanel subjectButtonsPanel = new JPanel();
+        subjectButtonsPanel.setLayout(new BoxLayout(subjectButtonsPanel, BoxLayout.Y_AXIS));
+        subjectPanel.add(subjectButtonsPanel);
+        
+        subjectButtonsPanel.add(optionsButtons[2]);
+        subjectButtonsPanel.add(Box.createVerticalGlue());
+        subjectButtonsPanel.add(Box.createVerticalGlue());
+        subjectButtonsPanel.add(optionsButtons[7]);
+        subjectButtonsPanel.add(Box.createVerticalGlue());
+        subjectButtonsPanel.add(Box.createVerticalGlue());
+        subjectButtonsPanel.add(optionsButtons[8]);
         
         // Build layout for Test Select area
         background.add(MyUtilities.SWING_UTILITIES.createPadding(10, SwingConstants.VERTICAL));
@@ -110,8 +123,8 @@ public class WindowBuilder {
         
         JPanel buttonGroup2 = new JPanel();
         calibrationOptionsPanel.add(buttonGroup2);
-        buttonGroup2.add(MyUtilities.SWING_UTILITIES.createPadding(155, SwingConstants.HORIZONTAL));
         buttonGroup2.add(optionsButtons[0]);
+        buttonGroup2.add(MyUtilities.SWING_UTILITIES.createPadding(115, SwingConstants.HORIZONTAL));
         
         JPanel toolOptionsPanel = new JPanel();
         toolOptionsPanel.setLayout(new BoxLayout(toolOptionsPanel, BoxLayout.Y_AXIS));

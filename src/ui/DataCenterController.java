@@ -151,7 +151,7 @@ public class DataCenterController extends GraphicsController {
             public void actionPerformed(ActionEvent e) {
                 // needs to prompt the file chooser
                 JFileChooser fileChooser = new JFileChooser();
-                fileChooser.setCurrentDirectory(new java.io.File("."));
+                fileChooser.setCurrentDirectory(new File("."));
                 fileChooser.setDialogTitle("Choose Data Folder...");
                 fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
                 fileChooser.setAcceptAllFileFilterUsed(false);

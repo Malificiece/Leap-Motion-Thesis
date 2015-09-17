@@ -191,6 +191,9 @@ public class LeapKeyboard extends IKeyboard implements LeapObserver, Calibration
                     leapPoint.setNormalizedPoint(point);
                 }
             } else {
+            	// TODO: If Keyboard is LEAP_AIR_STATIC then we need to increase the
+            	// touch threshold after the first detected touch. This will prevent
+            	// the "skimming" issue.
                 isTouching = leapPlane.isTouching();
             }
             
