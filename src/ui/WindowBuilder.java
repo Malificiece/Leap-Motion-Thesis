@@ -75,10 +75,10 @@ public class WindowBuilder {
         subjectButtonsPanel.add(optionsButtons[2]);
         subjectButtonsPanel.add(Box.createVerticalGlue());
         subjectButtonsPanel.add(Box.createVerticalGlue());
-        subjectButtonsPanel.add(optionsButtons[7]);
-        subjectButtonsPanel.add(Box.createVerticalGlue());
-        subjectButtonsPanel.add(Box.createVerticalGlue());
         subjectButtonsPanel.add(optionsButtons[8]);
+        subjectButtonsPanel.add(Box.createVerticalGlue());
+        subjectButtonsPanel.add(Box.createVerticalGlue());
+        subjectButtonsPanel.add(optionsButtons[7]);
         
         // Build layout for Test Select area
         background.add(MyUtilities.SWING_UTILITIES.createPadding(10, SwingConstants.VERTICAL));
