@@ -1,0 +1,38 @@
+SUBJECT_ID: 2mdcthnn
+tablet_DISCOMFORT_LEVEL: disagree
+tablet_FATIGUE_LEVEL: strongly disagree
+tablet_DIFFICULTY_LEVEL: strongly disagree
+leapSurface_DISCOMFORT_LEVEL: strongly disagree
+leapSurface_FATIGUE_LEVEL: strongly disagree
+leapSurface_DIFFICULTY_LEVEL: neutral
+leapAirPinch_DISCOMFORT_LEVEL: agree
+leapAirPinch_FATIGUE_LEVEL: strongly disagree
+leapAirPinch_DIFFICULTY_LEVEL: agree
+leapAirBimodal_DISCOMFORT_LEVEL: disagree
+leapAirBimodal_FATIGUE_LEVEL: strongly disagree
+leapAirBimodal_DIFFICULTY_LEVEL: agree
+leapAirStatic_DISCOMFORT_LEVEL: neutral
+leapAirStatic_FATIGUE_LEVEL: agree
+leapAirStatic_DIFFICULTY_LEVEL: neutral
+leapAirDynamic_DISCOMFORT_LEVEL: strongly disagree
+leapAirDynamic_FATIGUE_LEVEL: disagree
+leapAirDynamic_DIFFICULTY_LEVEL: strongly disagree
+AGE: 22
+GENDER: Male
+MAJOR: Computer Science
+HAS_PERSONAL_COMPUTER: Yes
+HOURS_PER_WEEK_ON_COMPUTER: More than 50 hours
+HAS_PREVIOUS_GESTURE_DEVICE_EXPERIENCE: Yes
+PREVIOUS_GESTURE_DEVICE_DESCRIPTION: MYO, Kinect, Wii
+HAS_PREVIOUS_TOUCH_DEVICE_EXPERIENCE: Yes
+PREVIOUS_TOUCH_DEVICE_DESCRIPTION: iPad, Surface, Android and IOS smartphones,Laptops with touch screens
+HAS_PREVIOUS_SWIPE_DEVICE_EXPERIENCE: No
+HAS_PHYSICAL_IMPAIRMENT: No
+HANDEDNESS: Right hand
+PREFERED_HANDEDNESS_FOR_EXPERIMENT: Right hand
+tablet_PREFERENCE_RANKING: 1
+leapSurface_PREFERENCE_RANKING: 2
+leapAirStatic_PREFERENCE_RANKING: 6
+leapAirPinch_PREFERENCE_RANKING: 5
+leapAirDynamic_PREFERENCE_RANKING: 3
+leapAirBimodal_PREFERENCE_RANKING: 4
