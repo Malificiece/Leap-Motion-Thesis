@@ -339,7 +339,7 @@ public class LeapKeyboard extends IKeyboard implements LeapObserver, Calibration
         try {
             LeapListener.removeObserver(this);
             LeapListener.stopListening();
-            System.out.println(KEYBOARD_NAME + " - Loading playback settings from " + playbackManager.getFilePath() + KEYBOARD_FILE_NAME + FileExt.INI.getExt());
+            System.out.println(KEYBOARD_NAME + " - Loading playback settings from " + playbackManager.getFilePath() + "\\" + KEYBOARD_FILE_NAME + FileExt.INI.getExt());
             try {
                 MyUtilities.FILE_IO_UTILITIES.readSettingsAndAttributesFromFile(playbackManager.getFilePath(), KEYBOARD_FILE_NAME + FileExt.INI.getExt(), this);
             } catch (IOException e) {

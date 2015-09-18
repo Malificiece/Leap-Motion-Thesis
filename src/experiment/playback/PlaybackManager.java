@@ -53,7 +53,7 @@ public class PlaybackManager {
 	public PlaybackManager(boolean repeat, File file) {
 	    isTutorial = false;
 	    isRepeating = repeat;
-	    FILE_PATH = file.getPath();
+	    FILE_PATH = file.getParent();
 	       try {
 	            ArrayList<String> fileData = MyUtilities.FILE_IO_UTILITIES.readListFromFile(file);
 	            parseFileData(fileData);
