@@ -11,6 +11,7 @@ public enum FilePath {
     //TABLET("tablet/"),
     //CONTROLLER("controller/");
 
+    //private final static String WORKING_DIRECTORY = System.getProperty("user.dir");
     private final String path;
     
     private FilePath(String path) {
@@ -18,6 +19,7 @@ public enum FilePath {
     }
     
     public String getPath() {
-        return path;
+        //return WORKING_DIRECTORY + path;
+    	return path;
     }
 }

@@ -1,0 +1,37 @@
+SUBJECT_ID: 96cgksvs
+leapAirStatic_DISCOMFORT_LEVEL: neutral
+leapAirStatic_FATIGUE_LEVEL: disagree
+leapAirStatic_DIFFICULTY_LEVEL: agree
+leapAirDynamic_DISCOMFORT_LEVEL: disagree
+leapAirDynamic_FATIGUE_LEVEL: disagree
+leapAirDynamic_DIFFICULTY_LEVEL: disagree
+tablet_DISCOMFORT_LEVEL: strongly disagree
+tablet_FATIGUE_LEVEL: disagree
+tablet_DIFFICULTY_LEVEL: disagree
+leapSurface_DISCOMFORT_LEVEL: disagree
+leapSurface_FATIGUE_LEVEL: disagree
+leapSurface_DIFFICULTY_LEVEL: disagree
+leapAirPinch_DISCOMFORT_LEVEL: disagree
+leapAirPinch_FATIGUE_LEVEL: disagree
+leapAirPinch_DIFFICULTY_LEVEL: disagree
+leapAirBimodal_DISCOMFORT_LEVEL: strongly disagree
+leapAirBimodal_FATIGUE_LEVEL: disagree
+leapAirBimodal_DIFFICULTY_LEVEL: disagree
+AGE: 21
+GENDER: Female
+MAJOR: Conputer Science
+HAS_PERSONAL_COMPUTER: Yes
+HOURS_PER_WEEK_ON_COMPUTER: More than 50 hours
+HAS_PREVIOUS_GESTURE_DEVICE_EXPERIENCE: No
+HAS_PREVIOUS_TOUCH_DEVICE_EXPERIENCE: Yes
+PREVIOUS_TOUCH_DEVICE_DESCRIPTION: iPad, Smartphone
+HAS_PREVIOUS_SWIPE_DEVICE_EXPERIENCE: No
+HAS_PHYSICAL_IMPAIRMENT: No
+HANDEDNESS: Right hand
+PREFERED_HANDEDNESS_FOR_EXPERIMENT: Right hand
+tablet_PREFERENCE_RANKING: 3
+leapSurface_PREFERENCE_RANKING: 1
+leapAirStatic_PREFERENCE_RANKING: 6
+leapAirPinch_PREFERENCE_RANKING: 4
+leapAirDynamic_PREFERENCE_RANKING: 5
+leapAirBimodal_PREFERENCE_RANKING: 2

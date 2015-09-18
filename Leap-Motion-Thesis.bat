@@ -1,0 +1,1 @@
+cmd /c start H:\jre1.8.0_60\bin\java.exe -Duser.dir=H:\git\Leap-Motion-Thesis -Djava.library.path=H:\git\Leap-Motion-Thesis\libs\ -jar H:\git\Leap-Motion-Thesis\Leap-Motion-Thesis.jar

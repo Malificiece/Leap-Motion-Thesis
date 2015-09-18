@@ -34,7 +34,7 @@ leapAirBimodal_DIFFICULTY_LEVEL: strongly disagree
 controller_PREFERENCE_RANKING: 6
 leapSurface_PREFERENCE_RANKING: 3
 leapAirStatic_PREFERENCE_RANKING: 5
-leapAirPinch_PREFERENCE_RANKING: 7
+leapAirPinch_PREFERENCE_RANKING: 6
 leapAirDynamic_PREFERENCE_RANKING: 4
 leapAirBimodal_PREFERENCE_RANKING: 1
 tablet_DISCOMFORT_LEVEL: strongly disagree
