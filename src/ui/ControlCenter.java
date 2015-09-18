@@ -58,6 +58,7 @@ public class ControlCenter {
     private JTextField subjectField;
     private String subjectID;
     private JComboBox<String> testTypeComboBox;
+    private JLabel testsFinishedLabel;
     private JButton editSubjectIDButton;
     private JButton randomizeSubjectIDButton;
     private JButton browseSubjectIDButton;
@@ -78,6 +79,7 @@ public class ControlCenter {
         subjectID = generateSubjectID();
         subjectField = new JTextField(subjectID, 10);
         testTypeComboBox = new JComboBox<String>();
+        testsFinishedLabel = new JLabel();
         editSubjectIDButton = new JButton("Edit");
         randomizeSubjectIDButton = new JButton("Randomize");
         browseSubjectIDButton = new JButton("Browse...");
@@ -93,7 +95,7 @@ public class ControlCenter {
         		likertSurveyButton, randomizeSubjectIDButton, browseSubjectIDButton};
         
         // Window builder builds window using important fields here. It adds unimportant fields that we won't use for aesthetics only.
-        WindowBuilder.buildControlWindow(frame, testTypeComboBox, subjectField, buttons);
+        WindowBuilder.buildControlWindow(frame, testTypeComboBox, subjectField, buttons, testsFinishedLabel);
         testTypeComboBox.setRenderer(new ComboBoxRenderer(testTypeComboBox));
         subjectField.setDocument(new AlphaNumericOnlyDocument());
         subjectField.setText(subjectID);
@@ -619,6 +621,7 @@ public class ControlCenter {
         
         public void updateSubjectID(JComboBox<String> comboBox, String subjectID) {
             String filePath = FilePath.RECORDED_DATA.getPath() + subjectID + "/";
+            int numFinished = 0;
             for(int i = 0; i < comboBox.getItemCount(); i++) {
                 String wildcardFileName = subjectID + "_" + fileNames.get(i) + FileUtilities.WILDCARD + FileExt.PLAYBACK.getExt();
                 boolean fileExists;
@@ -630,7 +633,9 @@ public class ControlCenter {
                     e.printStackTrace();
                 }
                 dataExists.put(comboBox.getItemAt(i).toString(), fileExists);
+                if(fileExists) numFinished++;
             }
+            testsFinishedLabel.setText(numFinished + "/" + comboBox.getItemCount());
         }
         
         public boolean dataExists(String value) {

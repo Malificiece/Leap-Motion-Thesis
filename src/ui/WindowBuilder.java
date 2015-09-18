@@ -43,7 +43,8 @@ public class WindowBuilder {
     public static void buildControlWindow(JFrame frame,
             JComboBox<String> testComboBox,
             JTextField subjectField,
-            JButton[] optionsButtons) { // calibrate, run, edit, exit, dictionary, formatter, likert, randomize, browse
+            JButton[] optionsButtons, // calibrate, run, edit, exit, dictionary, formatter, likert, randomize, browse
+            JLabel testsFinishedLabel) {
         
         JPanel background = new JPanel();
         background.setLayout(new BoxLayout(background, BoxLayout.Y_AXIS));
@@ -100,7 +101,12 @@ public class WindowBuilder {
         JPanel buttonGroup0 = new JPanel();
         testPanel.add(buttonGroup0);
         optionsButtons[6].setEnabled(false);
+        buttonGroup0.add(MyUtilities.SWING_UTILITIES.createPadding(80, SwingConstants.HORIZONTAL));
         buttonGroup0.add(optionsButtons[6]);
+        buttonGroup0.add(MyUtilities.SWING_UTILITIES.createPadding(55, SwingConstants.HORIZONTAL));
+        testsFinishedLabel.setFont(new Font(testsFinishedLabel.getName(), Font.PLAIN, 10));
+        testsFinishedLabel.setText(0 + "/" + testComboBox.getItemCount());
+        buttonGroup0.add(testsFinishedLabel);
         
         // Build layout for calibration and run buttons
         background.add(MyUtilities.SWING_UTILITIES.createPadding(10, SwingConstants.VERTICAL));

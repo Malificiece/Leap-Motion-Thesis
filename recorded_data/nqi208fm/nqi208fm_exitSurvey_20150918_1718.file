@@ -1,0 +1,38 @@
+SUBJECT_ID: nqi208fm
+leapAirBimodal_DISCOMFORT_LEVEL: neutral
+leapAirBimodal_FATIGUE_LEVEL: agree
+leapAirBimodal_DIFFICULTY_LEVEL: disagree
+leapAirStatic_DISCOMFORT_LEVEL: neutral
+leapAirStatic_FATIGUE_LEVEL: neutral
+leapAirStatic_DIFFICULTY_LEVEL: disagree
+leapAirDynamic_DISCOMFORT_LEVEL: neutral
+leapAirDynamic_FATIGUE_LEVEL: neutral
+leapAirDynamic_DIFFICULTY_LEVEL: strongly disagree
+tablet_DISCOMFORT_LEVEL: strongly disagree
+tablet_FATIGUE_LEVEL: strongly disagree
+tablet_DIFFICULTY_LEVEL: strongly disagree
+leapSurface_DISCOMFORT_LEVEL: strongly disagree
+leapSurface_FATIGUE_LEVEL: strongly disagree
+leapSurface_DIFFICULTY_LEVEL: strongly disagree
+leapAirPinch_DISCOMFORT_LEVEL: strongly disagree
+leapAirPinch_FATIGUE_LEVEL: strongly disagree
+leapAirPinch_DIFFICULTY_LEVEL: strongly disagree
+AGE: 18
+GENDER: Male
+MAJOR: Computer Science
+HAS_PERSONAL_COMPUTER: Yes
+HOURS_PER_WEEK_ON_COMPUTER: 6 to 10 hours
+HAS_PREVIOUS_GESTURE_DEVICE_EXPERIENCE: No
+HAS_PREVIOUS_TOUCH_DEVICE_EXPERIENCE: Yes
+PREVIOUS_TOUCH_DEVICE_DESCRIPTION: Andriod S5 Smartphone
+HAS_PREVIOUS_SWIPE_DEVICE_EXPERIENCE: Yes
+PREVIOUS_SWIPE_DEVICE_DESCRIPTION: Andriod S5 Smartphone
+HAS_PHYSICAL_IMPAIRMENT: No
+HANDEDNESS: Right hand
+PREFERED_HANDEDNESS_FOR_EXPERIMENT: Right hand
+tablet_PREFERENCE_RANKING: 3
+leapSurface_PREFERENCE_RANKING: 1
+leapAirStatic_PREFERENCE_RANKING: 6
+leapAirPinch_PREFERENCE_RANKING: 2
+leapAirDynamic_PREFERENCE_RANKING: 4
+leapAirBimodal_PREFERENCE_RANKING: 5
