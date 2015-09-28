@@ -14,7 +14,7 @@ public enum FileName {
     SWIPE("swipe"),
     EXIT_SURVEY("exitSurvey"),
     SUBJECT_MERGED_DATA("mergedData"),
-    CONSOLIDATED_PILOT_DATA("consolidatedPilotData"),
+    CONSOLIDATED_EXPERIMENT_DATA("consolidatedExperimentData"),
     KEYBOARD_IMAGE("_keyboard"),
     KEYBOARD_IMAGE_UPPER("_keyboard_upper"),
     DICTIONARY("English-US"),

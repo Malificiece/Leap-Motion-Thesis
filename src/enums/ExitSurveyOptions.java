@@ -68,7 +68,7 @@ public enum ExitSurveyOptions {
             case NO:
                 return 0;
             default:
-                return 0;
+                return -999;
         }
     }
 }

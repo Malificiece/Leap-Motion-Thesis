@@ -2,9 +2,18 @@ package experiment.data.formatter;
 
 import java.io.File;
 import java.io.IOException;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.Locale;
+import java.util.Map;
 import java.util.Map.Entry;
+import java.util.TreeMap;
 
 import javax.swing.JButton;
 import javax.swing.SwingUtilities;
@@ -60,103 +69,207 @@ public class DataFormatter implements Runnable {
     }
     
     private void consolidate() {
+        // Sort the order of the subjects by their dates first.
+        ArrayList<File> subjectDirectories = new ArrayList<File>();
+        {
+            HashMap<File, Date> dateMap = new HashMap<File, Date>();
+            DateComparator dateComparator = new DateComparator(dateMap);
+            TreeMap<File, Date> sortedMap = new TreeMap<File, Date>(dateComparator);
+            for(File subjectDirectory: directory.listFiles()) {
+                String subjectID = subjectDirectory.getName();
+                if(subjectDirectory.isDirectory() && !TUTORIAL.equals(subjectID)) {
+                    for(File file: subjectDirectory.listFiles()) {
+                        if(file.getName().contains(FileName.EXIT_SURVEY.getName())) {
+                            // Remove extraneous text from filename.
+                            String fileName = file.getName();
+                            fileName = fileName.replace(subjectID + "_" + FileName.EXIT_SURVEY.getName() + "_", "");
+                            fileName = fileName.replace(FileExt.FILE.getExt(), "");
+                            
+                            // Parse date with format "yyyyMMdd_kkmm"
+                            DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd_kkmm", Locale.ENGLISH);
+                            Date date = null;
+                            try {
+                                date = dateFormat.parse(fileName);
+                            } catch (ParseException e) {
+                                e.printStackTrace();
+                            }  
+                            dateMap.put(subjectDirectory, date);
+                        }
+                    }
+                }
+            }
+            sortedMap.putAll(dateMap);
+            subjectDirectories.addAll(sortedMap.keySet());
+        }
+
         // Go through each subject and then consolidate their data and put it into one .m file.
         LinkedHashMap<String, String> consolidatedData = new LinkedHashMap<String, String>();
+        LinkedHashMap<String, String> exitSurveyData = new LinkedHashMap<String, String>();
         String subjectOrder = null;
-        for(File subjectDirectory: directory.listFiles()) {
+        for(File subjectDirectory: subjectDirectories) {
             String subjectID = subjectDirectory.getName();
-            if(subjectDirectory.isDirectory() && !TUTORIAL.equals(subjectID)) {
-                String keyboardName = null;
-                if(subjectOrder == null) {
-                    subjectOrder = "'" + subjectID + "'";
-                } else {
-                    subjectOrder += ", '" + subjectID + "'";
-                }
-                // Read the merged data file
-                try {
-                    String fileName = subjectID + "_" + FileName.SUBJECT_MERGED_DATA.getName() + FileExt.DAT.getExt();
-                    ArrayList<String> fileContents = MyUtilities.FILE_IO_UTILITIES.readListFromFile(subjectDirectory.getPath() + "\\", fileName);
-                    for(String line: fileContents) {
-                        // Remove whitespace from line and then delimit the string based on semicolon.
-                        line = line.replaceAll("\\s+|\\[|\\]", "");
-                        // Delimit by colon to break into data type, value pair.
-                        String[] dataInfo = line.split(":");
-                        
-                        // Want to get the data type and data value unless it's a time value.
-                        StatisticDataType dataType = StatisticDataType.getByName(dataInfo[0]);
-                        
-                        if(dataType == StatisticDataType.KEYBOARD_TYPE) {
-                            // assign current keyboard here
-                            keyboardName = dataInfo[1];
-                        } else if(dataType != StatisticDataType.WORD_ORDER) {
-                            String key = keyboardName + "_" + dataType.name();
-                            String value = consolidatedData.get(key);
-                            /*if(value != null) {
-                                consolidatedData.put(key, value + "; " + dataInfo[1].replaceAll(",", "; "));
-                            } else {
-                                consolidatedData.put(key, dataInfo[1].replaceAll(",", "; "));
-                            }*/
-                            String [] values = dataInfo[1].split(",");
-                            float average = 0;
-                            for(String s: values) {
-                                float v = Float.parseFloat(s);
-                                average += v;
-                            }
-                            average /= values.length;
-                            if(value != null) {
-                                consolidatedData.put(key, value + "; " + average);
-                            } else {
-                                consolidatedData.put(key, "" + average);
-                            }
+            String keyboardName = null;
+            if(subjectOrder == null) {
+                subjectOrder = "'" + subjectID + "'";
+            } else {
+                subjectOrder += ", '" + subjectID + "'";
+            }
+            // Read the merged data file
+            try {
+                String fileName = subjectID + "_" + FileName.SUBJECT_MERGED_DATA.getName() + FileExt.DAT.getExt();
+                ArrayList<String> fileContents = MyUtilities.FILE_IO_UTILITIES.readListFromFile(subjectDirectory.getPath() + "\\", fileName);
+                for(String line: fileContents) {
+                    // Remove whitespace from line and then delimit the string based on semicolon.
+                    line = line.replaceAll("\\s+|\\[|\\]", "");
+                    // Delimit by colon to break into data type, value pair.
+                    String[] dataInfo = line.split(":");
+                    
+                    // Want to get the data type and data value unless it's a time value.
+                    StatisticDataType dataType = StatisticDataType.getByName(dataInfo[0]);
+                    
+                    if(dataType == StatisticDataType.KEYBOARD_TYPE) {
+                        // assign current keyboard here
+                        keyboardName = dataInfo[1];
+                    } else if(dataType != StatisticDataType.WORD_ORDER) {
+                        String key = keyboardName + "_" + dataType.name();
+                        String value = consolidatedData.get(key);
+                        /*if(value != null) {
+                            consolidatedData.put(key, value + "; " + dataInfo[1].replaceAll(",", "; "));
+                        } else {
+                            consolidatedData.put(key, dataInfo[1].replaceAll(",", "; "));
+                        }*/
+                        String [] values = dataInfo[1].split(",");
+                        float average = 0;
+                        for(String s: values) {
+                            float v = Float.parseFloat(s);
+                            average += v;
+                        }
+                        average /= values.length;
+                        if(value != null) {
+                            consolidatedData.put(key, value + "; " + average);
+                        } else {
+                            consolidatedData.put(key, "" + average);
                         }
                     }
-                } catch (IOException e) {
-                    e.printStackTrace();
-                    System.out.println("There was an error while trying to read from file for: " + subjectID);
                 }
-                // Read the exit survey file
-                try {
-                    String fileName = subjectID + "_" + FileName.EXIT_SURVEY.getName() + FileUtilities.WILDCARD + FileExt.FILE.getExt();
-                    ArrayList<String> fileContents = MyUtilities.FILE_IO_UTILITIES.readListFromWildcardFile(subjectDirectory.getPath() + "\\", fileName);
-                    for(String line: fileContents) {
-                        // Delimit by colon to break into data type, value pair.
-                        String[] dataInfo = line.split(": ");
-                        
-                        // Want to get the data type and data value unless it's a time value.
-                        ExitSurveyDataType dataType = ExitSurveyDataType.getByName(dataInfo[0]);
-
-                        if(ExitSurveyDataType.isLikert(dataType)) {
-                            String key = dataInfo[0];
-                            String value = consolidatedData.get(key);
-                            int numeric = ExitSurveyOptions.getNumericValuebyDescription(dataInfo[1]);
-                            if(value != null) {
-                                consolidatedData.put(key, value + "; " + numeric);
-                            } else {
-                                consolidatedData.put(key, "" + numeric);
+            } catch (IOException e) {
+                e.printStackTrace();
+                System.out.println("There was an error while trying to read from file for: " + subjectID);
+            }
+            // Read the exit survey file
+            try {
+                String fileName = subjectID + "_" + FileName.EXIT_SURVEY.getName() + FileUtilities.WILDCARD + FileExt.FILE.getExt();
+                ArrayList<String> fileContents = MyUtilities.FILE_IO_UTILITIES.readListFromWildcardFile(subjectDirectory.getPath() + "\\", fileName);
+                for(String line: fileContents) {
+                    // Delimit by colon to break into data type, value pair.
+                    String[] dataInfo = line.split(": ");
+                    
+                    // Want to get the data type and data value unless it's a time value.
+                    ExitSurveyDataType dataType = ExitSurveyDataType.getByName(dataInfo[0]);
+                    
+                    if(ExitSurveyDataType.isLikert(dataType)) {
+                        String key = dataInfo[0];
+                        String value = consolidatedData.get(key);
+                        int numeric = ExitSurveyOptions.getNumericValuebyDescription(dataInfo[1]);
+                        if(value != null) {
+                            consolidatedData.put(key, value + "; " + numeric);
+                        } else {
+                            consolidatedData.put(key, "" + numeric);
+                        }
+                    } else if(ExitSurveyDataType.isRanking(dataType)) {
+                        String key = dataInfo[0];
+                        String value = consolidatedData.get(key);
+                        if(value != null) {
+                            consolidatedData.put(key, value + "; " + dataInfo[1]);
+                        } else {
+                            consolidatedData.put(key, dataInfo[1]);
+                        }
+                    } else {
+                        String key = dataInfo[0];
+                        String value = exitSurveyData.get(key);
+                        switch(dataType) {
+                            case AGE:
+                                if(value != null) {
+                                    exitSurveyData.put(key, value + "; " + dataInfo[1]);
+                                } else {
+                                    exitSurveyData.put(key, dataInfo[1]);
+                                }
+                                break;
+                            case GENDER:
+                                if(value != null) {
+                                    exitSurveyData.put(key, value + "; " + dataInfo[1]);
+                                } else {
+                                    exitSurveyData.put(key, dataInfo[1]);
+                                }
+                                break;
+                            case HANDEDNESS:
+                                if(value != null) {
+                                    exitSurveyData.put(key, value + "; " + dataInfo[1]);
+                                } else {
+                                    exitSurveyData.put(key, dataInfo[1]);
+                                }
+                                break;
+                            case HAS_PHYSICAL_IMPAIRMENT:
+                            {
+                                int numeric = ExitSurveyOptions.getNumericValuebyDescription(dataInfo[1]);
+                                if(value != null) {
+                                    exitSurveyData.put(key, value + "; " + numeric);
+                                } else {
+                                    exitSurveyData.put(key,  "" + numeric);
+                                }
                             }
-                        } else if(ExitSurveyDataType.isRanking(dataType)) {
-                            String key = dataInfo[0];
-                            String value = consolidatedData.get(key);
-                            if(value != null) {
-                                consolidatedData.put(key, value + "; " + dataInfo[1]);
-                            } else {
-                                consolidatedData.put(key, dataInfo[1]);
+                                break;
+                            case HAS_PREVIOUS_GESTURE_DEVICE_EXPERIENCE:
+                            {
+                                int numeric = ExitSurveyOptions.getNumericValuebyDescription(dataInfo[1]);
+                                if(value != null) {
+                                    exitSurveyData.put(key, value + "; " + numeric);
+                                } else {
+                                    exitSurveyData.put(key,  "" + numeric);
+                                }
                             }
-                        } else if(dataType == ExitSurveyDataType.HAS_PREVIOUS_SWIPE_DEVICE_EXPERIENCE) {
-                            String key = dataInfo[0];
-                            String value = consolidatedData.get(key);
-                            int numeric = ExitSurveyOptions.getNumericValuebyDescription(dataInfo[1]);
-                            if(value != null) {
-                                consolidatedData.put(key, value + "; " + numeric);
-                            } else {
-                                consolidatedData.put(key,  "" + numeric);
+                                break;
+                            case HAS_PREVIOUS_SWIPE_DEVICE_EXPERIENCE:
+                            {
+                                int numeric = ExitSurveyOptions.getNumericValuebyDescription(dataInfo[1]);
+                                if(value != null) {
+                                    exitSurveyData.put(key, value + "; " + numeric);
+                                } else {
+                                    exitSurveyData.put(key,  "" + numeric);
+                                }
                             }
+                                break;
+                            case HAS_PREVIOUS_TOUCH_DEVICE_EXPERIENCE:
+                            {
+                                int numeric = ExitSurveyOptions.getNumericValuebyDescription(dataInfo[1]);
+                                if(value != null) {
+                                    exitSurveyData.put(key, value + "; " + numeric);
+                                } else {
+                                    exitSurveyData.put(key,  "" + numeric);
+                                }
+                            }
+                                break;
+                            case HOURS_PER_WEEK_ON_COMPUTER:
+                                if(value != null) {
+                                    exitSurveyData.put(key, value + "; " + dataInfo[1]);
+                                } else {
+                                    exitSurveyData.put(key, dataInfo[1]);
+                                }
+                                break;
+                            case PREFERED_HANDEDNESS_FOR_EXPERIMENT:
+                                if(value != null) {
+                                    exitSurveyData.put(key, value + "; " + dataInfo[1]);
+                                } else {
+                                    exitSurveyData.put(key, dataInfo[1]);
+                                }
+                                break;
+                            default: break;
                         }
                     }
-                } catch (IOException e) {
-                    e.printStackTrace();
-                    System.out.println("There was an error while trying to read from file for: " + subjectID);
                 }
+            } catch (IOException e) {
+                e.printStackTrace();
+                System.out.println("There was an error while trying to read from file for: " + subjectID);
             }
         }
         LinkedHashMap<String, ArrayList<Float>> standardDeviations = new LinkedHashMap<String, ArrayList<Float>>();
@@ -221,8 +334,7 @@ public class DataFormatter implements Runnable {
             }
         }
         matrices.put(StatisticDataType.SUBJECT_ORDER.name(), subjectOrder);
-        matrices.put(ExitSurveyDataType.HAS_PREVIOUS_SWIPE_DEVICE_EXPERIENCE.name(),
-                consolidatedData.get(ExitSurveyDataType.HAS_PREVIOUS_SWIPE_DEVICE_EXPERIENCE.name()));
+        matrices.putAll(exitSurveyData);
         
         ArrayList<Entry<String, ArrayList<Float>>> meanEntries = new ArrayList<Entry<String, ArrayList<Float>>>(means.entrySet());
         ArrayList<Entry<String, ArrayList<Float>>> sdEntries = new ArrayList<Entry<String, ArrayList<Float>>>(standardDeviations.entrySet());
@@ -413,7 +525,7 @@ public class DataFormatter implements Runnable {
             }
             data.add("\n% Anovas");
             
-            String fileName = FileName.CONSOLIDATED_PILOT_DATA.getName() + FileExt.MATLAB.getExt();
+            String fileName = FileName.CONSOLIDATED_EXPERIMENT_DATA.getName() + FileExt.MATLAB.getExt();
             MyUtilities.FILE_IO_UTILITIES.writeListToFile(data, directory.getPath() + "\\", fileName, false);
         } catch (IOException e) {
             e.printStackTrace();
@@ -435,9 +547,9 @@ public class DataFormatter implements Runnable {
                             ArrayList<String> fileContents = MyUtilities.FILE_IO_UTILITIES.readListFromWildcardFile(subjectDirectory.getPath() + "\\", wildcardFileName);
                             ArrayList<PlaybackFileData> fileData = parsePlaybackFileContents(fileContents);
                             switch(keyboard) {
-                                case CONTROLLER_CONSOLE:
+                                /*case CONTROLLER_CONSOLE:
                                     subjectData.addAll(calculateSubjectDataController(fileData, iKeyboard));
-                                    break;
+                                    break;*/
                                 case TABLET:
                                     subjectData.addAll(calculateSubjectData(fileData, iKeyboard));
                                     break;
@@ -475,7 +587,7 @@ public class DataFormatter implements Runnable {
         }
     }
     
-    private ArrayList<String> calculateSubjectDataController(ArrayList<PlaybackFileData> fileData, IKeyboard keyboard) {
+    /*private ArrayList<String> calculateSubjectDataController(ArrayList<PlaybackFileData> fileData, IKeyboard keyboard) {
         SimulateController simulateController = new SimulateController(keyboard);
         ArrayList<String> subjectData = new ArrayList<String>();
         subjectData.add(StatisticDataType.KEYBOARD_TYPE.name() + ": " + keyboard.getFileName());
@@ -768,7 +880,7 @@ public class DataFormatter implements Runnable {
                         System.out.print(virtualKeyboard.getNearestKeyNoEnter(v, 9999).getKey().getValue() + " ");
                     }
                     System.out.println();
-                    System.out.println("------------------------------------------------------------------------------");*/
+                    System.out.println("------------------------------------------------------------------------------");*//*
                     frechetDistanceArray.add(MyUtilities.MATH_UTILITILES.calculateFrechetDistance(
                             takenPath.toArray(new Vector[takenPath.size()]),
                             expectedPath.toArray(new Vector[expectedPath.size()])));
@@ -838,7 +950,7 @@ public class DataFormatter implements Runnable {
         subjectData.add(StatisticDataType.FRECHET_DISTANCE_TOUCH_ONLY_MODIFIED_SHORTEST.name() + ": " + modShortFrechetDistanceArray.toString());
         subjectData.add(StatisticDataType.FRECHET_DISTANCE_TOUCH_ONLY_MODIFIED_BACKSPACE.name() + ": " + modBackspaceFrechetDistanceArray.toString());
         return subjectData;
-    }
+    }*/
     
     private ArrayList<String> calculateSubjectData(ArrayList<PlaybackFileData> fileData, IKeyboard keyboard) {
         ArrayList<String> subjectData = new ArrayList<String>();
@@ -1072,6 +1184,11 @@ public class DataFormatter implements Runnable {
                 }
                 
                 if(reportData) {
+                    // There is a weird situation that requires this to fire, but this is the correct fix.
+                    if(timeDurationShort == 0) {
+                        timeDurationShort = timeDuration;
+                    }
+                    
                     wordList.add(currentWord);
                     planeBreachedCountArray.add(planeBreachedCount);
                     distanceTraveledArray.add(distanceTraveled *= PIXEL_TO_CENTIMETER);
@@ -1166,6 +1283,8 @@ public class DataFormatter implements Runnable {
                     backspaceINF = 0f;
                     backspaceIF = 0f;
                     //backspaceF = 0f;
+                    detectedShortestComplete = false;
+                    lastEnterAfterShortestComplete = false;
                 }
             }
         }
@@ -1305,6 +1424,23 @@ public class DataFormatter implements Runnable {
                 return eventData.get(eventIndex++);
             }
             return null;
+        }
+    }
+    
+    private class DateComparator implements Comparator<File> {
+
+        Map<File, Date> base;
+        public DateComparator(Map<File, Date> base) {
+            this.base = base;
+        }
+   
+        // Note: this comparator imposes orderings that are inconsistent with equals.
+        public int compare(File a, File b) {
+            if (base.get(a).after(base.get(b))) {
+                return 1;
+            } else {
+                return -1;
+            } // returning 0 would merge keys
         }
     }
 }
