@@ -2,7 +2,6 @@ package keyboard.controller;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -27,8 +26,6 @@ import keyboard.renderables.KeyboardGestures;
 import keyboard.renderables.VirtualKeyboard;
 import enums.Attribute;
 import enums.Direction;
-import enums.FileExt;
-import enums.FilePath;
 import enums.Gesture;
 import enums.Key;
 import enums.KeyboardType;
@@ -65,14 +62,7 @@ public class ControllerKeyboard extends IKeyboard implements ControllerPlaybackO
         super(keyboardType);
         keyboardAttributes = new ControllerAttributes(this);
         keyboardSettings = new ControllerSettings(this);
-        System.out.println(KEYBOARD_NAME + " - Loading Settings from " + FilePath.CONFIG.getPath() + KEYBOARD_FILE_NAME + FileExt.INI.getExt());
-        try {
-            MyUtilities.FILE_IO_UTILITIES.readSettingsAndAttributesFromFile(FilePath.CONFIG.getPath(), KEYBOARD_FILE_NAME + FileExt.INI.getExt(), this);
-        } catch (IOException e) {
-            System.out.println("Error occured while reading settings from file. Using default values on unreached settings.");
-            e.printStackTrace();
-        }
-        System.out.println("-------------------------------------------------------");
+        this.loadDefaultSettings();
         keyboardRenderables = new ControllerRenderables(this);
         CAMERA_DISTANCE = keyboardAttributes.getAttributeAsFloat(Attribute.CAMERA_DISTANCE);
         keyboardSize = keyboardAttributes.getAttributeAsPoint(Attribute.KEYBOARD_SIZE);

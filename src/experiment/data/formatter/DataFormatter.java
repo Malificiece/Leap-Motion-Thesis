@@ -19,7 +19,10 @@ import javax.swing.JButton;
 import javax.swing.SwingUtilities;
 
 import keyboard.IKeyboard;
+import keyboard.leap.LeapKeyboard;
+import keyboard.renderables.LeapPlane;
 import keyboard.renderables.VirtualKeyboard;
+import leap.LeapListener;
 
 import com.leapmotion.leap.Vector;
 
@@ -43,7 +46,8 @@ public class DataFormatter implements Runnable {
         CALCULATE;
     }
     private final double SECOND_AS_NANO = 1000000000;
-    private final float PIXEL_TO_CENTIMETER = 0.0264583f;
+    private final float PIXEL_TO_CENTIMETER_TOUCH = 0.053039f;
+    private final float MILLIMETER_TO_CENTIMETER = 0.1f;
     private final String TUTORIAL = FileName.TUTORIAL.getName();
     private FormatProcessType type;
     private File directory;
@@ -551,22 +555,22 @@ public class DataFormatter implements Runnable {
                                     subjectData.addAll(calculateSubjectDataController(fileData, iKeyboard));
                                     break;*/
                                 case TABLET:
-                                    subjectData.addAll(calculateSubjectData(fileData, iKeyboard));
+                                    subjectData.addAll(calculateSubjectData(fileData, iKeyboard, subjectDirectory));
                                     break;
                                 case LEAP_SURFACE:
-                                    subjectData.addAll(calculateSubjectData(fileData, iKeyboard));
+                                    subjectData.addAll(calculateSubjectData(fileData, iKeyboard, subjectDirectory));
                                     break;
                                 case LEAP_AIR_STATIC:
-                                    subjectData.addAll(calculateSubjectData(fileData, iKeyboard));
+                                    subjectData.addAll(calculateSubjectData(fileData, iKeyboard, subjectDirectory));
                                     break;
                                 case LEAP_AIR_DYNAMIC:
-                                    subjectData.addAll(calculateSubjectData(fileData, iKeyboard));
+                                    subjectData.addAll(calculateSubjectData(fileData, iKeyboard, subjectDirectory));
                                     break;
                                 case LEAP_AIR_PINCH:
-                                    subjectData.addAll(calculateSubjectData(fileData, iKeyboard));
+                                    subjectData.addAll(calculateSubjectData(fileData, iKeyboard, subjectDirectory));
                                     break;
                                 case LEAP_AIR_BIMODAL:
-                                    subjectData.addAll(calculateSubjectData(fileData, iKeyboard));
+                                    subjectData.addAll(calculateSubjectData(fileData, iKeyboard, subjectDirectory));
                                     break;
                                 default: break;
                             }
@@ -952,10 +956,20 @@ public class DataFormatter implements Runnable {
         return subjectData;
     }*/
     
-    private ArrayList<String> calculateSubjectData(ArrayList<PlaybackFileData> fileData, IKeyboard keyboard) {
+    private ArrayList<String> calculateSubjectData(ArrayList<PlaybackFileData> fileData, IKeyboard keyboard, File subjectDirectory) {
         ArrayList<String> subjectData = new ArrayList<String>();
         subjectData.add(StatisticDataType.KEYBOARD_TYPE.name() + ": " + keyboard.getFileName());
         VirtualKeyboard virtualKeyboard = (VirtualKeyboard) keyboard.getRenderables().getRenderable(Renderable.VIRTUAL_KEYBOARD);
+        LeapPlane leapPlane = (LeapPlane) keyboard.getRenderables().getRenderable(Renderable.LEAP_PLANE);
+        
+        // We must load the settings that were used during the experiment for Leap Keyboards
+        if(keyboard.getType().isLeap()) {
+            File file = new File(subjectDirectory.getPath(), keyboard.getFileName() + FileExt.INI.getExt());
+            keyboard.loadSettings(file);
+            leapPlane.calculatePlaneData();
+            LeapListener.registerObserver((LeapKeyboard) keyboard);
+            LeapListener.startListening();
+        }
         
         // Arrays
         ArrayList<String> wordList = new ArrayList<String>();
@@ -1165,13 +1179,25 @@ public class DataFormatter implements Runnable {
                             takenPath.add(newPosition);
                             if(!lastEnterAfterShortestComplete) takenPathModifiedShortest.add(newPosition);
                             numberOfActionsCount++;
-                            handVelocity += 
-                                    (MyUtilities.MATH_UTILITILES.findDistanceToPoint(previousPosition, newPosition) * PIXEL_TO_CENTIMETER)
-                                    / ((currentLine.getTime() - previousTime) / SECOND_AS_NANO);
-                            // MOVED TO HERE
-                            distanceTraveled += MyUtilities.MATH_UTILITILES.findDistanceToPoint(previousPosition, newPosition);
+                            if(keyboard.getType().isLeap()) {
+                                // We must convert the coordinates from the leap keyboards into the original device coordinate space
+                                // so that we can get the actual hand movement speed and travel distance.
+                                Vector previousDevicePosition = leapPlane.denormalizePoint(new Vector(previousPosition));
+                                Vector newDevicePosition = leapPlane.denormalizePoint(new Vector(newPosition));
+                                // Device coordinates are in millimeter so they need to be converted to centimeter.
+                                handVelocity += 
+                                        (MyUtilities.MATH_UTILITILES.findDistanceToPoint(previousDevicePosition, newDevicePosition) * MILLIMETER_TO_CENTIMETER)
+                                        / ((currentLine.getTime() - previousTime) / SECOND_AS_NANO);
+                                distanceTraveled += (MyUtilities.MATH_UTILITILES.findDistanceToPoint(previousDevicePosition, newDevicePosition) * MILLIMETER_TO_CENTIMETER);
+                            } else {
+                                handVelocity += 
+                                        (MyUtilities.MATH_UTILITILES.findDistanceToPoint(previousPosition, newPosition) * PIXEL_TO_CENTIMETER_TOUCH)
+                                        / ((currentLine.getTime() - previousTime) / SECOND_AS_NANO);
+                                distanceTraveled += (MyUtilities.MATH_UTILITILES.findDistanceToPoint(previousPosition, newPosition) * PIXEL_TO_CENTIMETER_TOUCH);
+                            }
                         }
                         if(firstTouch && previousPosition != null) {
+                            // MOVED TO IS_TOUCHING SECTION
                             //distanceTraveled += MyUtilities.MATH_UTILITILES.findDistanceToPoint(previousPosition, newPosition);
                         }
                         previousPosition = newPosition;
@@ -1191,8 +1217,8 @@ public class DataFormatter implements Runnable {
                     
                     wordList.add(currentWord);
                     planeBreachedCountArray.add(planeBreachedCount);
-                    distanceTraveledArray.add(distanceTraveled *= PIXEL_TO_CENTIMETER);
-                    distanceTraveledShortArray.add(distanceTraveledShort *= PIXEL_TO_CENTIMETER);
+                    distanceTraveledArray.add(distanceTraveled);
+                    distanceTraveledShortArray.add(distanceTraveledShort);
                     timeDurationArray.add(timeDuration);
                     timeDurationShortArray.add(timeDurationShort);
                     handVelocityAvgArray.add(handVelocity / numberOfActionsCount);
@@ -1288,6 +1314,14 @@ public class DataFormatter implements Runnable {
                 }
             }
         }
+        
+        // Reload the default settings for the Leap Keyboards
+        if(keyboard.getType().isLeap()) {
+            keyboard.loadDefaultSettings();
+            LeapListener.removeObserver((LeapKeyboard) keyboard);
+            LeapListener.stopListening();
+        }
+        
         // stuff arrays into subject Data
         subjectData.add(StatisticDataType.WORD_ORDER.name() + ": " + wordList.toString());
         subjectData.add(StatisticDataType.NUMBER_OF_TIMES_PLANE_BREACHED.name() + ": " + planeBreachedCountArray.toString());

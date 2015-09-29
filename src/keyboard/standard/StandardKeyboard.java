@@ -8,7 +8,6 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
-import java.io.IOException;
 import java.util.concurrent.locks.ReentrantLock;
 
 import javax.media.opengl.GL2;
@@ -25,8 +24,6 @@ import com.leapmotion.leap.Vector;
 
 import utilities.MyUtilities;
 import enums.Attribute;
-import enums.FileExt;
-import enums.FilePath;
 import enums.Gesture;
 import enums.Direction;
 import enums.KeyboardType;
@@ -63,14 +60,7 @@ public class StandardKeyboard extends IKeyboard implements PlaybackObserver, Wor
         super(keyboardType);
         keyboardAttributes = new StandardAttributes(this);
         keyboardSettings = new StandardSettings(this);
-        System.out.println(KEYBOARD_NAME + " - Loading Settings from " + FilePath.CONFIG.getPath() + KEYBOARD_FILE_NAME + FileExt.INI.getExt());
-        try {
-            MyUtilities.FILE_IO_UTILITIES.readSettingsAndAttributesFromFile(FilePath.CONFIG.getPath(), KEYBOARD_FILE_NAME + FileExt.INI.getExt(), this);
-        } catch (IOException e) {
-            System.out.println("Error occured while reading settings from file. Using default values on unreached settings.");
-            e.printStackTrace();
-        }
-        System.out.println("-------------------------------------------------------");
+        this.loadDefaultSettings();
         keyboardRenderables = new StandardRenderables(this);
         keyboardSize = keyboardAttributes.getAttributeAsPoint(Attribute.KEYBOARD_SIZE);
         float borderSize = keyboardAttributes.getAttributeAsFloat(Attribute.BORDER_SIZE) * 2;

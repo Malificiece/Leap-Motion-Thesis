@@ -4,7 +4,6 @@ import swipe.SwipeKeyboard;
 import utilities.Point;
 
 import java.awt.event.ActionEvent;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -24,8 +23,6 @@ import com.leapmotion.leap.InteractionBox;
 import com.leapmotion.leap.Vector;
 
 import enums.Attribute;
-import enums.FileExt;
-import enums.FilePath;
 import enums.Gesture;
 import enums.Key;
 import enums.KeyboardType;
@@ -74,14 +71,7 @@ public class LeapKeyboard extends IKeyboard implements LeapObserver, Calibration
         super(keyboardType);
         keyboardAttributes = new LeapAttributes(this);
         keyboardSettings = new LeapSettings(this);
-        System.out.println(KEYBOARD_NAME + " - Loading Settings from " + FilePath.CONFIG.getPath() + KEYBOARD_FILE_NAME + FileExt.INI.getExt());
-        try {
-            MyUtilities.FILE_IO_UTILITIES.readSettingsAndAttributesFromFile(FilePath.CONFIG.getPath(), KEYBOARD_FILE_NAME + FileExt.INI.getExt(), this);
-        } catch (IOException e) {
-            System.out.println("Error occured while reading settings from file. Using default values on unreached settings.");
-            e.printStackTrace();
-        }
-        System.out.println("-------------------------------------------------------");
+        this.loadDefaultSettings();
         keyboardRenderables = new LeapRenderables(this);
         keyboardSize = keyboardAttributes.getAttributeAsPoint(Attribute.KEYBOARD_SIZE);
         float borderSize = keyboardAttributes.getAttributeAsFloat(Attribute.BORDER_SIZE) * 2;
@@ -339,14 +329,8 @@ public class LeapKeyboard extends IKeyboard implements LeapObserver, Calibration
         try {
             LeapListener.removeObserver(this);
             LeapListener.stopListening();
-            System.out.println(KEYBOARD_NAME + " - Loading playback settings from " + playbackManager.getFilePath() + "\\" + KEYBOARD_FILE_NAME + FileExt.INI.getExt());
-            try {
-                MyUtilities.FILE_IO_UTILITIES.readSettingsAndAttributesFromFile(playbackManager.getFilePath(), KEYBOARD_FILE_NAME + FileExt.INI.getExt(), this);
-            } catch (IOException e) {
-                System.out.println("Error occured while reading settings from file. Using default values on unreached settings.");
-                e.printStackTrace();
-            }
-            System.out.println("-------------------------------------------------------");
+            this.loadSettings(playbackManager.getFilePath());
+            leapPlane.calculatePlaneData();
         	leapPoint.setNormalizedPoint(Vector.zero());
             isPlayback = true;
             playbackManager.registerObserver(this);
@@ -377,14 +361,8 @@ public class LeapKeyboard extends IKeyboard implements LeapObserver, Calibration
     public void finishPlayback(PlaybackManager playbackManager) {
         LEAP_LOCK.lock();
         try {
-            System.out.println(KEYBOARD_NAME + " - Loading default settings from " + FilePath.CONFIG.getPath() + KEYBOARD_FILE_NAME + FileExt.INI.getExt());
-            try {
-                MyUtilities.FILE_IO_UTILITIES.readSettingsAndAttributesFromFile(FilePath.CONFIG.getPath(), KEYBOARD_FILE_NAME + FileExt.INI.getExt(), this);
-            } catch (IOException e) {
-                System.out.println("Error occured while reading settings from file. Using default values on unreached settings.");
-                e.printStackTrace();
-            }
-            System.out.println("-------------------------------------------------------");
+            this.loadDefaultSettings();
+            leapPlane.calculatePlaneData();
             playbackManager.removeObserver(this);
             isPlayback = false;
             this.playbackManager = null;

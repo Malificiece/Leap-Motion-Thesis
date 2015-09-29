@@ -253,7 +253,7 @@ public class LeapPlane extends KeyboardRenderable {
         return distanceToPlane;
     }
     
-    public Vector getDenormalizedPlaceCenter() {
+    public Vector getDenormalizedPlaneCenter() {
         return denormalizedPlaneCenter;
     }
     
@@ -279,7 +279,7 @@ public class LeapPlane extends KeyboardRenderable {
         return true;
     }
     
-    private void calculatePlaneData() {
+    public void calculatePlaneData() {
         // Get the original attributes for recalculation.
         getPlaneAttributes();
         
@@ -442,6 +442,36 @@ public class LeapPlane extends KeyboardRenderable {
         point.setX(x);
         point.setY(y);
         point.setZ(z);
+    }
+    
+    // To denormalize a point completely we have to follow in reverse order the steps used to normalize.
+    public Vector denormalizePoint(Vector point) {        
+        // Scale back to device space keyboard.
+        point.setX((point.getX() - BORDER_SIZE) / KEYBOARD_SIZE.x);
+        point.setY((point.getY() - BORDER_SIZE) / KEYBOARD_SIZE.y);
+        point.setZ(point.getZ() / CAMERA_DISTANCE);
+        
+        // Remove normalization of the calculated plane.
+        // NOTE: The Z-coordinate was modified by the Leap Pinch, Leap Bimodal, and Leap Dynamic keyboards.
+        float x = (pointA.getX() + ((pointB.getX() - pointA.getX()) * point.getY())) + (normalizedPlaneWidth * point.getX());
+        float y = (pointA.getY() + ((pointD.getY() - pointA.getY()) * point.getX())) + (normalizedPlaneHeight * point.getY());
+        point.setX(x);
+        point.setY(y);
+        point.setZ((point.getZ() * distanceToCameraPlane) + planeCenter.getZ());
+        
+        // remove rotation and denormalize point to device space
+        point =  iBox.denormalizePoint(point);
+        if(axisToCamera.isValid()) {
+            point = MyUtilities.MATH_UTILITILES.rotateVector(point, axisToCamera.opposite(), angleToCamera);
+        }
+        return point;
+    }
+    
+    public void normalizePoint(Vector point, SwipePoint leapPoint) {
+        leapPoint.setPoint(point);
+        leapPoint.applyPlaneRotationAndNormalizePoint(axisToCamera, angleToCamera);
+        applyPlaneNormalization(leapPoint.getNormalizedPoint());
+        leapPoint.scaleTo3DSpace();
     }
     
     public void update(SwipePoint leapPoint, LeapTool leapTool, KeyboardGestures keyboardGestures, SwipeTrail swipeTrail, KeyboardType keyboardType, Hand leapHand) {

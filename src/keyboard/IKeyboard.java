@@ -2,6 +2,7 @@ package keyboard;
 
 import utilities.Point;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 
@@ -117,6 +118,39 @@ public abstract class IKeyboard {
         for(KeyboardObserver observer : observers) {
             observer.keyboardCalibrationFinishedEventObserved();
         }
+    }
+    
+    public void loadSettings(String filePath) {
+        System.out.println(KEYBOARD_NAME + " - Loading playback settings from " + filePath + "\\" + KEYBOARD_FILE_NAME + FileExt.INI.getExt());
+        try {
+            MyUtilities.FILE_IO_UTILITIES.readSettingsAndAttributesFromFile(filePath, KEYBOARD_FILE_NAME + FileExt.INI.getExt(), this);
+        } catch (IOException e) {
+            System.out.println("Error occured while reading settings from file. Using default values on unreached settings.");
+            e.printStackTrace();
+        }
+        System.out.println("-------------------------------------------------------");
+    }
+    
+    public void loadSettings(File file) {
+        System.out.println(KEYBOARD_NAME + " - Loading playback settings from " + file.getPath());
+        try {
+            MyUtilities.FILE_IO_UTILITIES.readSettingsAndAttributesFromFile(file, this);
+        } catch (IOException e) {
+            System.out.println("Error occured while reading settings from file. Using default values on unreached settings.");
+            e.printStackTrace();
+        }
+        System.out.println("-------------------------------------------------------");
+    }
+    
+    public void loadDefaultSettings() {
+        System.out.println(KEYBOARD_NAME + " - Loading default settings from " + FilePath.CONFIG.getPath() + KEYBOARD_FILE_NAME + FileExt.INI.getExt());
+        try {
+            MyUtilities.FILE_IO_UTILITIES.readSettingsAndAttributesFromFile(FilePath.CONFIG.getPath(), KEYBOARD_FILE_NAME + FileExt.INI.getExt(), this);
+        } catch (IOException e) {
+            System.out.println("Error occured while reading settings from file. Using default values on unreached settings.");
+            e.printStackTrace();
+        }
+        System.out.println("-------------------------------------------------------");
     }
     
     public void saveSettings() {

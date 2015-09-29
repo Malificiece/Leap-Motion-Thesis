@@ -327,6 +327,26 @@ public class FileUtilities {
     }
     
     // BOTH ATTRIBUTES AND SETTINGS
+    public void readSettingsAndAttributesFromFile(File file, IKeyboard keyboard) throws IOException {
+        // Go through each attribute and attempt to read it from file.
+        for(KeyboardAttribute keyboardAttribute: keyboard.getAttributes().getAllAttributes()) {
+            // Store default value so we know what the original is.
+            Object value = keyboardAttribute.getValue();
+            if((value = readValueFromFile(file, keyboardAttribute.getType().name(), value)) != null) {
+                keyboardAttribute.setValue(value);
+            }
+        }
+        
+        // Go through each setting and attempt to read it from file.
+        for(KeyboardSetting keyboardSetting: keyboard.getSettings().getAllSettings()) {
+            // Store default value so we know what the original is.
+            Double value = keyboardSetting.getValue();
+            if((value = (Double) readValueFromFile(file, keyboardSetting.getType().name(), value)) != null) {
+                keyboardSetting.setValue(value);
+            }
+        }
+    }
+    
     public void readSettingsAndAttributesFromFile(String filePath, String fileName, IKeyboard keyboard) throws IOException {
         // Attempt to open file, create it if it doesn't exist.
         File file = createFile(filePath, fileName);
