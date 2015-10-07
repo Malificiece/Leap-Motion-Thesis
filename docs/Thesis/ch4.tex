@@ -1,83 +1,14 @@
 \chapter{Methodology} \label{methodology}
 
-Pilot 1 -- Changes for study:
-Fixed:
-- Constructed dictionary so inputs will all type very similar words for best comparision
-- Simplified keyboard used (removed enter/space/period/shift/comma/numbers, changed location of backspace)
-- keyboard mod - disallow backspace of correct letters
-- keyboard mod - Removed having to press a key for confirmation of word (now confirmation on "release")
-- extended keyboard view for better view of 3 dimensions for users
-- limit interaction space to onscreen keyboard (works more like a phone keyboard now)
-- Fix calibration order
-- New Keyboard Types - Bimodal, Dynamic
-- Reduced number of experiment words from 30 to 10 per input
-Attempted but Unfixed:
-- slight corrections to help with pinch
-- Attempted Augmented Reality with Meta Glass, could not get rid of blurriness with glasses, so not implemented
-Observed:
-- sphere problem with touching plane
-- light matters
-
-Pilot 2 -- Changes for study:
-Fixed:
-- Narrowed objsectives/statistical analysis data
-- Change to intermittent exit surveys
-- UP IN THE AIR - remove stylus for mid air keyboards and use finger instead
-- UP IN THE AIR - change controller to WGK??
-- UP IN THE AIR - change dictionary builder from custom algorithm to frechet distance
-- not doing - UP IN THE AIR - don't force person to be correct?? --- No need to modify (justification of why I did this)
-- Made calibration faster (different depending on computer)
-- Had to remove lamenent surface and only use paper, "bubbling" was interferring with detection
-Observed:
-- leap surface, utensil has to be perpendicular to surface for it to work properly
-- sphere problem with touching plane
-- light matters
-
-Study Notes:
-In some cases, the calibrated plane normal flips and the direction the tool travels is reversed.
-If the plane is angled downward the touch threshold (possible culprit)??? seems to be far off the plane so the touch seems "instant".. it snaps to the touch plane and when removed it lifts high off the keyboard
-
- This chapter describes and justifies the data gathering method used. This chapter also outlines how you
-analyzed your data.
-
- Begin by describing the method you chose and why this method was the most appropriate. In doing so, you
-should cite reference literature about the method.
-
- Next, detail every step of the data gathering and analysis process. Although this section varies depending
-on method and analysis technique chosen, many of the following areas typically are addressed:
-
---description of research design
- internal validity
- external validity
-
---description of population and description of and justification for type of sample used or method for
-selecting units of observation
-
---development of instrument or method for making observations (e.g., question guide, categories for content
-analysis)
- pre-test
- reliability and validity of instrument or method
-
---administration of instrument or method for making observations (e.g., interviews, observation, content
-analysis)
-
---coding of data
-
---description of data analysis
- statistical analysis and tests performed
- identification of themes/categories (qualitative or historical research)
-
 \section{Pre-Pilot Study} \label{pre_pilot}
-
 The pre-pilot study was not a full-blown pilot. This study was used to test the conceptual feasibility of using 3 dimensions as a means of word separation for simulated touch input and to test the best-guess implementation for a word-gesture keyboard. TODO: See section SEPARATING WORDS CH3 for more information on how this process was derived.
 
 \subsection{Participants} \label{pre_participants}
-
 A small sample size of 2 was used in this study. Both participants were male, ages 24 and 25. Both participants had previous experience with gesture-controllers, touch screens, and word-gesture keyboards. See TODO: TABLE BELOW for more information.
 
 \begin{table}[h]
 	\centering
-	\caption[Schedule of Assessments]{\centering Details of Participants.}
+	\caption[Pre-pilot Study Details of Participants]{\centering Participant information including age, gender, handedness, computer usage, and previous experiences.}
 	\label{pre_participant_stats}
 	\resizebox{\textwidth}{!}{\begin{tabular}{ c | c c c c c c c c c c}
 		\hline
@@ -91,39 +22,31 @@ A small sample size of 2 was used in this study. Both participants were male, ag
 \end{table}
 
 \subsection{Input Devices and Interaction}
-
 The interaction methods used within the study were dependent on the currently active keyboard input. All of the keyboards were simulated on a 64-bit, Windows 7 work station, with all receivers or controllers connected via USB 2.0. The participants were allowed to recalibrate the active keyboard's interaction plane for a more comfortable experience suited to their arm. Calibration was only possible if applicable to the active keyboard input. Participants were also encouraged to reposition the gesture-controller, if applicable, and were given the option to freely rest or raise their elbows during the experiment. More information about the implementation of specific keyboard interactions, calibration, and the benefits of using a rested arm can be found in TODO: CHAPTER 3. Every keyboard was designed for use by either right or left handed participants.
 
 \subsubsection{Leap Motion Static-Air Keyboard}
-
 The Leap Motion Static-Air Keyboard used a Leap Motion Controller which was placed on the desk in front of the participant. The participant then used a stylus which was tracked by the Leap Motion in order to interact with a projected interaction plane. A touch was simulated by the insertion of the stylus into the interaction plane and a release was simulated upon the removal of the stylus. The interaction plane could be calibrated at any time prior to the experiment TODO: Provide picture.
 
 \subsubsection{Leap Motion Pinch-Air Keyboard}
-
 The Leap Motion Pinch-Air Keyboard also used a Leap Motion Controller that was positioned on the desk in front of the participant. The participant then used their bare hand, which was tracked at the center of their palm, to interact with the projected interaction plane. Touch was simulated by having the participant make a pinching gesture with their hand and a release was simulated when the participant released the pinch, opening their hand again. The interaction plane could be calibrated at any time prior to the experiment TODO: Provide picture. TODO: ALSO MAYBE REFERENCE VULTURE HERE or back in chpt
 
 \subsubsection{Leap Motion Surface Keyboard}
-
 Again, for the Leap Motion Surface Keyboard a Leap Motion Controller was used for tracking. Unlike the Leap Static-Air or Leap Pinch-Air keyboards, the gesture controller was placed into a custom designed holder instead of on the desk in front of the participant. The holder was attached to an inclined surface with a printed keyboard fixed on top TODO: for more details see section BUILDING SURFACE WGK. Because placement was not guaranteed to be identical between uses, in order to accurately simulate an interaction plane projected onto the printed keyboard, the Leap Motion Surface Keyboard required a single calibration after first being inserted into the holder. The participant then used a stylus, as before, that was tracked by the Leap Motion in order to detect interaction. A touch was simulated by pressing the tip of the stylus against the printed keyboard and a release was simulated when the tip of the stylus was again removed from the printed keyboard surface.
 
 \subsubsection{Xbox Controller Keyboard}
-
 The Xbox Controller Keyboard used an Xbox 360 Wireless Controller that transmitted information via the Microsoft Xbox 360 Wireless Receiver for Windows. The participants were required to use any of the directional sticks or the D-pad in order to change which key was selected, and then used the 'A' button in order to select the currently highlighted key. The Xbox Controller keyboard only allowed for single-input text entry, functioning in the same way as the default Xbox 360 virtual keyboard. 
 
 \subsection{Task Design} \label{pre_task}
-
 The design for the pre-pilot study included 4 different keyboard input devices representing each of the conditions that made up the task. The 4 conditions used were the Leap Motion Static-Air, Leap Motion Pinch-Air, Leap Motion Surface, and Xbox Controller keyboards. TODO: See section WORD GESTURE KEYBOARDS for specific details on each keyboard implementation.
 
 The task performed by the participants consisted of 30 trials for each of the 4 keyboard input devices creating a total of 120 trials per participant. For each trial, a word was chosen at random of length 3 through 6 from the Oxford English Dictionary and displayed on the screen. A blank text-area was positioned directly below the displayed word for the transcribed, or user-generated, text TODO: GIVE FIGURE FOR BLANK WORD DISPLAYED ON THE SCREEN. Beneath both text areas, there was a virtual representation of the keyboard the participants were using TODO: GIVE PICTURE FOR DISPLAYED KEYBOARD. The participants were then required to use the currently active keyboard input device to enter the displayed word using word-gesturing TODO: GIVE FIGURE SHOWING WORD-GESTURING. During the word-gesturing process, the participants were shown real-time updates to the displayed word and transcribed text as well as their movements within the virtual keyboard space. Detected key presses were appended directly to the transcribed text-area with correctly matching letters being highlighted in green and text entry errors being highlighted in red whereas only correctly matching letters, again highlighted in green, were applied to the displayed word TODO: REFERENCE A FIGURE HERE FOR COLOR OF TEXT. The participants were required to use the active keyboard input device's backspace key to remove errors. TODO: See section LACK OF WORD RECOGNITION for details on why a requirement to correctly enter the displayed word was enforced (best-guess nature vs word-recognition). Once a word was correctly entered, the participants were required to press the active keyboard's enter key to move onto the next word TODO: ADD PICTURE OF THE ENTER KEY.
 
-Small deviations in the above task were required for how the participants interacted with the Xbox Controller keyboard. For this keyboard, there was no word-gesturing feature implemented, instead the participant was asked to use single-input text entry using a standard Xbox 360 Controller. The Xbox Controller keyboard was implemented in the same way as a conventional console keyboard, TODO: see section WGK XBOX CONTROLLER for more information.
+Small deviations in the above task were required for how the participants interacted with the Xbox Controller keyboard. For this keyboard, there was no word-gesturing feature implemented, instead the participant was asked to use single-input text entry using a standard Xbox 360 Controller. The Xbox Controller keyboard was implemented in the same way as a conventional console keyboard, TODO: see section WGK XBOX CONTROLLER for more information. The participants had to press the 'A' button to select a letter, 'Y' button to delete, and the start button to move to the next word.
 
 \subsection{Experimental Design} \label{pre_experimental_design}
-
-The initial pre-pilot study used a Within-Subjects design without any counterbalancing. Both participants used every keyboard input device.
+The initial pre-pilot study used a within-subjects design without any counterbalancing. Both participants used every keyboard input device.
 
 \subsection{Procedure} \label{pre_procedure}
-
 There was only a single study visit for each participant in which all tasks were performed. The study visit took between 30 and 45 minutes to complete depending on how many calibrations were performed. The full set of tasks, and their expected durations, are detailed in TODO: SCHED OF ASSESMENTS the pre-pilot schedule of assessments. The participants followed the same process for each of the 4 keyboard input device's tasks.
 
 First, the participants were given a brief explanation and demonstration of the active keyboard input. The explanation dialog contained the name of the active keyboard, how it was interacted with, and whether or not it was a word-gesture keyboard. The researcher then demonstrated how to enter the word "test" using the active keyboard. The participants were then given control and handed the stylus or used their bare hand to interact with the keyboard to get a sense of how it worked.
@@ -132,11 +55,11 @@ Participants were then instructed to use the keyboard to perform practice words 
 
 Next, the participants performed the task itself. As detailed in TODO: SECTION TASKS, the participants were instructed to enter a total of 30 words for the current keyboard input device. None of the experiment words were duplicated between themselves or the words used during practice and again were pulled at random from the Oxford English Dictionary with lengths between 3 and 6 characters, filtering for swear words. Participants were not allowed to recalibrate the interaction space during the task. 
 
-After all tasks were completed for each of the 4 input devices, the participants were asked to fill out an exit survey TODO: SEE APPENDIX. The exit survey asked the participants for their age, gender, major, and handedness as well as several questions detailing any prior touch, gesture-controller, or word-gesutring experience or impairments that might relate to the study. Finally the participants were required to fill out the Likert scale relating to difficulty, discomfort and fatigue experienced when using the devices as well as rank each device on a numerical scale from best to worst.
+After all tasks were completed for each of the 4 input devices, the participants were asked to fill out an exit survey TODO: SEE APPENDIX. The exit survey asked the participants for their age, gender, major, and handedness as well as several questions detailing any prior touch, gesture-controller, or word-gesturing experience or impairments that might relate to the study. Finally the participants were required to fill out the Likert scale relating to difficulty, discomfort and fatigue experienced when using the devices as well as rank each device on a numerical scale from best to worst.
 
 \begin{table}[h]
 	\centering
-	\caption[Schedule of Assessments]{\centering Schedule of Assessments for a single study visit (in minutes).}
+	\caption[Pre-pilot Study Schedule of Assessments]{\centering Schedule of Assessments for a single study visit (in minutes).}
 	\label{pre_schedule_of_assessments}
 	\resizebox{\textwidth}{!}{\begin{tabular}{ l | c c c c c | c}
 			\hline
@@ -155,21 +78,18 @@ After all tasks were completed for each of the 4 input devices, the participants
 \end{table}
 	
 \subsection{Dependent Measures}
-
 The pre-pilot study only collected the playback data of participants. The playback data included detected key presses, the calibrated interaction plane, and the tracking location data.
 
 \section{Pilot Study} \label{pilot}
-
 The pilot study expanded on what was learned from the pre-pilot. Additional Mid-Air keyboard interactions were added and the displayed virtual keyboard was redesigned to be simpler and remove obtrusive features.
 
 \subsection{Participants} \label{pilot_participants}
-
 A sample size of 7 was used for the pilot study. There were 3 male and 4 female participants, ages ranging from 21 to 24 with a median age of 22. Participants' computer usage ranged from 6 to more than 50 hours per week with a median usage of 21 to 30 hours per week. All of the participants described their right hand as being dominant and all participants used their right hand during the experiment except for one participant who switched back and forth. All of the participants had previous experience with touch devices, whereas all but one participant had previous experience with gesture-controllers and only 57\% having previous experience with word-gesture keyboards. No participants had any impairment that affected their ability to enter text with computers. TODO: LINK TO THE TABLE BELOW FOR MORE DETAILS
 
 \begin{table}[h]
 	\centering
-	\caption[Schedule of Assessments]{\centering Details of Participants.}
-	\label{pre_participant_stats}
+	\caption[Pilot Study Details of Participants]{\centering Participant information including age, gender, handedness, computer usage, and previous experiences.}
+	\label{pilot_participant_stats}
 	\resizebox{\textwidth}{!}{\begin{tabular}{ c | c c c c c c c c c c}
 		\hline
 		Subject & Gender & Age & Computer Usage & Handedness & Hand Used & Touch-device & Gesture-controller & Word-gesturing & Impairment \\
@@ -187,40 +107,34 @@ A sample size of 7 was used for the pilot study. There were 3 male and 4 female 
 \end{table}
 
 \subsection{Input Devices and Interaction}
-
 The pilot study saw the introduction of three additional keyboard inputs, the Touch Screen Keyboard, the Leap Motion Bimodal-Air Keyboard, and the Leap Motion Predictive-Air Keyboard. The Touch Screen Keyboard was added because it is the de facto interaction for modern word-gesture keyboards TODO: FIND A REFERENCE TO THIS. The other two keyboards were added as alternative implementations to mid-air, word-gesture keyboards.
 
-As in the pre-pilot, interaction with the different keyboard devices were dependent on whatever device was active at the time. All of the keyboards except for the Touch Screen Keyboard were simulated on the same 64-bit, Windows 7 work station as before. The Touch Screen Keyboard was simulated on the Ideum Multitouch Table Platform tabletop, running 64-bit Windows 8. Again, all receivers or controllers were connected through USB 2.0. The participants were again allowed to recalibrate the active keyboard's interaction plane. Again, participants were encouraged to reposition the gesture-controller and were given the option to use either hand and rest or raise their arms during the experiment.
+As in the pre-pilot, interaction with the different keyboard devices were dependent on whatever device was active at the time. All of the keyboards except for the Touch Screen Keyboard were simulated on the same 64-bit, Windows 7 work station as before. The Touch Screen Keyboard was simulated on the Ideum Multi-touch Table Platform tabletop, running 64-bit Windows 8. Again, all receivers or controllers were connected through USB 2.0. The participants were again allowed to recalibrate the active keyboard's interaction plane. Again, participants were encouraged to reposition the gesture-controller and were given the option to use either hand and rest or raise their arms during the experiment.
 
 \subsubsection{Touch Screen Keyboard}
-
 The Touch Screen Keyboard was used on a large tabletop touch screen. The participant then used their finger to interact with the virtual keyboard on the screen in the same way as typical touch devices. Touch was simulated when the participants finger touched the screen and release was simulated when the finger was lifted from the surface TODO: Provide a picture.
 
 \subsubsection{Leap Motion Bimodal-Air Keyboard}
-
 The Leap Motion Bimodal-Air Keyboard used a Leap Motion Controller which was placed on the desk in front of the participant. The participant then used a stylus which was tracked by the Leap Motion in order to determine the location over the projected virtual keyboard. A touch was simulated by pressing the space bar key on a standard QWERTY keyboard and a touch release was simulated upon the release of the 'Space Bar.' The interaction plane could be calibrated at any time prior to the experiment TODO: Provide picture.
 
 \subsubsection{Leap Motion Predictive-Air Keyboard}
-
 The Leap Motion Predictive-Air Keyboard used a Leap Motion Controller which was placed on the desk in front of the participant. The participant then used a stylus which was tracked by the Leap Motion in order to interact with a projected interaction plane. A touch was simulated by recognizing and predicting a forward gesture of the stylus toward the interaction plane and a release was simulated by recognizing a backward gesture away from the interaction plane. As before, the interaction plane could be calibrated at any time prior to the experiment TODO: Provide picture.
 
-\subsection{Task Design}
-
-As in the pre-pilot, the conditions of the task were represented by the 7 different keyboard input devices. The 7 conditions used were the Leap Motion Static-Air, Leap Motion Pinch-Air, Leap Motion Surface, and Xbox Controller keyboards as before, with the addition of the Leap Motion Predicitive-Air, Leap Motion Bimodal-Air, and Touch Screen keyboards. TODO: See section Word GESTURE KEYBOARDS for specific details of the new keyboard implementations. 
+\subsection{Task Design} \label{pilot_task_design}
+As in the pre-pilot, the conditions of the task were represented by the 7 different keyboard input devices. The 7 conditions used were the Leap Motion Static-Air, Leap Motion Pinch-Air, Leap Motion Surface, and Xbox Controller keyboards as before, with the addition of the Leap Motion Predictive-Air, Leap Motion Bimodal-Air, and Touch Screen keyboards. TODO: See section Word GESTURE KEYBOARDS for specific details of the new keyboard implementations. 
 
 Task profiles were created for each of the 7 keyboard input devices. Each task profile consisted of 10 separate trials for a total of 70 trials per participant. The reduction in trials from 30 words to 10 words for each device was due to a complaint of fatigue during the pre-pilot study, one of the participants was unable to finish. The addition of task profiles were in an attempt to standardize the data collected rather than using random, changing words between uses of the same keyboard. Instead of choosing 10 words at random for each and every keyboard and participant, the task profiles insured that the same 10 words were used across each unique keyboard device for all participants. This was handled by generating static, unchanging dictionaries for each keyboard, guaranteeing a total of 70 unique words rather than a total of 490 unique words for the 7 participants. The 10 words selected for each dictionary were generated by a custom dissimilarity algorithm that produced the top 10 least dissimilar gesture-shapes across all words in the Oxford English Dictionary for words of length 3 through 6 characters. This meant that only 10 different gesture-shapes were used by each participant across all input devices, ensuring that all participants' experiences with each keyboards are as similar as possible to each other and other participants TODO: DICTIONARY ALG.
 
 For each trial, a word was chosen at random from the active keyboard's previously constructed dictionary and displayed on the screen. A blank text-area was positioned directly below the displayed word for the participants' transcribed text TODO: GIVE FIGURE FOR BLANK WORD DISPLAYED ON THE SCREEN. Beneath both text areas, the virtual representation of the keyboard that was previously displayed was updated and simplified TODO: GIVE PICTURE FOR DISPLAYED KEYBOARD. The shift, enter, and number keys were all removed, and the backspace key readjusted. The participants were then required to use the currently active keyboard input device to enter the displayed word using word-gesturing as before TODO: GIVE FIGURE SHOWING WORD-GESTURING. During the word-gesturing process, participants were still shown real-time updates to the displayed word and transcribed text as well as their movements within the virtual keyboard space TODO: REFERENCE A FIGURE HERE FOR COLOR OF TEXT. The participants were required to use the active keyboard device's backspace key to remove errors, however already correct transcribed characters were protected from being deleted. The change to protect the correctly transcribed characters was because of the high sensitivity and precision required to only delete the erroneous characters. Once a word was correctly entered, the participants were to release the simulated touch by the appropriate means of the active keyboard to move to the next word instead of hitting the enter key.
 
-As before, deviations in the above task were required for how the participants interacted with the Xbox Controller keyboard. For this keyboard, there was still no word-gesturing feature implemented, instead the participant was asked to use single-input text entry using a standard Xbox 360 Controller.
+As before, deviations in the above task were required for how the participants interacted with the Xbox Controller keyboard. For this keyboard, there was still no word-gesturing feature implemented, instead the participant was asked to use single-input text entry using a standard Xbox 360 Controller. The participants had to press the 'A' button to select a letter, 'Y' button to delete, and the start button to move to the next word.
 
 \subsection{Experimental Design} \label{pilot_experimental_design}
-
-A Within-Subjects design was again used for this study. The strength of a Within-Subjects design is that the overall power will increase and there will be a reduction in error variance associated with individual differences. The weakness of using the Within-Subjects design is that it suffers from carryover effects between each keyboard input device. The participation in one condition may affect performance in other conditions. To account for this weakness, the study was supplemented with a Latin Squares design for counterbalancing. Table \ref{pilot_latin_squares} shows how the Latin Squares design was utilized for a sample size of 7 with an equal number of different keyboard inputs. TODO: Alivins REFERENCE FOR LATIN SQUR in 4.4.6 Design. TODO: Get reference for within-subjects statements.
+A within-subjects design was again used for this study. The strength of a within-subjects design is that the overall power will increase and there will be a reduction in error variance associated with individual differences. The weakness of using the within-subjects design is that it suffers from carryover effects between each keyboard input device. The participation in one condition may affect performance in other conditions. To account for this weakness, the study was supplemented with a Latin Squares design for counterbalancing. Table~\ref{pilot_latin_squares} shows how the Latin Squares design was utilized for a sample size of 7 with an equal number of different keyboard inputs. TODO: NEED REFERENCE FOR WITHIN SUBJECT AND LATIN SQUARES.
 
 \begin{table}[h] % b - for bottom; !t - for top
 	\centering
-	\caption[Latin Squares Design Rep 1]{\centering Latin Squares design for 7 participants and 7 conditions.}
+	\caption[Latin Squares Example]{\centering Latin Squares design for 7 participants and 7 conditions.}
 	\label{pilot_latin_squares}
 	\begin{tabular}{c | c c c c c c c}
 		\hline
@@ -238,20 +152,19 @@ A Within-Subjects design was again used for this study. The strength of a Within
 \end{table}
 
 \subsection{Procedure} \label{pilot_procedure}
-
-Again, each subject participated in a single study visit which took between 30 and 70 minutes to complete depending on how many calibrations were performed. The full set of tasks, and their expected durations, are detailed in TODO: SCHED OF ASSESMENTS the pre-pilot schedule of assessments. The participants followed the same process for each of the 7 keyboard input devices' tasks.
+Again, each subject participated in a single study visit which took between 30 and 70 minutes to complete depending on how many calibrations were performed. The full set of tasks, and their expected durations, are detailed in Figure~\ref{pilot_schedule_of_assessments}, the pilot study schedule of assessments. The participants followed the same process for each of the 7 keyboard input devices' tasks.
 
 First, the participants were given a brief explanation and demonstration of the active keyboard input. The explanation dialog contained the name of the active keyboard, how it was interacted with, and whether or not it was a word-gesture keyboard. The researcher then demonstrated how to enter the word "test" using the active keyboard. The participants were then given control and handed the stylus or used their bare hand to interact with the keyboard to get a sense of how it worked.
 
 Participants were then instructed to use the keyboard to perform practice words which were randomly selected from the Oxford English Dictionary with lengths between 3 and 6 characters long. The practice words were filtered for offensive words and against the previously constructed experiment dictionaries so that no participants would be able to see any of the experiment words in advance. There was no limit placed on how many words could be performed while practicing. The participants were told to continue until they felt they were able to efficiently and comfortably type each word with minimal errors. During the practice phase, the opportunity recalibrate the interaction-space any number of times was given if it was applicable to the active keyboard.
 
-Next, the participants performed the task itself. As detailed in TODO: SECTION TASKS, the participants were instructed to enter a total of 10 words for the current keyboard input device. The words selected were pulled at random from the active keyboard's previously constructed dictionary until all 10 words in the dictionary were used. Participants were not allowed to recalibrate the interaction space during the task. 
+Next, the participants performed the task itself. As detailed in Section~\ref{pilot_task_design}, the participants were instructed to enter a total of 10 words for the current keyboard input device. The words selected were pulled at random from the active keyboard's previously constructed dictionary until all 10 words in the dictionary were used. Participants were not allowed to recalibrate the interaction space during the task. 
 
-After all tasks were completed for each of the 7 input devices, the participants were asked to fill out an exit survey TODO: SEE APPENDIX. The exit survey asked the participants for their age, gender, major, and handedness as well as several questions detailing any prior touch, gesture-controller, or word-gesutring experience or impairments that might relate to the study. Finally the participants were required to fill out the a Likert scale section relating to difficulty, discomfort and fatigue experienced when using the devices as well as rank each device on a numerical scale from best to worst.
+After all tasks were completed for each of the 7 input devices, the participants were asked to fill out an exit survey TODO: SEE APPENDIX. The exit survey asked the participants for their age, gender, major, and handedness as well as several questions detailing any prior touch, gesture-controller, or word-gesturing experience or impairments that might relate to the study. Finally the participants were required to fill out the a Likert scale section relating to difficulty, discomfort and fatigue experienced when using the devices as well as rank each device on a numerical scale from best to worst.
 
-\begin{table}[h]
+\begin{table}[h] % b - for bottom; !t - for top
 	\centering
-	\caption[Schedule of Assessments]{\centering Schedule of Assessments for a single study visit (in minutes).}
+	\caption[Pilot Study Schedule of Assessments]{\centering Schedule of Assessments for a single study visit (in minutes).}
 	\label{pilot_schedule_of_assessments}
 	\resizebox{\textwidth}{!}{\begin{tabular}{ l | c c c c c c c c | c}
 		\hline
@@ -269,192 +182,332 @@ After all tasks were completed for each of the 7 input devices, the participants
 	\end{tabular}}
 \end{table}
 	
-\subsection{Dependent Measures}
+\subsection{Dependent Measures} \label{pilot_dependent_measures}
+The design choice to not fully realize word-recognition, for the implemented word-gesture keyboard, heavily influenced the design of the task and therefore also affected the dependent measures. Each individual trial was designed as a single word rather than a phrase that included many words, as in Vulture TODO: REFERENCE VULTURE, therefore most dependent measures were analyzed on the word-gesture level. It's possible to analyze these values at the phrase level if every the combined trials are viewed as a single phrase.
 
-The pre-pilot study only collected the playback data of participants. The playback data included detected key presses, the calibrated interaction plane, and the tracking location data.
+\subsubsection{Text-Entry Rate}
+Typically, text-entry rates are calculated using the standard Words Per Minute formula
+\begin{equation}
+WPM = \frac{|T-1|}{S} \times 60 \times \frac{1}{5}
+\end{equation}
+where $|T-1|$ is the length of the transcribed string and $S$ is the amount of time, in seconds, that was taken to transcribe the word from the time the first character was produced TODO: GET VULTURE-3 REFERENCE. When dealing with timing word-gestures, however, the formula must be modified to:
+\begin{equation} \label{WPM}
+WPM = \frac{|T|}{S} \times 60 \times \frac{1}{5}
+\end{equation}
+where $|T-1|$ is replaced with $|T|$ and $S$ represents the amount of time, in seconds, that was taken to transcribe the word including the time that it took to produce the first character. The modification is required because the time it takes to produce the first character must be included when timing word-gestures TODO: VULTURE-17.
 
+\subsubsection{Error Rates}
+There were several techniques used to measure error rates and find the best representation of keyboard performance and account for the task design.
 
+The first error rate was modeled after the techniques in Vulture TODO: REFER VULTURE and uses the Minimum Word Distance which was calculated in the same way was the Minimum String Distance TODO: VULTURE-15, MACKENZIE 2003:
+\begin{equation} \label{MWD}
+MWD\ error\ rate = \frac{MWD(P,T)}{\overline{S_P}} \times 100\%
+\end{equation}
+Minimum Word Distance differentiated from Minimum String Distance in that it was calculated on a per-word level than on a per-character level where $P$ and $T$ were the sets of words in the presented and transcribed strings, and $\overline{S_P}$ was the mean size of the optimal alignments calculated on a per-word level TODO: REFERENCE VULTURE. It is important to note that because participants were forced to correctly type in words and there were no errors present in the final transcribed text, words that were considered erroneous had to be defined differently. For this study to use Minimum Word Distance, if the participant made any errors at all regardless of being forced to correct them, then the word was counted as incorrect. This gives the formula
+\begin{equation} \label{MWD_simple}
+MWD\ error\ rate = \frac{IW}{CW + IW} \times 100\%
+\end{equation}
+where $IW$ are words where the participant made any mistakes at all regardless of corrections and $CW$ are words where the participant got the word correct with one attempt.
 
+The next error rate used was the Keystrokes Per Character method, otherwise known as KSPC TODO: MACKENZIE 2003. The Keystrokes Per Character formula
+\begin{equation} \label{KSPC}
+KSPC \approx \frac{C + INF + IF + F}{C + INF}
+\end{equation}
+used Soukoreff and MacKenzie's keystroke taxonomy, where $C$ represented the correct characters in the transcribed text, $INF$ were the incorrect, not fixed characters in the transcribed text, $F$ was used to show the keystrokes which were editing functions, namely backspace, and $IF$ were the incorrect but fixed characters in the input stream, but not editing keys. The Keystrokes Per Character method was less than ideal and has many limitations as an error metric TODO: REF MACKENZIE 2003, yet it was still beneficial since the task required each word to be typed correctly before moving on to the next and the word-gesture keyboards were designed with a lack of true word-recognition TODO: REFER TO WGK IMPLEMENTATION. It's important to note that $INF$ always equated to zero, reducing Formula~\ref{KSPC} to
+\begin{equation} \label{KSPC_simple}
+KSPC \approx \frac{C + IF + F}{C}
+\end{equation}
+because participants were required to correctly transcribe each word.
 
+The final error rate used was the Total Error Rate TODO: MACKENZIE 2003. The Total Error Rate was also described by the previous keystroke taxonomy used in KSPC, giving the formula
+\begin{equation} \label{TER}{
+Total\ Error\ Rate = \frac{INF + IF}{C + INF + F} \times 100\%
+}
+\end{equation}
+where, again, $C$ represented the correct characters in the transcribed text, $INF$ were the incorrect, not fixed characters in the transcribed text, $F$ was used to show the keystrokes which were editing functions, namely backspace, and $IF$ were the incorrect but fixed characters in the input stream, but not editing keys. Again, Formula~\ref{TER} can be reduced to
+\begin{equation} \label{TER_simple}
+Total\ Error\ Rate = \frac{IF}{C + F} \times 100\%
+\end{equation}
+because participants were required to correctly transcribe words.
 
+\subsubsection{Correctness}
+Correctness of a single word-gesture was determined by calculating the Fr\'echet Distance between the expected word-gesture path and the participant's generated word-gesture path. Figure TODO: PUT A PICTURE HERE OF THE shows both the expected and user-generated paths of the word 'TODO: CHOOSE WORD'. The Fr\'echet Distance between two curves $P$ and $Q$, or in this case gesture-shapes, is defined as the minimum length leash needed to walk a dog when the person walks along $P$ and the dog walks along $Q$ \cite{Har-Peled2014}. Figure~\ref{code_frechet} shows the recursive implementation of Fr\'echet Distance used in this study where $P$ and $Q$ were the two paths being walked, $CA$ was the matrix that contains all possible distance values for each comparison, and $i$ and $j$ are the indices that were being examined for that particular recursive phase.
 
+\begin{figure}[h] % b - for bottom; !t - for top
+	\centering
+	\begin{lstlisting}
+        private float frechetRecursive(Vector [] P, Vector [] Q,
+		        Float [][] CA, int i, int j) {
+	        float CAij = 0;
+	        if(CA[i][j] > -1) {
+		        CAij = CA[i][j];
+	        } else if(i == 0 && j == 0) {
+		        CA[i][j] = distance(P[0], Q[0]);
+		        CAij = CA[i][j];
+	        } else if(i > 0 && j == 0) {
+		        CA[i][j] = Math.max(frechetRecursive(P, Q, CA, i - 1, 0), distance(P[i], Q[0]));
+		        CAij = CA[i][j];
+	        } else if(i == 0 && j > 0) {
+		        CA[i][j] = Math.max(frechetRecursive(P, Q, CA, 0, j - 1), distance(P[0], Q[j]));
+		        CAij = CA[i][j];
+	        } else if(i > 0 && j > 0) {
+		        float min = Math.min(frechetRecursive(P, Q, CA, i - 1, j), frechetRecursive(P, Q, CA, i - 1, j - 1));
+		        min = Math.min(min, frechetRecursive(P, Q, CA, i, j - 1));
+		        CA[i][j] = Math.max(min, distance(P[i], Q[j]));
+		        CAij = CA[i][j];
+	        } else {
+		        CA[i][j] = Float.POSITIVE_INFINITY;
+	        }
+	        return CAij;
+        }
+	\end{lstlisting}
+	\caption[Fr\'echet Distance code snippet]{A snippet of code showing the recursive implementation of Fr\'echet distance.}
+	\label{code_frechet}
+\end{figure}  
 
+\subsubsection{Distance Measures}
+Distance measures were used to evaluate the movements of the participants' hands in the interaction plane. The two primary distance measures were the distance traveled to complete a word's gesture-shape, recorded in centimeters, and the average velocity of the participant's hand recorded in centimeters per second.
 
+\subsubsection{Timing Measures}
+Timing measures were used to calculate text-entry rates as well as attempt to evaluate the participant's level of focus. The primary time measure taken was the duration required to complete a word's gesture-shape in seconds. The time measure attempting to determine a participant's level of focus was by recording the reaction time to respond to errors. Finally, the duration it took for participants to first simulate a touch and to correctly enter the first letter were recorded.
 
+\subsubsection{Quantitative Measures}
+There were two quantitative measures recorded, the number of practice words completed for each input per participant, and the number of times a touch was simulated for each subject per input.
 
+The number of practice words the participant completed aims to rate the complexity of each keyboard, comparing it to the recorded qualitative measures. Tracking the number of times a touch was simulated should be linked to error rates. This helped to try to determine if there were detection errors with the device itself rather than errors generated by the participants.
 
-\section{Final Study}
+\subsubsection{Qualitative Measures}
+The qualitative measures in this study were recorded by utilizing an exit survey once the task for all of the keyboards had been completed. The participants were asked to rate each keyboard that they used in terms of discomfort, difficulty, and fatigue using a Likert scale with 5 options. Discomfort was defined as the awkwardness of the keyboard and whether it required an uncomfortable position or gesture to use. Difficulty evaluated whether the keyboard input device was confusing to understand how to use, and fatigue asked the participant if they had experienced tiredness, soreness, or fatigue from the keyboard they had just used. Lastly, participants ranked the keyboards from 1, most preferred, to 7, the least preferred. TODO: SEE APPENDIX FOR EXIT SURVEY. 
 
+\section{Final Study} \label{final_study}
+In the final study, the Xbox Controller Keyboard was removed due to it's irrelevance, see Section TODO: XBOX WGK FUTURE WORK SECTION for more information on how gaming consoles' virtual keyboards can be improved by moving away from single-input text entry and instead implementing a word-gesture keyboard. In addition, the use of a stylus was removed as an interaction tool from all mid-air keyboards, allowing participants to interact barehanded with the mid-air keyboard inputs.
 
-
-
-
-
-
-
-
-
-
-
-\subsection{devices}
-
-The participants were allowed to recalibrate the active keyboard's interaction plane for a more comfortable experience suited to their arm, however a default interaction space was provided that was less likely to need to be recalibrated.
-
-\subsection{Dependent Measures}
-
--- PUT MODIFIED VERSIONS HERE IN FINAL STUDY ONLY
-
---Why did I make the changes to the variables I used, or why did I use the task that I used. (Forcing backspace/correctness and not allowing correct stuff to be backspaced etc. Should be justification from Pilot study + and sources on this kind of stuff).
-
---Make sure to use alvins resources on this, the standards for pointing evaluation so that I can mention why the keyboard is different. There is no midway select action even though this is mostly a precision pointing action... This needs to mention this here but also be a part of the literature review
-
-The statistical methods being used will consist of One-Way ANOVAs for each set of the recorded and calculated variables for the quantitative data. There will be 7 conditions for each which are representative of the 7 separate inputs methods being tested. Then, Tukey's HSD (honest significant difference) for multiple-compare will be used in conjunction with the ANOVAs using a post-hoc analysis. In addition, a Two-Way ANOVA will be used on each set of variables in conjunction with the previous swipe experience variable.
-
-The qualitative approaches being analyzed are the Likert scale and a ranking system. The Likert scale will use a One-Way ANOVA for analysis because responses to several Likert questions may be summed up providing that all the questions use the same Likert scale and that the scale is a defensible approximation to an interval scale. The ranked system will use the Friedman's test for analysis, and will be participant to a post-hoc analysis using Tukey's HSD.
-
-
-
-
-
-
-
-\section{Participants}
-
-How many participants we got for each phase, some identifiers, male/female/hours used/experience etc. Describe how all participants participated in every keyboard and all used the same dictionary to more accurately depict each of the keyboard inputs.
-
-A sample size of 14 was used in this study. The justification for this sample size comes from the formula to calculate the sample size for two independent group means using a pooled standard deviation:
-
+\subsection{Participants} \label{final_participants}
+A sample size of 18 was used in the final study. The justification for this sample size comes from the formula to calculate the sample size for two independent group means using a pooled standard deviation: TODO: GET REFERENCE FOR THIS FORMULA
 \begin{equation}
 N = \frac{2(z_{\frac{\alpha}{2}} + z_{1-\beta})^2}{(\frac{\mu_1 - \mu_2}{\sigma_{pooled}})^2}
 \end{equation}
+where $z_{\frac{\alpha}{2}}$ and $z_{1-\beta}$ were the z-scores for the $\alpha$ and $\beta$, respectively, $\mu_1$ and $\mu_2$ were the means of the two populations being compared and $\sigma_{pooled}$ is the pooled standard deviation of the two populations. A power of $1-\beta = 0.80$ and a significance level of $\alpha = 0.05$ were used when calculating the sample size. The derived sample size was the average sample size for all relevant variable comparisons based on the study objectives. Outliers requiring a sample size greater than 100 were removed. Furthermore, a sample size of 18 justifies a Replicated Latin Squares design for 6 input methods. The Latin Squares design was chosen for counterbalancing the experimental design and to reduce the effect of participation in one condition affecting performance of other conditions. Further details are explained in Section~\ref{final_experimental_design}.
 
-Pow	er of $1-\beta = 0.80$ and a significance level of $\alpha = 0.05$ were used when calculating the sample size. See Appendix G to see what variables and keyboard comparisons were used in the sample size calculation. The derived sample size was the average sample size for all relevant variable comparisons based on the study objectives. Outliers requiring a sample size greater than 100 were removed. Furthermore, a sample size of 14 justifies the Latin Squares design for 7 input methods. The Latin Squares design was chosen for counterbalancing the experimental design and to reduce the effect of participation in one condition affecting performance of other conditions. Further details are explained in Section \ref{3_experimental_design}, \textit{Experimental Design}.
-
-\section{Study Setup === Input Devices and Interaction}
-
-Computer Used, Leap, Tech etc, the table touch screen.
-
-\subsection{Study Design === Task???}
-
---- This should really be a description of the exact task performed (the number of trials, the number of words, the number of input devices) and what they were trying to do, the procedure doesn't include this, it just talks about the experiment ordering as a whole.
-
-The task performed by the participants consisted of 15 trials for each of the 6 keyboard input devices giving a total of 90 trials per participant. The task for each of the 6 keyboard input devices is identical to one another only differentiating by the dictionary used. For each trial, a word is selected at random from a predetermined dictionary of 15 words corresponding to the active keyboard input and appears on the screen. This process is repeated until all of the words in the dictionary have been selected. TODO: See section DICTIONARY EXPLANATION for details on how the predetermined dictionaries were generated.
-
-\section{Procedure}
-
-The process of how we went through the steps (this is the same procedure as in the protocol, so this should be an easy copy and paste). Just make it more beefy and change the vocabulary to reflect the trails/tasks.
-
-There will only be a single study visit for each participant in which all experiments will be performed and will end with an exit survey. The study visit will take no more than 60 minutes to complete. The participant will be asked to do the following procedures:
-
-\begin{itemize}
-\item Complete a set of tasks on the computer for each of the 7 virtual keyboard inputs. These tasks, for all of the virtual keyboard inputs, are expected to take an upward bound of 54 minutes to complete. For each of the 7 virtual keyboard inputs, the participant will complete the following steps:
-\begin{itemize}
-\item Given a brief explanation of the current input. This explanation will take a total of about 30 seconds. The dialog will be similar to: “This is the ABC keyboard (e.g., standard, controller, leap-air, leap-surface, etc.). It is a JKL keyboard (e.g., mid-air, controller-based, or touch-based) and you will use XYZ (e.g., stylus, hand, or controller) to interact with it.” The participant will then be given the interaction object and allowed to interact with the virtual keyboard input.
-\item The participant will be given multiple opportunities to optionally recalibrate the keyboard interaction-space (if applicable to the current input) as many times as needed. Some inputs do not have an interaction-space and therefore do not require calibration of any kind. This task will take a total of about 10 seconds for each calibration and is expected to take no more than 6 calibrations (1 minute) for each applicable input.
-\item The participant will then be given the opportunity to use each virtual keyboard input to type in a variety of practice words. Practice words are randomly selected from a large dictionary but filtered to remove swear words and words used in the experiments. The participant will be able to attempt as many practice words as needed until they feel comfortable with the current virtual keyboard input. At any time during this phase, the participant can opt to recalibrate the interaction-space if applicable. This task is expected to take a maximum time of 3 minutes.
-\item Next, the participant will be going through the experiment. They will type in a total of 10 words for the current virtual keyboard input. These words are preselected words for each input before the experiment begins and have been selected based on a similarity calculation and filtered for swear words. This task is expected to take a maximum time of 3 minutes.
-\item Finally, there will be a small survey section after using the current keyboard input to rate each one on the Likert scale relating to difficulty, discomfort and fatigue experienced when using the devices. This task is expected to take a maximum time of 30 seconds. See Appendix D for the keyboard input survey example.
-\end{itemize}
-\item After all experiments are completed for each input device, the participant will be asked to fill out an exit survey. This exit survey will obtain basic data such as age, gender, major, and handedness as well as several questions about any prior experience or impairments that might relate to the study. Finally, the exit survey will have a section to rank each device on a numerical scale. This exit survey will take a total of about 5 minutes. See Appendix E for the full exit survey.
-\end{itemize}
+There were 13 male and 5 female participants, ages ranging from 18 to 24 with a median age of 21. Participants' computer usage ranged from 1 to greater than 50 hours per week with a median usage between 31 to 50 hours per week. All but two of the participants described their right hand as being dominant with one participant describing their left hand and the other claiming to be ambidextrous. Correspondingly, all participants used their right hand during the experiment except for one participant who used their left hand and another who switched back and forth. All of the participants had previous experience with touch devices, whereas 83\% of participants had previous experience with gesture-controllers and only 56\% having previous experience with word-gesture keyboards. No participants had any impairment that affected their ability to enter text with computers. Refer to Table~\ref{final_participant_stats} for more specific details of each participant.
 
 \begin{table}[h]
-\centering
-\caption[Schedule of Assessments]{\centering Schedule of Assessments for a single study visit (in minutes).}
-\label{table_schedule_of_assessments}
-\resizebox{\textwidth}{!}{\begin{tabular}{ l | c c c c c c c | c}
-    \hline
-    {} & Controller & Touch Screen & Leap-Surface & Leap-Air & Leap-Air & Leap-Air & Leap-Air & \textbf{total}  \\
-    {} & {} & {} & {} & Static & Dynamic & Pinch & Bimodal & {}  \\
-    \hline
-    explain & .5 & .5 & .5 & .5 & .5 & .5 & .5 & \textbf{3.5} \\
-    calibrate & 0 & 0 & 1 & 1 & 1 & 1 & 1 & \textbf{5} \\
-    practice & 3 & 3 & 3 & 3 & 3 & 3 & 3 & \textbf{21} \\
-    task & 3 & 3 & 3 & 3 & 3 & 3 & 3 & \textbf{21} \\
-    survey & .5 & .5 & .5 & .5 & .5 & .5 & .5 & \textbf{3.5} \\
-    \hline
-    \textbf{total} & \textbf{7} & \textbf{7} & \textbf{8} & \textbf{8} & \textbf{8} & \textbf{8} & \textbf{8} & \textbf{54} \\
-    \hline
-\end{tabular}}
-\end{table}
+	\centering
+	\caption[Final Study Details of Participants]{\centering Participant information including age, gender, handedness, computer usage, and previous experiences.}
+	\label{final_participant_stats}
+	\resizebox{\textwidth}{!}{\begin{tabular}{ c | c c c c c c c c c c}
+			\hline
+			Subject & Gender & Age & Computer Usage & Handedness & Hand Used & Touch-device & Gesture-controller & Word-gesturing & Impairment \\
+			{} & {} & {} & per Week (hours) & {} & in Experiment & Experience & Experience & Experience & History \\
+			\hline
+			1  & female & 20 & 41 - 50 & right & right & yes & yes & no  & no \\
+			2  & male 	& 24 & 31 - 40 & right & right & yes & yes & yes & no \\
+			3  & male 	& 19 & 1 - 5   & both  & both  & yes & yes & no  & no \\
+			4  & male 	& 23 & 41 - 50 & right & right & yes & yes & yes & no \\
+			5  & male 	& 21 & 21 - 30 & right & both  & yes & yes & no  & no \\
+			6  & female & 22 & 50+     & right & right & yes & yes & yes & no \\
+			7  & male 	& 18 & 41 - 50 & right & right & yes & yes & yes & no \\
+			8  & female & 21 & 11 - 20 & right & right & yes & no  & yes & no \\
+			9  & male 	& 22 & 50+     & left  & left  & yes & yes & yes & no \\
+			10 & male 	& 18 & 21 - 30 & right & right & yes & yes & yes & no \\
+			11 & female & 21 & 50+     & right & right & yes & no  & no  & no \\
+			12 & male 	& 22 & 11 - 20 & right & right & yes & yes & yes & no \\
+			13 & male 	& 22 & 50+     & right & right & yes & yes & no  & no \\
+			14 & female & 18 & 50+     & right & right & yes & yes & yes & no \\
+			15 & male 	& 23 & 50+     & right & right & yes & yes & no  & no \\
+			16 & male 	& 18 & 6 - 10  & right & right & yes & no  & yes & no \\
+			17 & male 	& 19 & 11 - 20 & right & right & yes & yes & no  & no \\
+			18 & male	& 18 & 31 - 40 & right & right & yes & yes & no  & no \\
+			\hline
+		\end{tabular}}
+	\end{table}
 
-\subsection{Pilot Study 1}
+\subsection{Input Devices and Interaction} \label{final_devices}
+In order to focus the study on only word-gesture keyboards, the final study saw the removal of the Xbox Controller Keyboard. Again, all of the keyboards except for the Touch Screen Keyboard were simulated on the same 64-bit, Windows 7 work station as before. The Touch Screen Keyboard was simulated on the Ideum Multi-touch Table Platform tabletop, running 64-bit Windows 8. All receivers or controllers were connected through USB 2.0. The participants were again allowed  to recalibrate the active keyboard's interaction plane, however a default interaction space was provided that was unlikely to need to be recalibrated. Participants were encouraged to use the default-calibrated interaction space. Again, the participants were allowed to reposition the gesture-controller and were told to use the keyboards in whatever way they felt they could perform best.
 
-The number of words that were used in the initial pilot study were 30 words per keyboard input totaling 210 trials per participant. This lead to complaints about fatigue, one participant completely giving up on the Leap-Air Static keyboard input. The number of words per keyboard input was reduced to 10 words.
+A major change to all of the mid-air keyboards is that the stylus was removed. The absence of the stylus was aimed to remove the barrier between the participant and the keyboard input. The goal was to make it feel more natural and more like a touch screen.
 
-\subsection{Pilot Study 2}
+\subsubsection{Touch Screen Keyboard}
+The Touch Screen Keyboard was used on a large tabletop touch screen. The participant then used their finger to interact with the virtual keyboard on the screen in the same way as typical touch devices. Touch was simulated when the participants finger touched the screen and release was simulated when the finger was lifted from the surface TODO: Provide a picture.
 
-During the second pilot study participants were asked to fill out the Likert scale, keyboard evaluations for discomfort, ease of use and fatigue at the end of the experiment during the final exit survey. Subjects were having trouble recalling which keyboard was which so this prompted a change to the procedure to include intermittent keyboard evaluation surveys after each keyboard input task was completed rather than during the final exit survey.
+\subsubsection{Leap Motion Surface Keyboard}
+Again, for the Leap Motion Surface Keyboard a Leap Motion Controller was used for tracking. Unlike the other Leap-based keyboards, the gesture controller was placed into a custom designed holder instead of on the desk in front of the participant. The holder was attached to an inclined surface with a printed keyboard fixed on top TODO: for more details see section BUILDING SURFACE WGK. Placement, this time, was insured to be similar between uses, and therefore the Leap Motion Surface Keyboard required only a single calibration for all participants. The participant then used a stylus, as before, that was tracked by the Leap Motion in order to detect interaction. A touch was simulated by pressing the tip of the stylus against the printed keyboard and a release was simulated when the tip of the stylus was again removed from the printed keyboard surface.
 
-\section{Experimental Design} \label{experimental_design}
+\subsubsection{Leap Motion Static-Air Keyboard}
+The Leap Motion Static-Air Keyboard used a Leap Motion Controller which was placed on the desk in front of the participant. The participant then used the pointer finger of their dominant hand, which was tracked by the Leap Motion, to interact with a projected interaction plane. A touch was simulated by the insertion of their finger into the interaction plane and a release was simulated upon the removal of their finger. TODO: Provide picture.
 
-TODO: get reference for latin squares design, Alivin has a good one in 4.4.6 Design section. Also get a reference for within-participants design so that we can have a reference for these statements in the next paragraph.
+\subsubsection{Leap Motion Pinch-Air Keyboard}
+The Leap Motion Pinch-Air Keyboard also used a Leap Motion Controller that was positioned on the desk in front of the participant. The participant then used their bare hand, which was tracked at the center of their palm, to interact with the projected interaction plane. Touch was simulated by having the participant make a pinching gesture with their hand and a release was simulated when the participant released the pinch, opening their hand again. TODO: Provide picture. TODO: ALSO MAYBE REFERENCE VULTURE HERE or back in chpt
 
-A Within-Subjects design was used for this study. The strength of a Within-Subjects design is that the overall power will increase and there will be a reduction in error variance associated with individual differences. The weakness of using the Within-Subjects design is that it suffers from carryover effects between each keyboard input device. The participation in one condition may affect performance in other conditions. To account for this weakness, the study was supplemented with a Latin Squares design for counterbalancing. Table \ref{table_latin_squares_rep_1} and Table \ref{table_latin_squares_rep_2} show how the Replicated Latin Squares design was utilized for 7 different keyboard inputs and a sample size of 14.
+\subsubsection{Leap Motion Bimodal-Air Keyboard}
+The Leap Motion Bimodal-Air Keyboard used a Leap Motion Controller positioned on the desk in front of the participant as before. The participant then used the pointer finger of their dominant hand, which was tracked by the Leap Motion, to determine the location over the projected virtual keyboard. A touch was simulated by pressing the space bar key on a standard QWERTY keyboard and a touch release was simulated upon the release of the 'Space Bar.' TODO: Provide picture.
 
-\begin{table}[h] % b - for bottom; !t - for top
-\centering
-\caption[Latin Squares Design Rep 1]{\centering First rep of a Replicated Latin Squares design for 14 participants and 7 conditions.}
-\label{table_latin_squares_rep_1}
-\begin{tabular}{c | c c c c c c c}
-    \hline
-    \multicolumn{8}{c}{Rep 1} \\
-    participants & \multicolumn{7}{c}{conditions} \\
-    \hline
-    1 & A & B & C & D & E & F & G \\
-    2 & B & C & D & E & F & G & A \\
-    3 & C & D & E & F & G & A & B \\
-    4 & D & E & F & G & A & B & C \\
-    5 & E & F & G & A & B & C & D \\
-    6 & F & G & A & B & C & D & E \\
-    7 & G & A & B & C & D & E & F \\
-    \hline
-\end{tabular}
-\end{table}
+\subsubsection{Leap Motion Predictive-Air Keyboard}
+As the others, the Leap Motion Predictive-Air Keyboard saw a Leap Motion Controller placed on the desk in front of the participant. The participant then used the pointer finger of their dominant hand, which was tracked by the Leap Motion, to interact with a projected interaction plane. A touch was simulated by recognizing and predicting a forward gesture of the participant's finger toward the interaction plane and a release was simulated by recognizing a backward gesture away from the interaction plane. TODO: Provide picture.
 
-\begin{table}[h] % b - for bottom; !t - for top
-\centering
-\caption[Latin Squares Design Rep 2]{\centering Second rep of a Replicated Latin Squares design for 14 participants and 7 conditions.}
-\label{table_latin_squares_rep_2}
-\begin{tabular}{c | c c c c c c c}
-    \hline
-    \multicolumn{8}{c}{Rep 2} \\
-    participants & \multicolumn{7}{c}{conditions} \\
-    \hline
-    8 & G & A & B & C & D & E & F \\
-    9 & A & B & C & D & E & F & G \\
-    10 & B & C & D & E & F & G & A \\
-    11 & C & D & E & F & G & A & B \\
-    12 & D & E & F & G & A & B & C \\
-    13 & E & F & G & A & B & C & D \\
-    14 & F & G & A & B & C & D & E \\
-    \hline
-\end{tabular}
-\end{table}
+\subsection{Task Design} \label{final_task_design}
+As in the pilot, the conditions of the task were represented by the 6 different keyboard input devices. The 6 conditions used were the Leap Motion Static-Air, Leap Motion Pinch-Air, Leap Motion Surface, Leap Motion Predictive-Air, Leap Motion Bimodal-Air, and Touch Screen keyboards.
 
-\subsection{Pilot Study 1}
+Task profiles were created for each of the 6 keyboard input devices. Each task profile consisted of 15 separate trials for a total of 90 trials per participant. The increase in trials from 10 words to 15 words for each device was due to the removal of the Xbox Controller Keyboard. The creation of the task profiles was handled by generating static, unchanging dictionaries for each keyboard, guaranteeing a total of 90 unique words across all participants. The 15 words selected for each dictionary were again generated by the same custom dissimilarity algorithm, producing the top 15 least dissimilar gesture-shapes across all words in the Oxford English Dictionary for words of length 3 through 6 characters. TODO: DICTIONARY ALG.
 
-The initial pilot study used a Within-Subjects design without any counterbalancing.
+For each trial, a word was chosen at random from the active keyboard's previously constructed dictionary and displayed on the screen. A blank text-area was positioned directly below the displayed word for the participants' transcribed text TODO: GIVE FIGURE FOR BLANK WORD DISPLAYED ON THE SCREEN. Beneath both text areas, the keyboard input devices were virtually represented. The participants were then required to use the currently active keyboard input device to enter the displayed word using word-gesturing TODO: GIVE FIGURE SHOWING WORD-GESTURING. During the word-gesturing process, participants were again shown real-time updates TODO: REFERENCE A FIGURE HERE FOR COLOR OF TEXT. The participants were required to use the active keyboard device's backspace key to remove errors, however already correct transcribed characters were still protected from being deleted. Once a word was correctly entered, the participants were to release the simulated touch to move to the next word.
 
-\subsection{Pilot Study 2}
-
-The second pilot study also used the Within-Subjects design and introduced the Latin Squares design for counterbalancing. There were only 7 participants in the second pilot study; therefore, a Replicated Latin Squares design was not used. See Table \ref{table_latin_squares_no_reps} for a standard Latin Squares design.
+\subsection{Experimental Design} \label{final_experimental_design}
+As justified in the pilot, a within-subjects design was used for the final study. To minimize carryover effects, the study was supplemented with a Replicated Latin Squares design for counterbalancing. Table~\ref{final_latin_squares_rep} shows how the Replicated Latin Squares design was utilized for 6 different keyboard inputs with a sample size of 18.
 
 \begin{table}[h] % b - for bottom; !t - for top
-\centering
-\caption[Latin Squares Design with No Replications]{\centering Latin Squares design for 7 participants and 7 conditions.}
-\label{table_latin_squares_no_reps}
-\begin{tabular}{c | c c c c c c c}
-    \hline
-    participants & \multicolumn{7}{c}{conditions} \\
-    \hline
-    1 & A & B & C & D & E & F & G \\
-    2 & B & C & D & E & F & G & A \\
-    3 & C & D & E & F & G & A & B \\
-    4 & D & E & F & G & A & B & C \\
-    5 & E & F & G & A & B & C & D \\
-    6 & F & G & A & B & C & D & E \\
-    7 & G & A & B & C & D & E & F \\
-    \hline
-\end{tabular}
+	\centering
+	\caption[Replicated Latin Squares Example]{\centering The three replications requires for a Replicated Latin Squares design for 18 participants and 6 conditions.}
+	\label{final_latin_squares_rep}
+	\begin{tabular}{c | c c c c c c}
+		\multicolumn{7}{c}{First Replication} \\
+		\hline
+		participants & \multicolumn{6}{c}{conditions} \\
+		\hline
+		1 & A & B & C & D & E & F \\
+		2 & B & C & D & E & F & A \\
+		3 & C & D & E & F & A & B \\
+		4 & D & E & F & A & B & C \\
+		5 & E & F & A & B & C & D \\
+		6 & F & A & B & C & D & E \\
+		\hline
+	\end{tabular}
+	
+	\vspace*{5mm}
+	
+	\begin{tabular}{c | c c c c c c}
+		\multicolumn{7}{c}{Second Replication} \\
+		\hline
+		participants & \multicolumn{6}{c}{conditions} \\
+		\hline
+		7 & F & A & B & C & D & E \\
+		8 & A & B & C & D & E & F \\
+		9 & B & C & D & E & F & A \\
+		10 & C & D & E & F & A & B \\
+		11 & D & E & F & A & B & C \\
+		12 & E & F & A & B & C & D \\
+		\hline
+	\end{tabular}
+	
+	\vspace*{5mm}
+	
+	\begin{tabular}{c | c c c c c c}
+		\multicolumn{7}{c}{Third Replication} \\
+		\hline
+		participants & \multicolumn{6}{c}{conditions} \\
+		\hline
+		13 & E & F & A & B & C & D \\
+		14 & F & A & B & C & D & E \\
+		15 & A & B & C & D & E & F \\
+		16 & B & C & D & E & F & A \\
+		17 & C & D & E & F & A & B \\
+		18 & D & E & F & A & B & C \\
+		\hline
+	\end{tabular}
 \end{table}
+
+\subsection{Procedure} \label{final_procedure}
+Each subject participated in a single study visit which took between 30 and 45 minutes to complete. For this study, almost no calibrations were performed. The full set of tasks, and their expected durations, are detailed in Table~\ref{final_schedule_of_assessments}, the final study schedule of assessments. The participants followed the same process for each of the 6 keyboard input devices' tasks.
+
+First, the participants were given a brief explanation and demonstration of the active keyboard input. The explanation dialog contained the name of the active keyboard, how it was interacted with. The researcher then demonstrated how to enter the word "test" using the active keyboard. The participants were then given control and interacted with the keyboard to get a sense of how it worked.
+
+Participants were then instructed to use the keyboard to perform practice words which were randomly selected from the Oxford English Dictionary with lengths between 3 and 6 characters long. The practice words were again filtered for offensive words and against the previously constructed experiment dictionaries. There was no limit placed on how many words could be performed while practicing. The participants were told to continue until they felt they were able to efficiently and comfortably type each word with minimal errors. The participants were told that the keyboards could be recalibrated if absolutely necessary but were encouraged to learn to use the default calibration. This change was brought about because in the pilot study, participants had a hard time finding calibrations that worked, sometimes taking upwards of 30 minutes with poor results.
+
+Next, the participants performed the task itself. As detailed in Section~\ref{final_task_design}, the participants were instructed to enter a total of 15 words for the current keyboard input device. The words selected were pulled at random from the active keyboard's previously constructed dictionary until all 15 words in the dictionary were used.
+
+After the task for the active keyboard was completed, the participants were asked to fill out a small survey section. The survey asked participants to use the Likert scale to rate each keyboard in terms of difficulty, discomfort and fatigue experienced when using the devices. TODO: SEE APPENDIX FOR INTERMITTENT SURVEY OR FIGURE
+
+Finally, after all tasks were completed for each of the 6 input devices, the participants were asked to fill out an exit survey TODO: SEE APPENDIX. The exit survey, as in the pilot, asked the participants for their age, gender, major, and handedness as well as several questions detailing any prior touch, gesture-controller, or word-gesturing experience or impairments that might relate to the study. Lastly, the participants were asked to rank each device on a numerical scale from best to worst.
+
+\begin{table}[h] % b - for bottom; !t - for top
+	\centering
+	\caption[Final Study Schedule of Assessments]{\centering Schedule of Assessments for a single study visit (in minutes).}
+	\label{final_schedule_of_assessments}
+	\resizebox{\textwidth}{!}{\begin{tabular}{ l | c c c c c c c | c}
+		\hline
+		{} & Touch & Leap Motion & Leap Motion & Leap Motion & Leap Motion & Leap Motion & Exit & \textbf{total}  \\
+		{} & Screen & Surface & Static-Air & Pinch-Air & Predictive-Air & Bimodal-Air & Survey & {}  \\
+		\hline
+		explain & .5 & .5 & .5 & .5 & .5 & .5 & 0 & \textbf{3} \\
+		calibrate & 0 & 0 & .5 & 0 & .5 & .5 & 0 & \textbf{1.5} \\
+		practice & 3 & 3 & 3 & 3 & 3 & 3 & 0 & \textbf{18} \\
+		task & 1.5 & 1.5 & 1.5 & 1.5 & 1.5 & 1.5 & 0 & \textbf{9} \\
+		survey & .5 & .5 & .5 & .5 & .5 & .5 & 3 & \textbf{6} \\
+		\hline
+		\textbf{total} & \textbf{5.5} & \textbf{5.5} & \textbf{6} & \textbf{5.5} & \textbf{6} & \textbf{6} & \textbf{3} & \textbf{37.5} \\
+		\hline
+	\end{tabular}}
+\end{table}
+
+\subsection{Dependent Measures} \label{final_dependent_measures}
+Again because each individual trial was designed as a single word rather than a phrase that included many words, most dependent measures were analyzed on the word-gesture level. It's possible to analyze these values at the phrase level if every the combined trials are viewed as a single phrase. In addition, due to the lack of word-recognition in the design of the word-gesture keyboard, the forcing of participants to make corrections to transcribed words, and to help accommodate for device detection errors that were out of the participants' control, some of the dependent measures have had modified forms added. The modifications that were used directly effect the data processing for the transcribed word.
+
+The first of the modifications was by using the shortest form of the transcribed word, Table~\ref{shortest_transcribed} shows how this worked. The shortest-transcribed modification helps to account for device detection errors as well as the fact that participants were forced to correct words. The drawback, however, can be seen in Example 4 of Table~\ref{shortest_transcribed}, the participant's intention seemed to be the word "fired" instead of "fire" but this information was lost with the shortest-transcribed modification.
+
+\begin{table}[h] % b - for bottom; !t - for top
+	\centering
+	\caption[Shortest-transcribed Examples]{\centering Examples of the shortest-transcribed modification.}
+	\label{shortest_transcribed}
+	\resizebox{\textwidth}{!}{\begin{tabular}{ l | l l l }
+		\hline
+		{} & Presented text: & Input Stream: & Transcribed text: \\
+		\hline
+		Example 1 & quick & wquiclk${\leftarrow}{\leftarrow}{\leftarrow}{\leftarrow}{\leftarrow}{\leftarrow}{\leftarrow}$quick & wquiclk \\
+		Example 2 & dot & fdot${\leftarrow}{\leftarrow}{\leftarrow}{\leftarrow}$di${\leftarrow}$ot & fdot \\
+		Example 3 & burn & burnm${\leftarrow}$ & burn \\
+		Example 4 & fire & fuired${\leftarrow}{\leftarrow}{\leftarrow}{\leftarrow}{\leftarrow}$ired${\leftarrow}$ & fuire \\
+		\hline
+	\end{tabular}}
+\end{table}
+
+The second modification was by including backspaces as part of the presented word when a participant made mistakes, since participants were required to correct errors. With the modification to the presented text, the transcribed string was now represented by the entire input stream. Table~\ref{backspace_presented} shows how this worked. The main motivation behind this modification was to mirror the participants' requirement to use backspaces until a word was correctly entered, especially for the correctness measure, Fr\'echet Distance.
+
+\begin{table}[h] % b - for bottom; !t - for top
+	\centering
+	\caption[Backspace-transcribed Examples]{\centering Examples of the backspace-transcribed modification.}
+	\label{backspace_presented}
+	\resizebox{\textwidth}{!}{\begin{tabular}{ l | l l l l }
+		\hline
+		{} & Presented text: & Input Stream: &  Modified Presented text: & Transcribed text: \\
+		\hline
+		Example 1 & quick & wquiclk${\leftarrow}{\leftarrow}{\leftarrow}{\leftarrow}{\leftarrow}{\leftarrow}{\leftarrow}$quick & ${\leftarrow}{\leftarrow}{\leftarrow}{\leftarrow}{\leftarrow}{\leftarrow}{\leftarrow}$quick & wquiclk${\leftarrow}{\leftarrow}{\leftarrow}{\leftarrow}{\leftarrow}{\leftarrow}{\leftarrow}$quick \\
+		Example 2 & dot & fdot${\leftarrow}{\leftarrow}{\leftarrow}{\leftarrow}$di${\leftarrow}$ot & ${\leftarrow}{\leftarrow}{\leftarrow}{\leftarrow}$d${\leftarrow}$ot & fdot${\leftarrow}{\leftarrow}{\leftarrow}{\leftarrow}$di${\leftarrow}$ot \\
+		Example 3 & burn & burnm${\leftarrow}$ & burn${\leftarrow}$ & burnm${\leftarrow}$ \\
+		Example 4 & fire & fuired${\leftarrow}{\leftarrow}{\leftarrow}{\leftarrow}{\leftarrow}$ired${\leftarrow}$ & f${\leftarrow}{\leftarrow}{\leftarrow}{\leftarrow}{\leftarrow}$ire${\leftarrow}$ & fuired${\leftarrow}{\leftarrow}{\leftarrow}{\leftarrow}{\leftarrow}$ired${\leftarrow}$ \\
+		\hline
+	\end{tabular}}
+\end{table}
+
+\subsubsection{Text-Entry Rate}
+Again, text-entry rates are calculated using modified Words Per Minute, Formula~\ref{WPM}, where $|T-1|$ is replaced with $|T|$ and $S$ represents the amount of time, in seconds, that was taken to transcribe the word including the time that it took to produce the first character. The text-entry rate was calculated with and without the shortest-transcribed modification.
+
+\subsubsection{Error Rates}
+There were several techniques used to measure error rates and find the best representation of keyboard performance and account for the task design.
+
+The first error rate, again, uses modified Minimum Word Distance, Formula~\ref{MWD_simple}, where $IW$ are words where the participant made any mistakes at all regardless of corrections and $CW$ are words where the participant got the word correct with one attempt. The shortest-transcribed modification, though, allows for the original Minimum Word Distance formula, Formula~\ref{MWD} from Vulture TODO: VULTURE REF, where $P$ and $T$ were the sets of words in the presented and transcribed strings, and $\overline{S_P}$ was the mean size of the optimal alignments calculated on a per-word level.
+
+Next, due to the addition of the shortest-transcribed modification and because of the lack of word-recognition implementation of the word-gesture keyboards, the Minimum String Distance error rate was able to be used TODO: REF MAKENZIE 2003. Using the simplified keystroke taxonomy that was presented before, Minimum String Distance can be defined as the formula
+\begin{equation} \label{pilot_ter}
+	MSD\ error\ rate = \frac{INF}{C + INF} \times 100\%
+\end{equation}
+wher e$C$ represented the correct characters in the transcribed text and $INF$ were the incorrect, not fixed characters in the transcribed text.
+
+As before, the simplified Keystrokes Per Character formula, Formula~\ref{KSPC_simple}, was used where $C$ represented the correct characters in the transcribed text, $INF$ were the incorrect, not fixed characters in the transcribed text, $F$ was used to show the keystrokes which were editing functions, namely backspace, and $IF$ were the incorrect but fixed characters in the input stream, but not editing keys. Additionally, Formula~\ref{KSPC} was used with the shortest-transcribed modification.
+
+TODO: MENTION THAT TOTAL ERROR RATE SIMPLIFIED IS ACTUALLY ALMOST EXACTLY LIKE THE CORRECTED ERROR RATE
+The final error rate, again, was the simplified Total Error Rate from the Formula~\ref{TER_simple} where, again, $C$ represented the correct characters in the transcribed text, $INF$ were the incorrect, not fixed characters in the transcribed text, $F$ was used to show the keystrokes which were editing functions, namely backspace, and $IF$ were the incorrect but fixed characters in the input stream, but not editing keys. With the edition of the shortest-transcribed modification, Formula~\ref{TER} was also utilized.
+
+\subsubsection{Correctness}
+As in the pilot study, correctness of a single word-gesture was determined by calculating the Fr\'echet Distance between the expected word-gesture path and the participant's generated word-gesture path. Figure~\ref{code_frechet} shows the recursive implementation of Fr\'echet Distance used in this study where $P$ and $Q$ were the two paths being walked, $CA$ was the matrix that contains all possible distance values for each comparison, and $i$ and $j$ are the indices that were being examined for that particular recursive phase. The Fr\'echet Distance was also calculated for both the shortest-transcribed and backspace-transcribed modifications.
+
+\subsubsection{Distance Measures}
+The two primary distance measures were the distance traveled to complete a word's gesture-shape, recorded in centimeters, and the average velocity of the participant's hand recorded in centimeters per second.
+
+\subsubsection{Timing Measures}
+As before in the pilot, the primary time measure taken was the duration required to complete a word's gesture-shape in seconds. Additionally, the participant's reaction time to errors, the duration it took for participants to first simulate a touch, and the time it took to correctly enter the first letter were recorded.
+
+\subsubsection{Quantitative Measures}
+Again, there were two quantitative measures recorded, the number of practice words completed for each input per participant, and the number of times a touch was simulated for each subject per input.
+
+\subsubsection{Qualitative Measures}
+The qualitative measures, in the final study, were gathered from the intermittent surveys and the final exit survey. In the intermittent surveys, the participants were asked to rate each keyboard that they used in terms of discomfort, difficulty, and fatigue using a Likert scale with 5 options. In the final exit survey, participants ranked the keyboards from 1, most preferred, to 6, the least preferred. TODO: SEE APPENDIX FOR EXIT SURVEY. 

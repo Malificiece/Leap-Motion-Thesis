@@ -1,57 +1,59 @@
 \chapter{Discussion, Future Work and Conclusion}
-
-The purpose of this chapter is not just to reiterate what you found but rather to discuss what your findings
-mean in relation to the theoretical body of knowledge on the topic and your profession. Typically, students skimp
-on this chapter even though it may be the most important one because it answers the "So what?" question.
-
- Begin by discussing your findings in relation to the theoretical framework introduced in the literature
-review. In some cases, you may need to introduce new literature (particularly with qualitative research).
- This chapter also should address what your findings mean for communication professionals in the field
-being examined. In other words, what are the study's practical implications?
-
- Doctoral students also should discuss the pedagogical implications of the study. What does the study
-suggest for mass communication education?
-
- This chapter next outlines the limitations of the study. Areas for future research then are proposed.
- Obviously, the thesis or dissertation ends with a brief conclusion that provides closure. A strong final
-sentence should be written. 
-
 \section{Discussion}
+Vulture has shown that word-gesture keyboards are beneficial to mid-air text-entry by reaching a text-entry rate of 28 WPM, surpassing earlier work, however it utilizes pinching as a means of word separation TODO: VULTURE REFERENCE. This study aimed to find alternative solutions to word separation and interaction with a mid-air, word-gesture keyboard. Rather than pinching or inconvenient glove-use, this study utilized the 3rd-Dimension as well as a bimodal approach.
 
-\subsection{Calibration}
+This study suffered from some of the same issues that were experienced in Vulture, text-entry rates were much slower for mid-air keyboards than the Touch Screen Keyboard. One reason for this is that participants are required to couple the gestures in motor space with those on the display TODO: REF VULTURE 24. This affect was described in detail for many of the results in Chapter~\ref{5_results}. Another reason, as seen in Vulture and in other studies TODO: REF VULTURE AND VULTURE 32, participants heavily rely on the displayed feedback. This was seen mostly due to the small latency introduced when using the Leap Motion to track and display hand motions on the screen. Some participants commented having to slow down to ensure the display more accurately represented their hand movements. If movements were made that were too fast, the visual display would slightly lag behind and so some participants had a tendency to overshoot letters. A final reason, like in Vulture, is that many of the alternatives add to the complexity of text-entry by the forcing explicit delimiting of words. 
 
-\subsection{Reasons stylus was used instead of hands}
+\subsection{Pinching Interaction}
+This study utilized a pinching method using the Leap Motion in order to have a metric for comparison against Vulture's pinching since this study used a pseudo-implementation of word-gesturing, lacking word-recognition. The text-entry rate for pinching with a single session was 11.3 WPM which was consistent with the mean text-entry rate using Vulture ($M = 11.8$ WPM) for a single session TODO: REFERENCE VULTURE. This gave a solid measure for alternative solutions to compare against.
 
-\subsection{Reasons that I didn't implement a word-prediction algorithm for word-gesture keyboard}
+\subsection{3-Dimensional Interaction}
+This study showed initial text-entry rates for utilizing the 3rd-Dimension as a means of word separation at 8.6 WPM for the Static-Air approach and 9.6 WPM for the Predictive-Air approach. These approaches underperformed because of the difficulty in coupling word-gestures in motor space with those displayed on the screen with the added factor of having to move in the 3rd-Dimension and interact with an invisible plane to delimit words.
 
-\subsection{issues with entrance/exit of touch plane}
-Solve the problem of entering/leaving the touch plane (we move along a sphere) so when
-	moving away from the touch plane, you often hit the key above what you're leaving on.
+The Predictive-Air Keyboard was not significantly worse than the Pinch-Air Keyboard and needs to be investigated further with a repeated-measures, multiple session study. Both the Static-Air and Predictive-Air suffered from an issue referred to as "skimming". The "skimming" issue is when a participant reaches towards the interaction plane and simulates a touch but as they move their hand during the gesturing motion, natural arcing of the participant's hand causes them to lose the simulated touch TODO: GET PICTURE OF THIS. The natural arcing motion of the participants also seemed to cause a lot of errors after finishing writing a word because participants would pull their hand back in an arcing motion, especially if their elbow was rested. This would cause their finger to hit the key above the current key they were on and count it as a press TODO: GET PICTURE OF THIS TOO.
+
+It's very interesting to note that the Static-Air implementation was used to project a mid-air keyboard onto flat surfaces, simulating a touch screen. This was the Leap Surface Keyboard. The Leap Surface was essentially indistinguishable from the Touch Screen Keyboard in terms of performance and text-entry rate, reaching 17.1 WPM, for a single session. The Leap Surface Keyboard handily proves how essential it is it avoid having a decoupled input plane and display plane. This hints that the Static-Air Keyboard may substantially benefit from an input plane displayed using augmented reality.
+
+\subsection{Bimodal Interaction}
+Bimodal mid-air interactions are shown to be very promising in this study and it should be noted that any other secondary input can be used as the source for touch simulation. The Bimodal-Air Keyboard reached a text-entry rate of 15.8 WPM for a single session which is a significant improvement over using pinching or utilizing the 3rd-Dimension. The Bimodal-Air Keyboard was also often times indistinguishable from the Touch Screen Keyboard for many other dependent measures, all detailed in Chapter~\ref{5_results}. The Bimodal-Air keyboard needs to be further investigated in a repeated-measures, multiple session study on a word-gesture keyboard implemented with word-recognition.
+
+The Bimodal-Air isn't without some of it's own drawbacks though, as experienced with the other mid-air keyboards using the Leap Motion, there is an associated plane that the gesture is moving across as the participant moves their hand. This plane, if calibrated or oriented incorrectly, can lead to higher error rates and less precision overall.
+
+\subsection{Lacking Word-Recognition}
+There are some glaring limitations to using a pseudo-implementation of word-gesturing as opposed to using a full word-recognition implementation. A major differences was that the best-guess implementation analyzed the gesture as it was being created, showing participants real-time updates of what was happening to the path they were creating. As the gesture was being created, the system attempted to guess the current character being pressed based on the deviations in the gesture and then compared those deviations with the current characters that the participant was trying to achieve and against the previously detected deviation. The limitation that this imposes, seeing real-time character-level updates, is that most participants would interrupt their current word-gesture in order to fix the errors being created mid-gesture which is unnatural for word-gesturing. As well, the fidelity for making errors was much higher, allowing these interruptions to sometimes occur frequently. The lack or word-recognition means that words that aren't real could be produced through gesturing which again is counter-intuitive and once one mistake was made, the likelihood to see more errors increased.
 
 \section{Future Work}
+There are many things to consider when looking at improves to be made or additional studies that can be conducted.
 
-\subsection{number of trials}
+\subsection{Implement Word-Recognition}
+The most important change to this study that needs to be explored is to re-conduct the study using a standardized word-gesture keyboard implementation with word-recognition. This single improvement will give better and more standardized results across the board. There would also be no need for any modified variables, and less error measures could have been observed. There should also be an increase in text-entry rates since participants won't be distracted with errors mid-gesture.
 
-A greater number of trials per keyboard would have been better, in the future we need to reduce the number of keyboards each person is using so that each person can instead do something closer to 100 trials per keyboard (although 100 straight would be too tiring as shown by the first pilot study). This number can be further increased by having reoccurring visits. It would be good to have people train for each keyboard and have multiple study visits in order to get past the learning curve and get a better indication of each keyboards performance.
+\subsection{Redesign Task}
+The task for the study needs to be substantially redesigned to fit a word-recognition implementation of the word-gesture keyboards. First, the trials need to be phrases instead of single words to better track text-entry and error rates. Next, there shouldn't be any requirement to fix words, it should just feel natural for the participant and they can fix errors where they feel it's necessary. The number of trials needs to be increased but a significant amount and as well there study needs to be designed for repeated sessions so that improvements in text-entry rate can be seen. With repeated sessions and actual word-recognition, the Bimodal-Air keyboard is expected to achieve text-entry rates superior to those found in Vulture.
 
-\subsection{tilt the leap for better tracking}
+\subsection{Augmented Reality}
+In an effort to decrease the mental coupling required between the gesture motor-space and the keyboard display, augmented reality would be a huge boon for 3-Dimensional mid-air implementations. This is theorized to benefit the Static-Air Keyboard the most due to the success of the Leap Surface Keyboard which is just the Static-Air keyboard projected onto a surface. Participants being able to see the keyboard they are using would is expected to substantially increase text-entry rates.
 
-\subsection{image processing, any keyboard}
+\subsection{The "Skimming" Issue}
+As a first thought to solve the "skimming" issue, there is a seemingly obvious solution to the problem. Simply, once a simulated touch has been made, increase the interaction plane's threshold in the participant's direction, enough so that the participant's hand doesn't leave the surface when moving from side to side or up and down TODO GET A PICTURE COMPARING SKIMMING PROBLEM TO THIS SOLUTION. This change should see improved results for the Static-Air Keyboard since there would be many less times where the user accidentally exits the interaction plane. A similar approach could also be used for the Predictive-Air because sometimes quick side to side movements were seen as a touch being released.
 
-\subsection{augmented reality adaption}
+\subsection{Better Tracking}
+A simple observation that was made by the researcher is that there were many times that the Leap Motion had issues detecting people's hands and palm. The main reasoning for this was the positioning of the Leap Motion itself as well as some participants holding their hand in an upward position TODO: SHOW UPWARD POINTING HAND BLOCKING LEAP. A simple solution to this issue is to angle the leap so that so that it is facing the participant at a better angle TODO: SHOW LEAP AT AN ANGLE.
 
-\subsection{using sphere techniques to better determine the leaps position on a surface}
+\subsection{Alternative Interaction Plane}
+Something that was observed with all mid-air keyboards is that as the partcipants moved across the interaction plane, sometimes the side-to-side movements and up and down movements weren't represented as expected TODO: SHOW FIGURE THAT AN UP AND DOWN MOTION TRANSLATES TO AN ANGULAR MOTION. Better approaches to calibration as in and plane-creation Personal Space TODO: REFERENCE ALVIN need to be used such as those used and mentioned in TODO: REFERENCE ALVIN AND DARREN. A spherical or even curved interaction plane designed for the individual participant would greatly benefit both the all of the mid-air keyboards especially so that participants would be able to rest their arms. With a flat, quadrilateral plane, many participants suffered the same issues as mentioned in TODO: REFERENCE ALVIN, especially when moving to the extreme edges of the projected keyboard.
 
-\subsection{with better leap detection, use hand instead of stylus}
+\subsection{Multi-functional Space}
+Utilizing the 3rd-Dimension for mid-air word-gesturing keyboards, when not touching the interaction plane to simulate touch, hand gestures can be used to control a curser or for other gestures. This would allow users to fully interact with screens of any kind, including projections, and not limit the user to a keyboard and mouse.
 
-\subsection{would word-gesture controller-based keyboard be better for consoles}
+\subsection{Image Processing}
+After using the Leap Surface Keyboard and projecting a virtual keyboard over just a printed sheet, an addition that could be added to make the feature much more versatile is image processing. Being able to print and use any keyboard for word gesturing or otherwise could be interesting and highly beneficial.
 
-\subsubsection{Use WKG with controller}
-
-\subsubsection{Use gesture controller (x-box kinect) for text entry}
-
-\subsection{since we use 3 degrees, if above intersect plane, use gestures for other functions, aka controlling the mouse or other gesture related things}
+\subsection{Gaming Console Keyboards}
+An afterthought from using the Xbox Controller Keyboard in the pre-pilot and the pilot study, it would be very beneficial to apply what has been learned from this study and word-gesturing in general to gaming console keyboards. There are two options for implementing a word-gesture keyboard for gaming consoles. The first is to implement a mid-air word-gesture keyboard using the Xbox Kinect or using the Wii Remotes. The second option would be to transition from the standard console keyboards to a word-gesture keyboard just using standard console controllers. The word-gesture keyboard would most likely have to be bimodal. The user would hold the 'A' button while simulating touch and use the thumb stick to move a curser around for word-gesturing. Either method would be a great improvement over single character text-entry currently seen on modern gaming consoles.
 
 \subsection{Accessibility}
+A major motivation for this research was the idea of applying it for amputees or those with disabilities that affect their performance using a standard keyboard. A proper study in accessibility should be performed to utilize the Bimodal-Air keyboard for users with disabilities.
 
 \section {Conclusion}
+Word-gesture keyboards show a promising means to efficient, mid-air text-entry by tracing word-gestures instead of slow, single-input text-entry TODO: REFERENCE VULTURE. This study, demonstrated alternative ways to delimit the separation of words for mid-air, word-gesture keyboards. It was shown that utilizing the 3rd-Dimension as a means of word separation is too complex to be beneficial when paired with a decoupled gesture-space and keyboard display. As demonstrated by projecting a Static-Air plane onto a surface with the Leap Surface Keyboard, better results may be achieved when using the 3rd-Dimension as a means of word-separation if they are complimented by an augmented reality design to re-couple the gesture-space and keyboard display. Another method to lessen the severity of a decoupled gesture-space and keyboard display, the interaction plane needs to use new techniques to be better calibrated for each individual user and to display more accurate results and control TODO: REFERENCE DARREN AND ALVIN. Finally, the empirical results from this study shows that using a bimodal technique as a means of word separation would greatly benefit mid-air, word-gesture keyboards. The Bimodal-Air keyboard was slower in text-entry rates than the Touch Screen Keyboard, however, the bimodal method was near indistinguishable from the touch screen for almost all other empirical results and was also better than pinching for nearly all results. This study needs to have a follow-up study with redesigned trials using a full word-gesture keyboard implementation with repeated measures and reoccurring sessions to further investigate bimodal techniques for mid-air text-entry. A bimodal approach just might be the future of mid-air text-entry for word-gesture keyboards.

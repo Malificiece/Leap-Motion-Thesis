@@ -137,6 +137,15 @@ public class MathUtilities {
             CA = null;
         }
         
+        /**
+         * This function recursively steps through the Frechet Distance
+         * algorithm, reporting the minimum Frechet Distance calculated
+         * for two paths.
+         * @param P, Q the paths to measure
+         * @param CA matrix holding calculated distances between P and Q
+         * @param i, j the indicies compared on this recurion
+         * @return calculated Frechet Distance for CA[i][j]
+         */
         private float calculateFrechetDistanceRecursive(int i, int j) {
             float CAij = 0;
             // coupling search function

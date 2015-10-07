@@ -47,6 +47,7 @@ public class DataFormatter implements Runnable {
     }
     private final double SECOND_AS_NANO = 1000000000;
     private final float PIXEL_TO_CENTIMETER_TOUCH = 0.053039f;
+    private final float PIXEL_TO_CENTIMETER_OTHERS = 0.027673f;
     private final float MILLIMETER_TO_CENTIMETER = 0.1f;
     private final String TUTORIAL = FileName.TUTORIAL.getName();
     private FormatProcessType type;
@@ -81,7 +82,9 @@ public class DataFormatter implements Runnable {
             TreeMap<File, Date> sortedMap = new TreeMap<File, Date>(dateComparator);
             for(File subjectDirectory: directory.listFiles()) {
                 String subjectID = subjectDirectory.getName();
-                if(subjectDirectory.isDirectory() && !TUTORIAL.equals(subjectID)) {
+                if(subjectDirectory.isDirectory() && !TUTORIAL.equals(subjectID)
+                        && !("t2qcj5nu".equals(subjectID)
+                                || "n2hjcorb".equals(subjectID))) {
                     for(File file: subjectDirectory.listFiles()) {
                         if(file.getName().contains(FileName.EXIT_SURVEY.getName())) {
                             // Remove extraneous text from filename.
@@ -201,16 +204,16 @@ public class DataFormatter implements Runnable {
                                 break;
                             case GENDER:
                                 if(value != null) {
-                                    exitSurveyData.put(key, value + "; " + dataInfo[1]);
+                                    exitSurveyData.put(key, value + "; '" + dataInfo[1] + "'");
                                 } else {
-                                    exitSurveyData.put(key, dataInfo[1]);
+                                    exitSurveyData.put(key, "'" + dataInfo[1] + "'");
                                 }
                                 break;
                             case HANDEDNESS:
                                 if(value != null) {
-                                    exitSurveyData.put(key, value + "; " + dataInfo[1]);
+                                    exitSurveyData.put(key, value + "; '" + dataInfo[1] + "'");
                                 } else {
-                                    exitSurveyData.put(key, dataInfo[1]);
+                                    exitSurveyData.put(key, "'" + dataInfo[1] + "'");
                                 }
                                 break;
                             case HAS_PHYSICAL_IMPAIRMENT:
@@ -255,16 +258,16 @@ public class DataFormatter implements Runnable {
                                 break;
                             case HOURS_PER_WEEK_ON_COMPUTER:
                                 if(value != null) {
-                                    exitSurveyData.put(key, value + "; " + dataInfo[1]);
+                                    exitSurveyData.put(key, value + "; '" + dataInfo[1] + "'");
                                 } else {
-                                    exitSurveyData.put(key, dataInfo[1]);
+                                    exitSurveyData.put(key, "'" + dataInfo[1] + "'");
                                 }
                                 break;
                             case PREFERED_HANDEDNESS_FOR_EXPERIMENT:
                                 if(value != null) {
-                                    exitSurveyData.put(key, value + "; " + dataInfo[1]);
+                                    exitSurveyData.put(key, value + "; '" + dataInfo[1] + "'");
                                 } else {
-                                    exitSurveyData.put(key, dataInfo[1]);
+                                    exitSurveyData.put(key, "'" + dataInfo[1] + "'");
                                 }
                                 break;
                             default: break;
@@ -963,13 +966,13 @@ public class DataFormatter implements Runnable {
         LeapPlane leapPlane = (LeapPlane) keyboard.getRenderables().getRenderable(Renderable.LEAP_PLANE);
         
         // We must load the settings that were used during the experiment for Leap Keyboards
-        if(keyboard.getType().isLeap()) {
+        /*if(keyboard.getType().isLeap()) {
             File file = new File(subjectDirectory.getPath(), keyboard.getFileName() + FileExt.INI.getExt());
             keyboard.loadSettings(file);
             leapPlane.calculatePlaneData();
             LeapListener.registerObserver((LeapKeyboard) keyboard);
             LeapListener.startListening();
-        }
+        }*/
         
         // Arrays
         ArrayList<String> wordList = new ArrayList<String>();
@@ -991,6 +994,9 @@ public class DataFormatter implements Runnable {
         //ArrayList<Float> modBackspaceKSPC_Array = new ArrayList<Float>();
         ArrayList<Float> modShortMSD_Array = new ArrayList<Float>();
         ArrayList<Float> modBackspaceMSD_Array = new ArrayList<Float>();
+        ArrayList<Float> MWD_Array = new ArrayList<Float>();
+        ArrayList<Float> modShortMWD_Array = new ArrayList<Float>();
+        ArrayList<Float> modBackspaceMWD_Array = new ArrayList<Float>();
         ArrayList<Float> totalErrorRateArray = new ArrayList<Float>();
         ArrayList<Float> totalErrorRateShortArray = new ArrayList<Float>();
         ArrayList<Float> totalErrorRateBackspaceArray = new ArrayList<Float>();
@@ -1051,6 +1057,11 @@ public class DataFormatter implements Runnable {
         
         boolean detectedShortestComplete = false;
         boolean lastEnterAfterShortestComplete = false;
+        
+        int MWD = 0;
+        boolean errorOccured = false;
+        int shortMWD = 0;
+        int backspaceMWD = 0;
         
         for(PlaybackFileData currentLine: fileData) {
             Key pressedKey = null;
@@ -1146,6 +1157,7 @@ public class DataFormatter implements Runnable {
                                 if(expectedKey != Key.VK_ENTER) {
                                     expectedPathModifiedBackspace.add(virtualKeyboard.getVirtualKey(expectedKey).getCenter());
                                 }
+                                errorOccured = true;
                             } else if(expectedKey != Key.VK_BACK_SPACE && pressedKey == Key.VK_BACK_SPACE) {
                                 // TODO: Backspace is hit when it shouldn't be ---
                                 // however program prevents it from modifying the transcribed text
@@ -1179,7 +1191,7 @@ public class DataFormatter implements Runnable {
                             takenPath.add(newPosition);
                             if(!lastEnterAfterShortestComplete) takenPathModifiedShortest.add(newPosition);
                             numberOfActionsCount++;
-                            if(keyboard.getType().isLeap()) {
+                            /*if(keyboard.getType().isLeap()) {
                                 // We must convert the coordinates from the leap keyboards into the original device coordinate space
                                 // so that we can get the actual hand movement speed and travel distance.
                                 Vector previousDevicePosition = leapPlane.denormalizePoint(new Vector(previousPosition));
@@ -1189,12 +1201,12 @@ public class DataFormatter implements Runnable {
                                         (MyUtilities.MATH_UTILITILES.findDistanceToPoint(previousDevicePosition, newDevicePosition) * MILLIMETER_TO_CENTIMETER)
                                         / ((currentLine.getTime() - previousTime) / SECOND_AS_NANO);
                                 distanceTraveled += (MyUtilities.MATH_UTILITILES.findDistanceToPoint(previousDevicePosition, newDevicePosition) * MILLIMETER_TO_CENTIMETER);
-                            } else {
+                            } else {*/
                                 handVelocity += 
-                                        (MyUtilities.MATH_UTILITILES.findDistanceToPoint(previousPosition, newPosition) * PIXEL_TO_CENTIMETER_TOUCH)
+                                        (MyUtilities.MATH_UTILITILES.findDistanceToPoint(previousPosition, newPosition) /* * PIXEL_TO_CENTIMETER_TOUCH*/)
                                         / ((currentLine.getTime() - previousTime) / SECOND_AS_NANO);
-                                distanceTraveled += (MyUtilities.MATH_UTILITILES.findDistanceToPoint(previousPosition, newPosition) * PIXEL_TO_CENTIMETER_TOUCH);
-                            }
+                                distanceTraveled += (MyUtilities.MATH_UTILITILES.findDistanceToPoint(previousPosition, newPosition) /* * PIXEL_TO_CENTIMETER_TOUCH*/);
+                            //}
                         }
                         if(firstTouch && previousPosition != null) {
                             // MOVED TO IS_TOUCHING SECTION
@@ -1231,8 +1243,9 @@ public class DataFormatter implements Runnable {
                     }
                     WPM_Array.add(((currentWord.length() - 1) / timeDuration) * 60f * (1f / 5f));
                     modShortWPM_Array.add(((currentWord.length() - 1) / timeDurationShort) * 60f * (1f / 5f));
-                    modVultureWPM_Array.add((currentWord.length() / (timeDuration + (reactionTimeFirstPressed - reactionTimeFirstTouch))) * 60f * (1f / 5f));
-                    modShortVultureWPM_Array.add((currentWord.length() / (timeDurationShort + (reactionTimeFirstPressed - reactionTimeFirstTouch))) * 60f * (1f / 5f));
+                    modVultureWPM_Array.add((currentWord.length() / (timeDuration + (reactionTimeFirstPressed))) * 60f * (1f / 5f));
+                    modShortVultureWPM_Array.add((currentWord.length() / (timeDurationShort + (reactionTimeFirstPressed))) * 60f * (1f / 5f));
+                    System.out.println(reactionTimeFirstPressed + " - " + reactionTimeFirstTouch + " = " + (reactionTimeFirstPressed - reactionTimeFirstTouch));
                     //WPM_Array.add(((currentWord.length() - 1) / ((timeDuration + reactionTimeFirstTouch) - reactionTimeFirstPressed)) * 60f * (1f / 5f));
                     //modShortWPM_Array.add(((currentWord.length() - 1) / ((timeDurationShort + reactionTimeFirstTouch) - reactionTimeFirstPressed)) * 60f * (1f / 5f));
                     //modVultureWPM_Array.add((currentWord.length() / (timeDuration + reactionTimeFirstTouch)) * 60f * (1f / 5f));
@@ -1242,6 +1255,15 @@ public class DataFormatter implements Runnable {
                     //modBackspaceKSPC_Array.add((backspaceC + backspaceINF + backspaceIF + backspaceF) / (backspaceC + backspaceINF));
                     modShortMSD_Array.add((shortINF / (shortC + shortINF)) * 100);
                     modBackspaceMSD_Array.add((backspaceINF / (backspaceC + backspaceINF)) * 100);
+                    if(errorOccured) {
+                        MWD++;
+                    }
+                    if(shortINF > 0) {
+                        shortMWD++;
+                    }
+                    if(backspaceINF > 0) {
+                        backspaceMWD++;
+                    }
                     totalErrorRateArray.add(((INF + IF) / (C + INF + IF)) * 100);
                     totalErrorRateShortArray.add(((shortINF + shortIF) / (shortC + shortINF + shortIF)) * 100);
                     totalErrorRateBackspaceArray.add(((backspaceINF + backspaceIF) / (backspaceC + backspaceINF + backspaceIF)) * 100);
@@ -1267,15 +1289,19 @@ public class DataFormatter implements Runnable {
                     }
                     System.out.println();
                     System.out.println("------------------------------------------------------------------------------");*/
+                    // TODO: DECIDE IF THIS CONVERSION NEEDS TO BE DONE
                     frechetDistanceArray.add(MyUtilities.MATH_UTILITILES.calculateFrechetDistance(
                             takenPath.toArray(new Vector[takenPath.size()]),
-                            expectedPath.toArray(new Vector[expectedPath.size()])));
+                            expectedPath.toArray(new Vector[expectedPath.size()]))
+                            /* * (keyboard.getType() == KeyboardType.TABLET ? PIXEL_TO_CENTIMETER_TOUCH : PIXEL_TO_CENTIMETER_OTHERS)*/);
                     modShortFrechetDistanceArray.add(MyUtilities.MATH_UTILITILES.calculateFrechetDistance(
                             takenPathModifiedShortest.toArray(new Vector[takenPathModifiedShortest.size()]),
-                            expectedPath.toArray(new Vector[expectedPath.size()])));
+                            expectedPath.toArray(new Vector[expectedPath.size()]))
+                            /* * (keyboard.getType() == KeyboardType.TABLET ? PIXEL_TO_CENTIMETER_TOUCH : PIXEL_TO_CENTIMETER_OTHERS)*/);
                     modBackspaceFrechetDistanceArray.add(MyUtilities.MATH_UTILITILES.calculateFrechetDistance(
                             takenPath.toArray(new Vector[takenPath.size()]),
-                            expectedPathModifiedBackspace.toArray(new Vector[expectedPathModifiedBackspace.size()])));
+                            expectedPathModifiedBackspace.toArray(new Vector[expectedPathModifiedBackspace.size()]))
+                            /* * (keyboard.getType() == KeyboardType.TABLET ? PIXEL_TO_CENTIMETER_TOUCH : PIXEL_TO_CENTIMETER_OTHERS)*/);
                     reportData = false;
                     firstLetter = true;
                     planeBreachedCount = 0;
@@ -1311,16 +1337,21 @@ public class DataFormatter implements Runnable {
                     //backspaceF = 0f;
                     detectedShortestComplete = false;
                     lastEnterAfterShortestComplete = false;
+                    errorOccured = false;
                 }
             }
         }
         
+        MWD_Array.add((MWD / (float) wordList.size()) * 100);
+        modShortMWD_Array.add((shortMWD / (float) wordList.size()) * 100);
+        modBackspaceMWD_Array.add((backspaceMWD / (float) wordList.size()) * 100);
+        
         // Reload the default settings for the Leap Keyboards
-        if(keyboard.getType().isLeap()) {
+        /*if(keyboard.getType().isLeap()) {
             keyboard.loadDefaultSettings();
             LeapListener.removeObserver((LeapKeyboard) keyboard);
             LeapListener.stopListening();
-        }
+        }*/
         
         // stuff arrays into subject Data
         subjectData.add(StatisticDataType.WORD_ORDER.name() + ": " + wordList.toString());
@@ -1342,6 +1373,9 @@ public class DataFormatter implements Runnable {
         //subjectData.add(StatisticDataType.ERROR_RATE_MODIFIED_KSPC_BACKSPACE.name() + ": " + modBackspaceKSPC_Array.toString());
         subjectData.add(StatisticDataType.ERROR_RATE_MODIFIED_MSD_SHORTEST.name() + ": " + modShortMSD_Array.toString());
         subjectData.add(StatisticDataType.ERROR_RATE_MODIFIED_MSD_BACKSPACE.name() + ": " + modBackspaceMSD_Array.toString());
+        subjectData.add(StatisticDataType.ERROR_RATE_MWD.name() + ": " + MWD_Array.toString());
+        subjectData.add(StatisticDataType.ERROR_RATE_MODIFIED_MWD_SHORTEST.name() + ": " + modShortMWD_Array.toString());
+        subjectData.add(StatisticDataType.ERROR_RATE_MODIFIED_MWD_BACKSPACE.name() + ": " + modBackspaceMWD_Array.toString());
         subjectData.add(StatisticDataType.TOTAL_ERROR_RATE.name() + ": " + totalErrorRateArray.toString());
         subjectData.add(StatisticDataType.TOTAL_ERROR_RATE_MODIFIED_SHORTEST.name() + ": " + totalErrorRateShortArray.toString());
         subjectData.add(StatisticDataType.TOTAL_ERROR_RATE_MODIFIED_BACKSPACE.name() + ": " + totalErrorRateBackspaceArray.toString());
