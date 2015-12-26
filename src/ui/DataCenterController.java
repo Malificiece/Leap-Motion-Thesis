@@ -66,6 +66,7 @@ public class DataCenterController extends GraphicsController {
     private JButton goBackFolderButton;
     private JButton homeFolderButton;
     private JButton calculateDataButton;
+    private JButton specialDataButton;
     // File data previewer
     private JTextArea fileDetailsTextArea;
     // File playback
@@ -105,6 +106,7 @@ public class DataCenterController extends GraphicsController {
         homeFolderButton = new JButton(MyUtilities.SWING_UTILITIES.resizeImageIcon(new ImageIcon(FilePath.ASSETS.getPath()
                 + FileName.HOME.getName() + FileExt.PNG.getExt()), 16, 16));
         calculateDataButton = new JButton("Calculate"); // Calculates all data for this subject for every input
+        specialDataButton = new JButton("Special");
         // File data previewer
         fileDetailsTextArea = new JTextArea();
         // File playback
@@ -134,7 +136,7 @@ public class DataCenterController extends GraphicsController {
         }
         
         JButton buttons[] = {browseDataFolderButton, consolidateDataButton, goBackFolderButton,
-                homeFolderButton, calculateDataButton, playPauseButton, stopButton};
+                homeFolderButton, calculateDataButton, playPauseButton, stopButton, specialDataButton};
         @SuppressWarnings("rawtypes")
         JList lists[] = {currentDirectoryList, fileViewerList};
         JTextField textFields[] = {selectedDataFolderTextField, selectedFileTextField};
@@ -185,7 +187,7 @@ public class DataCenterController extends GraphicsController {
                         disableUI();
                         isFormatting = true;
                         Thread thread = new Thread(new DataFormatter(DataFormatter.FormatProcessType.CONSOLIDATE, dataFolder,
-                                new JButton [] {browseDataFolderButton, consolidateDataButton, calculateDataButton}));
+                                new JButton [] {browseDataFolderButton, consolidateDataButton, calculateDataButton, specialDataButton}));
                         thread.start();
                     }
                 } finally {
@@ -236,7 +238,29 @@ public class DataCenterController extends GraphicsController {
                         disableUI();
                         isFormatting = true;
                         Thread thread = new Thread(new DataFormatter(DataFormatter.FormatProcessType.CALCULATE, dataFolder,
-                                new JButton [] {browseDataFolderButton, consolidateDataButton, calculateDataButton}));
+                                new JButton [] {browseDataFolderButton, consolidateDataButton, calculateDataButton, specialDataButton}));
+                        thread.start();
+                    }
+                } finally {
+                    DATA_LOCK.unlock();
+                }
+            }
+        });
+        
+        specialDataButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent arg0) {
+                DATA_LOCK.lock();
+                try {
+                    if(!isFormatting()) {
+                        // needs to safeguard from exiting or doing anything
+                        // disable UI
+                        // Use the Data Formatter to calculate the special data
+                        // for an individual subject
+                        disableUI();
+                        isFormatting = true;
+                        Thread thread = new Thread(new DataFormatter(DataFormatter.FormatProcessType.SPECIAL, dataFolder,
+                                new JButton [] {browseDataFolderButton, consolidateDataButton, calculateDataButton, specialDataButton}));
                         thread.start();
                     }
                 } finally {

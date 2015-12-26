@@ -6,6 +6,7 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
@@ -13,6 +14,7 @@ import java.util.LinkedHashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.TreeMap;
 
 import javax.swing.JButton;
@@ -31,6 +33,7 @@ import enums.ExitSurveyDataType;
 import enums.ExitSurveyOptions;
 import enums.FileExt;
 import enums.FileName;
+import enums.FilePath;
 import enums.Key;
 import enums.Keyboard;
 import enums.KeyboardType;
@@ -43,7 +46,8 @@ import utilities.MyUtilities;
 public class DataFormatter implements Runnable {
     public enum FormatProcessType {
         CONSOLIDATE,
-        CALCULATE;
+        CALCULATE,
+        SPECIAL;
     }
     private final double SECOND_AS_NANO = 1000000000;
     private final float PIXEL_TO_CENTIMETER_TOUCH = 0.053039f;
@@ -65,12 +69,145 @@ public class DataFormatter implements Runnable {
         try {
             if(type == FormatProcessType.CALCULATE) {
                 calculate();
-            } else {
+            } else if(type == FormatProcessType.CONSOLIDATE) {
                 consolidate();
+            } else {
+                special();
             }
         } finally {
             enableUI();   
         }
+    }
+    
+    private void special() {
+        // retrieve dictionaries
+        ArrayList<ArrayList<String>> dictionaries = new ArrayList<ArrayList<String>>();
+        for(Keyboard keyboard: Keyboard.values()) {
+            if(keyboard.getType() != KeyboardType.DISABLED) {
+                try {
+                    dictionaries.add(MyUtilities.FILE_IO_UTILITIES.readListFromFile(FilePath.DICTIONARY.getPath(), keyboard.getType().getFileName() + FileExt.DICTIONARY.getExt()));
+                } catch (IOException e) {
+                    System.out.println("Dictionary failed: " + FilePath.DICTIONARY.getPath() + "\\" + keyboard.getType().getFileName() + FileExt.DICTIONARY.getExt());
+                    e.printStackTrace();
+                }
+            }
+        }
+        
+        // reorder words
+        ArrayList<ArrayList<String>> matlab = new ArrayList<ArrayList<String>>();
+        for(int dictionaryIndex = 0; dictionaryIndex < dictionaries.get(0).size(); dictionaryIndex++) {
+            ArrayList<String> words = new ArrayList<String>();
+            for(int wordIndex = 0; wordIndex < dictionaries.size(); wordIndex++) {
+                words.add("'" + dictionaries.get(wordIndex).get(dictionaryIndex) + "'");
+            }
+            matlab.add(words);
+        }
+        
+        String output = "DICTIONARIES = {";
+        output += matlab.get(0);
+        for(int i = 1; i < matlab.size(); i++) {
+            output += ", " + matlab.get(i);
+        }
+        output +=  "}";
+        System.out.println(output.replaceAll("\\[", "\\{").replaceAll("\\]", "\\}"));
+        
+        String alphabet = "abcdefghijklmnopqrstuvwxyz";
+        Keyboard keyboard = Keyboard.getByType(KeyboardType.TABLET);
+        VirtualKeyboard virtualKeyboard = (VirtualKeyboard) keyboard.getKeyboard().getRenderables().getRenderable(Renderable.VIRTUAL_KEYBOARD);
+        ArrayList<Vector> keyLocs = new ArrayList<Vector>();
+        for(int i = 0; i < alphabet.length(); i++) {
+            keyLocs.add(virtualKeyboard.getVirtualKey(Key.getByValue(alphabet.charAt(i))).getCenter());
+        }
+        String vectors = keyLocs.toString().replaceAll("\\[", "\\{").replaceAll("\\]", "\\}");
+        vectors = vectors.replaceAll("\\(", "\\[").replaceAll("\\)", "\\]");
+        System.out.println("KEYBOARD = " + vectors);
+        
+        // Stuff words into linked hashmap
+        LinkedHashMap<String, ArrayList<String>> wordPaths = new LinkedHashMap<String, ArrayList<String>>();
+        for(ArrayList<String> wordSet: matlab) {
+            for(String w: wordSet) {
+                wordPaths.put(w, new ArrayList<String>());
+            }
+        }
+        
+        // Go through each subject and then calculate their data and put it into one .dat file.
+        for(File subjectDirectory: directory.listFiles()) {
+            String subjectID = subjectDirectory.getName();
+            if(subjectDirectory.isDirectory() && !TUTORIAL.equals(subjectID)
+                    && !("t2qcj5nu".equals(subjectID)
+                    || "n2hjcorb".equals(subjectID))) {
+                for(File file: subjectDirectory.listFiles()) {
+                    if(file.getName().contains(FileName.SUBJECT_MERGED_DATA.getName())) {
+                        ArrayList<String> fileContents = null;
+                        try {
+                            fileContents = MyUtilities.FILE_IO_UTILITIES.readListFromFile(file);
+                        } catch (IOException e) {
+                            // TODO Auto-generated catch block
+                            e.printStackTrace();
+                        }
+                        String keyboardName = null;
+                        ArrayList<String> wordOrder = null;
+                        int currentWord = -1;
+                        for(String line: fileContents) {
+                            // Remove whitespace from line and then delimit the string based on semicolon.
+                            line = line.replaceAll("\\s+", "");
+                            // Delimit by colon to break into data type, value pair.
+                            String[] dataInfo = line.split(":");
+                            
+                            // Want to get the data type and data value unless it's a time value.
+                            StatisticDataType dataType = StatisticDataType.getByName(dataInfo[0]);
+                            if(dataType == StatisticDataType.KEYBOARD_TYPE) {
+                                // assign current keyboard here
+                                dataInfo[1] = dataInfo[1].replaceAll("\\[|\\]", "");
+                                keyboardName = dataInfo[1];
+                            } else if(dataType == StatisticDataType.WORD_ORDER) {
+                                dataInfo[1] = dataInfo[1].replaceAll("\\[|\\]", "");
+                                wordOrder = new ArrayList<String>();
+                                wordOrder.addAll(Arrays.asList(dataInfo[1].split(",")));
+                                currentWord = 0;
+                            } else if(dataType == StatisticDataType.TAKEN_PATH_TOUCH_ONLY) {
+                                String [] parts = dataInfo[1].split("\\],\\[");
+                                for(String p: parts) {
+                                    p = p.replaceAll("\\[|\\]", "").replaceAll("\\)", "\\]").replaceAll("\\(", "\\[");
+                                    ArrayList<String> value = wordPaths.get("'"+wordOrder.get(currentWord)+"'");
+                                    value.add(p);
+                                    currentWord++;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        // Have to format the string for whatever word array we get
+        // laid out as[word1, word2..., [x,y],[x,y],[x,y],...wordn]
+        String order = "WORD_ORDER = {";
+        String path = "WORD_PATHS = {";
+        int first = 0;
+        for(Entry<String, ArrayList<String>> entry: wordPaths.entrySet()) {
+            ArrayList<String> paths = entry.getValue();
+            if(first == 0) {
+                order += entry.getKey();
+                path += "{{" + paths.get(0);
+                for(int i = 1; i < paths.size(); i++) {
+                    path += "}, {" + paths.get(i);
+                }
+                path += "}}";
+                first++;
+            } else {
+                order += ", "  +entry.getKey();
+                path += ", {{" + paths.get(0);
+                for(int i = 1; i < paths.size(); i++) {
+                    path += "}, {" + paths.get(i);
+                }
+                path += "}}";
+            }
+        }
+        order += "}";
+        path += "}";
+        
+        System.out.println(order);
+        System.out.println(path);
     }
     
     private void consolidate() {
@@ -588,7 +725,7 @@ public class DataFormatter implements Runnable {
                     MyUtilities.FILE_IO_UTILITIES.writeListToFile(subjectData, subjectDirectory.getPath() + "\\", fileName, false);
                 } catch (IOException e) {
                     e.printStackTrace();
-                    System.out.println("There was an error while trying to write calculated data to file for: " + subjectID);
+                    System.err.println("There was an error while trying to write calculated data to file for: " + subjectID);
                 }
             }
         }
@@ -1003,6 +1140,7 @@ public class DataFormatter implements Runnable {
         ArrayList<Float> frechetDistanceArray = new ArrayList<Float>();
         ArrayList<Float> modShortFrechetDistanceArray = new ArrayList<Float>();
         ArrayList<Float> modBackspaceFrechetDistanceArray = new ArrayList<Float>();
+        ArrayList<ArrayList<Vector>> takenPathArray = new ArrayList<ArrayList<Vector>>();
         
         // Tracked Variables
         boolean firstLetter = true;
@@ -1222,6 +1360,12 @@ public class DataFormatter implements Runnable {
                 }
                 
                 if(reportData) {
+                    {
+                        ArrayList<Vector> copy = new ArrayList<Vector>();
+                        copy.addAll(takenPath);
+                        takenPathArray.add(copy);
+                    }
+                    
                     // There is a weird situation that requires this to fire, but this is the correct fix.
                     if(timeDurationShort == 0) {
                         timeDurationShort = timeDuration;
@@ -1245,7 +1389,7 @@ public class DataFormatter implements Runnable {
                     modShortWPM_Array.add(((currentWord.length() - 1) / timeDurationShort) * 60f * (1f / 5f));
                     modVultureWPM_Array.add((currentWord.length() / (timeDuration + (reactionTimeFirstPressed))) * 60f * (1f / 5f));
                     modShortVultureWPM_Array.add((currentWord.length() / (timeDurationShort + (reactionTimeFirstPressed))) * 60f * (1f / 5f));
-                    System.out.println(reactionTimeFirstPressed + " - " + reactionTimeFirstTouch + " = " + (reactionTimeFirstPressed - reactionTimeFirstTouch));
+                    //System.out.println(reactionTimeFirstPressed + " - " + reactionTimeFirstTouch + " = " + (reactionTimeFirstPressed - reactionTimeFirstTouch));
                     //WPM_Array.add(((currentWord.length() - 1) / ((timeDuration + reactionTimeFirstTouch) - reactionTimeFirstPressed)) * 60f * (1f / 5f));
                     //modShortWPM_Array.add(((currentWord.length() - 1) / ((timeDurationShort + reactionTimeFirstTouch) - reactionTimeFirstPressed)) * 60f * (1f / 5f));
                     //modVultureWPM_Array.add((currentWord.length() / (timeDuration + reactionTimeFirstTouch)) * 60f * (1f / 5f));
@@ -1382,6 +1526,7 @@ public class DataFormatter implements Runnable {
         subjectData.add(StatisticDataType.FRECHET_DISTANCE_TOUCH_ONLY.name() + ": " + frechetDistanceArray.toString());
         subjectData.add(StatisticDataType.FRECHET_DISTANCE_TOUCH_ONLY_MODIFIED_SHORTEST.name() + ": " + modShortFrechetDistanceArray.toString());
         subjectData.add(StatisticDataType.FRECHET_DISTANCE_TOUCH_ONLY_MODIFIED_BACKSPACE.name() + ": " + modBackspaceFrechetDistanceArray.toString());
+        subjectData.add(StatisticDataType.TAKEN_PATH_TOUCH_ONLY.name() + ": " + takenPathArray.toString());
         return subjectData;
     }
     

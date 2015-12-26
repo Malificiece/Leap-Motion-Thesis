@@ -222,7 +222,7 @@
 % \@startsection{<name>}{<level>}{<indent>}{<beforeskip>}{<afterskip>}{<style>}*[<altheading>]{<heading>}
 \renewcommand{\section}
 {%
-	\@startsection{section}{1}{0pt}{1em}{0.001ex}%skip: 2 space before, 1 space after. adjusted to 0.001 so that it's virually none
+	\@startsection{section}{1}{0pt}{1em}{0.001ex}%skip: 2 space before, 1 space after. adjusted to 0.001 so that it's virtually none
 	{\centering\normalfont\slshape\normalsize}
 }
 % IF there is content text immediately after level 3, 

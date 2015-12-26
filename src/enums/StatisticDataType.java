@@ -9,6 +9,7 @@ public enum StatisticDataType {
     SUBJECT_ORDER,
     WORD_ORDER,
     // TODO: decide between FULL, FIRST_TOUCH, TOUCH_ONLY etc and consider shortest
+    TAKEN_PATH_TOUCH_ONLY,
     NUMBER_OF_TIMES_PLANE_BREACHED,
     DISTANCE_TRAVELED_TOUCH_ONLY,
     DISTANCE_TRAVELED_TOUCH_ONLY_SHORTEST,

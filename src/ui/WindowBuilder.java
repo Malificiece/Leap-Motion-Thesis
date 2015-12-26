@@ -1000,7 +1000,7 @@ public class WindowBuilder {
             JTextArea fileDetailsTextArea,
             JTextField[] textFields, // homeFolder, fileSelected
             JList<File>[] lists, // currentDirectory, fileViewer
-            JButton[] buttons, // browse, consolidate, back, home, calculate, pause/play, stop
+            JButton[] buttons, // browse, consolidate, back, home, calculate, pause/play, stop, special
             JSplitPane splitPane,
             JLabel[] labels, // current, max
             JProgressBar playbackProgressBar) {
@@ -1091,6 +1091,7 @@ public class WindowBuilder {
         calculateButtonPanel.add(MyUtilities.SWING_UTILITIES.createPadding(5, SwingConstants.VERTICAL));
         JPanel calculateButtonCenter = new JPanel(new FlowLayout(FlowLayout.CENTER));
         calculateButtonCenter.add(buttons[4]);
+        calculateButtonCenter.add(buttons[7]);
         calculateButtonPanel.add(calculateButtonCenter);
         
         calculateButtonPanel.add(MyUtilities.SWING_UTILITIES.createPadding(0, SwingConstants.VERTICAL));
