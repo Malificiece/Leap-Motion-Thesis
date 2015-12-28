@@ -1,0 +1,39 @@
+SUBJECT_ID: u47kpm6o
+leapAirBimodal_DISCOMFORT_LEVEL: strongly disagree
+leapAirBimodal_FATIGUE_LEVEL: strongly disagree
+leapAirBimodal_DIFFICULTY_LEVEL: strongly disagree
+leapAirStatic_DISCOMFORT_LEVEL: strongly disagree
+leapAirStatic_FATIGUE_LEVEL: strongly disagree
+leapAirStatic_DIFFICULTY_LEVEL: agree
+leapAirDynamic_DISCOMFORT_LEVEL: strongly disagree
+leapAirDynamic_FATIGUE_LEVEL: strongly disagree
+leapAirDynamic_DIFFICULTY_LEVEL: strongly disagree
+tablet_DISCOMFORT_LEVEL: strongly disagree
+tablet_FATIGUE_LEVEL: strongly disagree
+tablet_DIFFICULTY_LEVEL: strongly disagree
+leapSurface_DISCOMFORT_LEVEL: strongly disagree
+leapSurface_FATIGUE_LEVEL: strongly disagree
+leapSurface_DIFFICULTY_LEVEL: strongly disagree
+leapAirPinch_DISCOMFORT_LEVEL: strongly disagree
+leapAirPinch_FATIGUE_LEVEL: strongly disagree
+leapAirPinch_DIFFICULTY_LEVEL: strongly disagree
+AGE: 22
+GENDER: Male
+MAJOR: Computer Science
+HAS_PERSONAL_COMPUTER: Yes
+HOURS_PER_WEEK_ON_COMPUTER: More than 50 hours
+HAS_PREVIOUS_GESTURE_DEVICE_EXPERIENCE: Yes
+PREVIOUS_GESTURE_DEVICE_DESCRIPTION: Kinect, Leap Motion, Myo
+HAS_PREVIOUS_TOUCH_DEVICE_EXPERIENCE: Yes
+PREVIOUS_TOUCH_DEVICE_DESCRIPTION: iPad, Laptop, smartphone
+HAS_PREVIOUS_SWIPE_DEVICE_EXPERIENCE: Yes
+PREVIOUS_SWIPE_DEVICE_DESCRIPTION: Android
+HAS_PHYSICAL_IMPAIRMENT: No
+HANDEDNESS: Left hand
+PREFERED_HANDEDNESS_FOR_EXPERIMENT: Left hand
+tablet_PREFERENCE_RANKING: 1
+leapSurface_PREFERENCE_RANKING: 2
+leapAirStatic_PREFERENCE_RANKING: 6
+leapAirPinch_PREFERENCE_RANKING: 4
+leapAirDynamic_PREFERENCE_RANKING: 5
+leapAirBimodal_PREFERENCE_RANKING: 3

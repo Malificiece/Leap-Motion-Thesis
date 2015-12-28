@@ -12,6 +12,7 @@ public enum FileName {
     CONTROLLER_GESTURE("controllerGesture"),
     TABLET("tablet"),
     SWIPE("swipe"),
+    CONTROLLER("controller"),
     EXIT_SURVEY("exitSurvey"),
     SUBJECT_MERGED_DATA("mergedData"),
     CONSOLIDATED_EXPERIMENT_DATA("consolidatedExperimentData"),

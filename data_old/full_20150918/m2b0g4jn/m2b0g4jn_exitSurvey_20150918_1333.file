@@ -1,0 +1,38 @@
+SUBJECT_ID: m2b0g4jn
+leapAirPinch_DISCOMFORT_LEVEL: disagree
+leapAirPinch_FATIGUE_LEVEL: agree
+leapAirPinch_DIFFICULTY_LEVEL: strongly disagree
+leapAirBimodal_DISCOMFORT_LEVEL: disagree
+leapAirBimodal_FATIGUE_LEVEL: agree
+leapAirBimodal_DIFFICULTY_LEVEL: disagree
+leapAirStatic_DISCOMFORT_LEVEL: disagree
+leapAirStatic_FATIGUE_LEVEL: agree
+leapAirStatic_DIFFICULTY_LEVEL: agree
+leapAirDynamic_DISCOMFORT_LEVEL: strongly disagree
+leapAirDynamic_FATIGUE_LEVEL: neutral
+leapAirDynamic_DIFFICULTY_LEVEL: strongly disagree
+tablet_DISCOMFORT_LEVEL: strongly disagree
+tablet_FATIGUE_LEVEL: strongly disagree
+tablet_DIFFICULTY_LEVEL: strongly disagree
+leapSurface_DISCOMFORT_LEVEL: strongly disagree
+leapSurface_FATIGUE_LEVEL: strongly disagree
+leapSurface_DIFFICULTY_LEVEL: disagree
+AGE: 23
+GENDER: Male
+MAJOR: Computer Science - Gaming Track
+HAS_PERSONAL_COMPUTER: Yes
+HOURS_PER_WEEK_ON_COMPUTER: More than 50 hours
+HAS_PREVIOUS_GESTURE_DEVICE_EXPERIENCE: Yes
+PREVIOUS_GESTURE_DEVICE_DESCRIPTION: Wii, Leap Motion, Razor Hydra
+HAS_PREVIOUS_TOUCH_DEVICE_EXPERIENCE: Yes
+PREVIOUS_TOUCH_DEVICE_DESCRIPTION: iPad, iPhone, Nintendo DS (Stylus)
+HAS_PREVIOUS_SWIPE_DEVICE_EXPERIENCE: No
+HAS_PHYSICAL_IMPAIRMENT: No
+HANDEDNESS: Right hand
+PREFERED_HANDEDNESS_FOR_EXPERIMENT: Right hand
+tablet_PREFERENCE_RANKING: 1
+leapSurface_PREFERENCE_RANKING: 2
+leapAirStatic_PREFERENCE_RANKING: 5
+leapAirPinch_PREFERENCE_RANKING: 4
+leapAirDynamic_PREFERENCE_RANKING: 3
+leapAirBimodal_PREFERENCE_RANKING: 6

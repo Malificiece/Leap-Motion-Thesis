@@ -115,8 +115,10 @@ public class LeapPlane extends KeyboardRenderable {
     }
 
     public void setInteractionBox(InteractionBox iBox) {
-        this.iBox = iBox;
-        calculatePlaneData();
+        if(iBox != null) {
+            this.iBox = iBox;
+            calculatePlaneData();
+        }
     }
     
     private void getPlaneAttributes() {

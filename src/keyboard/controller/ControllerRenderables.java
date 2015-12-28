@@ -17,8 +17,8 @@ public class ControllerRenderables extends KeyboardRenderables {
 
     ControllerRenderables(ControllerKeyboard keyboard) {
         // order here determines render order
-        this.addRenderable(new KeyboardImage(keyboard.getFileName() + FileName.KEYBOARD_IMAGE.getName() + FileExt.PNG.getExt()));
-        this.addRenderable(new KeyboardImage(keyboard.getFileName() + FileName.KEYBOARD_IMAGE_UPPER.getName() + FileExt.PNG.getExt()));
+        this.addRenderable(new KeyboardImage(FileName.CONTROLLER.getName() + FileName.KEYBOARD_IMAGE.getName() + FileExt.PNG.getExt()));
+        this.addRenderable(new KeyboardImage(FileName.CONTROLLER.getName() + FileName.KEYBOARD_IMAGE_UPPER.getName() + FileExt.PNG.getExt()));
         this.swapToLowerCaseKeyboard();
         this.addRenderable(new VirtualKeyboard(keyboard.getAttributes()));
         if(Gesture.ENABLED) {

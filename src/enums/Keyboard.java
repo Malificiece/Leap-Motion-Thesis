@@ -7,16 +7,16 @@ import keyboard.standard.StandardKeyboard;
 import keyboard.tablet.TabletKeyboard;
 
 public enum Keyboard {
-    STANDARD(KeyboardType.DISABLED),
-    CONTROLLER_CONSOLE(KeyboardType.DISABLED),
-    CONTROLLER_GESTURE(KeyboardType.DISABLED),
+    STANDARD(KeyboardType.DISABLED), // not needed for pilot or full study
+    CONTROLLER_CONSOLE(KeyboardType.DISABLED/*KeyboardType.CONTROLLER_CONSOLE*/), // TODO: set to disabled for full study
+    CONTROLLER_GESTURE(KeyboardType.DISABLED), // never implemented
     TABLET(KeyboardType.TABLET),
     LEAP_SURFACE(KeyboardType.LEAP_SURFACE),
     LEAP_AIR_STATIC(KeyboardType.LEAP_AIR_STATIC),
     LEAP_AIR_PINCH(KeyboardType.LEAP_AIR_PINCH),
     LEAP_AIR_DYNAMIC(KeyboardType.LEAP_AIR_DYNAMIC),
     LEAP_AIR_BIMODAL(KeyboardType.LEAP_AIR_BIMODAL),
-    LEAP_AIR_AUGMENTED(KeyboardType.DISABLED);
+    LEAP_AIR_AUGMENTED(KeyboardType.DISABLED); // never implemented
 
     private final KeyboardType keyboardType;
     private final String keyboardName;

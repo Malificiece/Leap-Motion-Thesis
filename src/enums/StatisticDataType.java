@@ -19,6 +19,7 @@ public enum StatisticDataType {
     REACTION_TIME_FIRST_TOUCH,
     AVERAGE_REACTION_TIME_TO_ERRORS, // This should be the average per word that way we have one reaction time per word rather than many.
     AVERAGE_PIXEL_VELOCITY,
+    AVERAGE_HAND_VELOCITY,
     TEXT_ENTRY_RATE_WPM,
     TEXT_ENTRY_RATE_MODIFIED_WPM_SHORTEST,
     TEXT_ENTRY_RATE_MODIFIED_WPM_VULTURE,

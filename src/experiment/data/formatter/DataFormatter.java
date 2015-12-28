@@ -14,7 +14,6 @@ import java.util.LinkedHashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Set;
 import java.util.TreeMap;
 
 import javax.swing.JButton;
@@ -134,7 +133,7 @@ public class DataFormatter implements Runnable {
         for(File subjectDirectory: directory.listFiles()) {
             String subjectID = subjectDirectory.getName();
             if(subjectDirectory.isDirectory() && !TUTORIAL.equals(subjectID)
-                    && !("t2qcj5nu".equals(subjectID)
+                    && !("t2qcj5nu".equals(subjectID) // Get rid of extras (reduce to 18)
                     || "n2hjcorb".equals(subjectID))) {
                 for(File file: subjectDirectory.listFiles()) {
                     if(file.getName().contains(FileName.SUBJECT_MERGED_DATA.getName())) {
@@ -145,7 +144,7 @@ public class DataFormatter implements Runnable {
                             // TODO Auto-generated catch block
                             e.printStackTrace();
                         }
-                        String keyboardName = null;
+                        //String keyboardName = null;
                         ArrayList<String> wordOrder = null;
                         int currentWord = -1;
                         for(String line: fileContents) {
@@ -159,7 +158,7 @@ public class DataFormatter implements Runnable {
                             if(dataType == StatisticDataType.KEYBOARD_TYPE) {
                                 // assign current keyboard here
                                 dataInfo[1] = dataInfo[1].replaceAll("\\[|\\]", "");
-                                keyboardName = dataInfo[1];
+                                //keyboardName = dataInfo[1];
                             } else if(dataType == StatisticDataType.WORD_ORDER) {
                                 dataInfo[1] = dataInfo[1].replaceAll("\\[|\\]", "");
                                 wordOrder = new ArrayList<String>();
@@ -274,7 +273,7 @@ public class DataFormatter implements Runnable {
                     if(dataType == StatisticDataType.KEYBOARD_TYPE) {
                         // assign current keyboard here
                         keyboardName = dataInfo[1];
-                    } else if(dataType != StatisticDataType.WORD_ORDER) {
+                    } else if(dataType != StatisticDataType.WORD_ORDER && dataType != StatisticDataType.TAKEN_PATH_TOUCH_ONLY) {
                         String key = keyboardName + "_" + dataType.name();
                         String value = consolidatedData.get(key);
                         /*if(value != null) {
@@ -691,9 +690,9 @@ public class DataFormatter implements Runnable {
                             ArrayList<String> fileContents = MyUtilities.FILE_IO_UTILITIES.readListFromWildcardFile(subjectDirectory.getPath() + "\\", wildcardFileName);
                             ArrayList<PlaybackFileData> fileData = parsePlaybackFileContents(fileContents);
                             switch(keyboard) {
-                                /*case CONTROLLER_CONSOLE:
+                                case CONTROLLER_CONSOLE:
                                     subjectData.addAll(calculateSubjectDataController(fileData, iKeyboard));
-                                    break;*/
+                                    break;
                                 case TABLET:
                                     subjectData.addAll(calculateSubjectData(fileData, iKeyboard, subjectDirectory));
                                     break;
@@ -731,21 +730,12 @@ public class DataFormatter implements Runnable {
         }
     }
     
-    /*private ArrayList<String> calculateSubjectDataController(ArrayList<PlaybackFileData> fileData, IKeyboard keyboard) {
-        SimulateController simulateController = new SimulateController(keyboard);
+    private ArrayList<String> calculateSubjectDataController(ArrayList<PlaybackFileData> fileData, IKeyboard keyboard) {
+        SimulatedController simulatedController = new SimulatedController(keyboard);
         ArrayList<String> subjectData = new ArrayList<String>();
         subjectData.add(StatisticDataType.KEYBOARD_TYPE.name() + ": " + keyboard.getFileName());
         VirtualKeyboard virtualKeyboard = (VirtualKeyboard) keyboard.getRenderables().getRenderable(Renderable.VIRTUAL_KEYBOARD);
-        // Determine key distances for controller.
-        final float DISTANCE_RIGHT_LEFT;
-        final float DISTANCE_UP_DOWN;
-        {
-            Vector Q = virtualKeyboard.getVirtualKey(Key.VK_Q).getCenter();
-            Vector W = virtualKeyboard.getVirtualKey(Key.VK_W).getCenter();
-            Vector A = virtualKeyboard.getVirtualKey(Key.VK_A).getCenter();
-            DISTANCE_RIGHT_LEFT = MyUtilities.MATH_UTILITILES.findDistanceToPoint(Q, W);
-            DISTANCE_UP_DOWN = MyUtilities.MATH_UTILITILES.findDistanceToPoint(Q, A);
-        }
+        
         // Arrays
         ArrayList<String> wordList = new ArrayList<String>();
         ArrayList<Integer> planeBreachedCountArray = new ArrayList<Integer>();
@@ -756,6 +746,7 @@ public class DataFormatter implements Runnable {
         ArrayList<Float> reactionTimeFirstPressedArray = new ArrayList<Float>();
         ArrayList<Float> reactionTimeFirstTouchArray = new ArrayList<Float>();
         ArrayList<Float> reactionTimeToErrorAvgArray = new ArrayList<Float>();
+        ArrayList<Float> pixelVelocityAvgArray = new ArrayList<Float>();
         ArrayList<Float> handVelocityAvgArray = new ArrayList<Float>();
         ArrayList<Float> WPM_Array = new ArrayList<Float>();
         ArrayList<Float> modShortWPM_Array = new ArrayList<Float>();
@@ -766,20 +757,26 @@ public class DataFormatter implements Runnable {
         //ArrayList<Float> modBackspaceKSPC_Array = new ArrayList<Float>();
         ArrayList<Float> modShortMSD_Array = new ArrayList<Float>();
         ArrayList<Float> modBackspaceMSD_Array = new ArrayList<Float>();
+        ArrayList<Float> MWD_Array = new ArrayList<Float>();
+        ArrayList<Float> modShortMWD_Array = new ArrayList<Float>();
+        ArrayList<Float> modBackspaceMWD_Array = new ArrayList<Float>();
         ArrayList<Float> totalErrorRateArray = new ArrayList<Float>();
         ArrayList<Float> totalErrorRateShortArray = new ArrayList<Float>();
         ArrayList<Float> totalErrorRateBackspaceArray = new ArrayList<Float>();
         ArrayList<Float> frechetDistanceArray = new ArrayList<Float>();
         ArrayList<Float> modShortFrechetDistanceArray = new ArrayList<Float>();
         ArrayList<Float> modBackspaceFrechetDistanceArray = new ArrayList<Float>();
+        ArrayList<ArrayList<Vector>> takenPathArray = new ArrayList<ArrayList<Vector>>();
         
         // Tracked Variables
         boolean firstLetter = true;
-        boolean firstTouch = false;
         String currentWord = null;
         long wordStartTime = 0l;
         long previousTime = 0l;
         Key previousKey = null;
+        
+        boolean isTouching = false;
+        boolean firstTouch = false;
         
         int planeBreachedCount = 0;
         
@@ -789,6 +786,8 @@ public class DataFormatter implements Runnable {
         float timeDuration = 0f; // convert to seconds
         float timeDurationShort = 0f;
         
+        float touchDuration = 0f;
+        
         float reactionTimeFirstPressed = 0f; // convert to seconds
         float reactionTimeFirstTouch = 0;
         
@@ -797,6 +796,7 @@ public class DataFormatter implements Runnable {
         int responseToErrorsCount = 0;
         
         float handVelocity = 0f; // convert to m/s
+        float pixelVelocity = 0f; // pixel/s
         int numberOfActionsCount = 0;
         
         ArrayList<Vector> expectedPath = new ArrayList<Vector>();
@@ -821,6 +821,11 @@ public class DataFormatter implements Runnable {
         
         boolean detectedShortestComplete = false;
         
+        int MWD = 0;
+        boolean errorOccured = false;
+        int shortMWD = 0;
+        int backspaceMWD = 0;
+        
         for(PlaybackFileData currentLine: fileData) {
             Key pressedKey = null;
             while(currentLine.hasNext()) {
@@ -833,57 +838,66 @@ public class DataFormatter implements Runnable {
                         numberOfActionsCount = 0;
                         responseToErrorsCount = 0;
                         detectedShortestComplete = false;
-                        
                         // This path should contain the last key used or where the selection started.
                         String newWord = (String) currentData.getValue();
                         if(currentWord == null) {
-                            simulateController.selectKey(Key.VK_Q);
-                            expectedPath.add(virtualKeyboard.getVirtualKey(Key.VK_Q).getCenter());
-                            expectedPathModifiedBackspace.add(virtualKeyboard.getVirtualKey(Key.VK_Q).getCenter());
+                            simulatedController.selectKey(Key.VK_Q);
+                            //expectedPath.add(virtualKeyboard.getVirtualKey(Key.VK_Q).getCenter());
+                            //expectedPathModifiedBackspace.add(virtualKeyboard.getVirtualKey(Key.VK_Q).getCenter());
                             for(char c: newWord.toCharArray()) {
                                 // This path should contain the last key used or where the selection started.
                                 expectedPath.add(virtualKeyboard.getVirtualKey(Key.getByValue(c)).getCenter());
                             }
-                            takenPath.add(virtualKeyboard.getVirtualKey(Key.VK_Q).getCenter());
-                            takenPathModifiedShortest.add(virtualKeyboard.getVirtualKey(Key.VK_Q).getCenter());
+                            //takenPath.add(virtualKeyboard.getVirtualKey(Key.VK_Q).getCenter());
+                            //takenPathModifiedShortest.add(virtualKeyboard.getVirtualKey(Key.VK_Q).getCenter());
                         } else if(!currentWord.equals(newWord)) {
-                            expectedPath.add(virtualKeyboard.getVirtualKey(simulateController.getSelectedKey()).getCenter());
-                            expectedPathModifiedBackspace.add(virtualKeyboard.getVirtualKey(simulateController.getSelectedKey()).getCenter());
+                            //expectedPath.add(virtualKeyboard.getVirtualKey(simulatedController.getSelectedKey()).getCenter());
+                            //expectedPathModifiedBackspace.add(virtualKeyboard.getVirtualKey(simulatedController.getSelectedKey()).getCenter());
                             for(char c: newWord.toCharArray()) {
                                 // This path should contain the last key used or where the selection started.
                                 expectedPath.add(virtualKeyboard.getVirtualKey(Key.getByValue(c)).getCenter());
                             }
-                            takenPath.add(virtualKeyboard.getVirtualKey(simulateController.getSelectedKey()).getCenter());
-                            takenPathModifiedShortest.add(virtualKeyboard.getVirtualKey(simulateController.getSelectedKey()).getCenter());
-                            previousKey = null;
+                            //takenPath.add(virtualKeyboard.getVirtualKey(simulatedController.getSelectedKey()).getCenter());
+                            //takenPathModifiedShortest.add(virtualKeyboard.getVirtualKey(simulatedController.getSelectedKey()).getCenter());
+                            //previousKey = null;
                         }
                         currentWord = newWord;
+                        previousKey = null;
                         break;
                     case KEY_PRESSED:
                         // First letter of word
                         pressedKey = (Key) currentData.getValue();
-                        if(!firstTouch) {
-                            firstTouch = true;
-                            reactionTimeFirstTouch = (float) ((currentLine.getTime() - wordStartTime) / SECOND_AS_NANO);
-                            timeDuration = (float) (currentLine.getTime() / SECOND_AS_NANO);
-                        }
                         if(!detectedShortestComplete && pressedKey == Key.getByValue(currentWord.charAt(shortC))) {
                             shortC++;
                             if(shortC == currentWord.length()) {
                                 detectedShortestComplete = true;
                                 distanceTraveledShort = distanceTraveled;
-                                timeDurationShort = (float) ((currentLine.getTime() / SECOND_AS_NANO) - timeDuration);
+                                timeDurationShort = (float) ((currentLine.getTime() / SECOND_AS_NANO) - touchDuration);
                             }
                         }
+                        if(!firstTouch) {
+                            firstTouch = true;
+                            reactionTimeFirstTouch = (float) ((currentLine.getTime() - wordStartTime) / SECOND_AS_NANO);
+                            //timeDuration = (float) (currentLine.getTime() / SECOND_AS_NANO);
+                        }
+                        if(!isTouching) {
+                            isTouching = true;
+                            takenPath.add(virtualKeyboard.getVirtualKey(simulatedController.getSelectedKey()).getCenter());
+                            if(!detectedShortestComplete) takenPathModifiedShortest.add(virtualKeyboard.getVirtualKey(simulatedController.getSelectedKey()).getCenter());
+                            touchDuration = (float) (currentLine.getTime() / SECOND_AS_NANO); 
+                        }
                         if(pressedKey == Key.VK_ENTER) {
+                            isTouching = false;
                             planeBreachedCount++;
+                            // Update time duration here
+                            if(!firstLetter) timeDuration += (float) ((previousTime / SECOND_AS_NANO) - touchDuration);
                         }
                         break;
                     case KEY_EXPECTED:
                         Key expectedKey = (Key) currentData.getValue();
                         if(pressedKey == Key.VK_ENTER && expectedKey == Key.VK_ENTER) {
                             reportData = true;
-                            timeDuration = (float) ((previousTime / SECOND_AS_NANO) - timeDuration);
+                            //timeDuration = (float) ((previousTime / SECOND_AS_NANO) - timeDuration);
                         } else if(pressedKey == Key.VK_BACK_SPACE && expectedKey == Key.VK_BACK_SPACE) {
                             INF--;
                             F++;
@@ -895,7 +909,7 @@ public class DataFormatter implements Runnable {
                             }
                             backspaceC++;
                             expectedPathModifiedBackspace.add(virtualKeyboard.getVirtualKey(Key.VK_BACK_SPACE).getCenter());
-                            if(simulateController.getSelectedKey() != Key.VK_BACK_SPACE) {
+                            if(simulatedController.getSelectedKey() != Key.VK_BACK_SPACE) {
                                 takenPath.add(virtualKeyboard.getVirtualKey(Key.VK_BACK_SPACE).getCenter());
                             }
                             if(timeErrorOccured > 0) {
@@ -908,7 +922,7 @@ public class DataFormatter implements Runnable {
                             backspaceC++;
                             expectedPathModifiedBackspace.add(virtualKeyboard.getVirtualKey(pressedKey).getCenter());
                             if(pressedKey == previousKey) {
-                                takenPath.add(virtualKeyboard.getVirtualKey(simulateController.getSelectedKey()).getCenter());
+                                takenPath.add(virtualKeyboard.getVirtualKey(simulatedController.getSelectedKey()).getCenter());
                             }
                             if(firstLetter) {
                                 firstLetter = false;
@@ -923,6 +937,7 @@ public class DataFormatter implements Runnable {
                                 if(expectedKey != Key.VK_ENTER) {
                                     expectedPathModifiedBackspace.add(virtualKeyboard.getVirtualKey(expectedKey).getCenter());
                                 }
+                                errorOccured = true;
                             } else if(expectedKey != Key.VK_BACK_SPACE && pressedKey == Key.VK_BACK_SPACE) {
                                 // TODO: Backspace is hit when it shouldn't be ---
                                 // however program prevents it from modifying the transcribed text
@@ -952,21 +967,20 @@ public class DataFormatter implements Runnable {
                         break;
                     case DIRECTION_PRESSED:
                         Direction direction = (Direction) currentData.getValue();
-                        if(direction == Direction.RIGHT || direction == Direction.LEFT) {
-                            distanceTraveled += DISTANCE_RIGHT_LEFT;
-                            if(firstTouch) handVelocity += (DISTANCE_RIGHT_LEFT * PIXEL_TO_CENTIMETER) / ((currentLine.getTime() - previousTime) / SECOND_AS_NANO);
-                        } else if(direction == Direction.UP || direction == Direction.DOWN) {
-                            distanceTraveled += DISTANCE_UP_DOWN;
-                            if(firstTouch) handVelocity += (DISTANCE_UP_DOWN * PIXEL_TO_CENTIMETER) / ((currentLine.getTime() - previousTime) / SECOND_AS_NANO);
-                        }
-                        if(firstTouch) numberOfActionsCount++;
-                        simulateController.moveSelectedKey(direction);
-                        takenPath.add(virtualKeyboard.getVirtualKey(simulateController.getSelectedKey()).getCenter());
-                        if(!detectedShortestComplete) takenPathModifiedShortest.add(virtualKeyboard.getVirtualKey(simulateController.getSelectedKey()).getCenter());
-                        if(!firstTouch) {
-                            firstTouch = true;
-                            reactionTimeFirstTouch = (float) ((currentLine.getTime() - wordStartTime) / SECOND_AS_NANO);
-                            timeDuration = (float) (currentLine.getTime() / SECOND_AS_NANO);
+                        Vector previousPosition = virtualKeyboard.getVirtualKey(simulatedController.getSelectedKey()).getCenter();
+                        simulatedController.moveSelectedKey(direction);
+                        Vector newPosition = virtualKeyboard.getVirtualKey(simulatedController.getSelectedKey()).getCenter();
+                        if(isTouching) {
+                            numberOfActionsCount++;
+                            takenPath.add(newPosition);
+                            if(!detectedShortestComplete) takenPathModifiedShortest.add(newPosition);
+                            handVelocity += 
+                                    (MyUtilities.MATH_UTILITILES.findDistanceToPoint(previousPosition, newPosition) * PIXEL_TO_CENTIMETER_OTHERS)
+                                    / ((currentLine.getTime() - previousTime) / SECOND_AS_NANO);
+                            pixelVelocity += 
+                                    (MyUtilities.MATH_UTILITILES.findDistanceToPoint(previousPosition, newPosition))
+                                    / ((currentLine.getTime() - previousTime) / SECOND_AS_NANO);
+                            distanceTraveled += (MyUtilities.MATH_UTILITILES.findDistanceToPoint(previousPosition, newPosition));
                         }
                         previousTime = currentLine.getTime();
                         break;
@@ -977,13 +991,25 @@ public class DataFormatter implements Runnable {
                 }
                 
                 if(reportData) {
+                    {
+                        ArrayList<Vector> copy = new ArrayList<Vector>();
+                        copy.addAll(takenPath);
+                        takenPathArray.add(copy);
+                    }
+                    
+                    // There is a weird situation that requires this to fire, but this is the correct fix.
+                    if(timeDurationShort == 0) {
+                        timeDurationShort = timeDuration;
+                    }
+                    
                     wordList.add(currentWord);
                     planeBreachedCountArray.add(planeBreachedCount);
-                    distanceTraveledArray.add(distanceTraveled *= PIXEL_TO_CENTIMETER);
-                    distanceTraveledShortArray.add(distanceTraveledShort *= PIXEL_TO_CENTIMETER);
+                    distanceTraveledArray.add(distanceTraveled);
+                    distanceTraveledShortArray.add(distanceTraveledShort);
                     timeDurationArray.add(timeDuration);
                     timeDurationShortArray.add(timeDurationShort);
                     handVelocityAvgArray.add(handVelocity / numberOfActionsCount);
+                    pixelVelocityAvgArray.add(pixelVelocity / numberOfActionsCount);
                     reactionTimeFirstPressedArray.add(reactionTimeFirstPressed);
                     reactionTimeFirstTouchArray.add(reactionTimeFirstTouch);
                     if(responseToErrorsCount == 0) {
@@ -991,15 +1017,29 @@ public class DataFormatter implements Runnable {
                     } else {
                         reactionTimeToErrorAvgArray.add(reactionTimeToError / responseToErrorsCount);   
                     }
-                    WPM_Array.add(((currentWord.length() - 1) / ((timeDuration + reactionTimeFirstTouch) - reactionTimeFirstPressed)) * 60f * (1f / 5f));
-                    modShortWPM_Array.add(((currentWord.length() - 1) / ((timeDurationShort + reactionTimeFirstTouch) - reactionTimeFirstPressed)) * 60f * (1f / 5f));
-                    modVultureWPM_Array.add((currentWord.length() / (timeDuration + (reactionTimeFirstPressed - reactionTimeFirstTouch))) * 60f * (1f / 5f));
-                    modShortVultureWPM_Array.add((currentWord.length() / (timeDurationShort + (reactionTimeFirstPressed - reactionTimeFirstTouch))) * 60f * (1f / 5f));
+                    WPM_Array.add(((currentWord.length() - 1) / timeDuration) * 60f * (1f / 5f));
+                    modShortWPM_Array.add(((currentWord.length() - 1) / timeDurationShort) * 60f * (1f / 5f));
+                    modVultureWPM_Array.add((currentWord.length() / (timeDuration + (reactionTimeFirstPressed))) * 60f * (1f / 5f));
+                    modShortVultureWPM_Array.add((currentWord.length() / (timeDurationShort + (reactionTimeFirstPressed))) * 60f * (1f / 5f));
+                    //System.out.println(reactionTimeFirstPressed + " - " + reactionTimeFirstTouch + " = " + (reactionTimeFirstPressed - reactionTimeFirstTouch));
+                    //WPM_Array.add(((currentWord.length() - 1) / ((timeDuration + reactionTimeFirstTouch) - reactionTimeFirstPressed)) * 60f * (1f / 5f));
+                    //modShortWPM_Array.add(((currentWord.length() - 1) / ((timeDurationShort + reactionTimeFirstTouch) - reactionTimeFirstPressed)) * 60f * (1f / 5f));
+                    //modVultureWPM_Array.add((currentWord.length() / (timeDuration + reactionTimeFirstTouch)) * 60f * (1f / 5f));
+                    //modShortVultureWPM_Array.add((currentWord.length() / (timeDurationShort + reactionTimeFirstTouch)) * 60f * (1f / 5f));
                     KSPC_Array.add((C + INF + IF + F) / (C + INF));
                     modShortKSPC_Array.add((shortC + shortINF + shortIF + shortF) / (shortC + shortINF));
                     //modBackspaceKSPC_Array.add((backspaceC + backspaceINF + backspaceIF + backspaceF) / (backspaceC + backspaceINF));
                     modShortMSD_Array.add((shortINF / (shortC + shortINF)) * 100);
                     modBackspaceMSD_Array.add((backspaceINF / (backspaceC + backspaceINF)) * 100);
+                    if(errorOccured) {
+                        MWD++;
+                    }
+                    if(shortINF > 0) {
+                        shortMWD++;
+                    }
+                    if(backspaceINF > 0) {
+                        backspaceMWD++;
+                    }
                     totalErrorRateArray.add(((INF + IF) / (C + INF + IF)) * 100);
                     totalErrorRateShortArray.add(((shortINF + shortIF) / (shortC + shortINF + shortIF)) * 100);
                     totalErrorRateBackspaceArray.add(((backspaceINF + backspaceIF) / (backspaceC + backspaceINF + backspaceIF)) * 100);
@@ -1024,29 +1064,36 @@ public class DataFormatter implements Runnable {
                         System.out.print(virtualKeyboard.getNearestKeyNoEnter(v, 9999).getKey().getValue() + " ");
                     }
                     System.out.println();
-                    System.out.println("------------------------------------------------------------------------------");*//*
+                    System.out.println("------------------------------------------------------------------------------");*/
+                    // TODO: DECIDE IF THIS CONVERSION NEEDS TO BE DONE
                     frechetDistanceArray.add(MyUtilities.MATH_UTILITILES.calculateFrechetDistance(
                             takenPath.toArray(new Vector[takenPath.size()]),
-                            expectedPath.toArray(new Vector[expectedPath.size()])));
+                            expectedPath.toArray(new Vector[expectedPath.size()]))
+                            /* * (keyboard.getType() == KeyboardType.TABLET ? PIXEL_TO_CENTIMETER_TOUCH : PIXEL_TO_CENTIMETER_OTHERS)*/);
                     modShortFrechetDistanceArray.add(MyUtilities.MATH_UTILITILES.calculateFrechetDistance(
                             takenPathModifiedShortest.toArray(new Vector[takenPathModifiedShortest.size()]),
-                            expectedPath.toArray(new Vector[expectedPath.size()])));
+                            expectedPath.toArray(new Vector[expectedPath.size()]))
+                            /* * (keyboard.getType() == KeyboardType.TABLET ? PIXEL_TO_CENTIMETER_TOUCH : PIXEL_TO_CENTIMETER_OTHERS)*/);
                     modBackspaceFrechetDistanceArray.add(MyUtilities.MATH_UTILITILES.calculateFrechetDistance(
                             takenPath.toArray(new Vector[takenPath.size()]),
-                            expectedPathModifiedBackspace.toArray(new Vector[expectedPathModifiedBackspace.size()])));
+                            expectedPathModifiedBackspace.toArray(new Vector[expectedPathModifiedBackspace.size()]))
+                            /* * (keyboard.getType() == KeyboardType.TABLET ? PIXEL_TO_CENTIMETER_TOUCH : PIXEL_TO_CENTIMETER_OTHERS)*/);
                     reportData = false;
                     firstLetter = true;
-                    firstTouch = false;
                     planeBreachedCount = 0;
+                    isTouching = false;
+                    firstTouch = false;
                     distanceTraveled = 0f;
                     distanceTraveledShort = 0f;
                     timeDuration = 0f; // convert to seconds
                     timeDurationShort = 0f;
+                    previousKey = null;
                     reactionTimeFirstPressed = 0f; // convert to seconds
                     reactionTimeFirstTouch = 0f;
                     reactionTimeToError = 0f; // convert to seconds
                     responseToErrorsCount = 0;
                     handVelocity = 0f; // convert to m/s
+                    pixelVelocity = 0f; // pixel/s
                     numberOfActionsCount = 0;
                     expectedPath.clear();
                     takenPath.clear();
@@ -1064,9 +1111,16 @@ public class DataFormatter implements Runnable {
                     backspaceINF = 0f;
                     backspaceIF = 0f;
                     //backspaceF = 0f;
+                    detectedShortestComplete = false;
+                    errorOccured = false;
                 }
             }
         }
+        
+        MWD_Array.add((MWD / (float) wordList.size()) * 100);
+        modShortMWD_Array.add((shortMWD / (float) wordList.size()) * 100);
+        modBackspaceMWD_Array.add((backspaceMWD / (float) wordList.size()) * 100);
+        
         // stuff arrays into subject Data
         subjectData.add(StatisticDataType.WORD_ORDER.name() + ": " + wordList.toString());
         subjectData.add(StatisticDataType.NUMBER_OF_TIMES_PLANE_BREACHED.name() + ": " + planeBreachedCountArray.toString());
@@ -1074,27 +1128,32 @@ public class DataFormatter implements Runnable {
         subjectData.add(StatisticDataType.DISTANCE_TRAVELED_TOUCH_ONLY_SHORTEST.name() + ": " + distanceTraveledShortArray.toString());
         subjectData.add(StatisticDataType.TIME_DURATION_TOUCH_ONLY.name() + ": " + timeDurationArray.toString());
         subjectData.add(StatisticDataType.TIME_DURATION_TOUCH_ONLY_SHORTEST.name() + ": " + timeDurationShortArray.toString());
-        subjectData.add(StatisticDataType.AVERAGE_PIXEL_VELOCITY.name() + ": " + handVelocityAvgArray.toString());
+        subjectData.add(StatisticDataType.AVERAGE_HAND_VELOCITY.name() + ": " + handVelocityAvgArray.toString());
+        subjectData.add(StatisticDataType.AVERAGE_PIXEL_VELOCITY.name() + ": " + pixelVelocityAvgArray.toString());
         subjectData.add(StatisticDataType.REACTION_TIME_FIRST_PRESSED.name() + ": " + reactionTimeFirstPressedArray.toString());
         subjectData.add(StatisticDataType.REACTION_TIME_FIRST_TOUCH.name() + ": " + reactionTimeFirstTouchArray.toString());
         subjectData.add(StatisticDataType.AVERAGE_REACTION_TIME_TO_ERRORS.name() + ": " + reactionTimeToErrorAvgArray.toString());
         subjectData.add(StatisticDataType.TEXT_ENTRY_RATE_WPM.name() + ": " + WPM_Array.toString());
         subjectData.add(StatisticDataType.TEXT_ENTRY_RATE_MODIFIED_WPM_SHORTEST.name() + ": " + modShortWPM_Array.toString());
-        subjectData.add(StatisticDataType.TEXT_ENTRY_RATE_MODIFIED_WPM_VULTURE.name() + ": " + modVultureWPM_Array.toString());
-        subjectData.add(StatisticDataType.TEXT_ENTRY_RATE_MODIFIED_WPM_SHORTEST_VULTURE.name() + ": " + modShortVultureWPM_Array.toString());
+        subjectData.add(StatisticDataType.TEXT_ENTRY_RATE_MODIFIED_WPM_VULTURE.name() + ": " + WPM_Array.toString()); // TODO: since this is single input selection we use normal WPM
+        subjectData.add(StatisticDataType.TEXT_ENTRY_RATE_MODIFIED_WPM_SHORTEST_VULTURE.name() + ": " + modShortWPM_Array.toString()); // TODO: since this is single input selection we use normal WPM
         subjectData.add(StatisticDataType.ERROR_RATE_KSPC.name() + ": " + KSPC_Array.toString());
         subjectData.add(StatisticDataType.ERROR_RATE_MODIFIED_KSPC_SHORTEST.name() + ": " + modShortKSPC_Array.toString());
         //subjectData.add(StatisticDataType.ERROR_RATE_MODIFIED_KSPC_BACKSPACE.name() + ": " + modBackspaceKSPC_Array.toString());
         subjectData.add(StatisticDataType.ERROR_RATE_MODIFIED_MSD_SHORTEST.name() + ": " + modShortMSD_Array.toString());
         subjectData.add(StatisticDataType.ERROR_RATE_MODIFIED_MSD_BACKSPACE.name() + ": " + modBackspaceMSD_Array.toString());
+        subjectData.add(StatisticDataType.ERROR_RATE_MWD.name() + ": " + MWD_Array.toString());
+        subjectData.add(StatisticDataType.ERROR_RATE_MODIFIED_MWD_SHORTEST.name() + ": " + modShortMWD_Array.toString());
+        subjectData.add(StatisticDataType.ERROR_RATE_MODIFIED_MWD_BACKSPACE.name() + ": " + modBackspaceMWD_Array.toString());
         subjectData.add(StatisticDataType.TOTAL_ERROR_RATE.name() + ": " + totalErrorRateArray.toString());
         subjectData.add(StatisticDataType.TOTAL_ERROR_RATE_MODIFIED_SHORTEST.name() + ": " + totalErrorRateShortArray.toString());
         subjectData.add(StatisticDataType.TOTAL_ERROR_RATE_MODIFIED_BACKSPACE.name() + ": " + totalErrorRateBackspaceArray.toString());
         subjectData.add(StatisticDataType.FRECHET_DISTANCE_TOUCH_ONLY.name() + ": " + frechetDistanceArray.toString());
         subjectData.add(StatisticDataType.FRECHET_DISTANCE_TOUCH_ONLY_MODIFIED_SHORTEST.name() + ": " + modShortFrechetDistanceArray.toString());
         subjectData.add(StatisticDataType.FRECHET_DISTANCE_TOUCH_ONLY_MODIFIED_BACKSPACE.name() + ": " + modBackspaceFrechetDistanceArray.toString());
+        subjectData.add(StatisticDataType.TAKEN_PATH_TOUCH_ONLY.name() + ": " + takenPathArray.toString());
         return subjectData;
-    }*/
+    }
     
     private ArrayList<String> calculateSubjectData(ArrayList<PlaybackFileData> fileData, IKeyboard keyboard, File subjectDirectory) {
         ArrayList<String> subjectData = new ArrayList<String>();
@@ -1103,13 +1162,13 @@ public class DataFormatter implements Runnable {
         LeapPlane leapPlane = (LeapPlane) keyboard.getRenderables().getRenderable(Renderable.LEAP_PLANE);
         
         // We must load the settings that were used during the experiment for Leap Keyboards
-        /*if(keyboard.getType().isLeap()) {
+        if(keyboard.getType().isLeap()) {
             File file = new File(subjectDirectory.getPath(), keyboard.getFileName() + FileExt.INI.getExt());
             keyboard.loadSettings(file);
             leapPlane.calculatePlaneData();
             LeapListener.registerObserver((LeapKeyboard) keyboard);
             LeapListener.startListening();
-        }*/
+        }
         
         // Arrays
         ArrayList<String> wordList = new ArrayList<String>();
@@ -1121,6 +1180,7 @@ public class DataFormatter implements Runnable {
         ArrayList<Float> reactionTimeFirstPressedArray = new ArrayList<Float>();
         ArrayList<Float> reactionTimeFirstTouchArray = new ArrayList<Float>();
         ArrayList<Float> reactionTimeToErrorAvgArray = new ArrayList<Float>();
+        ArrayList<Float> pixelVelocityAvgArray = new ArrayList<Float>();
         ArrayList<Float> handVelocityAvgArray = new ArrayList<Float>();
         ArrayList<Float> WPM_Array = new ArrayList<Float>();
         ArrayList<Float> modShortWPM_Array = new ArrayList<Float>();
@@ -1171,6 +1231,7 @@ public class DataFormatter implements Runnable {
         int responseToErrorsCount = 0;
         
         float handVelocity = 0f; // convert to m/s
+        float pixelVelocity = 0f; // pixel/s
         int numberOfActionsCount = 0;
         
         ArrayList<Vector> expectedPath = new ArrayList<Vector>();
@@ -1329,7 +1390,7 @@ public class DataFormatter implements Runnable {
                             takenPath.add(newPosition);
                             if(!lastEnterAfterShortestComplete) takenPathModifiedShortest.add(newPosition);
                             numberOfActionsCount++;
-                            /*if(keyboard.getType().isLeap()) {
+                            if(keyboard.getType().isLeap()) {
                                 // We must convert the coordinates from the leap keyboards into the original device coordinate space
                                 // so that we can get the actual hand movement speed and travel distance.
                                 Vector previousDevicePosition = leapPlane.denormalizePoint(new Vector(previousPosition));
@@ -1338,13 +1399,17 @@ public class DataFormatter implements Runnable {
                                 handVelocity += 
                                         (MyUtilities.MATH_UTILITILES.findDistanceToPoint(previousDevicePosition, newDevicePosition) * MILLIMETER_TO_CENTIMETER)
                                         / ((currentLine.getTime() - previousTime) / SECOND_AS_NANO);
-                                distanceTraveled += (MyUtilities.MATH_UTILITILES.findDistanceToPoint(previousDevicePosition, newDevicePosition) * MILLIMETER_TO_CENTIMETER);
-                            } else {*/
+                                //distanceTraveled += (MyUtilities.MATH_UTILITILES.findDistanceToPoint(previousDevicePosition, newDevicePosition) * MILLIMETER_TO_CENTIMETER);
+                            } else {
                                 handVelocity += 
-                                        (MyUtilities.MATH_UTILITILES.findDistanceToPoint(previousPosition, newPosition) /* * PIXEL_TO_CENTIMETER_TOUCH*/)
+                                        (MyUtilities.MATH_UTILITILES.findDistanceToPoint(previousPosition, newPosition) * PIXEL_TO_CENTIMETER_TOUCH)
                                         / ((currentLine.getTime() - previousTime) / SECOND_AS_NANO);
-                                distanceTraveled += (MyUtilities.MATH_UTILITILES.findDistanceToPoint(previousPosition, newPosition) /* * PIXEL_TO_CENTIMETER_TOUCH*/);
-                            //}
+                                //distanceTraveled += (MyUtilities.MATH_UTILITILES.findDistanceToPoint(previousPosition, newPosition) * PIXEL_TO_CENTIMETER_TOUCH);
+                            }
+                            distanceTraveled += (MyUtilities.MATH_UTILITILES.findDistanceToPoint(previousPosition, newPosition));
+                            pixelVelocity += 
+                                    (MyUtilities.MATH_UTILITILES.findDistanceToPoint(previousPosition, newPosition))
+                                    / ((currentLine.getTime() - previousTime) / SECOND_AS_NANO);
                         }
                         if(firstTouch && previousPosition != null) {
                             // MOVED TO IS_TOUCHING SECTION
@@ -1378,6 +1443,7 @@ public class DataFormatter implements Runnable {
                     timeDurationArray.add(timeDuration);
                     timeDurationShortArray.add(timeDurationShort);
                     handVelocityAvgArray.add(handVelocity / numberOfActionsCount);
+                    pixelVelocityAvgArray.add(pixelVelocity / numberOfActionsCount);
                     reactionTimeFirstPressedArray.add(reactionTimeFirstPressed);
                     reactionTimeFirstTouchArray.add(reactionTimeFirstTouch);
                     if(responseToErrorsCount == 0) {
@@ -1462,6 +1528,7 @@ public class DataFormatter implements Runnable {
                     reactionTimeToError = 0f; // convert to seconds
                     responseToErrorsCount = 0;
                     handVelocity = 0f; // convert to m/s
+                    pixelVelocity = 0f; // pixel/s
                     numberOfActionsCount = 0;
                     expectedPath.clear();
                     takenPath.clear();
@@ -1491,11 +1558,11 @@ public class DataFormatter implements Runnable {
         modBackspaceMWD_Array.add((backspaceMWD / (float) wordList.size()) * 100);
         
         // Reload the default settings for the Leap Keyboards
-        /*if(keyboard.getType().isLeap()) {
+        if(keyboard.getType().isLeap()) {
             keyboard.loadDefaultSettings();
             LeapListener.removeObserver((LeapKeyboard) keyboard);
             LeapListener.stopListening();
-        }*/
+        }
         
         // stuff arrays into subject Data
         subjectData.add(StatisticDataType.WORD_ORDER.name() + ": " + wordList.toString());
@@ -1504,7 +1571,8 @@ public class DataFormatter implements Runnable {
         subjectData.add(StatisticDataType.DISTANCE_TRAVELED_TOUCH_ONLY_SHORTEST.name() + ": " + distanceTraveledShortArray.toString());
         subjectData.add(StatisticDataType.TIME_DURATION_TOUCH_ONLY.name() + ": " + timeDurationArray.toString());
         subjectData.add(StatisticDataType.TIME_DURATION_TOUCH_ONLY_SHORTEST.name() + ": " + timeDurationShortArray.toString());
-        subjectData.add(StatisticDataType.AVERAGE_PIXEL_VELOCITY.name() + ": " + handVelocityAvgArray.toString());
+        subjectData.add(StatisticDataType.AVERAGE_HAND_VELOCITY.name() + ": " + handVelocityAvgArray.toString());
+        subjectData.add(StatisticDataType.AVERAGE_PIXEL_VELOCITY.name() + ": " + pixelVelocityAvgArray.toString());
         subjectData.add(StatisticDataType.REACTION_TIME_FIRST_PRESSED.name() + ": " + reactionTimeFirstPressedArray.toString());
         subjectData.add(StatisticDataType.REACTION_TIME_FIRST_TOUCH.name() + ": " + reactionTimeFirstTouchArray.toString());
         subjectData.add(StatisticDataType.AVERAGE_REACTION_TIME_TO_ERRORS.name() + ": " + reactionTimeToErrorAvgArray.toString());

@@ -22,7 +22,7 @@ public class LeapListener extends Listener /*implements SaveSettingsObserver*/ {
     }
     
     public void onInit(Controller controller) {
-        System.out.println("Leap - Initialized");
+        System.out.println("Leap - Initialized " + controller.frame().interactionBox());
         notifyListenersInteractionBoxUpdate(controller.frame().interactionBox());
     }
 

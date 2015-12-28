@@ -1,0 +1,39 @@
+SUBJECT_ID: tii26doa
+leapAirStatic_DISCOMFORT_LEVEL: disagree
+leapAirStatic_FATIGUE_LEVEL: agree
+leapAirStatic_DIFFICULTY_LEVEL: disagree
+leapAirDynamic_DISCOMFORT_LEVEL: strongly disagree
+leapAirDynamic_FATIGUE_LEVEL: neutral
+leapAirDynamic_DIFFICULTY_LEVEL: disagree
+tablet_DISCOMFORT_LEVEL: strongly disagree
+tablet_FATIGUE_LEVEL: strongly disagree
+tablet_DIFFICULTY_LEVEL: strongly disagree
+leapSurface_DISCOMFORT_LEVEL: strongly disagree
+leapSurface_FATIGUE_LEVEL: strongly disagree
+leapSurface_DIFFICULTY_LEVEL: strongly disagree
+leapAirPinch_DISCOMFORT_LEVEL: strongly disagree
+leapAirPinch_FATIGUE_LEVEL: neutral
+leapAirPinch_DIFFICULTY_LEVEL: neutral
+leapAirBimodal_DISCOMFORT_LEVEL: strongly disagree
+leapAirBimodal_FATIGUE_LEVEL: strongly disagree
+leapAirBimodal_DIFFICULTY_LEVEL: strongly disagree
+AGE: 18
+GENDER: Male
+MAJOR: Computer Science
+HAS_PERSONAL_COMPUTER: Yes
+HOURS_PER_WEEK_ON_COMPUTER: 21 to 30 hours
+HAS_PREVIOUS_GESTURE_DEVICE_EXPERIENCE: Yes
+PREVIOUS_GESTURE_DEVICE_DESCRIPTION: Kinect, wii sensor bar
+HAS_PREVIOUS_TOUCH_DEVICE_EXPERIENCE: Yes
+PREVIOUS_TOUCH_DEVICE_DESCRIPTION: iPad, Android, iPhone, Kindle Fire
+HAS_PREVIOUS_SWIPE_DEVICE_EXPERIENCE: Yes
+PREVIOUS_SWIPE_DEVICE_DESCRIPTION: Android
+HAS_PHYSICAL_IMPAIRMENT: No
+HANDEDNESS: Right hand
+PREFERED_HANDEDNESS_FOR_EXPERIMENT: Right hand
+tablet_PREFERENCE_RANKING: 3
+leapSurface_PREFERENCE_RANKING: 1
+leapAirStatic_PREFERENCE_RANKING: 5
+leapAirPinch_PREFERENCE_RANKING: 6
+leapAirDynamic_PREFERENCE_RANKING: 4
+leapAirBimodal_PREFERENCE_RANKING: 2
