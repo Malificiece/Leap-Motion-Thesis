@@ -1,4 +1,31 @@
 function keyboard_paths_multi(num,r,c,boolean)
+%
+% Copyright (c) 2015, Garrett Benoit. All rights reserved.
+%
+% Redistribution and use in source and binary forms, with or without
+% modification, are permitted provided that the following conditions
+% are met:
+%
+%   - Redistributions of source code must retain the above copyright
+%     notice, this list of conditions and the following disclaimer.
+%
+%   - Redistributions in binary form must reproduce the above copyright
+%     notice, this list of conditions and the following disclaimer in the
+%     documentation and/or other materials provided with the distribution.
+%
+% THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS
+% IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
+% THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+% PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+% CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+% EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+% PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+% PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+% LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+% NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+% SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+%
+
 DICTIONARIES = {{'sue', 'hot', 'got', 'fit', 'due', 'fir'}, {'tin', 'tub', 'rub', 'rim', 'gin', 'run'}, {'coy', 'dot', 'sir', 'soy', 'zit', 'sit'}, {'find', 'rubs', 'rind', 'fins', 'fibs', 'fine'}, {'mans', 'owns', 'lane', 'mane', 'pens', 'pans'}, {'core', 'fire', 'sire', 'sure', 'fore', 'dire'}, {'bale', 'vale', 'gape', 'gale', 'hale', 'tale'}, {'tales', 'bales', 'hales', 'games', 'gales', 'dales'}, {'shier', 'shies', 'shirt', 'shift', 'shire', 'shied'}, {'falls', 'galls', 'balls', 'gamma', 'calls', 'halls'}, {'sires', 'fores', 'sores', 'cores', 'fires', 'sites'}, {'dubbed', 'rubbed', 'subbed', 'finned', 'tinned', 'sinned'}, {'sicker', 'docket', 'socket', 'rocket', 'rocker', 'wicker'}, {'dipped', 'ripped', 'yipped', 'tipped', 'topped', 'hopped'}, {'hailed', 'mailed', 'bailed', 'jailed', 'nailed', 'failed'}};
 %FRECHET = {{'eeg', 'egg', 'erg', 'ref', 'reg', 'rev', 'def', 'dry', 'eft', 'est'},{'eel', 'ell', 'elk', 'del', 'esp', 'reo', 'rep', 'sep', 'sol', 'sop'},{'min', 'kin', 'mob', 'mom', 'mon', 'mum', 'nib', 'non', 'nub', 'nun'},{'moos', 'moss', 'kids', 'kips', 'kiss', 'miss', 'mods', 'mood', 'mops', 'nips'},{'boos', 'boss', 'bias', 'bids', 'bios', 'boas', 'bois', 'bops', 'hips', 'hiss'},{'toll', 'tool', 'rill', 'roil', 'roll', 'rook', 'till', 'toil', 'took', 'yolk'},{'feel', 'fell', 'cell', 'dell', 'geek', 'crop', 'deep', 'desk', 'doll', 'dolo'},{'crees', 'cress', 'cerea', 'cered', 'crass', 'creed', 'crews', 'feeds', 'feted', 'fetes'},{'trees', 'tress', 'reads', 'reeds', 'rewed', 'teras', 'teres', 'terra', 'tread', 'treed'},{'tolls', 'tools', 'rills', 'roils', 'rolls', 'rooks', 'tills', 'toils', 'yolks', 'filed'},{'heels', 'hells', 'bells', 'gelds', 'jells', 'jerks', 'beeps', 'belle', 'below', 'broad'}, {'fusees', 'fusses', 'ciders', 'cussed', 'cusses', 'fizzed', 'fizzes', 'fussed', 'fuzzed', 'fuzzes'},{'rooter', 'rotter', 'reiter', 'report', 'retire', 'retort', 'rioter', 'terror', 'titter', 'tooter'},{'looses', 'losses', 'kidded', 'kissed', 'kisses', 'lidded', 'lizard', 'loaded', 'loosed', 'losers'},{'toller', 'tooler', 'ripple', 'roller', 'tiller', 'tipple', 'toiler', 'toilet', 'topple', 'triple'}};
 FRECHET = {{'egg', 'erg', 'reg', 'def', 'dry', 'est'}, {'crass', 'creed', 'crews', 'feeds', 'feted', 'fetes'}};
