@@ -1,0 +1,98 @@
+tablet = tablet_TEXT_ENTRY_RATE_WPM;
+surface = leapSurface_TEXT_ENTRY_RATE_WPM;
+static = leapAirStatic_TEXT_ENTRY_RATE_WPM;
+pinch = leapAirPinch_TEXT_ENTRY_RATE_WPM;
+dynamic = leapAirDynamic_TEXT_ENTRY_RATE_WPM;
+bimodal = leapAirBimodal_TEXT_ENTRY_RATE_WPM;
+tblA = table(tablet, surface, static, pinch, dynamic, bimodal, 'RowNames', SUBJECT_ORDER);
+tblB = sortrows(tblA,'tablet')
+tblB = sortrows(tblA,'surface')
+tblB = sortrows(tblA,'static')
+tblB = sortrows(tblA,'pinch')
+tblB = sortrows(tblA,'dynamic')
+tblB = sortrows(tblA,'bimodal')
+
+KEYBOARD_ORDER = {'controller', 'touch-screen', 'surface', 'static-air', 'pinch-air', 'predictive-air', 'bimodal-air'};
+
+VARIABLE_ORDER = {TEXT_ENTRY_RATE_MODIFIED_WPM_VULTURE, TEXT_ENTRY_RATE_MODIFIED_WPM_SHORTEST_VULTURE, ERROR_RATE_MWD, ERROR_RATE_MODIFIED_MWD_SHORTEST, ERROR_RATE_KSPC, ERROR_RATE_MODIFIED_KSPC_SHORTEST, ERROR_RATE_MODIFIED_MSD_SHORTEST, ERROR_RATE_MODIFIED_MSD_BACKSPACE, TOTAL_ERROR_RATE, TOTAL_ERROR_RATE_MODIFIED_SHORTEST, FRECHET_DISTANCE_TOUCH_ONLY, FRECHET_DISTANCE_TOUCH_ONLY_MODIFIED_SHORTEST, FRECHET_DISTANCE_TOUCH_ONLY_MODIFIED_BACKSPACE, DISTANCE_TRAVELED_TOUCH_ONLY, DISTANCE_TRAVELED_TOUCH_ONLY_SHORTEST, AVERAGE_PIXEL_VELOCITY, AVERAGE_HAND_VELOCITY, TIME_DURATION_TOUCH_ONLY, TIME_DURATION_TOUCH_ONLY_SHORTEST, AVERAGE_REACTION_TIME_TO_ERRORS, REACTION_TIME_FIRST_TOUCH, REACTION_TIME_FIRST_PRESSED, NUMBER_OF_TIMES_PLANE_BREACHED, PRACTICE_WORDS_PER_INPUT, DISCOMFORT_LEVEL, FATIGUE_LEVEL, DIFFICULTY_LEVEL, PREFERENCE_RANKING};
+
+VARIABLE_NAMES = {'Text-Entry Rate', {'Text-Entry Rate', 'Modified Shortest-Transcribed'}, 'Minimum Word Distance', {'Minimum Word Distance', 'Modified Shortest-Transcribed'}, 'Keystrokes Per Character', {'Keystrokes Per Character', 'Modified Shortest-Transcribed'}, {'Minimum String Distance', 'Modified Shortest-Transcribed'}, {'Minimum String Distance', 'Modified Backspace-Transcribed'}, 'Total Error Rate', {'Total Error Rate', 'Modified Shortest-Transcribed'}, 'Fréchet Distance', {'Fréchet Distance', 'Modified Shortest-Transcribed'}, {'Fréchet Distance', 'Modified Backspace-Transcribed'}, 'Word-Gesture Distance', {'Word-Gesture Distance', 'Modified Shortest-Transcribed'}, 'Word-Gesture Velocity', 'Hand Velocity', 'Word-Gesture Duration', {'Word-Gesture Duration', 'Modified Shortest-Transcribed'}, 'Reaction Time to Errors', 'Reaction Time to Simulate Touch', 'Reaction Time for First Correct Letter', 'Number of Touches Simulated', 'Number of Practice Words', 'Level of Discomfort', 'Level of Fatigue', 'Level of Difficulty', 'Preference Ranking'};
+
+X_LABEL = 'Keyboard Input Device';
+
+Y_LABELS = {'Words Per Minute (WPM)', 'Words Per Minute (WPM)', 'Error Rate (%)', 'Error Rate (%)', 'Key Strokes Per Character', 'Key Strokes Per Character', 'Error Rate (%)', 'Error Rate (%)', 'Error Rate (%)', 'Error Rate (%)', 'Distance (pixels)','Distance (pixels)', 'Distance (pixels)', 'Distance (pixels)', 'Distance (pixels)', 'Velocity (pixels/s)', 'Velocity (cm/s)', 'Time (s)', 'Time (s)', 'Time (s)', 'Time (s)', 'Time (s)', 'Number of Touches Detected', 'Number of Practice Words', 'Likert Scale', 'Likert Scale', 'Likert Scale', 'Rank'}
+
+'Word-Gesture Duration'
+{'Word-Gesture Duration', 'Modified Shortest-Transcribed'}
+{'Minimum String Distance', 'Modified Backspace-Transcribed'}
+
+'Fréchet Distance'
+{'Fréchet Distance', 'Modified Shortest-Transcribed'}
+{'Fréchet Distance', 'Modified Backspace-Transcribed'}
+
+
+confidence interval = std(VARIABLE_COLUMN, sqrt(18)) * 1.96
+
+axis([1,18,0,inf])
+
+VARIABLE = TEXT_ENTRY_RATE_MODIFIED_WPM_VULTURE
+p = [1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18];
+parts = [p;p;p;p;p;p]';
+plot = plot(VARIABLE)
+set(gca, 'XTick', p)
+l = legend(KEYBOARD_ORDER)
+l.Location = 'eastoutside'
+hold on
+m = mean(TEXT_ENTRY_RATE_MODIFIED_WPM_VULTURE);
+m = [m;m;m;m;m;m;m;m;m;m;m;m;m;m;m;m;m;m];
+plot2 = plot(m,'linestyle','--')
+plot2.Color(:,1) = plot.Color(:)
+hold off
+
+scatter(parts, VARIABLE)
+
+Other anova stuff
+anova1(VARIABLE, KEYBOARD_ORDER);
+title('Text-Entry Rate')
+ylabel('Words Per Minute (WPM)')
+xlabel('Keyboard Input Device')
+title({'Text-Entry Rate', 'Modified Shortest-Transcribed'})
+
+
+l = line
+l.LineStyle = 'none'
+l = line
+l.LineStyle = 'none'
+l = line
+l.LineStyle = 'none'
+l = line
+l.LineStyle = 'none'
+l = line
+l.LineStyle = 'none'
+l = legend({' 2 = Strongly Agree', ' 1 = Agree', ' 0 = Neutral', '-1 = Disagree', '-2 = Strongly Disagree'});
+l.Box = 'off'
+l.FontSize = 7
+
+
+title('Fréchet Distance')
+ylabel('Distance (cm^{2})')
+xlabel('Keyboard Input Device')
+title({'Fréchet Distance', 'Modified Shortest-Transcribed'})
+
+
+For keyboard planes:
+A = [-87.4723, 136.018, -12.6537] * 0.1;
+B = [-89.575, 217.366, -52.1349] * 0.1;
+C = [70.881, 194.759, -62.62] * 0.1;
+D = [72.9324, 157.572, -59.8648] * 0.1;
+width = sqrt((A(1)-D(1))^2 + (A(2)-D(2))^2 + (A(3)-D(3))^2)
+height = sqrt((A(1)-B(1))^2 + (A(2)-B(2))^2 + (A(3)-B(3))^2)
+keysize = 0.0672 * width
+gapsize = 0.0105 * width
+patch([A(1), B(1), C(1), D(1)],[A(2), B(2), C(2), D(2)], [A(3), B(3), C(3), D(3)])
+ylabel('Y (cm)')
+xlabel('X (cm)')
+zlabel('Z (cm)')
+title('Touch Screen')
+title({'Touch Screen', 'Calibrated Plane'})
+axis([-5,55,-25,35])
